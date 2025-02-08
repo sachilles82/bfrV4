@@ -72,29 +72,26 @@
                                         size="bl-none"
                                         variant="listbox"
                                         searchable
+                                        empty=" "
                                         placeholder="Choose States"
                                     >
-                                        @if ($states->count() == 0)
-                                            <flux:option value="">-- choose country first --</flux:option>
-                                        @endif
-
+                                        {{-- Optionen --}}
                                         @foreach ($states as $state)
                                             <flux:option value="{{ $state->id }}">
                                                 <div class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
                                                     <img
                                                         src="/flags/state/{{ strtolower($state->code) }}.svg"
-                                                        class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-gray-800 text-gray-700 dark:text-gray-400"
+                                                        class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-zinc-800 text-gray-700 dark:text-gray-400"
                                                     >
                                                     <div class="px-2 truncate">
                                                         {{ $state->name }}
                                                     </div>
                                                 </div>
-                                                {{-- Nur hier wird der Trigger hinzugefügt, wenn benötigt --}}
-
-
                                             </flux:option>
-
                                         @endforeach
+
+                                        {{-- Benannter Slot "my" für den Trigger --}}
+                                        <x-slot name="add">
                                             <flux:modal.trigger name="create-state">
                                                 <flux:button
                                                     icon="plus"
@@ -104,10 +101,8 @@
                                                     {{ __('Open State Menu') }}
                                                 </flux:button>
                                             </flux:modal.trigger>
-
+                                        </x-slot>
                                     </flux:select>
-
-
                                 </div>
                             </x-pupi.input.group>
                         </div>
@@ -154,6 +149,17 @@
                                     @foreach ($cities as $city)
                                         <flux:option value="{{ $city->id }}">{{ $city->name }}</flux:option>
                                     @endforeach
+                                    <x-slot name="add">
+                                        <flux:modal.trigger name="create-city">
+                                            <flux:button
+                                                icon="plus"
+                                                class="w-full rounded-lg dark:bg-white/5 bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-700/90 dark:hover:text-gray-300"
+                                                variant="filled"
+                                            >
+                                                {{ __('Open Zip&City Menu') }}
+                                            </flux:button>
+                                        </flux:modal.trigger>
+                                    </x-slot>
                                 </flux:select>
                             </div>
                         </x-pupi.input.group>

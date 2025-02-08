@@ -13,15 +13,16 @@
     'clear' => null,
     'close' => null,
     'size' => null,
+    'add' => null, // diesen habe ich hinzugefügt
 ])
 
 @php
-$invalid ??= ($name && $errors->has($name));
+    $invalid ??= ($name && $errors->has($name));
 
-$class= Flux::classes()
-    ->add('w-full');
+    $class= Flux::classes()
+        ->add('w-full');
 
-$trigger ??= $button;
+    $trigger ??= $button;
 @endphp
 
 <ui-select
@@ -32,10 +33,10 @@ $trigger ??= $button;
     data-flux-select
 >
     <?php if ($trigger): ?> {{ $trigger }} <?php else: ?>
-        <flux:select.button :$placeholder :$invalid :$size :$clearable :suffix="$selectedSuffix" />
+    <flux:select.button :$placeholder :$invalid :$size :$clearable :suffix="$selectedSuffix" />
     <?php endif; ?>
 
-    <flux:options :$search :$searchable :$indicator :$empty>
+    <flux:options :$search :$searchable :$indicator :$empty :$add>
         {{ $slot}}
     </flux:options>
 
