@@ -1,0 +1,356 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+@layer base {
+    :root {
+        /******* tailwind names are variables, not colors */
+        --colors-indigo-50: 238, 242, 255;
+        --colors-indigo-100: 224, 231, 255;
+        --colors-indigo-200: 199, 210, 254;
+        --colors-indigo-300: 165, 180, 252;
+        --colors-indigo-400: 129, 140, 248;
+        --colors-indigo-500: 99, 102, 241;
+        --colors-indigo-600: 79, 70, 229;
+        --colors-indigo-700: 67, 56, 202;
+        --colors-indigo-800: 55, 48, 163;
+        --colors-indigo-900: 49, 46, 129;
+
+        --colors-gray-50: 249, 250, 251;
+        --colors-gray-100: 243, 244, 246;
+        --colors-gray-200: 229, 231, 235;
+        --colors-gray-300: 209, 213, 219;
+        --colors-gray-400: 156, 163, 175;
+        --colors-gray-500: 107, 114, 128;
+        --colors-gray-600: 75, 85, 99;
+        --colors-gray-700: 55, 65, 81;
+        --colors-gray-800: 31, 41, 55;
+        --colors-gray-900: 17, 24, 39;
+    }
+
+    .dark {
+        /*--color-accent: var(--color-indigo-500);*/
+        /*--color-accent-content: var(--color-indigo-100);*/
+        /*--color-accent-foreground: var(--color-white);*/
+        --colors-indigo-50: 238, 242, 255;
+        --colors-indigo-100: 224, 231, 255;
+        --colors-indigo-200: 199, 210, 254;
+        --colors-indigo-300: 165, 180, 252;
+        --colors-indigo-400: 129, 140, 248;
+        --colors-indigo-500: 99, 102, 241;
+        --colors-indigo-600: 79, 70, 229;
+        --colors-indigo-700: 67, 56, 202;
+        --colors-indigo-800: 55, 48, 163;
+        --colors-indigo-900: 49, 46, 129;
+
+        --colors-gray-50: 249, 250, 251;
+        --colors-gray-100: 243, 244, 246;
+        --colors-gray-200: 229, 231, 235;
+        --colors-gray-300: 209, 213, 219;
+        --colors-gray-400: 156, 163, 175;
+        --colors-gray-500: 107, 114, 128;
+        --colors-gray-600: 75, 85, 99;
+        --colors-gray-700: 55, 65, 81;
+        --colors-gray-800: 31, 41, 55;
+        --colors-gray-900: 17, 24, 39;
+    }
+
+    .theme-orange {
+
+        --colors-indigo-50: 255, 247, 237; /* orange-50 */
+        --colors-indigo-100: 254, 230, 138; /* orange-100 */
+        --colors-indigo-200: 253, 186, 116; /* orange-200 */
+        --colors-indigo-300: 251, 146, 60; /* orange-300 */
+        --colors-indigo-400: 249, 115, 22; /* orange-400 */
+        --colors-indigo-500: 234, 88, 12; /* orange-500 */
+        --colors-indigo-600: 194, 65, 12; /* orange-600 */
+        --colors-indigo-700: 154, 52, 18; /* orange-700 */
+        --colors-indigo-800: 124, 45, 18; /* orange-800 */
+        --colors-indigo-900: 94, 38, 18; /* orange-900 */
+
+        --colors-gray-50: 250, 250, 249; /* stone-50 */
+        --colors-gray-100: 245, 245, 244; /* stone-100 */
+        --colors-gray-200: 231, 229, 228; /* stone-200 */
+        --colors-gray-300: 209, 213, 219; /* stone-300 */
+        --colors-gray-400: 156, 163, 175; /* stone-400 */
+        --colors-gray-500: 107, 114, 128; /* stone-500 */
+        --colors-gray-600: 75, 85, 99; /* stone-600 */
+        --colors-gray-700: 55, 65, 81; /* stone-700 */
+        --colors-gray-800: 31, 41, 55; /* stone-800 */
+        --colors-gray-900: 28, 25, 23; /* stone-900 */
+
+
+
+    }
+
+    .dark.theme-orange {
+
+        --colors-indigo-50: 255, 247, 237; /* orange-50 */
+        --colors-indigo-100: 254, 230, 138; /* orange-100 */
+        --colors-indigo-200: 253, 186, 116; /* orange-200 */
+        --colors-indigo-300: 251, 146, 60; /* orange-300 */
+        --colors-indigo-400: 249, 115, 22; /* orange-400 */
+        --colors-indigo-500: 249, 115, 22; /* orange-500 */
+        --colors-indigo-600: 194, 65, 12; /* orange-600 */
+        --colors-indigo-700: 154, 52, 18; /* orange-700 */
+        --colors-indigo-800: 124, 45, 18; /* orange-800 */
+        --colors-indigo-900: 94, 38, 18; /* orange-900 */
+
+        --colors-gray-50: 250, 250, 249; /* stone-50 */
+        --colors-gray-100: 245, 245, 244; /* stone-100 */
+        --colors-gray-200: 231, 229, 228; /* stone-200 */
+        --colors-gray-300: 214, 211, 209; /* stone-300 */
+        --colors-gray-400: 168, 162, 158; /* stone-400 */
+        --colors-gray-500: 120, 113, 108; /* stone-500 */
+        --colors-gray-600: 87, 83, 78; /* stone-600 */
+        --colors-gray-700: 68, 64, 60; /* stone-700 */
+        --colors-gray-800: 41, 37, 36; /* stone-800 */
+        --colors-gray-900: 28, 25, 23; /* stone-900 */
+
+    }
+
+    .theme-green {
+        /* Ersetzt (Tailwind-) "indigo" durch "green" */
+        --colors-indigo-50:  240, 253, 244; /* green-50  */
+        --colors-indigo-100: 220, 252, 231; /* green-100 */
+        --colors-indigo-200: 187, 247, 208; /* green-200 */
+        --colors-indigo-300: 134, 239, 172; /* green-300 */
+        --colors-indigo-400:  74, 222, 128; /* green-400 */
+        --colors-indigo-500:  34, 197,  94; /* green-500 */
+        --colors-indigo-600:  22, 163,  74; /* green-600 */
+        --colors-indigo-700:  21, 128,  61; /* green-700 */
+        --colors-indigo-800:  22, 101,  52; /* green-800 */
+        --colors-indigo-900:  20,  83,  45; /* green-900 */
+        --colors-indigo-950:   5,  46,  22; /* green-950 */
+
+        /* Ersetzt (Tailwind-) "gray" durch "neutral" (oder was du willst)
+           aber du MUSST es in "gray" umbenennen, wenn du "bg-gray-xxx" im Code hast! */
+        --colors-gray-50:  250, 250, 250;  /* neutral-50 */
+        --colors-gray-100: 245, 245, 245;  /* neutral-100 */
+        --colors-gray-200: 229, 229, 229;  /* neutral-200 */
+        --colors-gray-300: 212, 212, 212;  /* neutral-300 */
+        --colors-gray-400: 163, 163, 163;  /* neutral-400 */
+        --colors-gray-500: 115, 115, 115;  /* neutral-500 */
+        --colors-gray-600:  82,  82,  82;  /* neutral-600 */
+        --colors-gray-700:  64,  64,  64;  /* neutral-700 */
+        --colors-gray-800:  38,  38,  38;  /* neutral-800 */
+        --colors-gray-900:  23,  23,  23;  /* neutral-900 */
+        --colors-gray-950:  10,  10,  10;  /* neutral-950 */
+    }
+
+    .dark.theme-green {
+        /* Dunkle Variante, falls du sie anders färben willst:
+           Hier überschreibst du denselben Satz (indigo + gray)
+           aber in "Dark"-Werten.
+           Du kannst sie gleich lassen oder etwas abändern. */
+
+        --colors-indigo-50:  240, 253, 244; /* green-50  */
+        --colors-indigo-100: 220, 252, 231; /* green-100 */
+        --colors-indigo-200: 187, 247, 208; /* green-200 */
+        --colors-indigo-300: 134, 239, 172; /* green-300 */
+        --colors-indigo-400:  74, 222, 128; /* green-400 */
+        --colors-indigo-500:  34, 197,  94; /* green-500 */
+        --colors-indigo-600:  22, 163,  74; /* green-600 */
+        --colors-indigo-700:  21, 128,  61; /* green-700 */
+        --colors-indigo-800:  22, 101,  52; /* green-800 */
+        --colors-indigo-900:  20,  83,  45; /* green-900 */
+        --colors-indigo-950:   5,  46,  22; /* green-950 */
+
+        --colors-gray-50:  250, 250, 250;  /* neutral-50 */
+        --colors-gray-100: 245, 245, 245;  /* neutral-100 */
+        --colors-gray-200: 229, 229, 229;  /* neutral-200 */
+        --colors-gray-300: 212, 212, 212;  /* neutral-300 */
+        --colors-gray-400: 163, 163, 163;  /* neutral-400 */
+        --colors-gray-500: 115, 115, 115;  /* neutral-500 */
+        --colors-gray-600:  82,  82,  82;  /* neutral-600 */
+        --colors-gray-700:  64,  64,  64;  /* neutral-700 */
+        --colors-gray-800:  38,  38,  38;  /* neutral-800 */
+        --colors-gray-900:  23,  23,  23;  /* neutral-900 */
+        --colors-gray-950:  10,  10,  10;  /* neutral-950 */
+    }
+
+    .theme-red {
+        /* Ersetzt Indigo durch Rot */
+        --colors-indigo-50:  254, 242, 242; /* red-50  */
+        --colors-indigo-100: 254, 226, 226; /* red-100 */
+        --colors-indigo-200: 254, 202, 202; /* red-200 */
+        --colors-indigo-300: 252, 165, 165; /* red-300 */
+        --colors-indigo-400: 248, 113, 113; /* red-400 */
+        --colors-indigo-500: 239,  68,  68; /* red-500 */
+        --colors-indigo-600: 220,  38,  38; /* red-600 */
+        --colors-indigo-700: 185,  28,  28; /* red-700 */
+        --colors-indigo-800: 153,  27,  27; /* red-800 */
+        --colors-indigo-900: 127,  29,  29; /* red-900 */
+        --colors-indigo-950:  69,  10,  10; /* red-950 */
+
+        /* Ersetzt Gray durch Neutral */
+        --colors-gray-50:   250, 250, 250; /* neutral-50  */
+        --colors-gray-100:  245, 245, 245; /* neutral-100 */
+        --colors-gray-200:  229, 229, 229; /* neutral-200 */
+        --colors-gray-300:  212, 212, 212; /* neutral-300 */
+        --colors-gray-400:  163, 163, 163; /* neutral-400 */
+        --colors-gray-500:  115, 115, 115; /* neutral-500 */
+        --colors-gray-600:   82,  82,  82; /* neutral-600 */
+        --colors-gray-700:   64,  64,  64; /* neutral-700 */
+        --colors-gray-800:   38,  38,  38; /* neutral-800 */
+        --colors-gray-900:   23,  23,  23; /* neutral-900 */
+        --colors-gray-950:   10,  10,  10; /* neutral-950 */
+    }
+
+    /* Dark Mode für .theme-red */
+    .dark.theme-red {
+        /* Du kannst für Dark Mode ggf. dieselben Werte belassen
+           oder (falls du dunklere Rottöne möchtest) anpassen. */
+        --colors-indigo-50:  254, 242, 242;
+        --colors-indigo-100: 254, 226, 226;
+        --colors-indigo-200: 254, 202, 202;
+        --colors-indigo-300: 252, 165, 165;
+        --colors-indigo-400: 248, 113, 113;
+        --colors-indigo-500: 239,  68,  68;
+        --colors-indigo-600: 220,  38,  38;
+        --colors-indigo-700: 185,  28,  28;
+        --colors-indigo-800: 153,  27,  27;
+        --colors-indigo-900: 127,  29,  29;
+        --colors-indigo-950:  69,  10,  10;
+
+        --colors-gray-50:   250, 250, 250;
+        --colors-gray-100:  245, 245, 245;
+        --colors-gray-200:  229, 229, 229;
+        --colors-gray-300:  212, 212, 212;
+        --colors-gray-400:  163, 163, 163;
+        --colors-gray-500:  115, 115, 115;
+        --colors-gray-600:   82,  82,  82;
+        --colors-gray-700:   64,  64,  64;
+        --colors-gray-800:   38,  38,  38;
+        --colors-gray-900:   23,  23,  23;
+        --colors-gray-950:   10,  10,  10;
+    }
+
+
+    /* ======================================== */
+    /* ========== THEME: BLUE + ZINC ========= */
+    /* ======================================== */
+    .theme-blue {
+        /* Ersetzt Indigo durch Blau */
+        --colors-indigo-50:  239, 246, 255; /* blue-50  */
+        --colors-indigo-100: 219, 234, 254; /* blue-100 */
+        --colors-indigo-200: 191, 219, 254; /* blue-200 */
+        --colors-indigo-300: 147, 197, 253; /* blue-300 */
+        --colors-indigo-400:  96, 165, 250; /* blue-400 */
+        --colors-indigo-500:  59, 130, 246; /* blue-500 */
+        --colors-indigo-600:  37,  99, 235; /* blue-600 */
+        --colors-indigo-700:  29,  78, 216; /* blue-700 */
+        --colors-indigo-800:  30,  64, 175; /* blue-800 */
+        --colors-indigo-900:  30,  58, 138; /* blue-900 */
+        --colors-indigo-950:  13,  31,  85; /* blue-950 */
+
+        /* Ersetzt Gray durch Zinc */
+        --colors-gray-50:   250, 250, 250; /* zinc-50  */
+        --colors-gray-100:  244, 244, 245; /* zinc-100 */
+        --colors-gray-200:  228, 228, 231; /* zinc-200 */
+        --colors-gray-300:  212, 212, 216; /* zinc-300 */
+        --colors-gray-400:  161, 161, 170; /* zinc-400 */
+        --colors-gray-500:  113, 113, 122; /* zinc-500 */
+        --colors-gray-600:   82,  82,  91; /* zinc-600 */
+        --colors-gray-700:   63,  63,  70; /* zinc-700 */
+        --colors-gray-800:   39,  39,  42; /* zinc-800 */
+        --colors-gray-900:   24,  24,  27; /* zinc-900 */
+        --colors-gray-950:   14,  14,  18; /* zinc-950 */
+    }
+
+    .dark.theme-blue {
+        /* Dark Mode für .theme-blue */
+        --colors-indigo-50:  239, 246, 255;
+        --colors-indigo-100: 219, 234, 254;
+        --colors-indigo-200: 191, 219, 254;
+        --colors-indigo-300: 147, 197, 253;
+        --colors-indigo-400:  96, 165, 250;
+        --colors-indigo-500:  59, 130, 246;
+        --colors-indigo-600:  37,  99, 235;
+        --colors-indigo-700:  29,  78, 216;
+        --colors-indigo-800:  30,  64, 175;
+        --colors-indigo-900:  30,  58, 138;
+        --colors-indigo-950:  13,  31,  85;
+
+        --colors-gray-50:   250, 250, 250;
+        --colors-gray-100:  244, 244, 245;
+        --colors-gray-200:  228, 228, 231;
+        --colors-gray-300:  212, 212, 216;
+        --colors-gray-400:  161, 161, 170;
+        --colors-gray-500:  113, 113, 122;
+        --colors-gray-600:   82,  82,  91;
+        --colors-gray-700:   63,  63,  70;
+        --colors-gray-800:   39,  39,  42;
+        --colors-gray-900:   24,  24,  27;
+        --colors-gray-950:   14,  14,  18;
+    }
+
+    /* =========================================== */
+    /* ============ THEME: LIME + NEUTRAL ======== */
+    /* =========================================== */
+    .theme-lime {
+        /* Ersetzt Indigo durch Lime */
+        --colors-indigo-50:  247, 254, 231; /* lime-50  */
+        --colors-indigo-100: 236, 252, 203; /* lime-100 */
+        --colors-indigo-200: 217, 249, 157; /* lime-200 */
+        --colors-indigo-300: 190, 242, 100; /* lime-300 */
+        --colors-indigo-400: 163, 230,  53; /* lime-400 */
+        --colors-indigo-500: 132, 204,  22; /* lime-500 */
+        --colors-indigo-600: 101, 163,  13; /* lime-600 */
+        --colors-indigo-700:  77, 124,  15; /* lime-700 */
+        --colors-indigo-800:  63,  98,  18; /* lime-800 */
+        --colors-indigo-900:  54,  83,  20; /* lime-900 */
+        --colors-indigo-950:  26,  46,   8; /* lime-950 */
+
+        /* Ersetzt Gray durch Neutral */
+        --colors-gray-50:   250, 250, 250; /* neutral-50  */
+        --colors-gray-100:  245, 245, 245; /* neutral-100 */
+        --colors-gray-200:  229, 229, 229; /* neutral-200 */
+        --colors-gray-300:  212, 212, 212; /* neutral-300 */
+        --colors-gray-400:  163, 163, 163; /* neutral-400 */
+        --colors-gray-500:  115, 115, 115; /* neutral-500 */
+        --colors-gray-600:   82,  82,  82; /* neutral-600 */
+        --colors-gray-700:   64,  64,  64; /* neutral-700 */
+        --colors-gray-800:   38,  38,  38; /* neutral-800 */
+        --colors-gray-900:   23,  23,  23; /* neutral-900 */
+        --colors-gray-950:   10,  10,  10; /* neutral-950 */
+    }
+
+    /* =========================================== */
+    /* ======== DARK MODE: LIME + NEUTRAL ======== */
+    /* =========================================== */
+    .dark.theme-lime {
+        /* Wenn du für Dark-Mode andere Werte willst,
+           kannst du sie hier ändern. Du kannst sie
+           auch 1:1 übernehmen. */
+        --colors-indigo-50:  247, 254, 231;
+        --colors-indigo-100: 236, 252, 203;
+        --colors-indigo-200: 217, 249, 157;
+        --colors-indigo-300: 190, 242, 100;
+        --colors-indigo-400: 163, 230,  53;
+        --colors-indigo-500: 132, 204,  22;
+        --colors-indigo-600: 101, 163,  13;
+        --colors-indigo-700:  77, 124,  15;
+        --colors-indigo-800:  63,  98,  18;
+        --colors-indigo-900:  54,  83,  20;
+        --colors-indigo-950:  26,  46,   8;
+
+        --colors-gray-50:   250, 250, 250;
+        --colors-gray-100:  245, 245, 245;
+        --colors-gray-200:  229, 229, 229;
+        --colors-gray-300:  212, 212, 212;
+        --colors-gray-400:  163, 163, 163;
+        --colors-gray-500:  115, 115, 115;
+        --colors-gray-600:   82,  82,  82;
+        --colors-gray-700:   64,  64,  64;
+        --colors-gray-800:   38,  38,  38;
+        --colors-gray-900:   23,  23,  23;
+        --colors-gray-950:   10,  10,  10;
+    }
+
+
+}
