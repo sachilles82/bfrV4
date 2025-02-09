@@ -1,32 +1,25 @@
 <x-pupi.layout.form>
-
     <x-slot:title>
         {{ __('Address') }}
     </x-slot:title>
-
     <x-slot:description>
-        {{__('Here are stored the address information')}}
+        {{ __('Here are stored the address information') }}
     </x-slot:description>
-
     <x-slot name="form">
-
-
         <form wire:submit.prevent="save"
               class="bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
             <div class="px-4 py-6 sm:p-8">
-
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-
+                    <!-- Country Dropdown -->
                     <div class="sm:col-span-6 md:col-span-5 flex">
                         <div class="mt-4">
-
                             <x-pupi.input.group
                                 label="{{ __('Country') }}"
-                                for="country"
+                                for="selectedCountry"
                                 badge="{{ __('Required') }}"
-                                :error="$errors->first('country')"
-                                help-text="{{ __('') }}"
-                                model="country"
+                                :error="$errors->first('selectedCountry')"
+                                help-text=""
+                                model="selectedCountry"
                             >
                                 <div class="relative mt-2">
                                     <flux:select
@@ -38,14 +31,12 @@
                                         size="br-none"
                                     >
                                         @foreach ($countries as $country)
-                                            <flux:option value="{{ $country->id }}">
-                                                <div
-                                                    class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
-                                                    <img
-                                                        src="/flags/country-{{ strtolower($country->code) }}.svg"
-                                                        class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-gray-800 text-gray-700 dark:text-gray-400">
+                                            <flux:option value="{{ $country['id'] }}">
+                                                <div class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
+                                                    <img src="/flags/country-{{ strtolower($country['code']) }}.svg"
+                                                         class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-gray-800 text-gray-700 dark:text-gray-400">
                                                     <div class="px-2 truncate">
-                                                        {{ $country->name }}
+                                                        {{ $country['name'] }} (ID: {{ $country['id'] }})
                                                     </div>
                                                 </div>
                                             </flux:option>
@@ -54,15 +45,15 @@
                                 </div>
                             </x-pupi.input.group>
                         </div>
-                        <!-- Country Dropdown End-->
 
+                        <!-- State Dropdown -->
                         <div class="mt-4 relative w-full">
                             <x-pupi.input.group
                                 label="{{ __('State') }}"
                                 for="selectedState"
                                 badge="{{ __('Required') }}"
                                 :error="$errors->first('selectedState')"
-                                help-text="{{ __('') }}"
+                                help-text=""
                                 model="selectedState"
                             >
                                 <div class="relative mt-2">
@@ -72,25 +63,20 @@
                                         size="bl-none"
                                         variant="listbox"
                                         searchable
-                                        empty=" "
+                                        empty="Keine Resultate"
                                         placeholder="Choose States"
                                     >
-                                        {{-- Optionen --}}
                                         @foreach ($states as $state)
-                                            <flux:option value="{{ $state->id }}">
+                                            <flux:option value="{{ $state['id'] }}">
                                                 <div class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
-                                                    <img
-                                                        src="/flags/state/{{ strtolower($state->code) }}.svg"
-                                                        class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-zinc-800 text-gray-700 dark:text-gray-400"
-                                                    >
+                                                    <img src="/flags/state/{{ strtolower($state['code']) }}.svg"
+                                                         class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-zinc-800 text-gray-700 dark:text-gray-400">
                                                     <div class="px-2 truncate">
-                                                        {{ $state->name }}
+                                                        {{ $state['name'] }} (ID: {{ $state['id'] }})
                                                     </div>
                                                 </div>
                                             </flux:option>
                                         @endforeach
-
-                                        {{-- Benannter Slot "my" für den Trigger --}}
                                         <x-slot name="add">
                                             <flux:modal.trigger name="create-state">
                                                 <flux:button
@@ -108,13 +94,14 @@
                         </div>
                     </div>
 
+                    <!-- Street + Number -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Street + Number') }}"
                             for="street_number"
                             badge="{{ __('Required') }}"
                             :error="$errors->first('street_number')"
-                            help-text="{{ __('') }}"
+                            help-text=""
                             model="street_number"
                         >
                             <x-pupi.input.text
@@ -126,14 +113,15 @@
                         </x-pupi.input.group>
                     </div>
 
+                    <!-- ZIP + City Dropdown -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('ZIP + City') }}"
-                            for="city"
+                            for="selectedCity"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('city')"
-                            help-text="{{ __('') }}"
-                            model="city"
+                            :error="$errors->first('selectedCity')"
+                            help-text=""
+                            model="selectedCity"
                         >
                             <div class="relative mt-2">
                                 <flux:select
@@ -143,11 +131,13 @@
                                     searchable
                                     placeholder="Choose Zip & City"
                                 >
-                                    @if ($cities->count() == 0)
+                                    @if (empty($cities))
                                         <flux:option value="">-- choose state first --</flux:option>
                                     @endif
                                     @foreach ($cities as $city)
-                                        <flux:option value="{{ $city->id }}">{{ $city->name }}</flux:option>
+                                        <flux:option value="{{ $city['id'] }}">
+                                            {{ $city['name'] }}
+                                        </flux:option>
                                     @endforeach
                                     <x-slot name="add">
                                         <flux:modal.trigger name="create-city">
@@ -165,7 +155,6 @@
                         </x-pupi.input.group>
                     </div>
                 </div>
-
             </div>
 
             <!-- Button Container with Action Buttons -->
@@ -173,7 +162,5 @@
                 <x-pupi.button.fluxsubmit/>
             </x-pupi.button.container>
         </form>
-
     </x-slot>
-
 </x-pupi.layout.form>

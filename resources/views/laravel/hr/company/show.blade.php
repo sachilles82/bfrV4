@@ -6,18 +6,21 @@
             <x-navigation.settings.sidebar />
         </x-slot:sidebar>
 
-
-
-        <livewire:address.select
-{{--            :addressable="$company"--}}
+        <livewire:address.address-manager
+            :addressable="$company"
         />
-
-{{--        <livewire:address.address-manager--}}
-{{--            :addressable="$company"--}}
-{{--        />--}}
 
 
 
     </x-pupi.layout.container>
 
 </x-app-layout>
+
+
+
+
+
+
+{{--        <livewire:address.select--}}
+{{--            :addressable="$company"--}}
+{{--        />--}}

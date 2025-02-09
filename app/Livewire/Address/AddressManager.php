@@ -2,33 +2,32 @@
 
 namespace App\Livewire\Address;
 
-use App\Livewire\Address\Helper\LoadData;
+use App\Models\Address\Country;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class AddressManager extends Component
 {
-    use LoadData;
-
     public $addressable;
 
-    public $countries;
-    public $states;
-    public $cities;
+    public array $countries = [];
 
     public function mount($addressable): void
     {
         $this->addressable = $addressable;
 
-        $this->loadCountries();
+        $countries = Cache::remember('all-countries', now()->addWeek(), function () {
+            return Country::select(['id', 'name', 'code'])
+                ->orderBy('id')
+                ->get()
+                ->toArray();
+        });
 
-        $this->loadStates();
-
-        $this->loadCities();
-
+        $this->countries = is_array($countries) ? $countries : collect($countries)->toArray();
     }
 
-    public function render():View
+    public function render(): View
     {
         return view('livewire.address.address-manager');
     }

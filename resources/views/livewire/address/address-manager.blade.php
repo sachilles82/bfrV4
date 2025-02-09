@@ -1,4 +1,16 @@
 <div>
+
+    <livewire:address.select
+        :addressable="$addressable"
+        :countries="$countries"
+    />
+</div>
+
+
+
+
+
+
 {{--    <livewire:address.state-form--}}
 {{--        :countries="$countries"--}}
 {{--    />--}}
@@ -10,12 +22,12 @@
 
 
 
-    <livewire:address.select
-        :countries="$countries"
-        :states="$states"
-        :cities="$cities"
-        lazy
-    />
+{{--<livewire:address.select--}}
+{{--    --}}{{--        :countries="$countries"--}}
+{{--    --}}{{--        :states="$states"--}}
+{{--    --}}{{--        :cities="$cities"--}}
+{{--    lazy--}}
+{{--/>--}}
 
 {{--    <livewire:address.address-form--}}
 {{--        :addressable="$addressable"--}}
@@ -23,4 +35,3 @@
 {{--        :states="$states"--}}
 {{--        :cities="$cities"--}}
 {{--    />--}}
-</div>
