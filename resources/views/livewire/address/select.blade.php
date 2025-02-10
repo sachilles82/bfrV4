@@ -23,6 +23,7 @@
                             >
                                 <div class="relative mt-2">
                                     <flux:select
+                                        wire:init="selectedCountry"
                                         wire:model.live="selectedCountry"
                                         id="country"
                                         variant="listbox"
@@ -58,14 +59,15 @@
                                 model="selectedState"
                             >
                                 <div class="relative mt-2">
-                                    <flux:select wire:init="loadStates"
-                                                 wire:model.live="selectedState"
-                                                 id="state"
-                                                 size="bl-none"
-                                                 variant="listbox"
-                                                 searchable
-                                                 empty="Keine Resultate"
-                                                 placeholder="Choose States"
+                                    <flux:select
+                                        wire:init="selectedState"
+                                        wire:model.live="selectedState"
+                                        id="state"
+                                        size="bl-none"
+                                        variant="listbox"
+                                        searchable
+                                        empty="Keine Resultate"
+                                        placeholder="Choose States"
                                     >
                                         @foreach ($states as $state)
                                             <flux:option value="{{ $state['id'] }}">
@@ -126,12 +128,13 @@
                             model="selectedCity"
                         >
                             <div class="relative mt-2">
-                                <flux:select wire:init="loadCities"
-                                             wire:model="selectedCity"
-                                             id="city"
-                                             variant="listbox"
-                                             searchable
-                                             placeholder="Choose Zip & City"
+                                <flux:select
+                                    wire:init="selectedCity"
+                                    wire:model="selectedCity"
+                                    id="city"
+                                    variant="listbox"
+                                    searchable
+                                    placeholder="Choose Zip & City"
                                 >
                                     @if (empty($cities))
                                         <flux:option value="">-- choose state first --</flux:option>

@@ -1,5 +1,9 @@
 <div>
 
+{{--        <livewire:address.state-form--}}
+{{--            :countries="$countries"--}}
+{{--        />--}}
+
     <livewire:address.select
         :addressable="$addressable"
         :countries="$countries"
@@ -10,10 +14,6 @@
 
 
 
-
-{{--    <livewire:address.state-form--}}
-{{--        :countries="$countries"--}}
-{{--    />--}}
 
 {{--    <livewire:address.city-form--}}
 {{--        :countries="$countries"--}}

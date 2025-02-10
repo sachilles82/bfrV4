@@ -32,9 +32,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
     Route::prefix('settings')->group(function () {
 
-        Route::get('/company', [
-            CompanyController::class, 'show'
-        ])->name('settings.company');
+        // Hier werden nur diese Routen gecached:
+        Route::get('/company', [CompanyController::class, 'show'])
+//            ->middleware('cacheResponse')
+            ->name('settings.company');
 
         Route::get('/profile', [
             ProfileController::class, 'show'

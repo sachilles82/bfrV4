@@ -17,14 +17,18 @@ class AddressManager extends Component
     {
         $this->addressable = $addressable;
 
-        $countries = Cache::remember('all-countries', now()->addWeek(), function () {
-            return Country::select(['id', 'name', 'code'])
-                ->orderBy('id')
-                ->get()
-                ->toArray();
-        });
+//        $this->countries = Cache::remember('countries-all', now()->addWeek(), function () {
+//            return Country::select(['id', 'name', 'code'])
+//                ->orderBy('id')
+//                ->get()
+//                ->toArray();
+//        });
 
-        $this->countries = $countries;
+        // Lade alle Länder mit den benötigten Feldern
+        $this->countries = Country::select('id', 'name', 'code')
+            ->orderBy('id')
+            ->get()
+            ->toArray();
     }
 
     public function render(): View
