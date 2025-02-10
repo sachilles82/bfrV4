@@ -7,10 +7,10 @@ trait ValidateAddressable
     public function rules(): array
     {
         return [
-            'street_number'      => 'required|string|max:255',
-            'selectedCountry'    => 'required|exists:countries,id',
-            'selectedState'      => 'required|exists:states,id',
-            'selectedCity'       => 'required|exists:cities,id',
+            'selectedCountry' => 'required|integer|exists:countries,id',
+            'selectedState'   => 'required|integer|exists:states,id',
+            'selectedCity'    => 'required|integer|exists:cities,id',
+            'street_number'   => 'required|string|max:255',
         ];
     }
 

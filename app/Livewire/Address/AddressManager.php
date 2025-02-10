@@ -24,7 +24,7 @@ class AddressManager extends Component
                 ->toArray();
         });
 
-        $this->countries = is_array($countries) ? $countries : collect($countries)->toArray();
+        $this->countries = $countries;
     }
 
     public function render(): View

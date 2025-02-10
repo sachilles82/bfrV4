@@ -18,27 +18,26 @@ class Select extends Component
 
     public Model $addressable;
 
-    /** Vom Parent übergebene Daten als Array.*/
+    /** Vom Parent übergebene Länder-Daten als Array. */
     public array $countries = [];
 
-    // Dynamisch geladene Daten als Arrays.
+    // Dynamisch geladene Daten als Arrays
     public array $states = [];
     public array $cities = [];
-    protected array $countriesData = [];
 
     // Ausgewählte Werte
     public ?int $selectedCountry = null;
-    public ?string $selectedState = null;
+    public ?int $selectedState = null;
     public ?int $selectedCity = null;
-
     public string $street_number = '';
+
 
     public function mount(Model $addressable, array $countries): void
     {
-        $this->addressable   = $addressable;
-        $this->countriesData = $countries;
-        $this->states        = [];
-        $this->cities        = [];
+        $this->addressable = $addressable;
+        $this->countries   = $countries;
+        $this->states      = [];
+        $this->cities      = [];
 
         // Falls bereits eine Adresse vorhanden ist, lade die gespeicherten Werte
         if ($address = $this->addressable->address) {
@@ -62,95 +61,107 @@ class Select extends Component
         }
     }
 
-
+    /**
+     * Speichert die Adresse.
+     */
     public function save(): void
     {
         // Autorisierung prüfen
         $this->authorize('update', $this->addressable);
 
-        // Validierung (nutzt jetzt die angepassten Regeln)
+        // Validierung anhand der in $rules definierten Regeln
         $this->validate();
 
-        // Mapping der Werte zu den DB-Spalten
-        $this->addressable->address()->updateOrCreate([], [
-            'street_number' => $this->street_number,
-            'country_id'    => $this->selectedCountry,
-            'state_id'      => $this->selectedState,
-            'city_id'       => $this->selectedCity,
-        ]);
+        try {
+            // Mapping der Werte zu den DB-Spalten
+            $this->addressable->address()->updateOrCreate([], [
+                'street_number' => $this->street_number,
+                'country_id'    => $this->selectedCountry,
+                'state_id'      => $this->selectedState,
+                'city_id'       => $this->selectedCity,
+            ]);
 
-        Flux::toast(
-            text: __('Address updated successfully.'),
-            heading: __('Success.'),
-            variant: 'success'
-        );
+            // Erfolgsmeldung
+            Flux::toast(
+                text: __('Address updated successfully.'),
+                heading: __('Success.'),
+                variant: 'success'
+            );
 
-        $this->dispatch('address-updated');
-    }
-
-
-    /**
-     * Lädt die States des aktuell ausgewählten Landes als Array.
-     */
-    protected function loadStates(): void
-    {
-        $cacheKey = 'states-country-' . $this->selectedCountry . '-user-' . Auth::id();
-
-        $states = Cache::remember($cacheKey, now()->addWeek(), function () {
-            return State::select(['id', 'name', 'code', 'country_id'])
-                ->where('country_id', $this->selectedCountry)
-                ->where(function ($query) {
-                    $query->where('team_id', optional(Auth::user()->currentTeam)->id)
-                        ->orWhere('created_by', 1);
-                })
-                ->orderBy('id')
-                ->get()
-                ->toArray(); // Rückgabe als Array
-        });
-        $this->states = is_array($states) ? $states : $states->toArray();
+            $this->dispatch('address-updated');
+        } catch (\Exception $e) {
+            // Fehlerbehandlung: Fehler anzeigen und ggf. loggen
+            Flux::toast(
+                text: __('An error occurred while saving the address.'),
+                heading: __('Error'),
+                variant: 'error'
+            );
+            // Optional: \Log::error($e);
+        }
     }
 
     /**
-     * Lädt die Cities des aktuell ausgewählten Staates als Array.
+     * Lädt die States des aktuell ausgewählten Landes.
      */
-    protected function loadCities(): void
+    public function loadStates(): void
     {
-        if (!is_null($this->selectedState)) {
-            $cacheKey = 'cities-state-' . $this->selectedState . '-user-' . Auth::id();
+        $teamId = Auth::user()->currentTeam?->id ?? 0;
+        if ($this->selectedCountry) {
+            $cacheKey = sprintf('state-country-%d-team-%d', $this->selectedCountry, $teamId);
 
-            $cities = Cache::remember($cacheKey, now()->addWeek(), function () {
+            $this->states = Cache::remember($cacheKey, now()->addWeek(), function () use ($teamId) {
+                return State::select(['id', 'name', 'code', 'country_id'])
+                    ->where('country_id', $this->selectedCountry)
+                    ->where(function ($query) use ($teamId) {
+                        $query->where('team_id', $teamId)
+                            ->orWhere('created_by', 1); // Hinweis: Passen, falls nötig, über Konfiguration an
+                    })
+                    ->orderBy('id')
+                    ->get()
+                    ->toArray();
+            });
+        }
+    }
+
+    /**
+     * Lädt die Cities des aktuell ausgewählten Staates.
+     */
+    public function loadCities(): void
+    {
+        $teamId = Auth::user()->currentTeam?->id ?? 0;
+        if ($this->selectedState) {
+            $cacheKey = sprintf('cities-state-%d-team-%d', $this->selectedState, $teamId);
+
+            $this->cities = Cache::remember($cacheKey, now()->addWeek(), function () use ($teamId) {
                 return City::select(['id', 'name', 'state_id'])
                     ->where('state_id', $this->selectedState)
-                    ->where(function ($query) {
-                        $query->where('team_id', optional(Auth::user()->currentTeam)->id)
+                    ->where(function ($query) use ($teamId) {
+                        $query->where('team_id', $teamId)
                             ->orWhere('created_by', 1);
                     })
                     ->orderBy('id')
                     ->get()
                     ->toArray();
             });
-            $this->cities = is_array($cities) ? $cities : $cities->toArray();
         } else {
             $this->cities = [];
         }
     }
 
     /**
-     * Wird automatisch aufgerufen, wenn sich der Wert von $selectedCountry ändert.
+     * Wird automatisch aufgerufen, wenn sich der Wert von selectedCountry ändert.
      */
     public function updatedSelectedCountry(): void
     {
         $this->selectedState = null;
         $this->selectedCity  = null;
-
-        $this->states = [];
-        $this->cities = [];
-
+        $this->states        = [];
+        $this->cities        = [];
         $this->loadStates();
     }
 
     /**
-     * Wird automatisch aufgerufen, wenn sich der Wert von $selectedState ändert.
+     * Wird automatisch aufgerufen, wenn sich der Wert von selectedState ändert.
      */
     public function updatedSelectedState(): void
     {
@@ -161,9 +172,9 @@ class Select extends Component
     public function render(): View
     {
         return view('livewire.address.select', [
-            'countries' => $this->countriesData,
-            'states' => $this->states,
-            'cities' => $this->cities,
+            'countries' => $this->countries,
+            'states'    => $this->states,
+            'cities'    => $this->cities,
         ]);
     }
 }

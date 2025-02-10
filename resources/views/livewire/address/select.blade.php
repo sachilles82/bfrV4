@@ -32,11 +32,12 @@
                                     >
                                         @foreach ($countries as $country)
                                             <flux:option value="{{ $country['id'] }}">
-                                                <div class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
+                                                <div
+                                                    class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
                                                     <img src="/flags/country-{{ strtolower($country['code']) }}.svg"
                                                          class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-gray-800 text-gray-700 dark:text-gray-400">
                                                     <div class="px-2 truncate">
-                                                        {{ $country['name'] }} (ID: {{ $country['id'] }})
+                                                        {{ $country['name'] }}
                                                     </div>
                                                 </div>
                                             </flux:option>
@@ -57,22 +58,23 @@
                                 model="selectedState"
                             >
                                 <div class="relative mt-2">
-                                    <flux:select
-                                        wire:model.live="selectedState"
-                                        id="state"
-                                        size="bl-none"
-                                        variant="listbox"
-                                        searchable
-                                        empty="Keine Resultate"
-                                        placeholder="Choose States"
+                                    <flux:select wire:init="loadStates"
+                                                 wire:model.live="selectedState"
+                                                 id="state"
+                                                 size="bl-none"
+                                                 variant="listbox"
+                                                 searchable
+                                                 empty="Keine Resultate"
+                                                 placeholder="Choose States"
                                     >
                                         @foreach ($states as $state)
                                             <flux:option value="{{ $state['id'] }}">
-                                                <div class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
+                                                <div
+                                                    class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
                                                     <img src="/flags/state/{{ strtolower($state['code']) }}.svg"
                                                          class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-zinc-800 text-gray-700 dark:text-gray-400">
                                                     <div class="px-2 truncate">
-                                                        {{ $state['name'] }} (ID: {{ $state['id'] }})
+                                                        {{ $state['name'] }}
                                                     </div>
                                                 </div>
                                             </flux:option>
@@ -105,7 +107,7 @@
                             model="street_number"
                         >
                             <x-pupi.input.text
-                                wire:model="street_number"
+                                wire:model.lazy="street_number"
                                 name="street_number"
                                 id="street_number"
                                 placeholder="{{ __('Musterstrasse 25') }}"
@@ -124,19 +126,21 @@
                             model="selectedCity"
                         >
                             <div class="relative mt-2">
-                                <flux:select
-                                    wire:model="selectedCity"
-                                    id="city"
-                                    variant="listbox"
-                                    searchable
-                                    placeholder="Choose Zip & City"
+                                <flux:select wire:init="loadCities"
+                                             wire:model="selectedCity"
+                                             id="city"
+                                             variant="listbox"
+                                             searchable
+                                             placeholder="Choose Zip & City"
                                 >
                                     @if (empty($cities))
                                         <flux:option value="">-- choose state first --</flux:option>
                                     @endif
                                     @foreach ($cities as $city)
                                         <flux:option value="{{ $city['id'] }}">
-                                            {{ $city['name'] }}
+                                            <div class="px-2 truncate">
+                                                {{ $city['name'] }}
+                                            </div>
                                         </flux:option>
                                     @endforeach
                                     <x-slot name="add">
