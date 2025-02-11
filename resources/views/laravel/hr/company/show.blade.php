@@ -6,13 +6,13 @@
             <x-navigation.settings.sidebar />
         </x-slot:sidebar>
 
-        <livewire:h-r.company.company-update
-            :company="$company"
-        />
+{{--        <livewire:h-r.company.company-update--}}
+{{--            :company="$company"--}}
+{{--        />--}}
 
         <livewire:address.address-manager
             :addressable="$company"
-            lazy
+{{--            lazy--}}
         />
 
     </x-pupi.layout.container>
