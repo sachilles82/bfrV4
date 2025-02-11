@@ -14,7 +14,7 @@
 
     <x-slot name="form">
 
-        <form wire:submit.prevent="store"
+        <form wire:submit.prevent="updateRole"
               class="bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg md:col-span-2">
 
             <div class="flex items-center gap-x-4 p-6 pb-1">

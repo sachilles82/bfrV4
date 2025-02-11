@@ -11,7 +11,7 @@
     <x-slot name="form">
 
         <!-- Company Form -->
-        <form wire:submit.prevent="save">
+        <form wire:submit.prevent="updateCompany">
             <div class="px-4 py-6 sm:p-8">
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
@@ -60,8 +60,10 @@
                             searchable
                             placeholder="{{ __('Choose an Industry') }}"
                         >
-                            @foreach(\App\Models\HR\Industry::all() as $industry)
-                                <flux:option value="{{ $industry->id }}">{{ $industry->name }}</flux:option>
+                            @foreach($this->industries as $industry)
+                                <flux:option value="{{ $industry->id }}">
+                                    {{ $industry->name }}
+                                </flux:option>
                             @endforeach
                         </flux:select>
                     </div>

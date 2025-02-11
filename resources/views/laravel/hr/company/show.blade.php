@@ -12,6 +12,7 @@
 
         <livewire:address.address-manager
             :addressable="$company"
+            lazy
         />
 
     </x-pupi.layout.container>

@@ -6,7 +6,7 @@
         {{ __('Here are stored the address information') }}
     </x-slot:description>
     <x-slot name="form">
-        <form wire:submit.prevent="save"
+        <form wire:submit.prevent="updateAddress"
               class="bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
             <div class="px-4 py-6 sm:p-8">
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -23,7 +23,7 @@
                             >
                                 <div class="relative mt-2">
                                     <flux:select
-                                        wire:init="selectedCountry"
+{{--                                        wire:init="selectedCountry"--}}
                                         wire:model.live="selectedCountry"
                                         id="country"
                                         variant="listbox"
@@ -60,7 +60,7 @@
                             >
                                 <div class="relative mt-2">
                                     <flux:select
-                                        wire:init="selectedState"
+{{--                                        wire:init="selectedState"--}}
                                         wire:model.live="selectedState"
                                         id="state"
                                         size="bl-none"
@@ -129,7 +129,7 @@
                         >
                             <div class="relative mt-2">
                                 <flux:select
-                                    wire:init="selectedCity"
+{{--                                    wire:init="selectedCity"--}}
                                     wire:model="selectedCity"
                                     id="city"
                                     variant="listbox"

@@ -64,7 +64,7 @@ class Update extends Component
             ->toArray();
     }
 
-    public function store(): void
+    public function updateRole(): void
     {
         $userId = auth()->id();
         try {
