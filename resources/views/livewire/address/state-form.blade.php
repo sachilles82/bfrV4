@@ -40,7 +40,7 @@
                                     </flux:option>
                                 @endforeach
                             </flux:select>
-                            <div wire:loading class="absolute inset-0 flex items-center rounded-lg rounded-r-none justify-center dark:bg-white/10 bg-gray-100 backdrop-blur-sm">
+                            <div wire:loading class="absolute inset-0 flex items-center rounded-lg rounded-r-none justify-center backdrop-blur-sm">
                             </div>
                         </div>
                     </x-pupi.input.group>
@@ -64,7 +64,7 @@
                             autocomplete="off"
                             placeholder="z.B. Bayern"
                         />
-                        <div wire:loading class="absolute inset-0 dark:bg-white/10 bg-gray-100 rounded-lg rounded-l-none flex items-center justify-center">
+                        <div wire:loading class="absolute inset-0  rounded-lg rounded-l-none flex items-center justify-center backdrop-blur-sm">
 
                         </div>
                         </div>
