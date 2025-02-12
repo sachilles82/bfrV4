@@ -9,7 +9,7 @@ trait ValidateStateForm
     {
         return [
             'name' => 'required|string|max:255',
-            'country_id' => 'required|exists:countries,id',
+            'selectedCountry' => 'required|exists:countries,id',
         ];
     }
 
@@ -20,8 +20,8 @@ trait ValidateStateForm
             'name.required' => __('The name is required.'),
             'name.string' => __('The name must be a string.'),
             'name.max' => __('The name may not be greater than 255 characters.'),
-            'country_id.required' => __('The country is required.'),
-            'country_id.exists' => __('The selected country is invalid.'),
+            'selectedCountry.required' => __('The country is required.'),
+            'selectedCountry.exists' => __('The selected country is invalid.'),
         ];
     }
 

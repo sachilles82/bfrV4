@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Address;
+namespace App\Livewire\Address\AlpineExample;
 
 use App\Livewire\Address\Helper\ValidateCityForm;
 use App\Models\Address\City;

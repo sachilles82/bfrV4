@@ -28,7 +28,7 @@ class StatePolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->can('create-state');
     }
 
     /**
@@ -36,29 +36,19 @@ class StatePolicy
      */
     public function update(User $user, State $state): bool
     {
-        //
+        if ($user->can('edit-all-state')) {
+            return true;
+        }
+
+        if ($user->can('edit-state')) {
+            return $user->id == $state->created_by;
+        }
     }
 
     /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, State $state): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, State $state): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, State $state): bool
     {
         //
     }
