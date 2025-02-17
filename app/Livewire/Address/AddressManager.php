@@ -18,7 +18,9 @@ class AddressManager extends Component
 
         // Länder dauerhaft cachen (rememberForever)
         $this->countries = Cache::rememberForever('countries-all', function () {
-            return Country::select(['id', 'name', 'code'])
+            return Country::select([
+                'id', 'name', 'code'
+            ])
                 ->orderBy('id')
                 ->get()
                 ->toArray();

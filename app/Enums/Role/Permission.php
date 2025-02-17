@@ -67,6 +67,30 @@ enum Permission: string
     case UPDATE_OWN_ROLE_PERMISSIONS = 'update-own-role-permissions';
     // ... etc.
 
+    /** Address */
+    case LIST_ADDRESS = 'list-address';
+    case CREATE_ADDRESS = 'create-address';
+    case EDIT_ADDRESS = 'edit-address';
+    case EDIT_OWN_ADDRESS = 'edit-own-address';
+    case DELETE_ADDRESS = 'delete-address';
+
+    case LIST_STATE = 'list-state';
+    case CREATE_STATE = 'create-state';
+    case EDIT_ALL_STATE = 'edit-all-state';
+    case EDIT_OWN_STATE = 'edit-own-state';
+    case DELETE_ALL_STATE = 'delete-state';
+    case DELETE_OWN_STATE = 'delete-own-state';
+
+    case LIST_CITY = 'list-city';
+    case CREATE_CITY = 'create-city';
+    case EDIT_ALL_CITY = 'edit-all_city';
+    case EDIT_OWN_CITY = 'edit-own-city';
+    case DELETE_ALL_CITY = 'delete-city';
+    case DELETE_OWN_CITY = 'delete-own-city';
+
+
+    // ... etc.
+
 
     /**
      * Bestimmt, welcher App dieser enum-Wert zugeordnet ist.
@@ -79,12 +103,10 @@ enum Permission: string
             Permission::CREATE_TEAM,
             Permission::EDIT_TEAM,
             Permission::DELETE_TEAM,
-
             Permission::LIST_COMPANY,
             Permission::CREATE_COMPANY,
             Permission::EDIT_COMPANY,
             Permission::DELETE_COMPANY,
-
             Permission::LIST_USER,
             Permission::CREATE_USER,
             Permission::EDIT_USER,
@@ -94,8 +116,8 @@ enum Permission: string
             // HOLIDAY APP
             Permission::LIST_BOOKING,
             Permission::CREATE_BOOKING,
-            PERMISSION::EDIT_BOOKING,
-            PERMISSION::DELETE_BOOKING
+            Permission::EDIT_BOOKING,
+            Permission::DELETE_BOOKING
             => 'holidayApp',
 
             // CRM APP
@@ -112,7 +134,7 @@ enum Permission: string
             Permission::DELETE_PROJECT
             => 'projectApp',
 
-            // Settings
+            // Settings (Roles, Address, State)
             Permission::LIST_ROLE,
             Permission::CREATE_ROLE,
             Permission::EDIT_ROLE,
@@ -120,10 +142,31 @@ enum Permission: string
             Permission::DELETE_ROLE,
             Permission::DELETE_OWN_ROLE,
             Permission::UPDATE_ROLE_PERMISSIONS,
-            Permission::UPDATE_OWN_ROLE_PERMISSIONS
+            Permission::UPDATE_OWN_ROLE_PERMISSIONS,
+
+            Permission::LIST_ADDRESS,
+            Permission::CREATE_ADDRESS,
+            Permission::EDIT_ADDRESS,
+            Permission::EDIT_OWN_ADDRESS,
+            Permission::DELETE_ADDRESS,
+
+            Permission::LIST_STATE,
+            Permission::CREATE_STATE,
+            Permission::EDIT_ALL_STATE,
+            Permission::EDIT_OWN_STATE,
+            Permission::DELETE_ALL_STATE,
+            Permission::DELETE_OWN_STATE,
+
+            Permission::LIST_CITY,
+            Permission::CREATE_CITY,
+            Permission::EDIT_ALL_CITY,
+            Permission::EDIT_OWN_CITY,
+            Permission::DELETE_ALL_CITY,
+            Permission::DELETE_OWN_CITY,
             => 'settingApp',
         };
     }
+
 
     /**
      * Bestimmt die (feinere) Gruppierung innerhalb einer App.
@@ -154,8 +197,8 @@ enum Permission: string
             // HOLIDAY APP
             Permission::LIST_BOOKING,
             Permission::CREATE_BOOKING,
-            PERMISSION::EDIT_BOOKING,
-            PERMISSION::DELETE_BOOKING
+            Permission::EDIT_BOOKING,
+            Permission::DELETE_BOOKING
             => 'booking',
 
             // CRM APP
@@ -172,7 +215,7 @@ enum Permission: string
             Permission::DELETE_PROJECT
             => 'project',
 
-            // Settings
+            // Settings: Roles
             Permission::LIST_ROLE,
             Permission::CREATE_ROLE,
             Permission::EDIT_ROLE,
@@ -182,8 +225,35 @@ enum Permission: string
             Permission::UPDATE_ROLE_PERMISSIONS,
             Permission::UPDATE_OWN_ROLE_PERMISSIONS
             => 'role',
+
+            // Address
+            Permission::LIST_ADDRESS,
+            Permission::CREATE_ADDRESS,
+            Permission::EDIT_ADDRESS,
+            Permission::EDIT_OWN_ADDRESS,
+            Permission::DELETE_ADDRESS
+            => 'address',
+
+            // State (alle Cases abdecken!)
+            Permission::LIST_STATE,
+            Permission::CREATE_STATE,
+            Permission::EDIT_ALL_STATE,
+            Permission::EDIT_OWN_STATE,
+            Permission::DELETE_ALL_STATE,
+            Permission::DELETE_OWN_STATE
+            => 'state',
+
+            // City (alle Cases abdecken!)
+            Permission::LIST_CITY,
+            Permission::CREATE_CITY,
+            Permission::EDIT_ALL_CITY,
+            Permission::EDIT_OWN_CITY,
+            Permission::DELETE_ALL_CITY,
+            Permission::DELETE_OWN_CITY
+            => 'city',
         };
     }
+
 
     /**
      * Liefert eine Beschreibung der Berechtigung.
@@ -236,6 +306,30 @@ enum Permission: string
             self::DELETE_OWN_ROLE => __('permissions.delete-own-role_description'),
             self::UPDATE_ROLE_PERMISSIONS => __('permissions.update-role-permissions_description'),
             self::UPDATE_OWN_ROLE_PERMISSIONS => __('permissions.update-own-role-permissions_description'),
+
+            // Address
+            self::LIST_ADDRESS => __('permissions.list-address_description'),
+            self::CREATE_ADDRESS => __('permissions.create-address_description'),
+            self::EDIT_ADDRESS   => __('permissions.edit-address_description'),
+            self::EDIT_OWN_ADDRESS => __('permissions.edit-own-address_description'),
+            self::DELETE_ADDRESS => __('permissions.delete-address_description'),
+
+            //State
+            self::LIST_STATE => __('permissions.list-state_description'),
+            self::CREATE_STATE => __('permissions.create-state_description'),
+            self::EDIT_ALL_STATE   => __('permissions.edit-all-state_description'),
+            self::EDIT_OWN_STATE => __('permissions.edit-own-state_description'),
+            self::DELETE_ALL_STATE => __('permissions.delete-state_description'),
+            self::DELETE_OWN_STATE => __('permissions.delete-own-state_description'),
+
+            //City
+            self::LIST_CITY => __('permissions.list-city_description'),
+            self::CREATE_CITY => __('permissions.create-city_description'),
+            self::EDIT_ALL_CITY   => __('permissions.edit-all-city_description'),
+            self::EDIT_OWN_CITY => __('permissions.edit-own-city_description'),
+            self::DELETE_ALL_CITY => __('permissions.delete-city_description'),
+            self::DELETE_OWN_CITY => __('permissions.delete-own-city_description'),
+
         };
     }
 

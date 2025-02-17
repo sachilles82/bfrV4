@@ -2,33 +2,20 @@
 
 namespace App\Policies\Address;
 
+use App\Enums\Role\Permission;
 use App\Models\Address\State;
 use App\Models\User;
 
 class StatePolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, State $state): bool
-    {
-//       return $user->id === $state->created_by:
-    }
 
     /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        return $user->can('create-state');
+//        return $user->can(Permission::CREATE_STATE);
+        return true;
     }
 
     /**
@@ -36,13 +23,17 @@ class StatePolicy
      */
     public function update(User $user, State $state): bool
     {
-        if ($user->can('edit-all-state')) {
-            return true;
-        }
-
-        if ($user->can('edit-state')) {
-            return $user->id == $state->created_by;
-        }
+//        if ($user->can(Permission::EDIT_ALL_STATE)) {
+//            return true;
+//        }
+//
+//        if ($user->can(Permission::EDIT_OWN_STATE)) {
+//            return $user->id == $state->created_by;
+//        }
+//
+//        return false;
+        //nur zu Testzwecken
+                return true;
     }
 
     /**
@@ -50,6 +41,16 @@ class StatePolicy
      */
     public function delete(User $user, State $state): bool
     {
-        //
+//        if ($user->can(Permission::DELETE_ALL_STATE)) {
+//            return true;
+//        }
+//
+//        if ($user->can(Permission::DELETE_OWN_STATE)) {
+//            return $user->id == $state->created_by;
+//        }
+//
+//        return false;
+
+        return true;
     }
 }

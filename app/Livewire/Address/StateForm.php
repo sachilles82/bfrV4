@@ -16,36 +16,28 @@ class StateForm extends Component
     use ValidateStateForm, WithPerPagePagination;
 
     public array $countries = [];
-
     public ?int $stateId = null;
     public ?string $name = null;
-    public ?string $code = null; // Falls benötigt (hier verwenden wir z.B. einen Dummy-Wert)
-    public ?int $selectedCountry = null;  // Die aktuell ausgewählte Country-ID
+    public ?string $code = null; // Dummy-Wert, falls benötigt
+    public ?int $selectedCountry = null;
     public bool $editing = false;
 
-    /**
-     * Der Parameter $countries wird hier vom Parent übergeben.
-     */
     public function mount(array $countries): void
     {
         $this->countries = $countries;
     }
 
-    /**
-     * Speichert oder aktualisiert einen State.
-     */
-
-
     public function saveState(): void
     {
         try {
             $this->validate();
-
             $code = 'PUP'; // Dummy Code
 
             if ($this->editing && $this->stateId) {
                 $state = State::where('created_by', Auth::id())
                     ->findOrFail($this->stateId);
+
+                $this->authorize('update', $state);
 
                 $state->update([
                     'name'       => $this->name,
@@ -59,6 +51,9 @@ class StateForm extends Component
                     variant: 'success'
                 );
             } else {
+
+                $this->authorize('create', State::class);
+
                 State::create([
                     'name'       => $this->name,
                     'code'       => $code,
@@ -72,106 +67,94 @@ class StateForm extends Component
                 );
             }
 
-            $this->dispatch('refresh-states-all', ['modifiedCountry' => $this->selectedCountry]);
+            $this->dispatch('states-updated', ['modifiedCountry' => $this->selectedCountry]);
 
         } catch (\Throwable $e) {
-            // Wenn es sich um eine ValidationException handelt, diese erneut werfen
             if ($e instanceof ValidationException) {
                 throw $e;
             }
 
-            // Andernfalls generische Fehlermeldung anzeigen
             Flux::toast(
                 text: __('An error occurred while saving the state.'),
                 heading: __('Error.'),
                 variant: 'danger'
             );
         }
+
         $this->finish();
     }
 
-
-
-    /**
-     * Lädt einen bestehenden State zur Bearbeitung.
-     */
     public function editState(int $id): void
     {
         try {
             $state = State::where('created_by', Auth::id())
                 ->findOrFail($id);
 
-//            $this->authorize('update-state', $state);
-
-            $this->stateId    = $state->id;
-            $this->name       = $state->name;
-            $this->code       = $state->code;
+            $this->stateId         = $state->id;
+            $this->name            = $state->name;
+            $this->code            = $state->code;
             $this->selectedCountry = $state->country_id;
-
-            $this->editing = true;
+            $this->editing         = true;
 
         } catch (\Throwable $e) {
+
             Flux::toast(
-                text: __('You can not editing the state.'),
+                text: __('You cannot edit the state.'),
                 heading: __('Error.'),
                 variant: 'danger'
             );
+
         }
     }
 
-
-    /**
-     * Löscht einen State.
-     */
     public function deleteState(int $id): void
     {
         try {
             $state = State::where('created_by', Auth::id())
                 ->findOrFail($id);
 
-            // Hole den Country-Wert direkt aus dem gelöschten State
+            $this->authorize('delete', $state);
+
             $modifiedCountry = $state->country_id;
 
             $state->delete();
-
-            $this->dispatch('refresh-states-all', ['modifiedCountry' => $modifiedCountry]);
+            $this->dispatch('states-updated', ['modifiedCountry' => $modifiedCountry]);
 
             Flux::toast(
                 text: __('State deleted successfully.'),
                 heading: __('Success.'),
                 variant: 'success'
             );
+
             $this->finish();
 
         } catch (\Throwable $e) {
+
             Flux::toast(
-                text: __('You can not delete this state.'),
+                text: __('You cannot delete this state.'),
                 heading: __('Error.'),
                 variant: 'danger'
             );
+
         }
     }
 
-
-    /**
-     * Setzt das Formular zurück.
-     */
     public function finish(): void
     {
-        $this->modal('create-state')->close();
+        $this->modal('create-state')
+            ->close();
 
         $this->reset([
             'stateId', 'name', 'selectedCountry', 'editing'
         ]);
+
+        $this->resetValidation();
     }
 
-    /**
-     * Rendert die Komponente.
-     */
     public function render(): View
     {
         $query = State::where('created_by', Auth::id())
-            ->with('country:id,code')
+            ->with('country:id,code,name')
             ->orderBy('id');
 
         $states = $this->applySimplePagination($query);
@@ -180,4 +163,5 @@ class StateForm extends Component
             'states' => $states,
         ]);
     }
+
 }

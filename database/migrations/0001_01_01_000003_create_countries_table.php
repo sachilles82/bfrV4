@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('phonecode',10)->nullable();
             $table->string('currency', 3)->nullable();
             $table->timestamps();
+
+            $table->index(['name', 'code']);
         });
     }
 

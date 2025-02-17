@@ -28,7 +28,7 @@ class CityPolicy
      */
     public function create(User $user): bool
     {
-        //
+       return true;
     }
 
     /**
@@ -36,7 +36,7 @@ class CityPolicy
      */
     public function update(User $user, City $city): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -44,7 +44,7 @@ class CityPolicy
      */
     public function delete(User $user, City $city): bool
     {
-        //
+        return true;
     }
 
     /**

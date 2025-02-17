@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('cities', function (Blueprint $table) {
@@ -18,9 +15,7 @@ return new class extends Migration
             $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
-
-            $table->index(['state_id', 'team_id']);
-            $table->index('created_by');
+            $table->index(['name', 'state_id', 'team_id', 'created_by']);
         });
     }
 

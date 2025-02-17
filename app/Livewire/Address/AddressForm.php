@@ -3,8 +3,7 @@
 namespace App\Livewire\Address;
 
 use App\Livewire\Address\Helper\ValidateAddressable;
-use App\Models\Address\City;
-use App\Models\Address\State;
+use App\Services\Address\AddressCache;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +17,7 @@ class AddressForm extends Component
     use ValidateAddressable;
 
     public Model $addressable;
+
     public array $countries = [];
     public array $states = [];
     public array $cities = [];
@@ -27,15 +27,10 @@ class AddressForm extends Component
     public ?int $selectedCity = null;
     public string $street_number = '';
 
-    protected const CACHE_TTL = 604800; // 1 Woche in Sekunden
-
-    /**
-     * Der Parameter $countries wird hier übergeben, um die Länderliste zu erhalten.
-     */
     public function mount(Model $addressable, array $countries): void
     {
         $cacheKey = sprintf('addressable-%s', $addressable->getKey());
-        // Das addressable Model wird dauerhaft gecached, da sich diese Daten selten ändern.
+
         $this->addressable = Cache::rememberForever($cacheKey, function () use ($addressable) {
             return $addressable->loadMissing('address');
         });
@@ -50,7 +45,6 @@ class AddressForm extends Component
             $this->selectedCity = $address->city_id ?? null;
             $this->street_number = $address->street_number ?? '';
         } else {
-            // Fallback: Wähle das erste Land, falls keine Adresse vorhanden ist.
             $this->selectedCountry = $countries[0]['id'] ?? null;
         }
 
@@ -62,30 +56,12 @@ class AddressForm extends Component
         }
     }
 
-    /**
-     * Eine Hilfsmethode, die einen Cache-Eintrag mit einer definierten TTL erstellt.
-     */
-    protected function cacheQuery(string $cacheKey, \Closure $callback)
-    {
-        return Cache::remember($cacheKey, now()->addSeconds(self::CACHE_TTL), $callback);
-    }
-
     public function loadStates(): void
     {
         $teamId = Auth::user()->currentTeam?->id ?? 0;
+
         if ($this->selectedCountry) {
-            $cacheKey = sprintf('state-country-%d-team-%d', $this->selectedCountry, $teamId);
-            $this->states = $this->cacheQuery($cacheKey, function () use ($teamId) {
-                return State::select(['id', 'name', 'code', 'country_id'])
-                    ->where('country_id', $this->selectedCountry)
-                    ->where(function ($query) use ($teamId) {
-                        $query->where('team_id', $teamId)
-                            ->orWhere('created_by', 1);
-                    })
-                    ->orderBy('id')
-                    ->get()
-                    ->toArray();
-            });
+            $this->states = AddressCache::getStates($this->selectedCountry, $teamId);
         }
     }
 
@@ -93,18 +69,7 @@ class AddressForm extends Component
     {
         $teamId = Auth::user()->currentTeam?->id ?? 0;
         if ($this->selectedState) {
-            $cacheKey = sprintf('cities-state-%d-team-%d', $this->selectedState, $teamId);
-            $this->cities = $this->cacheQuery($cacheKey, function () use ($teamId) {
-                return City::select(['id', 'name', 'state_id'])
-                    ->where('state_id', $this->selectedState)
-                    ->where(function ($query) use ($teamId) {
-                        $query->where('team_id', $teamId)
-                            ->orWhere('created_by', 1);
-                    })
-                    ->orderBy('id')
-                    ->get()
-                    ->toArray();
-            });
+            $this->cities = AddressCache::getCities($this->selectedState, $teamId);
         } else {
             $this->cities = [];
         }
@@ -128,6 +93,7 @@ class AddressForm extends Component
     public function updateAddress(): void
     {
         $this->authorize('update', $this->addressable);
+
         $this->validate();
 
         try {
@@ -138,11 +104,8 @@ class AddressForm extends Component
                 'city_id' => $this->selectedCity,
             ]);
 
-            // Den Cache invalidieren
             $cacheKey = sprintf('addressable-%s', $this->addressable->getKey());
             Cache::forget($cacheKey);
-
-            // Setze die Property neu, sodass der Cache-Aufruf in mount() (oder einer Methode) wieder ausgeführt wird.
             $this->addressable = Cache::rememberForever($cacheKey, function () {
                 return $this->addressable->fresh('address');
             });
@@ -154,41 +117,50 @@ class AddressForm extends Component
             );
 
             $this->dispatch('address-updated');
+
         } catch (\Exception $e) {
+
             Flux::toast(
                 text: __('An error occurred while saving the address.'),
                 heading: __('Error'),
                 variant: 'error'
             );
+
         }
     }
 
-    #[On('refresh-states-all')]
+    #[On(['refresh-states-all', 'states-updated'])]
     public function loadStatesFromDatabase($eventData = null): void
     {
         $teamId = Auth::user()->currentTeam?->id ?? 0;
 
-        // Wenn im Event-Datenarray ein modifiedCountry übergeben wurde, lösche den zugehörigen Cache
         if (is_array($eventData) && isset($eventData['modifiedCountry'])) {
             $modifiedCountry = $eventData['modifiedCountry'];
-            $cacheKey = sprintf('state-country-%d-team-%d', $modifiedCountry, $teamId);
-            ray($cacheKey);
-            Cache::forget($cacheKey);
+            AddressCache::forgetStates($modifiedCountry, $teamId);
         }
 
         $this->loadStates();
     }
 
+    #[On('refresh-states-cities')]
+    public function loadCitiesFromDatabase($eventData = null): void
+    {
+        $teamId = Auth::user()->currentTeam?->id ?? 0;
 
+        if (is_array($eventData) && isset($eventData['modifiedState'])) {
+            $modifiedState = $eventData['modifiedState'];
+            AddressCache::forgetCities($modifiedState, $teamId);
+        }
 
+        $this->loadCities();
+    }
 
     public function render(): View
     {
         return view('livewire.address.address-form', [
             'countries' => $this->countries,
-            'states' => $this->states,
-            'cities' => $this->cities,
+            'states'    => $this->states,
+            'cities'    => $this->cities,
         ]);
     }
-
 }

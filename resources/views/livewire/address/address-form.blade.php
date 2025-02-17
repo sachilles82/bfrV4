@@ -23,7 +23,7 @@
                             >
                                 <div class="relative mt-2">
                                     <flux:select
-                                        {{--                                        wire:init="selectedCountry"--}}
+                                        wire:init="selectedCountry"
                                         wire:model.live="selectedCountry"
                                         id="country"
                                         variant="listbox"
@@ -60,7 +60,7 @@
                             >
                                 <div class="relative mt-2">
                                     <flux:select
-                                        {{--                                        wire:init="selectedState"--}}
+                                        wire:init="selectedState"
                                         wire:model.live="selectedState"
                                         id="state"
                                         size="bl-none"
@@ -81,18 +81,20 @@
                                                 </div>
                                             </flux:option>
                                         @endforeach
-                                        <x-slot name="add">
-                                            <flux:modal.trigger name="create-state">
-                                                <flux:separator class="mt-2 mb-1"/>
-                                                <flux:button
-                                                    icon="plus"
-                                                    class="w-full rounded-b-lg rounded-t-none dark:bg-white/10 dark:hover:hover:bg-white/20 dark:text-white"
-                                                    variant="filled"
-                                                >
-                                                    {{ __('Open State Menu') }}
-                                                </flux:button>
-                                            </flux:modal.trigger>
-                                        </x-slot>
+                                        @can('create', \App\Models\Address\State::class)
+                                            <x-slot name="add">
+                                                <flux:modal.trigger name="create-state">
+                                                    <flux:separator class="mt-2 mb-1"/>
+                                                    <flux:button
+                                                        icon="plus"
+                                                        class="w-full rounded-b-lg rounded-t-none dark:bg-white/10 dark:hover:hover:bg-white/20 dark:text-white"
+                                                        variant="filled"
+                                                    >
+                                                        {{ __('Open State Menu') }}
+                                                    </flux:button>
+                                                </flux:modal.trigger>
+                                            </x-slot>
+                                        @endcan
                                     </flux:select>
                                 </div>
                             </x-pupi.input.group>
@@ -130,7 +132,7 @@
                         >
                             <div class="relative mt-2">
                                 <flux:select
-                                    {{--                                    wire:init="selectedCity"--}}
+                                    wire:init="selectedCity"
                                     wire:model="selectedCity"
                                     id="city"
                                     variant="listbox"
@@ -147,18 +149,20 @@
                                             </div>
                                         </flux:option>
                                     @endforeach
-                                    <x-slot name="add">
-                                        <flux:modal.trigger name="create-city">
-                                            <flux:separator class="mt-2 mb-1"/>
-                                            <flux:button
-                                                icon="plus"
-                                                class="w-full rounded-b-lg rounded-t-none dark:bg-white/10 dark:hover:hover:bg-white/20 dark:text-white"
-                                                variant="filled"
-                                            >
-                                                {{ __('Open Zip & City Menu') }}
-                                            </flux:button>
-                                        </flux:modal.trigger>
-                                    </x-slot>
+{{--                                    @can('create', \App\Models\Address\City::class)--}}
+                                        <x-slot name="add">
+                                            <flux:modal.trigger name="create-city">
+                                                <flux:separator class="mt-2 mb-1"/>
+                                                <flux:button
+                                                    icon="plus"
+                                                    class="w-full rounded-b-lg rounded-t-none dark:bg-white/10 dark:hover:hover:bg-white/20 dark:text-white"
+                                                    variant="filled"
+                                                >
+                                                    {{ __('Open Zip & City Menu') }}
+                                                </flux:button>
+                                            </flux:modal.trigger>
+                                        </x-slot>
+{{--                                    @endcan--}}
                                 </flux:select>
                             </div>
                         </x-pupi.input.group>
@@ -167,9 +171,11 @@
             </div>
 
             <!-- Button Container with Action Buttons -->
-            <x-pupi.button.container>
-                <x-pupi.button.fluxsubmit/>
-            </x-pupi.button.container>
+            @can('update', $addressable)
+                <x-pupi.button.container>
+                    <x-pupi.button.fluxsubmit/>
+                </x-pupi.button.container>
+            @endcan
         </form>
     </x-slot>
 </x-pupi.layout.form>
