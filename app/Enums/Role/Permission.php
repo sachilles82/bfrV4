@@ -74,20 +74,11 @@ enum Permission: string
     case EDIT_OWN_ADDRESS = 'edit-own-address';
     case DELETE_ADDRESS = 'delete-address';
 
-    case LIST_STATE = 'list-state';
-    case CREATE_STATE = 'create-state';
-    case EDIT_ALL_STATE = 'edit-all-state';
-    case EDIT_OWN_STATE = 'edit-own-state';
-    case DELETE_ALL_STATE = 'delete-state';
-    case DELETE_OWN_STATE = 'delete-own-state';
-
-    case LIST_CITY = 'list-city';
-    case CREATE_CITY = 'create-city';
-    case EDIT_ALL_CITY = 'edit-all_city';
-    case EDIT_OWN_CITY = 'edit-own-city';
-    case DELETE_ALL_CITY = 'delete-city';
-    case DELETE_OWN_CITY = 'delete-own-city';
-
+    case CREATE_STATE_CITY = 'create-state-city';
+    case EDIT_ALL_STATE_CITY = 'edit-all-state-city';
+    case EDIT_OWN_STATE_CITY = 'edit-own-state-city';
+    case DELETE_ALL_STATE_CITY = 'delete-state-city';
+    case DELETE_OWN_STATE_CITY = 'delete-own-state-city';
 
     // ... etc.
 
@@ -150,19 +141,11 @@ enum Permission: string
             Permission::EDIT_OWN_ADDRESS,
             Permission::DELETE_ADDRESS,
 
-            Permission::LIST_STATE,
-            Permission::CREATE_STATE,
-            Permission::EDIT_ALL_STATE,
-            Permission::EDIT_OWN_STATE,
-            Permission::DELETE_ALL_STATE,
-            Permission::DELETE_OWN_STATE,
-
-            Permission::LIST_CITY,
-            Permission::CREATE_CITY,
-            Permission::EDIT_ALL_CITY,
-            Permission::EDIT_OWN_CITY,
-            Permission::DELETE_ALL_CITY,
-            Permission::DELETE_OWN_CITY,
+            Permission::CREATE_STATE_CITY,
+            Permission::EDIT_ALL_STATE_CITY,
+            Permission::EDIT_OWN_STATE_CITY,
+            Permission::DELETE_ALL_STATE_CITY,
+            Permission::DELETE_OWN_STATE_CITY
             => 'settingApp',
         };
     }
@@ -234,23 +217,13 @@ enum Permission: string
             Permission::DELETE_ADDRESS
             => 'address',
 
-            // State (alle Cases abdecken!)
-            Permission::LIST_STATE,
-            Permission::CREATE_STATE,
-            Permission::EDIT_ALL_STATE,
-            Permission::EDIT_OWN_STATE,
-            Permission::DELETE_ALL_STATE,
-            Permission::DELETE_OWN_STATE
-            => 'state',
-
-            // City (alle Cases abdecken!)
-            Permission::LIST_CITY,
-            Permission::CREATE_CITY,
-            Permission::EDIT_ALL_CITY,
-            Permission::EDIT_OWN_CITY,
-            Permission::DELETE_ALL_CITY,
-            Permission::DELETE_OWN_CITY
-            => 'city',
+            // State and City Manager
+            Permission::CREATE_STATE_CITY,
+            Permission::EDIT_ALL_STATE_CITY,
+            Permission::EDIT_OWN_STATE_CITY,
+            Permission::DELETE_ALL_STATE_CITY,
+            Permission::DELETE_OWN_STATE_CITY
+            => 'State City Manager',
         };
     }
 
@@ -314,21 +287,13 @@ enum Permission: string
             self::EDIT_OWN_ADDRESS => __('permissions.edit-own-address_description'),
             self::DELETE_ADDRESS => __('permissions.delete-address_description'),
 
-            //State
-            self::LIST_STATE => __('permissions.list-state_description'),
-            self::CREATE_STATE => __('permissions.create-state_description'),
-            self::EDIT_ALL_STATE   => __('permissions.edit-all-state_description'),
-            self::EDIT_OWN_STATE => __('permissions.edit-own-state_description'),
-            self::DELETE_ALL_STATE => __('permissions.delete-state_description'),
-            self::DELETE_OWN_STATE => __('permissions.delete-own-state_description'),
+            //State City Manager
+            self::CREATE_STATE_CITY => __('permissions.create-state-city_description'),
+            self::EDIT_ALL_STATE_CITY => __('permissions.edit-all-state-city_description'),
+            self::EDIT_OWN_STATE_CITY => __('permissions.edit-own-state-city_description'),
+            self::DELETE_ALL_STATE_CITY => __('permissions.delete-state-city_description'),
+            self::DELETE_OWN_STATE_CITY => __('permissions.delete-own-state-city_description'),
 
-            //City
-            self::LIST_CITY => __('permissions.list-city_description'),
-            self::CREATE_CITY => __('permissions.create-city_description'),
-            self::EDIT_ALL_CITY   => __('permissions.edit-all-city_description'),
-            self::EDIT_OWN_CITY => __('permissions.edit-own-city_description'),
-            self::DELETE_ALL_CITY => __('permissions.delete-city_description'),
-            self::DELETE_OWN_CITY => __('permissions.delete-own-city_description'),
 
         };
     }

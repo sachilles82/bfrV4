@@ -251,7 +251,13 @@
                     <flux:column class="!text-sm font-semibold">{{ __('City') }}</flux:column>
                     <flux:column class="!text-sm font-semibold">{{ __('State') }}</flux:column>
                     <flux:column class="!text-sm font-semibold">{{ __('Country') }}</flux:column>
-                    <flux:column class="!text-sm font-semibold">{{ __('Actions') }}</flux:column>
+                    @if(auth()->user()
+                       ->can(\App\Enums\Role\Permission::EDIT_ALL_STATE_CITY)
+                       ||
+                       auth()->user()
+                       ->can(\App\Enums\Role\Permission::EDIT_OWN_STATE_CITY))
+                        <flux:column class="!text-sm font-semibold">{{ __('Actions') }}</flux:column>
+                    @endif
                 </flux:columns>
 
                 <flux:rows>

@@ -149,7 +149,7 @@
                                             </div>
                                         </flux:option>
                                     @endforeach
-{{--                                    @can('create', \App\Models\Address\City::class)--}}
+                                    @can('create', \App\Models\Address\City::class)
                                         <x-slot name="add">
                                             <flux:modal.trigger name="create-city">
                                                 <flux:separator class="mt-2 mb-1"/>
@@ -163,7 +163,7 @@
                                                 </flux:button>
                                             </flux:modal.trigger>
                                         </x-slot>
-{{--                                    @endcan--}}
+                                    @endcan
                                 </flux:select>
                             </div>
                         </x-pupi.input.group>
