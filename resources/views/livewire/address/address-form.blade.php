@@ -154,6 +154,7 @@
                                             <flux:modal.trigger name="create-city">
                                                 <flux:separator class="mt-2 mb-1"/>
                                                 <flux:button
+                                                    @click="$dispatch('create-city')"
                                                     icon="plus"
                                                     class="w-full rounded-b-lg rounded-t-none dark:bg-white/10 dark:hover:hover:bg-white/20 dark:text-white"
                                                     variant="filled"

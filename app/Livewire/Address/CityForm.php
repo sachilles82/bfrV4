@@ -4,7 +4,7 @@ namespace App\Livewire\Address;
 
 use App\Livewire\Address\Helper\ValidateCityForm;
 use App\Models\Address\City;
-use App\Services\Address\AddressCache;
+use App\Models\Address\State;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -27,8 +27,6 @@ class CityForm extends Component
 
     public bool $editing = false;
 
-    protected const CACHE_TTL = 604800;
-
     public function mount(array $countries): void
     {
         $this->countries = $countries;
@@ -41,23 +39,22 @@ class CityForm extends Component
         return Auth::user()->currentTeam?->id ?? 0;
     }
 
+    #[On('create-city')]
     public function loadStates(): void
     {
         if ($this->selectedCountry) {
             $teamId = $this->getTeamId();
-            $this->states = AddressCache::getStates($this->selectedCountry, $teamId);
-        }
-    }
 
-    #[On('refresh-states-all')]
-    public function loadStatesFromDatabase($eventData = null): void
-    {
-        $teamId = $this->getTeamId();
-        if (is_array($eventData) && isset($eventData['modifiedCountry'])) {
-            $modifiedCountry = $eventData['modifiedCountry'];
-            AddressCache::forgetStates($modifiedCountry, $teamId);
+            $this->states = State::select(['id', 'name', 'code', 'country_id'])
+                ->where('country_id', $this->selectedCountry)
+                ->where(function ($query) use ($teamId) {
+                    $query->where('team_id', $teamId)
+                        ->orWhere('created_by', 1);
+                })
+                ->orderBy('id')
+                ->get()
+                ->toArray();
         }
-        $this->loadStates();
     }
 
     public function updatedSelectedCountry(): void
@@ -185,7 +182,7 @@ class CityForm extends Component
 
         $this->reset([
             'cityId', 'name', 'selectedCountry', 'selectedState', 'editing'
-            ]);
+        ]);
 
         $this->resetValidation();
     }
