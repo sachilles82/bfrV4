@@ -4,11 +4,11 @@
     <nav class="flex-none px-0 sm:px-0 lg:px-0 overflow-x-auto">
         <ul role="list" class="flex gap-x-3 gap-y-1 whitespace-nowrap xl:flex-col">
             <li>
-                <a href="{{ route('settings.company') }}" wire:navigate.hover
-                   class="{{ request()->routeIs('settings.company') ? 'text-indigo-600 bg-gray-50 dark:text-white dark:bg-gray-800' : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white' }} group flex gap-x-3 rounded-md py-2 pl-2 pr-3 text-sm leading-6 font-semibold">
-                    <flux:icon.building-office
-                        class="h-6 w-6 {{ request()->routeIs('settings.company') ? 'dark:text-white dark:bg-gray-800' : 'hover:bg-gray-50 group-hover:text-indigo-600 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-500 dark:group-hover:text-white' }}"/>
-                    <span class="truncate">{{ __('Company') }}</span>
+                <a href="{{ route('hr.employees') }}" wire:navigate.hover
+                   class="{{ request()->routeIs('hr.employees') ? 'text-indigo-600 bg-gray-50 dark:text-white dark:bg-gray-800' : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white' }} group flex gap-x-3 rounded-md py-2 pl-2 pr-3 text-sm leading-6 font-semibold">
+                    <flux:icon.user-group
+                        class="h-6 w-6 {{ request()->routeIs('hr.employees') ? 'dark:text-white dark:bg-gray-800' : 'hover:bg-gray-50 group-hover:text-indigo-600 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-500 dark:group-hover:text-white' }}"/>
+                    <span class="truncate">{{ __('Employees') }}</span>
                 </a>
 
                 {{--            <a href="--}}

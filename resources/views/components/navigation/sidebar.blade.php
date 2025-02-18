@@ -12,6 +12,20 @@
                 <span class="mt-2">{{ __('Dashboard') }}</span>
             </a>
 
+            <a wire:navigate href="{{ route('hr.employees') }}"
+               class="{{ request()->routeIs([
+                                            'hr.employees',
+                                            'employee.profile.show'
+                                            ])
+                                                ? 'text-white bg-indigo-800 dark:text-white dark:bg-gray-800' : 'dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 text-indigo-100 hover:bg-indigo-800 hover:text-white' }} group flex w-full flex-col items-center rounded-md p-3 text-xs font-medium">
+                <flux:icon.user-group
+                    class="{{ request()->routeIs([
+                                            'hr.employees',
+                                            'settings.departments.show'
+                                            ]) ? 'dark:text-white dark:bg-gray-800' : 'text-indigo-300 dark:text-gray-400 group-hover:text-white' }} h-6 w-6"/>
+                <span class="mt-2">{{ __('Account`s')}}</span>
+            </a>
+
             <a wire:navigate href="{{ route('settings.profile') }}"
                class="{{ request()->routeIs([
                                             'settings.profile',
@@ -31,20 +45,6 @@
                                             'settings.departments.show'
                                             ]) ? 'dark:text-white dark:bg-gray-800' : 'text-indigo-300 dark:text-gray-400 group-hover:text-white' }} h-6 w-6"/>
                 <span class="mt-2">{{ __('Settings')}}</span>
-            </a>
-
-            <a wire:navigate href=""
-               class="{{ request()->routeIs([
-                                            'employee.profile',
-                                            'employee.profile.show'
-                                            ])
-                                                ? 'text-white bg-indigo-800 dark:text-white dark:bg-gray-800' : 'dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 text-indigo-100 hover:bg-indigo-800 hover:text-white' }} group flex w-full flex-col items-center rounded-md p-3 text-xs font-medium">
-                <flux:icon.user-group
-                    class="{{ request()->routeIs([
-                                            'settings.profile',
-                                            'settings.departments.show'
-                                            ]) ? 'dark:text-white dark:bg-gray-800' : 'text-indigo-300 dark:text-gray-400 group-hover:text-white' }} h-6 w-6"/>
-                <span class="mt-2">{{ __('Account`s')}}</span>
             </a>
 
         </div>

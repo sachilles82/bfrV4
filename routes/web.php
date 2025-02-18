@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Role\Permission;
+use App\Http\Controllers\Account\Employee\EmployeeController;
 use App\Http\Controllers\HR\CompanyController;
 use App\Http\Controllers\HR\DepartmentController;
 use App\Http\Controllers\HR\Employee\ComplianceController;
@@ -63,6 +64,36 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
                 ->name('settings.roles.show');
         });
 
+    });
+
+    Route::prefix('accounts')->group(function () {
+
+        Route::get('/employees',  function () {
+            return view('laravel/hr/employee/index');
+        })->name('hr.employees');
+        // Optional: Route für das Mitarbeiter-Profil, z. B.:
+        Route::get('/employees/{employee}', [
+            EmployeeController::class, 'profile'
+        ])->name('employees.profile');
+
+
+
+        Route::get('/departments', function () {
+            return view('laravel/hr/department/index');
+        })->name('settings.departments');
+
+        Route::get('/departments/{department}', [
+            DepartmentController::class, 'show'
+        ])->name('settings.departments.show');
+
+//        Route::middleware(['can:' . Permission::LIST_ROLE->value])->group(function () {
+//            Route::get('/roles', function () {
+//                return view('laravel/spatie/role/index');
+//            })->name('settings.roles');
+//
+//            Route::get('/roles/{roleId}/{app}', [RoleController::class, 'show'])
+//                ->name('settings.roles.show');
+//        });
 
     });
 });

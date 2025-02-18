@@ -3,11 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Account\Employee;
 use App\Models\Address\State;
 use App\Traits\HasAddress;
 use App\Traits\TraitForUserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -82,6 +84,12 @@ class User extends Authenticatable
     public function states(): HasMany
     {
         return $this->hasMany(State::class);
+    }
+
+    /* Der User kann ein Employee sein */
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class);
     }
 
 }
