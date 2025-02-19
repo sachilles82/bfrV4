@@ -172,11 +172,11 @@
             </div>
 
             <!-- Button Container with Action Buttons -->
-            @can('update', $addressable)
+{{--            @can('update', $addressable)--}}
                 <x-pupi.button.container>
                     <x-pupi.button.fluxsubmit/>
                 </x-pupi.button.container>
-            @endcan
+{{--            @endcan--}}
         </form>
     </x-slot>
 </x-pupi.layout.form>

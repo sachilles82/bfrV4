@@ -2,7 +2,6 @@
 
 namespace App\Nova\Company;
 
-use Illuminate\Http\Request;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -13,9 +12,9 @@ class Industry extends Resource
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\HR\Industry>
+     * @var class-string<\App\Models\Alem\Industry>
      */
-    public static $model = \App\Models\HR\Industry::class;
+    public static $model = \App\Models\Alem\Industry::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.

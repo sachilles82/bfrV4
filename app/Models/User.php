@@ -3,8 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Account\Employee;
 use App\Models\Address\State;
+use App\Models\Alem\Employee;
 use App\Traits\HasAddress;
 use App\Traits\TraitForUserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
@@ -43,6 +44,7 @@ class User extends Authenticatable
         'password',
         'company_id',
         'user_type',
+        'gender',
         'created_by',
     ];
 
@@ -91,5 +93,29 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class);
     }
+
+    /**
+     * Verwende den "username" als Schlüssel für das Route Model Binding.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function ($user) {
+            if (empty($user->slug)) {
+                $user->slug = Str::slug($user->name);
+            }
+        });
+
+        static::updating(function ($user) {
+            // Optional: Den slug auch aktualisieren, wenn sich der Name ändert.
+            $user->slug = Str::slug($user->name);
+        });
+    }
+
+
 
 }

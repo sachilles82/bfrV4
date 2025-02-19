@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\HR\Company;
+use App\Models\Alem\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Jetstream\Events\TeamCreated;

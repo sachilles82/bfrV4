@@ -2,16 +2,16 @@
 
 namespace App\Providers;
 
-use App\Models\Account\Employee;
+use App\Http\Controllers\Alem\Employee\EmployeeController;
 use App\Models\Address\State;
-use App\Models\HR\Company;
-use App\Models\HR\Employee\EmployeeController;
+use App\Models\Alem\Company;
+use App\Models\Alem\Employee;
 use App\Models\Spatie\Permission;
 use App\Models\Spatie\Role;
 use App\Policies\Address\AddressablePolicy;
 use App\Policies\Address\StatePolicy;
-use App\Policies\HR\CompanyPolicy;
-use App\Policies\HR\Employee\EmployeePolicy;
+use App\Policies\Alem\Employee\EmployeePolicy;
+use App\Policies\Alem\CompanyPolicy;
 use App\Policies\Spatie\PermissionPolicy;
 use App\Policies\Spatie\RolePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -33,7 +33,7 @@ class AuthServiceProvider extends ServiceProvider
         //  Address State City
         State::class => StatePolicy::class,
         EmployeeController::class => EmployeePolicy::class,
-        Employee::class => \App\Policies\Account\Employee\EmployeePolicy::class,
+        Employee::class => EmployeePolicy::class,
     ];
 
     /**

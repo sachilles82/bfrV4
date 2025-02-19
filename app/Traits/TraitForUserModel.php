@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Models\HR\Company;
+use App\Models\Alem\Company;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

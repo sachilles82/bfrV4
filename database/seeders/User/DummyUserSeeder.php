@@ -14,9 +14,9 @@ class DummyUserSeeder extends Seeder
 
     public function run(): void
     {
-        DB::table('users')->insert([
-            'name'       => 'Wir durch Super Admin ersetzt im AdminSeeder',
-            'email'      => 'system@example.com',
+        \App\Models\User::create([
+            'name'     => 'Wir durch Super Admin ersetzt im AdminSeeder',
+            'email'    => 'system@example.com',
             'password'   => Hash::make('secret'),
             'created_at' => now(),
             'updated_at' => now(),

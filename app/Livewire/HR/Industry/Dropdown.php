@@ -2,7 +2,7 @@
 
 namespace App\Livewire\HR\Industry;
 
-use App\Models\HR\Industry;
+use App\Models\Alem\Industry;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 

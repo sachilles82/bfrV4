@@ -92,7 +92,7 @@ class AddressForm extends Component
 
     public function updateAddress(): void
     {
-        $this->authorize('update', $this->addressable);
+//        $this->authorize('update', $this->addressable);
 
         $this->validate();
 

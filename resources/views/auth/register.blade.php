@@ -4,7 +4,7 @@
             <x-authentication-card-logo/>
         </x-slot>
 
-{{--        <x-validation-errors class="mb-4"/>--}}
+        {{--        <x-validation-errors class="mb-4"/>--}}
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
@@ -13,7 +13,7 @@
                     <flux:label badge="{{ __('Required') }}">{{ __('Industry') }}</flux:label>
                     <flux:select variant="listbox" searchable placeholder="{{ __('Choose a Industry') }}"
                                  x-model="selectedIndustry">
-                        @foreach(\App\Models\HR\Industry::all() as $industry)
+                        @foreach(\App\Models\Alem\Industry::all() as $industry)
                             <flux:option value="{{ $industry->id }}">{{ $industry->name }}</flux:option>
                         @endforeach
                     </flux:select>
@@ -22,22 +22,21 @@
                 </div>
 
 
-
                 <div x-data="{ selectedSize: '{{ \App\Enums\Company\CompanySize::OneToFive }}' }">
                     <flux:field>
                         <flux:label badge="{{ __('Required') }}">{{ __('Company Size') }}</flux:label>
 
                         <flux:select
-                            id="company_size"
-                            name="company_size"
-                            variant="listbox"
-                            placeholder="{{ __('Company Size') }}"
-                            @change="selectedSize = $event.target.value"
+                                id="company_size"
+                                name="company_size"
+                                variant="listbox"
+                                placeholder="{{ __('Company Size') }}"
+                                @change="selectedSize = $event.target.value"
                         >
                             @foreach(App\Enums\Company\CompanySize::options() as $value => $label)
                                 <flux:option
-                                    value="{{ $value }}"
-                                    :selected="$value === '1-5'"
+                                        value="{{ $value }}"
+                                        :selected="$value === '1-5'"
                                 >
                                     {{ $label }}
                                 </flux:option>
@@ -53,7 +52,7 @@
                     <flux:input.group>
                         <flux:input placeholder="meinefirma"/>
 
-                        <flux:input.group.suffix >.reportix.app</flux:input.group.suffix>
+                        <flux:input.group.suffix>.reportix.app</flux:input.group.suffix>
 
                     </flux:input.group>
 
@@ -65,10 +64,10 @@
                 <flux:radio.group label="Company Type" variant="segmented">
                     @foreach(\App\Enums\Company\CompanyType::options() as $value => $label)
                         <flux:radio
-                            label="{{ $label }}"
-                            value="{{ $value }}"
-                            :checked="$value === 'gmbh'"
-                            @click="selectedValue = '{{ $value }}'"
+                                label="{{ $label }}"
+                                value="{{ $value }}"
+                                :checked="$value === 'gmbh'"
+                                @click="selectedValue = '{{ $value }}'"
                         />
                     @endforeach
                 </flux:radio.group>
@@ -78,7 +77,8 @@
 
             <div class="mt-4">
                 <x-label for="name" value="{{ __('Company Name') }}"/>
-                <x-input id="name" class="block mt-1 w-full" type="text" name="company_name" :value="old('company_name')" required
+                <x-input id="name" class="block mt-1 w-full" type="text" name="company_name"
+                         :value="old('company_name')" required
                          autofocus autocomplete="company_name"/>
             </div>
 

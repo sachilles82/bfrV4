@@ -4,16 +4,22 @@ namespace App\Enums\User;
 
 enum Gender: string
 {
-    case Other = 'other';
     case Male = 'male';
     case Female = 'female';
+
+    public static function options(): array
+    {
+        return [
+            self::Male->value   => 'Male',
+            self::Female->value => 'Female',
+        ];
+    }
 
     public function label(): string
     {
         return match ($this) {
-            static::Other => __('Other'),
-            static::Male => __('Male'),
-            static::Female => __('Female'),
+            self::Male   => __('Male'),
+            self::Female => __('Female'),
         };
     }
 }

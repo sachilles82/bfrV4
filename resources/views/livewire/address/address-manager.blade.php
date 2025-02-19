@@ -13,6 +13,7 @@
     <livewire:address.address-form
         :addressable="$addressable"
         :countries="$countries"
+{{--        lazy--}}
     />
 
 </div>

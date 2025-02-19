@@ -7,7 +7,7 @@ use App\Enums\Company\CompanySize;
 use App\Enums\Company\CompanyType;
 use App\Enums\Role\UserHasRole;
 use App\Enums\User\UserType;
-use App\Models\HR\Company;
+use App\Models\Alem\Company;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;

@@ -12,7 +12,6 @@
             <x-navigation.settings.role-header
                 :role="$role"
             />
-
         </x-slot:header>
 
         <livewire:spatie.role.permission.update
