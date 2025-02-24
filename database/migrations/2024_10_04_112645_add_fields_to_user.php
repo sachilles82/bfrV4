@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('created_by')->after('gender')->nullable();
             $table->string('theme')->default('default')->after('created_by');
             $table->string('slug')->unique()->nullable()->after('theme');
+            $table->foreignId('last_name')->after('slug')->nullable();
         });
     }
 

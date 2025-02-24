@@ -58,7 +58,7 @@
                                             @php
                                                 $nameInitials = strtoupper(join('+', array_map(function($name) {
                                                     return substr($name, 0, 1);
-                                                }, explode(' ', $user->name . ' ' . $user->name))));
+                                                }, explode(' ', $user->name . ' ' . $user->last_name))));
                                             @endphp
                                             <img
                                                 src="https://ui-avatars.com/api/?name={{ $nameInitials }}&color=7F9CF5&background=EBF4FF"
@@ -68,14 +68,14 @@
                                     <div x-show="checked" x-cloak class="ml-4">
                                         <div
                                             class="font-medium text-gray-500 dark:text-gray-600">
-                                            {{$user->name}}
+                                            {{$user->name}}  {{$user->last_name}}
                                         </div>
                                         <div class="mt-1 text-gray-500 dark:text-gray-600">Malermeister</div>
                                     </div>
                                     <div x-show="!checked" class="ml-4">
                                         <a wire:navigate.hover href="{{ route('employees.profile', $user) }}"
                                            class="font-medium text-gray-900 dark:text-gray-300 hover:text-indigo-700 decoration-1 hover:underline dark:hover:text-indigo-300">
-                                            {{ $user->name }}
+                                            {{$user->name}}  {{$user->last_name}}
                                         </a>
 
                                         <div class="mt-1 text-gray-500 dark:text-gray-400">Malermeister</div>

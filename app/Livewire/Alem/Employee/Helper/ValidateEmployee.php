@@ -11,6 +11,7 @@ trait ValidateEmployee
         return [
             // Für den zugehörigen User (Update: Name als employee_name, E-Mail, Gender)
             'name'   => 'required|string|min:3',
+            'last_name'   => 'required|string|min:3',
             'email'           => [
                 'required',
                 'email',
@@ -25,7 +26,7 @@ trait ValidateEmployee
             'probation'       => 'nullable|date',
             'social_number'   => 'nullable|string',
             'personal_number' => 'nullable|string',
-            'profession'      => 'nullable|string',
+//            'profession'      => 'nullable|string',
         ];
     }
 
@@ -34,6 +35,8 @@ trait ValidateEmployee
         return [
             'name.required'   => __('Employee name is required.'),
             'name.min'        => __('Employee name must be at least 3 characters.'),
+            'last_name.required'   => __('Employee last name is required.'),
+            'last_name.min'        => __('Employee last name must be at least 3 characters.'),
             'email.required'           => __('Email is required.'),
             'email.email'              => __('Email must be valid.'),
             'email.unique'             => __('Email already exists.'),

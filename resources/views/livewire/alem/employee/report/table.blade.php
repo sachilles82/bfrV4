@@ -1,5 +1,5 @@
 <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Employee Reports</h1>
+    <h1 class="text-2xl font-bold mb-4">Sahreim Reports</h1>
 
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">

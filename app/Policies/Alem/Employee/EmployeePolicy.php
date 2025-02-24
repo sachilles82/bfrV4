@@ -2,7 +2,7 @@
 
 namespace App\Policies\Alem\Employee;
 
-use App\Models\Alem\Employee;
+use App\Models\Alem\Employee\Employee;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 

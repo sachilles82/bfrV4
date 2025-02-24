@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Alem;
+namespace App\Models\Alem\Employee;
 
 use App\Models\User;
 use App\Traits\BelongsToTeam;
@@ -28,7 +28,6 @@ class Employee extends Model
         'social_number',
         'personal_number',
         'profession',
-
         'company_id',
         'team_id',
         'created_by',

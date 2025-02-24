@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Alem\Employee\Profile;
 
-use App\Models\Alem\Employee;
+use App\Models\Alem\Employee\Employee;
 use App\Models\User;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -19,6 +19,7 @@ class Information extends Component
 
     // Lokale Properties für User-Daten (vom zugehörigen User)
     public string $name;
+    public string $last_name;
     public string $email;
     public ?string $gender = '';
 
@@ -47,6 +48,7 @@ class Information extends Component
 
         // Setze die lokalen Felder aus den User-Daten und Employee-Daten
         $this->name = $user->name;
+        $this->last_name = $user->last_name;
         $this->email         = $user->email;
         $this->gender        = $user->gender ?? '';
 
@@ -65,6 +67,7 @@ class Information extends Component
     {
         return [
             'name'   => 'required|string|min:3',
+            'last_name'   => 'required|string|min:3',
             'email'           => [
                 'required',
                 'email',
@@ -92,6 +95,7 @@ class Information extends Component
         // Update der User-Daten
         $this->employee->user->update([
             'name'   => $this->name,
+            'last_name'   => $this->last_name,
             'email'  => $this->email,
             'gender' => $this->gender,
         ]);

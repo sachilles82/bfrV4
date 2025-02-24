@@ -4,7 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Address\State;
-use App\Models\Alem\Employee;
+use App\Models\Alem\Employee\Employee;
 use App\Traits\HasAddress;
 use App\Traits\TraitForUserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,6 +40,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'last_name',
         'email',
         'password',
         'company_id',

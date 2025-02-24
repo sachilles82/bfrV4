@@ -1,6 +1,6 @@
 <x-pupi.layout.form>
     <x-slot:title>
-        {{ __('Employee Details') }}
+        {{ __('Employee Account Details') }}
     </x-slot:title>
 
     <x-slot:description>
@@ -26,7 +26,7 @@
                         </div>
                     </div>
 
-                    <div class="sm:col-span-3">
+                    <div class="sm:col-span-4">
                         <x-pupi.input.group label="{{ __('Gender') }}" for="gender" badge="{{ __('Required') }}" :error="$errors->first('gender')">
                             <flux:select wire:model="gender" id="gender" name="gender" variant="listbox" placeholder="{{ __('Select Gender') }}">
                                 @foreach(\App\Enums\User\Gender::options() as $value => $label)
@@ -37,63 +37,93 @@
                     </div>
 
                     <!-- Employee Name -->
-                    <div class="sm:col-span-4">
-                        <x-pupi.input.group label="{{ __('Name Surname') }}" for="name" badge="{{ __('Required') }}" :error="$errors->first('name')">
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('First Name') }}" for="name" badge="{{ __('Required') }}" :error="$errors->first('name')">
                             <x-pupi.input.text wire:model="name" name="name" id="name" placeholder="{{ __('Employee Name') }}"/>
                         </x-pupi.input.group>
                     </div>
+                    <!-- Employee Name -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Last Name') }}" for="last_name" badge="{{ __('Required') }}" :error="$errors->first('last_name')">
+                            <x-pupi.input.text wire:model="last_name" name="last_name" id="last_name" placeholder="{{ __('Employee Name') }}"/>
+                        </x-pupi.input.group>
+                    </div>
                     <!-- Email -->
-                    <div class="sm:col-span-4">
+                    <div class="sm:col-span-3">
                         <x-pupi.input.group label="{{ __('Email') }}" for="email" badge="{{ __('Required') }}" :error="$errors->first('email')">
                             <x-pupi.input.text wire:model="email" name="email" id="email" placeholder="{{ __('Email') }}"/>
                         </x-pupi.input.group>
                     </div>
-                    <!-- Gender -->
-                    <div class="sm:col-span-2">
-                        <x-pupi.input.group label="{{ __('Gender') }}" for="gender" badge="{{ __('Required') }}" :error="$errors->first('gender')">
-                            <flux:select wire:model="gender" id="gender" name="gender" variant="listbox" placeholder="{{ __('Select Gender') }}">
-                                <flux:option value="male">{{ __('Male') }}</flux:option>
-                                <flux:option value="female">{{ __('Female') }}</flux:option>
-                                <flux:option value="other">{{ __('Other') }}</flux:option>
+                    <!-- Phone -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Phone') }}" for="phone" badge="{{ __('Required') }}" :error="$errors->first('phone')">
+                            <x-pupi.input.text  name="phone" id="phone" placeholder="{{ __('Phone') }}"/>
+                        </x-pupi.input.group>
+                    </div>
+
+
+                    <!-- Team Select -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Team') }}" for="team" badge="{{ __('Required') }}" :error="$errors->first('team')">
+                            <flux:select wire:model="team" id="team" name="team" variant="listbox" placeholder="{{ __('Select Team') }}">
+                                <flux:option value="sales">{{ __('Sales') }}</flux:option>
+                                <flux:option value="marketing">{{ __('Marketing') }}</flux:option>
+                                <flux:option value="development">{{ __('Development') }}</flux:option>
+                                <flux:option value="support">{{ __('Support') }}</flux:option>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
+
+                    <!-- Department Select -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Department') }}" for="department" badge="{{ __('Required') }}" :error="$errors->first('department')">
+                            <flux:select wire:model="department" id="department" name="department" variant="listbox" placeholder="{{ __('Select Department') }}">
+                                <flux:option value="finance">{{ __('Finance') }}</flux:option>
+                                <flux:option value="hr">{{ __('HR') }}</flux:option>
+                                <flux:option value="it">{{ __('IT') }}</flux:option>
+                                <flux:option value="operations">{{ __('Operations') }}</flux:option>
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
+
+
                     <!-- Date Hired -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Date Hired') }}" for="date_hired" badge="{{ __('Required') }}" :error="$errors->first('date_hired')">
-                            <x-pupi.input.text wire:model="date_hired" name="date_hired" id="date_hired" type="date"/>
-                        </x-pupi.input.group>
-                    </div>
-                    <!-- Date Fired (optional) -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Date Fired') }}" for="date_fired" :error="$errors->first('date_fired')">
-                            <x-pupi.input.text wire:model="date_fired" name="date_fired" id="date_fired" type="date"/>
-                        </x-pupi.input.group>
-                    </div>
-                    <!-- Probation End (optional) -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Probation End') }}" for="probation" :error="$errors->first('probation')">
-                            <x-pupi.input.text wire:model="probation" name="probation" id="probation" type="date"/>
-                        </x-pupi.input.group>
-                    </div>
-                    <!-- Social Number -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Social Number') }}" for="social_number" :error="$errors->first('social_number')">
-                            <x-pupi.input.text wire:model="social_number" name="social_number" id="social_number" placeholder="{{ __('Enter social number') }}"/>
-                        </x-pupi.input.group>
-                    </div>
-                    <!-- Personal Number -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Personal Number') }}" for="personal_number" :error="$errors->first('personal_number')">
-                            <x-pupi.input.text wire:model="personal_number" name="personal_number" id="personal_number" placeholder="{{ __('Enter personal number') }}"/>
-                        </x-pupi.input.group>
-                    </div>
-                    <!-- Profession -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Profession') }}" for="profession" :error="$errors->first('profession')">
-                            <x-pupi.input.text wire:model="profession" name="profession" id="profession" placeholder="{{ __('Enter profession') }}"/>
-                        </x-pupi.input.group>
-                    </div>
+{{--                    <div class="sm:col-span-3">--}}
+{{--                        <x-pupi.input.group label="{{ __('Date Hired') }}" for="date_hired" badge="{{ __('Required') }}" :error="$errors->first('date_hired')">--}}
+{{--                            <x-pupi.input.text wire:model="date_hired" name="date_hired" id="date_hired" type="date"/>--}}
+{{--                        </x-pupi.input.group>--}}
+{{--                    </div>--}}
+{{--                    <!-- Date Fired (optional) -->--}}
+{{--                    <div class="sm:col-span-3">--}}
+{{--                        <x-pupi.input.group label="{{ __('Date Fired') }}" for="date_fired" :error="$errors->first('date_fired')">--}}
+{{--                            <x-pupi.input.text wire:model="date_fired" name="date_fired" id="date_fired" type="date"/>--}}
+{{--                        </x-pupi.input.group>--}}
+{{--                    </div>--}}
+{{--                    <!-- Probation End (optional) -->--}}
+{{--                    <div class="sm:col-span-3">--}}
+{{--                        <x-pupi.input.group label="{{ __('Probation End') }}" for="probation" :error="$errors->first('probation')">--}}
+{{--                            <x-pupi.input.text wire:model="probation" name="probation" id="probation" type="date"/>--}}
+{{--                        </x-pupi.input.group>--}}
+{{--                    </div>--}}
+{{--                    <!-- Social Number -->--}}
+{{--                    <div class="sm:col-span-3">--}}
+{{--                        <x-pupi.input.group label="{{ __('Social Number') }}" for="social_number" :error="$errors->first('social_number')">--}}
+{{--                            <x-pupi.input.text wire:model="social_number" name="social_number" id="social_number" placeholder="{{ __('Enter social number') }}"/>--}}
+{{--                        </x-pupi.input.group>--}}
+{{--                    </div>--}}
+{{--                    <!-- Personal Number -->--}}
+{{--                    <div class="sm:col-span-3">--}}
+{{--                        <x-pupi.input.group label="{{ __('Personal Number') }}" for="personal_number" :error="$errors->first('personal_number')">--}}
+{{--                            <x-pupi.input.text wire:model="personal_number" name="personal_number" id="personal_number" placeholder="{{ __('Enter personal number') }}"/>--}}
+{{--                        </x-pupi.input.group>--}}
+{{--                    </div>--}}
+{{--                    <!-- Profession -->--}}
+{{--                    <div class="sm:col-span-3">--}}
+{{--                        <x-pupi.input.group label="{{ __('Profession') }}" for="profession" :error="$errors->first('profession')">--}}
+{{--                            <x-pupi.input.text wire:model="profession" name="profession" id="profession" placeholder="{{ __('Enter profession') }}"/>--}}
+{{--                        </x-pupi.input.group>--}}
+{{--                    </div>--}}
                 </div>
             </div>
             <!-- Button Container -->

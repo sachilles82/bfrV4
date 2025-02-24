@@ -28,12 +28,12 @@
                     :user="$user"
                 />
             @elseif($activeTab === 'report')
-                <livewire:alem.employee.profile.reports
+                <livewire:alem.employee.report.report-table
                     :user="$user"
                     key="report-{{ $user->id }}"
                 />
             @elseif($activeTab === 'holiday')
-                <livewire:alem.employee.profile.holiday
+                <livewire:alem.employee.holiday.holiday-table
                     :user="$user"
                     key="holiday-{{ $user->id }}"
                 />

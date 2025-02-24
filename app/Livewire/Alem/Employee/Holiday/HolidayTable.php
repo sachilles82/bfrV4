@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Profile;
+namespace App\Livewire\Alem\Employee\Holiday;
 
 use Carbon\Carbon;
 use Livewire\Component;
 
-class Reports extends Component
+class HolidayTable extends Component
 {
     public $dummyReports = [];
 
@@ -34,6 +34,6 @@ class Reports extends Component
     }
     public function render()
     {
-        return view('livewire.alem.employee.profile.reports');
+        return view('livewire.alem.employee.holiday.table');
     }
 }

@@ -4,8 +4,9 @@ namespace App\Livewire\Alem\Employee;
 
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
-use App\Models\Alem\Employee;
+use App\Models\Alem\Employee\Employee;
 use App\Models\User;
+use App\Models\Alem\Employee\Setting\Profession;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -19,8 +20,9 @@ use Livewire\Component;
 class CreateEmployee extends Component
 {
     use ValidateEmployee, AuthorizesRequests;
+
     // Felder für den User
-    public $name, $email, $password, $gender, $role = 'employee';
+    public $name, $last_name, $email, $password, $gender, $role = 'employee';
 
     // Felder für den Employee
     public $date_hired, $date_fired, $social_number, $personal_number, $profession, $company_id, $team_id, $created_by, $user_id, $uuid, $probation;
@@ -29,17 +31,29 @@ class CreateEmployee extends Component
     public bool $showModal = false;
 
     /**
-     * Speichert einen neuen Employee inkl. zugehörigem User.
+     * Computed Property: Liefert alle Professions der aktuellen Firma.
      */
+    public function getProfessionsProperty()
+    {
+        return Profession::where('company_id', auth()->user()->company_id)
+            ->orderBy('name')
+            ->get();
+    }
+
     public function saveEmployee(): void
     {
-        try {
-            $this->authorize('create', Employee::class);
-            $this->validate();
+        // Hier wird u. a. validiert, dass eine Profession ausgewählt wurde.
+        $this->authorize('create', Employee::class);
+//        $this->validate([
+//            // Weitere Regeln kommen aus dem Trait ValidateEmployee …
+//            'profession' => 'required|exists:professions,id',
+//        ]);
 
+        try {
             // Neuen User anlegen
             $user = User::create([
                 'name'       => $this->name,
+                'last_name'  => $this->last_name,
                 'email'      => $this->email,
                 'password'   => Hash::make($this->password),
                 'user_type'  => UserType::Employee,
@@ -50,15 +64,15 @@ class CreateEmployee extends Component
 
             // Employee-Datensatz erstellen und mit dem User verknüpfen
             Employee::create([
-                'user_id'        => $user->id,
-                'uuid'           => (string) Str::uuid(),
-                'date_hired'     => Carbon::parse($this->date_hired),
-                'social_number'  => $this->social_number,
-                'personal_number'=> $this->personal_number,
-                'profession'     => $this->profession,
-                'company_id'     => auth()->user()->company_id,
-                'team_id'        => auth()->user()->currentTeam->id,
-                'created_by'     => auth()->id(),
+                'user_id'         => $user->id,
+                'uuid'            => (string) Str::uuid(),
+                'date_hired'      => Carbon::parse($this->date_hired),
+                'social_number'   => $this->social_number,
+                'personal_number' => $this->personal_number,
+                'profession'      => $this->profession, // Hier wird die Profession‑ID gespeichert
+                'company_id'      => auth()->user()->company_id,
+                'team_id'         => auth()->user()->currentTeam->id,
+                'created_by'      => auth()->id(),
             ]);
 
             $this->resetForm();
@@ -72,12 +86,6 @@ class CreateEmployee extends Component
 
             $this->reset();
 
-        } catch (ValidationException $ve) {
-            Flux::toast(
-                text: __('Validation error. Please check your inputs.'),
-                heading: __('Error'),
-                variant: 'danger'
-            );
         } catch (AuthorizationException $ae) {
             Flux::toast(
                 text: __('You are not authorized to create an employee.'),
@@ -99,7 +107,7 @@ class CreateEmployee extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'name', 'email', 'password', 'gender', 'role',
+            'name', 'last_name', 'email', 'password', 'gender', 'role',
             'date_hired', 'social_number', 'personal_number', 'profession'
         ]);
         $this->showModal = false;
