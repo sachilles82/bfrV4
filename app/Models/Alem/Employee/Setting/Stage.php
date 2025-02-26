@@ -6,7 +6,7 @@ use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Profession extends Model
+class Stage extends Model
 {
     use HasFactory, BelongsToCompany;
 

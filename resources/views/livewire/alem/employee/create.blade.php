@@ -70,24 +70,56 @@
                     </div>
 
                     <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Profession') }}" for="role" badge="{{ __('Required') }}" :error="$errors->first('role')">
-                            <flux:select wire:model="role" id="role" variant="listbox" placeholder="{{ __('Select role') }}">
-                                <flux:option value="employee">{{ __('Employee') }}</flux:option>
-                                <flux:option value="worker">{{ __('Worker') }}</flux:option>
-                                <flux:option value="manager">{{ __('Manager') }}</flux:option>
-                                <flux:option value="editor">{{ __('Editor') }}</flux:option>
-                                <flux:option value="temporary">{{ __('Temporary') }}</flux:option>
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
+                    <x-pupi.input.group label="{{ __('Profession') }}" for="profession" badge="{{ __('Required') }}" :error="$errors->first('profession')">
+                        <flux:select searchable wire:model="profession" id="profession" variant="listbox" placeholder="{{ __('Select Profession') }}">
+                            @forelse($this->professions as $prof)
+                                <flux:option value="{{ $prof->id }}">
+                                    <span class="truncate">{{ $prof->name }}</span>
+                                </flux:option>
+                            @empty
+                                <flux:option value="">{{ __('No professions found') }}</flux:option>
+                            @endforelse
+
+                            <!-- Trigger zum Öffnen des Profession-Modals -->
+                            <x-slot name="add">
+                                <flux:modal.trigger name="create-profession">
+                                    <flux:separator class="mt-2 mb-1"/>
+                                    <flux:button
+                                        icon="plus"
+                                        class="w-full rounded-b-lg rounded-t-none"
+                                        variant="filled">
+                                        {{ __('Create Profession') }}
+                                    </flux:button>
+                                </flux:modal.trigger>
+                            </x-slot>
+                        </flux:select>
+                    </x-pupi.input.group>
+                </div>
+
                     <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Reifegrad') }}" for="role" badge="{{ __('Required') }}" :error="$errors->first('role')">
-                            <flux:select wire:model="role" id="role" variant="listbox" placeholder="{{ __('Select role') }}">
-                                <flux:option value="employee">{{ __('Employee') }}</flux:option>
-                                <flux:option value="worker">{{ __('Worker') }}</flux:option>
-                                <flux:option value="manager">{{ __('Manager') }}</flux:option>
-                                <flux:option value="editor">{{ __('Editor') }}</flux:option>
-                                <flux:option value="temporary">{{ __('Temporary') }}</flux:option>
+                        <x-pupi.input.group
+                            label="{{ __('Stage') }}"
+                            for="stage"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('stage')">
+                            <flux:select searchable wire:model="stage" id="stage" variant="listbox" placeholder="{{ __('Select Stage') }}">
+                                @forelse($this->stages as $st)
+                                    <flux:option value="{{ $st->id }}">
+                                        <span class="truncate">{{ $st->name }}</span>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No stages found') }}</flux:option>
+                                @endforelse
+
+                                <!-- Trigger zum Öffnen des Stage-Modals -->
+                                <x-slot name="add">
+                                    <flux:modal.trigger name="create-stage">
+                                        <flux:separator class="mt-2 mb-1"/>
+                                        <flux:button icon="plus" class="w-full rounded-b-lg rounded-t-none" variant="filled">
+                                            {{ __('Create Stage') }}
+                                        </flux:button>
+                                    </flux:modal.trigger>
+                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>

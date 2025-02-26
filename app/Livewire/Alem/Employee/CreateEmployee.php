@@ -7,6 +7,7 @@ use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Employee\Employee;
 use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
+use App\Models\Alem\Employee\Setting\Stage;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CreateEmployee extends Component
@@ -25,7 +27,8 @@ class CreateEmployee extends Component
     public $name, $last_name, $email, $password, $gender, $role = 'employee';
 
     // Felder für den Employee
-    public $date_hired, $date_fired, $social_number, $personal_number, $profession, $company_id, $team_id, $created_by, $user_id, $uuid, $probation;
+    public $date_hired, $date_fired, $social_number, $personal_number, $profession, $stage;
+    public $company_id, $team_id, $created_by, $user_id, $uuid, $probation;
 
     // Modal-Status
     public bool $showModal = false;
@@ -33,21 +36,30 @@ class CreateEmployee extends Component
     /**
      * Computed Property: Liefert alle Professions der aktuellen Firma.
      */
+    #[On('professionUpdated')]
     public function getProfessionsProperty()
     {
         return Profession::where('company_id', auth()->user()->company_id)
-            ->orderBy('name')
+            ->orderBy('id')
+            ->get();
+    }
+
+    /**
+     * Computed Property: Liefert alle Stages der aktuellen Firma.
+     */
+    #[On('stageUpdated')]
+    public function getStagesProperty()
+    {
+        return Stage::where('company_id', auth()->user()->company_id)
+            ->orderBy('id')
             ->get();
     }
 
     public function saveEmployee(): void
     {
-        // Hier wird u. a. validiert, dass eine Profession ausgewählt wurde.
         $this->authorize('create', Employee::class);
-//        $this->validate([
-//            // Weitere Regeln kommen aus dem Trait ValidateEmployee …
-//            'profession' => 'required|exists:professions,id',
-//        ]);
+
+        $this->validate();
 
         try {
             // Neuen User anlegen
@@ -69,7 +81,8 @@ class CreateEmployee extends Component
                 'date_hired'      => Carbon::parse($this->date_hired),
                 'social_number'   => $this->social_number,
                 'personal_number' => $this->personal_number,
-                'profession'      => $this->profession, // Hier wird die Profession‑ID gespeichert
+                'profession'      => $this->profession, // Profession‑ID
+                'stage'           => $this->stage,      // Stage‑ID
                 'company_id'      => auth()->user()->company_id,
                 'team_id'         => auth()->user()->currentTeam->id,
                 'created_by'      => auth()->id(),
@@ -108,7 +121,7 @@ class CreateEmployee extends Component
     {
         $this->reset([
             'name', 'last_name', 'email', 'password', 'gender', 'role',
-            'date_hired', 'social_number', 'personal_number', 'profession'
+            'date_hired', 'social_number', 'personal_number', 'profession', 'stage'
         ]);
         $this->showModal = false;
     }

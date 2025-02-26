@@ -7,16 +7,16 @@ trait ValidateProfessionForm
     public function rules(): array
     {
         return [
-            // Für den zugehörigen User (Update: Name als employee_name, E-Mail, Gender)
-            'name' => 'required|string|min:3|unique:professions,name,' . $this->professionId,
+            'name' => 'required|string|min:3|max:50' . $this->professionId,
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required'   => __('Employee name is required.'),
-            'name.min'        => __('Employee name must be at least 3 characters.'),
+            'name.required'   => __('Profession name is required.'),
+            'name.min'        => __('Profession name must be at least 3 characters.'),
+            'name.max'        => __('Profession name may not be greater than 50 characters.'),
         ];
     }
 

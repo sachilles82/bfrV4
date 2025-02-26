@@ -1,8 +1,8 @@
-<div wire:ignore.self>
-    <flux:modal name="create-profession" variant="flyout" position="left" class="md:w-1/4 space-y-6">
+ <flux:modal name="create-profession" class="w-96">
+        <!-- Modal-Header -->
         <div>
             <flux:heading size="lg">
-                {{ $editing ? __('Edit Profession') : __('Create Profession') }}
+                {{ __('Profession Manager') }}
             </flux:heading>
             <flux:subheading>
                 {{ $editing ? __('Edit the profession details.') : __('Fill out the details to create a new profession.') }}
@@ -12,20 +12,40 @@
         <!-- Formular: Create/Update Profession -->
         <form wire:submit.prevent="saveProfession" class="space-y-4">
             <div class="sm:col-span-3">
-                <x-pupi.input.group label="{{ __('Profession') }}" for="name" badge="{{ __('Required') }}" :error="$errors->first('name')">
+                <x-pupi.input.group
+                    label="{{ __('Profession') }}"
+                    for="name"
+                    badge="{{ __('Required') }}"
+                    :error="$errors->first('name')">
                     <x-pupi.input.text wire:model.defer="name" id="name" placeholder="{{ __('Enter profession name') }}" />
                 </x-pupi.input.group>
             </div>
 
-            <!-- Buttons -->
-            <div class="flex space-x-4">
-                <x-pupi.button.fluxback type="button" wire:click="resetForm">
-                    {{ __('Cancel') }}
-                </x-pupi.button.fluxback>
-                <flux:button type="submit">
-                    {{ $editing ? __('Update Profession') : __('Create Profession') }}
-                </flux:button>
-            </div>
+            <!-- Formular-Buttons -->
+{{--            <div class="flex space-x-4">--}}
+{{--                <x-pupi.button.fluxback type="button" wire:click="resetForm">--}}
+{{--                    {{ __('Cancel') }}--}}
+{{--                </x-pupi.button.fluxback>--}}
+{{--                <flux:button type="submit">--}}
+{{--                    {{ $editing ? __('Update Profession') : __('Create Profession') }}--}}
+{{--                </flux:button>--}}
+{{--            </div>--}}
+
+
+            <div class="flex gap-2">
+                        <flux:spacer/>
+
+                        <flux:modal.close>
+                            <flux:button wire:click="resetForm" variant="ghost">Cancel</flux:button>
+                        </flux:modal.close>
+
+                        <flux:button type="submit" variant="primary">
+                            {{ $editing ? __('Update') : __('Create ') }}
+                        </flux:button>
+                  </div>
+
+
+
         </form>
 
         <!-- Tabelle mit vorhandenen Professions -->
@@ -72,7 +92,7 @@
                 @empty
                     <flux:row>
                         <flux:cell colspan="2" class="px-4 py-2 text-gray-500">
-                            <div class="flex justify-center items-center">
+                            <div class="flex justify-center items-center space-x-2">
                                 <x-pupi.icon.database />
                                 <span class="py-0 font-medium text-gray-400 dark:text-gray-400 text-lg">
                                     {{ __('No entries found...') }}
@@ -83,5 +103,5 @@
                 @endforelse
             </flux:rows>
         </flux:table>
+        {{ $professions->links() }}
     </flux:modal>
-</div>
