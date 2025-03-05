@@ -42,16 +42,30 @@
                 </x-slot:head>
                 <x-slot:body>
                     @forelse($users as $user)
+{{--                        <tr--}}
+{{--                            wire:key="{{ $user->id }}"--}}
+{{--                            x-on:check-all.window="checked = $event.detail"--}}
+{{--                            x-on:update-table.window="checked = false"--}}
+{{--                            x-data="{ checked: false }"--}}
+{{--                            x-init="checked = $wire.selectedIds.includes('{{ $user->id }}')"--}}
+{{--                            x-bind:class="{--}}
+{{--                                        'bg-gray-100 dark:bg-gray-800/50': checked,--}}
+{{--                                        'hover:bg-gray-100 dark:hover:bg-gray-800/50': !checked--}}
+{{--                                      }"--}}
+{{--                        >--}}
+
+                        {{-- Update only the tr element in your table --}}
                         <tr
                             wire:key="{{ $user->id }}"
                             x-on:check-all.window="checked = $event.detail"
                             x-on:update-table.window="checked = false"
+                            x-on:employee-updated.window="checked = false"
                             x-data="{ checked: false }"
                             x-init="checked = $wire.selectedIds.includes('{{ $user->id }}')"
                             x-bind:class="{
-                                        'bg-gray-100 dark:bg-gray-800/50': checked,
-                                        'hover:bg-gray-100 dark:hover:bg-gray-800/50': !checked
-                                      }"
+                'bg-gray-100 dark:bg-gray-800/50': checked,
+                'hover:bg-gray-100 dark:hover:bg-gray-800/50': !checked
+              }"
                         >
                             <td class="relative px-7 sm:w-12 sm:px-6">
                                 <div x-show="checked" x-cloak
@@ -115,7 +129,7 @@
                                                             icon="trash" variant="danger">
                                                 {{ __('Delete Permanently') }}
                                             </flux:menu.item>
-                                        @elseif($user->account_status === \App\Enums\User\EmployeeAccountStatus::ARCHIVED)
+                                        @elseif($user->account_status === \App\Enums\User\AccountStatus::ARCHIVED)
                                             <!-- Options for archived users -->
                                             <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
                                                 {{ __('Edit') }}
@@ -123,7 +137,7 @@
 
                                             <flux:separator class="my-1" />
 
-                                            <flux:menu.item wire:click="restore({{ $user->id }})" icon="check-circle">
+                                            <flux:menu.item wire:click="activate({{ $user->id }})" icon="check-circle">
                                                 {{ __('Set Active') }}
                                             </flux:menu.item>
                                             <flux:menu.item wire:click="notActivate({{ $user->id }})" icon="x-mark">
@@ -137,7 +151,7 @@
                                                             icon="trash" variant="danger">
                                                 {{ __('Move to Trash') }}
                                             </flux:menu.item>
-                                        @elseif($user->account_status === \App\Enums\User\EmployeeAccountStatus::NOT_ACTIVATED)
+                                        @elseif($user->account_status === \App\Enums\User\AccountStatus::NOT_ACTIVATED)
                                             <!-- Options for not activated users -->
                                             <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
                                                 {{ __('Edit') }}

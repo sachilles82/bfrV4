@@ -3,7 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Enums\User\EmployeeAccountStatus;
+use App\Enums\User\AccountStatus;
 use App\Models\Address\State;
 use App\Models\Alem\Employee\Employee;
 use App\Traits\HasAddress;
@@ -84,7 +84,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'account_status' => EmployeeAccountStatus::class,
+            'account_status' => AccountStatus::class,
         ];
     }
 
@@ -107,9 +107,7 @@ class User extends Authenticatable
         return $this->hasOne(Employee::class);
     }
 
-    /**
-     * Verwende den "username" als Schlüssel für das Route Model Binding.
-     */
+    /* Verwende den "username" als Schlüssel für das Route Model Binding.*/
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -129,68 +127,94 @@ class User extends Authenticatable
         });
     }
 
-    /**
-     * Legt fest, welche Users aus dem Bin (Trash) entfernt werden sollen.
-     */
+    /* Legt fest, welche Users aus dem Bin (Trash) entfernt werden sollen.*/
     public function prunable()
     {
         return static::onlyTrashed()
             ->where('deleted_at', '<=', now()->subDays(7));
     }
 
-    /**
-     * Scope für aktive (nicht archivierte und nicht gelöschte) Users.
-     */
+    /* Prüft, ob der Benutzer aktiv ist */
+    public function isActive(): bool
+    {
+        return $this->account_status === AccountStatus::ACTIVE
+            && !$this->trashed();
+    }
+
+    /* Prüft, ob der Benutzer nicht aktiviert ist */
+    public function isNotActivated(): bool
+    {
+        return $this->account_status === AccountStatus::NOT_ACTIVATED
+            && !$this->trashed();
+    }
+
+    /* Prüft, ob der Benutzer archiviert ist */
+    public function isArchived(): bool
+    {
+        return $this->account_status === AccountStatus::ARCHIVED
+            && !$this->trashed();
+    }
+
+    /* Prüft, ob der Benutzer im Papierkorb ist */
+    public function isTrashed(): bool
+    {
+        return $this->trashed();
+    }
+
+    /* Prüft, ob der Benutzer in einem bestimmten Status ist */
+    public function hasStatus(AccountStatus $status): bool
+    {
+        return $this->account_status === $status;
+    }
+
+    /* Setzt den Status des Benutzers */
+    public function setStatus(AccountStatus $status): self
+    {
+        $this->update(['account_status' => $status]);
+        return $this;
+    }
+
+    /* Scope for active users */
     public function scopeActive($query)
     {
-        return $query->where('account_status', EmployeeAccountStatus::ACTIVE->value)
+        return $query->where('account_status', AccountStatus::ACTIVE->value)
             ->whereNull('deleted_at');
     }
 
-    /**
-     * Scope für nicht aktivierte Users.
-     */
+    /* Scope for not activated users */
     public function scopeNotActivated($query)
     {
-        return $query->where('account_status', EmployeeAccountStatus::NOT_ACTIVATED->value)
+        return $query->where('account_status', AccountStatus::NOT_ACTIVATED->value)
             ->whereNull('deleted_at');
     }
 
-    /**
-     * Scope für archivierte Users (aber noch nicht im Bin).
-     */
+    /* Scope for archived users */
     public function scopeArchived($query)
     {
-        return $query->where('account_status', EmployeeAccountStatus::ARCHIVED->value)
+        return $query->where('account_status', AccountStatus::ARCHIVED->value)
             ->whereNull('deleted_at');
     }
 
-    /**
-     * Scope für alle nicht-gelöschten Benutzer (active, not_activated, und archived)
-     */
+    /* Scope for all non-deleted users */
     public function scopeNotTrashed($query)
     {
         return $query->whereNull('deleted_at');
     }
 
-    /**
-     * Override the SoftDeletes trait's delete method to update account_status
-     */
+    /* Override the SoftDeletes trait's delete method to update account_status */
     public function delete()
     {
-        $this->update(['account_status' => EmployeeAccountStatus::TRASHED->value]);
+        $this->update(['account_status' => AccountStatus::TRASHED->value]);
         return parent::delete();
     }
 
-    /**
-     * Override the SoftDeletes trait's restore method to restore previous status
-     */
+    /* Override the SoftDeletes trait's restore method to restore previous status */
     public function restore()
     {
         $result = parent::restore();
         // If account_status is trashed, change it back to active
-        if ($this->account_status === EmployeeAccountStatus::TRASHED) {
-            $this->update(['account_status' => EmployeeAccountStatus::ACTIVE->value]);
+        if ($this->account_status === AccountStatus::TRASHED) {
+            $this->update(['account_status' => AccountStatus::ACTIVE->value]);
         }
         return $result;
     }

@@ -2,7 +2,7 @@
 
 namespace App\Enums\User;
 
-enum EmployeeAccountStatus: string
+enum AccountStatus: string
 {
     case ACTIVE = 'active';
     case NOT_ACTIVATED = 'not_activated';
@@ -28,6 +28,5 @@ enum EmployeeAccountStatus: string
             'trashed'        => 'bg-red-50 dark:bg-red-400/10 text-red-700 dark:text-red-400 ring-red-600/10 dark:ring-red-400/20',
         };
     }
-
 
 }

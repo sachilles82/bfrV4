@@ -2,13 +2,14 @@
 
 namespace App\Livewire\Alem\Employee;
 
-use App\Enums\User\EmployeeAccountStatus;
+use App\Enums\User\AccountStatus;
 use App\Livewire\Alem\Employee\Helper\Searchable;
 use App\Models\User;
 use App\Traits\Table\WithPerPagePagination;
 use App\Traits\Table\WithSorting;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
 class EmployeeTable extends Component
@@ -28,6 +29,8 @@ class EmployeeTable extends Component
     public function setStatusFilter(string $status): void
     {
         $this->statusFilter = $status;
+        $this->resetSelections();
+        $this->dispatch('update-table');
     }
 
     /**
@@ -35,42 +38,96 @@ class EmployeeTable extends Component
      */
     public function bulkUpdateStatus(string $action): void
     {
-        $users = User::whereIn('id', $this->selectedIds)->get();
+        // Use withTrashed() to include trashed users in the query
+        $users = $this->getSelectedUsers();
+        $count = 0;
 
         foreach ($users as $user) {
-            if ($action === 'active') {
-                // Falls der User gelöscht wurde, wiederherstellen
-                if ($user->trashed()) {
-                    $user->restore();
-                }
-                // Status auf Active setzen
-                $user->update([
-                    'account_status' => EmployeeAccountStatus::ACTIVE->value
-                ]);
-            } elseif ($action === 'not_activated') {
-                // Status auf Not Activated setzen
-                $user->update([
-                    'account_status' => EmployeeAccountStatus::NOT_ACTIVATED->value
-                ]);
-            } elseif ($action === 'archived') {
-                // Archivieren und Account-Status auf "archived" setzen
-                $user->update([
-                    'account_status' => EmployeeAccountStatus::ARCHIVED->value
-                ]);
-            } elseif ($action === 'trash') {
-                // Falls noch nicht gelöscht, soft-delete durchführen
+            $count++;
+            $this->processUserAction($user, $action);
+        }
+
+        $this->showSuccessMessage($count);
+        $this->resetSelections();
+        $this->notifyUiUpdate();
+    }
+
+    /**
+     * Verarbeitet eine Benutzeraktion basierend auf dem Aktionstyp
+     */
+    private function processUserAction(User $user, string $action): void
+    {
+        switch ($action) {
+            case 'active':
+                $this->restoreIfTrashed($user);
+                $this->updateUserStatus($user, AccountStatus::ACTIVE->value);
+                break;
+
+            case 'not_activated':
+                $this->restoreIfTrashed($user);
+                $this->updateUserStatus($user, AccountStatus::NOT_ACTIVATED->value);
+                break;
+
+            case 'archived':
+                $this->restoreIfTrashed($user);
+                $this->updateUserStatus($user, AccountStatus::ARCHIVED->value);
+                break;
+
+            case 'trash':
                 if (!$user->trashed()) {
                     $user->delete(); // This will also set account_status to 'trashed'
                 }
-            }
+                break;
+
+            case 'restore_to_archive':
+                if ($user->trashed()) {
+                    $user->restore();
+                    $this->updateUserStatus($user, AccountStatus::ARCHIVED->value);
+                }
+                break;
         }
+    }
 
-        // Nach Bulk-Aktion die ausgewählten IDs leeren
-        $this->selectedIds = [];
-        $this->idsOnPage = [];
-        $this->resetFilters();
+    /**
+     * Stellt einen Benutzer wieder her, wenn er im Papierkorb ist
+     */
+    private function restoreIfTrashed(User $user): void
+    {
+        if ($user->trashed()) {
+            $user->restore();
+        }
+    }
 
-        $this->dispatch('employeeUpdated');
+    /**
+     * Aktualisiert den Account-Status eines Benutzers
+     */
+    private function updateUserStatus(User $user, string $status): void
+    {
+        $user->update([
+            'account_status' => $status
+        ]);
+    }
+
+    /**
+     * Zeigt eine Erfolgsmeldung an, wenn Aktionen ausgeführt wurden
+     */
+    private function showSuccessMessage(int $count): void
+    {
+        if ($count > 0) {
+            Flux::toast(
+                text: __(':count employees updated successfully.', ['count' => $count]),
+                heading: __('Success'),
+                variant: 'success'
+            );
+        }
+    }
+
+    /**
+     * Holt alle ausgewählten Benutzer inkl. gelöschter
+     */
+    private function getSelectedUsers()
+    {
+        return User::withTrashed()->whereIn('id', $this->selectedIds)->get();
     }
 
     /**
@@ -78,27 +135,42 @@ class EmployeeTable extends Component
      */
     public function bulkForceDelete(): void
     {
-        $users = User::withTrashed()->whereIn('id', $this->selectedIds)->get();
-        $count = 0;
+        $users = $this->getSelectedUsers();
+        $count = $this->permanentlyDeleteUsers($users);
 
+        if ($count > 0) {
+            $this->showDeleteSuccessMessage($count);
+        }
+
+        $this->resetSelections();
+        $this->notifyUiUpdate();
+    }
+
+    /**
+     * Löscht Benutzer permanent und gibt die Anzahl zurück
+     */
+    private function permanentlyDeleteUsers($users): int
+    {
+        $count = 0;
         foreach ($users as $user) {
             if ($user->trashed()) {
                 $user->forceDelete();
                 $count++;
             }
         }
+        return $count;
+    }
 
-        $this->selectedIds = [];
-        $this->idsOnPage = [];
-        $this->dispatch('employeeUpdated');
-
-        if ($count > 0) {
-            Flux::toast(
-                text: __(':count employees permanently deleted.', ['count' => $count]),
-                heading: __('Success.'),
-                variant: 'danger'
-            );
-        }
+    /**
+     * Zeigt eine Erfolgsmeldung für dauerhafte Löschung an
+     */
+    private function showDeleteSuccessMessage(int $count): void
+    {
+        Flux::toast(
+            text: __(':count employees permanently deleted.', ['count' => $count]),
+            heading: __('Success.'),
+            variant: 'danger'
+        );
     }
 
     /**
@@ -107,9 +179,28 @@ class EmployeeTable extends Component
     public function resetFilters(): void
     {
         $this->reset('search', 'sortCol', 'sortAsc', 'statusFilter');
+        $this->resetSelections();
         $this->dispatch('resetFilters');
+        $this->dispatch('update-table');
     }
 
+    /**
+     * Setzt die Auswahlfelder zurück
+     */
+    private function resetSelections(): void
+    {
+        $this->selectedIds = [];
+        $this->idsOnPage = [];
+    }
+
+    /**
+     * Benachrichtigt die UI über Aktualisierungen
+     */
+    private function notifyUiUpdate(): void
+    {
+        $this->dispatch('employeeUpdated');
+        $this->dispatch('update-table');
+    }
 
     /**
      * Soft-deletes einen Mitarbeiter.
@@ -119,13 +210,8 @@ class EmployeeTable extends Component
         $user = User::find($userId);
         if ($user) {
             $user->delete(); // This will also set account_status to 'trashed'
-            $this->dispatch('employeeUpdated');
-
-            Flux::toast(
-                text: __('Employee moved to trash.'),
-                heading: __('Success.'),
-                variant: 'success'
-            );
+            $this->notifyUiUpdate();
+            $this->showToast('Employee moved to trash.', 'Success.', 'success');
         }
     }
 
@@ -135,18 +221,10 @@ class EmployeeTable extends Component
     public function notActivate($userId): void
     {
         $user = User::find($userId);
-        if ($user && $user->account_status !== EmployeeAccountStatus::NOT_ACTIVATED->value) {
-            $user->update([
-                'account_status' => EmployeeAccountStatus::NOT_ACTIVATED->value
-            ]);
-
-            $this->dispatch('employeeUpdated');
-
-            Flux::toast(
-                text: __('Employee set to not activated.'),
-                heading: __('Success.'),
-                variant: 'success'
-            );
+        if ($user && $user->account_status !== AccountStatus::NOT_ACTIVATED->value) {
+            $this->updateUserStatus($user, AccountStatus::NOT_ACTIVATED->value);
+            $this->notifyUiUpdate();
+            $this->showToast('Employee set to not activated.', 'Success.', 'success');
         }
     }
 
@@ -156,18 +234,10 @@ class EmployeeTable extends Component
     public function archive($userId): void
     {
         $user = User::find($userId);
-        if ($user && $user->account_status !== EmployeeAccountStatus::ARCHIVED->value) {
-            $user->update([
-                'account_status' => EmployeeAccountStatus::ARCHIVED->value
-            ]);
-
-            $this->dispatch('employeeUpdated');
-
-            Flux::toast(
-                text: __('Employee archived.'),
-                heading: __('Success.'),
-                variant: 'success'
-            );
+        if ($user && $user->account_status !== AccountStatus::ARCHIVED->value) {
+            $this->updateUserStatus($user, AccountStatus::ARCHIVED->value);
+            $this->notifyUiUpdate();
+            $this->showToast('Employee archived.', 'Success.', 'success');
         }
     }
 
@@ -177,46 +247,30 @@ class EmployeeTable extends Component
     public function restore($userId): void
     {
         $user = User::withTrashed()->find($userId);
-        if ($user) {
-            if ($user->trashed()) {
-                $user->restore(); // This will also restore account_status
+        if (!$user) return;
 
-                Flux::toast(
-                    text: __('Employee restored from trash.'),
-                    heading: __('Success.'),
-                    variant: 'success'
-                );
-            } elseif ($user->account_status === EmployeeAccountStatus::ARCHIVED->value) {
-                $user->update([
-                    'account_status' => EmployeeAccountStatus::ACTIVE->value
-                ]);
-
-                Flux::toast(
-                    text: __('Employee restored from archive.'),
-                    heading: __('Success.'),
-                    variant: 'success'
-                );
-            }
-            $this->dispatch('employeeUpdated');
+        if ($user->trashed()) {
+            $user->restore(); // This will also restore account_status
+            $this->showToast('Employee restored from trash.', 'Success.', 'success');
+        } elseif ($user->account_status === AccountStatus::ARCHIVED->value) {
+            $this->updateUserStatus($user, AccountStatus::ACTIVE->value);
+            $this->showToast('Employee restored from archive.', 'Success.', 'success');
         }
+
+        $this->notifyUiUpdate();
     }
 
+    /**
+     * Stellt einen gelöschten Mitarbeiter im archivierten Zustand wieder her
+     */
     public function restoreToArchive($userId): void
     {
         $user = User::withTrashed()->find($userId);
         if ($user && $user->trashed()) {
             $user->restore();  // First restore from trash
-            $user->update([    // Then set to archived
-                'account_status' => EmployeeAccountStatus::ARCHIVED->value
-            ]);
-
-            Flux::toast(
-                text: __('Employee restored to archive.'),
-                heading: __('Success.'),
-                variant: 'success'
-            );
-
-            $this->dispatch('employeeUpdated');
+            $this->updateUserStatus($user, AccountStatus::ARCHIVED->value);
+            $this->showToast('Employee restored to archive.', 'Success.', 'success');
+            $this->notifyUiUpdate();
         }
     }
 
@@ -226,17 +280,10 @@ class EmployeeTable extends Component
     public function activate($userId): void
     {
         $user = User::find($userId);
-        if ($user && $user->account_status !== EmployeeAccountStatus::ACTIVE->value) {
-            $user->update([
-                'account_status' => EmployeeAccountStatus::ACTIVE->value
-            ]);
-            $this->dispatch('employeeUpdated');
-
-            Flux::toast(
-                text: __('Employee activated.'),
-                heading: __('Success.'),
-                variant: 'success'
-            );
+        if ($user && $user->account_status !== AccountStatus::ACTIVE->value) {
+            $this->updateUserStatus($user, AccountStatus::ACTIVE->value);
+            $this->showToast('Employee activated.', 'Success.', 'success');
+            $this->notifyUiUpdate();
         }
     }
 
@@ -248,40 +295,60 @@ class EmployeeTable extends Component
         $user = User::withTrashed()->find($userId);
         if ($user) {
             $user->forceDelete();
-
-            Flux::toast(
-                text: __('Employee permanently deleted.'),
-                heading: __('Success.'),
-                variant: 'danger'
-            );
-
-            $this->dispatch('employeeUpdated');
+            $this->showToast('Employee permanently deleted.', 'Success.', 'danger');
+            $this->notifyUiUpdate();
         }
+    }
+
+    /**
+     * Zeigt einen Toast an
+     */
+    private function showToast(string $text, string $heading, string $variant): void
+    {
+        Flux::toast(
+            text: __($text),
+            heading: __($heading),
+            variant: $variant
+        );
     }
 
     /**
      * Wendet den Status-Filter an.
      */
-    protected function applyStatusFilter($query)
+    protected function applyStatusFilter(Builder $query): Builder
     {
         switch ($this->statusFilter) {
             case 'not_activated':
-                $query->notActivated();
+                // Explicitly filter for not activated, non-trashed users
+                $query->whereNull('deleted_at')
+                    ->where('account_status', AccountStatus::NOT_ACTIVATED->value);
                 break;
+
             case 'archived':
-                $query->archived();
+                // Explicitly filter for archived, non-trashed users
+                $query->whereNull('deleted_at')
+                    ->where('account_status', AccountStatus::ARCHIVED->value);
                 break;
+
             case 'trash':
+                // Only show trashed users, regardless of their account_status
                 $query->onlyTrashed();
                 break;
+
             case 'active':
             default:
-                $query->active();
+                // Explicitly filter for active, non-trashed users
+                $query->whereNull('deleted_at')
+                    ->where('account_status', AccountStatus::ACTIVE->value);
         }
+
         return $query;
     }
 
-    protected function applySorting($query)
+    /**
+     * Wendet die Sortierung auf die Abfrage an
+     */
+    protected function applySorting(Builder $query): Builder
     {
         if ($this->sortCol) {
             $column = match ($this->sortCol) {
