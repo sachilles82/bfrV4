@@ -19,6 +19,12 @@
                         </x-pupi.input.group>
                     </div>
 
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Personal Number') }}" for="ahv_number" badge="{{ __('Required') }}">
+                            <x-pupi.input.text wire:model="ahv_number" id="ahv_number" name="ahv_number" />
+                        </x-pupi.input.group>
+                    </div>
+
                     <!-- Birthdate -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group label="{{ __('Birthdate') }}" for="birthdate" badge="{{ __('Required') }}">

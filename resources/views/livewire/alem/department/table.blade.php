@@ -13,7 +13,7 @@
             </div>
         </div>
     </div>
-
+@json($selectedIds) @json($idsOnPage)
     <x-pupi.table.container>
         <div x-data="{checked:false}">
             <x-pupi.table.main>

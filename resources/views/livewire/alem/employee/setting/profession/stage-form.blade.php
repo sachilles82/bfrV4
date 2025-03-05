@@ -17,7 +17,7 @@
                 for="name"
                 badge="{{ __('Required') }}"
                 :error="$errors->first('name')">
-                <x-pupi.input.text wire:model.defer="name" id="name" placeholder="{{ __('Enter stage name') }}" />
+                <x-pupi.input.text wire:model.defer="name" id="name" placeholder="{{ __('Enter stage name') }}"/>
             </x-pupi.input.group>
         </div>
 
@@ -80,7 +80,7 @@
                 <flux:row>
                     <flux:cell colspan="2" class="px-4 py-2 text-gray-500">
                         <div class="flex justify-center items-center space-x-2">
-                            <x-pupi.icon.database />
+                            <x-pupi.icon.database/>
                             <span class="py-0 font-medium text-gray-400 dark:text-gray-400 text-lg">
                                 {{ __('No entries found...') }}
                             </span>

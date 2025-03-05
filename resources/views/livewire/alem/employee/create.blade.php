@@ -129,9 +129,9 @@
                             <flux:select wire:model="role" id="role" variant="listbox" placeholder="{{ __('Select role') }}">
                                 <flux:option value="employee">{{ __('Onboarding') }}</flux:option>
                                 <flux:option value="worker">{{ __('Probation') }}</flux:option>
-                                <flux:option value="manager">{{ __('Active') }}</flux:option>
+                                <flux:option value="employed">{{ __('Employed') }}</flux:option>
                                 <flux:option value="editor">{{ __('On Leave') }}</flux:option>
-                                <flux:option value="temporary">{{ __('Inactive') }}</flux:option>
+                                <flux:option value="separated">{{ __('Separated') }}</flux:option>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -161,14 +161,15 @@
                                 </li>
                                 <li class="flex items-center justify-between py-4">
                                     <div class="flex flex-col">
-                                        <p class="text-sm font-medium leading-6 dark:text-white text-gray-900"
-                                           id="privacy-option-1-label">{{ __('Account Status')}}</p>
-                                        <p class="text-sm dark:text-gray-400 text-gray-500"
-                                           id="privacy-option-1-description">{{ __('Toggle to set the Account Status to active')}}</p>
+                                        <p class="text-sm font-medium leading-6 dark:text-white text-gray-900" id="account-status-label">
+                                            {{ __('Account Status') }}
+                                        </p>
+                                        <p class="text-sm dark:text-gray-400 text-gray-500" id="account-status-description">
+                                            {{ __('Toggle to set the Account Status to active. Default is Not Activated.') }}
+                                        </p>
                                     </div>
-                                    <flux:switch wire:model.live="notifications" label="Enable notifications" />
-                                    {{--                                    <x-pupi.inputs.status-toggle/>--}}
-                                    {{--                                                        <x-pupi.inputs.email-verified/>--}}
+                                    <!-- Der Switch bindet an die boolesche Eigenschaft isActive -->
+                                    <flux:switch wire:model="isActive" label="{{ $isActive ? __('Active') : __('Not Activated') }}" />
                                 </li>
 
                             </ul>

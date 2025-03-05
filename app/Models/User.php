@@ -3,11 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\User\EmployeeAccountStatus;
 use App\Models\Address\State;
 use App\Models\Alem\Employee\Employee;
 use App\Traits\HasAddress;
 use App\Traits\TraitForUserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,6 +33,7 @@ class User extends Authenticatable
     use TraitForUserModel;
     use HasAddress;
     use SoftDeletes;
+    use Prunable;
     use HasRoles;
 
     /**
@@ -47,6 +50,7 @@ class User extends Authenticatable
         'user_type',
         'gender',
         'created_by',
+        'account_status',
     ];
 
     /**
@@ -80,8 +84,16 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'account_status' => EmployeeAccountStatus::class,
         ];
     }
+
+    /**
+     * Definiere zusätzliche Datumfelder.
+     */
+    protected $dates = [
+        'deleted_at',
+    ];
 
     /* User & States Relation */
     public function states(): HasMany
@@ -117,6 +129,69 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * Legt fest, welche Users aus dem Bin (Trash) entfernt werden sollen.
+     */
+    public function prunable()
+    {
+        return static::onlyTrashed()
+            ->where('deleted_at', '<=', now()->subDays(7));
+    }
 
+    /**
+     * Scope für aktive (nicht archivierte und nicht gelöschte) Users.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('account_status', EmployeeAccountStatus::ACTIVE->value)
+            ->whereNull('deleted_at');
+    }
 
+    /**
+     * Scope für nicht aktivierte Users.
+     */
+    public function scopeNotActivated($query)
+    {
+        return $query->where('account_status', EmployeeAccountStatus::NOT_ACTIVATED->value)
+            ->whereNull('deleted_at');
+    }
+
+    /**
+     * Scope für archivierte Users (aber noch nicht im Bin).
+     */
+    public function scopeArchived($query)
+    {
+        return $query->where('account_status', EmployeeAccountStatus::ARCHIVED->value)
+            ->whereNull('deleted_at');
+    }
+
+    /**
+     * Scope für alle nicht-gelöschten Benutzer (active, not_activated, und archived)
+     */
+    public function scopeNotTrashed($query)
+    {
+        return $query->whereNull('deleted_at');
+    }
+
+    /**
+     * Override the SoftDeletes trait's delete method to update account_status
+     */
+    public function delete()
+    {
+        $this->update(['account_status' => EmployeeAccountStatus::TRASHED->value]);
+        return parent::delete();
+    }
+
+    /**
+     * Override the SoftDeletes trait's restore method to restore previous status
+     */
+    public function restore()
+    {
+        $result = parent::restore();
+        // If account_status is trashed, change it back to active
+        if ($this->account_status === EmployeeAccountStatus::TRASHED) {
+            $this->update(['account_status' => EmployeeAccountStatus::ACTIVE->value]);
+        }
+        return $result;
+    }
 }

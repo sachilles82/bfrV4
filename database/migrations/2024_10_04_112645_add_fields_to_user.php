@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\User\EmployeeAccountStatus;
 use App\Enums\User\UserType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,7 +20,11 @@ return new class extends Migration
             $table->foreignId('created_by')->after('gender')->nullable();
             $table->string('theme')->default('default')->after('created_by');
             $table->string('slug')->unique()->nullable()->after('theme');
-            $table->foreignId('last_name')->after('slug')->nullable();
+            $table->string('last_name')->after('slug')->nullable(); // Changed from foreignId to string
+            $table->timestamp('archived_at')->nullable()->after('last_name');
+            $table->string('account_status')->default(EmployeeAccountStatus::NOT_ACTIVATED->value)->after('archived_at'); // Changed from timestamp to string
+
+            $table->index(['name', 'team_id', 'company_id', 'user_type', 'archived_at', 'account_status']);
         });
     }
 

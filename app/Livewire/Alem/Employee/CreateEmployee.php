@@ -14,7 +14,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -25,6 +24,7 @@ class CreateEmployee extends Component
 
     // Felder für den User
     public $name, $last_name, $email, $password, $gender, $role = 'employee';
+    public bool $isActive = false; // Account Status: false = not activated (default), true = active
 
     // Felder für den Employee
     public $date_hired, $date_fired, $social_number, $personal_number, $profession, $stage;
@@ -33,9 +33,6 @@ class CreateEmployee extends Component
     // Modal-Status
     public bool $showModal = false;
 
-    /**
-     * Computed Property: Liefert alle Professions der aktuellen Firma.
-     */
     #[On('professionUpdated')]
     public function getProfessionsProperty()
     {
@@ -44,9 +41,6 @@ class CreateEmployee extends Component
             ->get();
     }
 
-    /**
-     * Computed Property: Liefert alle Stages der aktuellen Firma.
-     */
     #[On('stageUpdated')]
     public function getStagesProperty()
     {
@@ -58,19 +52,20 @@ class CreateEmployee extends Component
     public function saveEmployee(): void
     {
         $this->authorize('create', Employee::class);
-
         $this->validate();
 
         try {
-            // Neuen User anlegen
+            // Neuen User anlegen und dabei account_status setzen
             $user = User::create([
-                'name'       => $this->name,
-                'last_name'  => $this->last_name,
-                'email'      => $this->email,
-                'password'   => Hash::make($this->password),
-                'user_type'  => UserType::Employee,
-                'company_id' => auth()->user()->company_id,
-                'created_by' => auth()->id(),
+                'name'           => $this->name,
+                'last_name'      => $this->last_name,
+                'email'          => $this->email,
+                'password'       => Hash::make($this->password),
+                'user_type'      => UserType::Employee,
+                'company_id'     => auth()->user()->company_id,
+                'created_by'     => auth()->id(),
+                // Wird als "active" gespeichert, wenn $isActive true ist, ansonsten "not_activated"
+                'account_status' => $this->isActive ? 'active' : 'not_activated',
             ]);
             $user->assignRole($this->role);
 
@@ -81,8 +76,8 @@ class CreateEmployee extends Component
                 'date_hired'      => Carbon::parse($this->date_hired),
                 'social_number'   => $this->social_number,
                 'personal_number' => $this->personal_number,
-                'profession'      => $this->profession, // Profession‑ID
-                'stage'           => $this->stage,      // Stage‑ID
+                'profession'      => $this->profession,
+                'stage'           => $this->stage,
                 'company_id'      => auth()->user()->company_id,
                 'team_id'         => auth()->user()->currentTeam->id,
                 'created_by'      => auth()->id(),
@@ -114,13 +109,10 @@ class CreateEmployee extends Component
         }
     }
 
-    /**
-     * Setzt das Formular zurück und schließt das Modal.
-     */
     public function resetForm(): void
     {
         $this->reset([
-            'name', 'last_name', 'email', 'password', 'gender', 'role',
+            'name', 'last_name', 'email', 'password', 'gender', 'role', 'isActive',
             'date_hired', 'social_number', 'personal_number', 'profession', 'stage'
         ]);
         $this->showModal = false;
