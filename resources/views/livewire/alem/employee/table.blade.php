@@ -43,6 +43,22 @@
                     <x-pupi.table.th.actions/>
                 </x-slot:head>
                 <x-slot:body>
+                    @if($statusFilter === 'trashed')
+                        <tr>
+                            <td colspan="8" class="bg-yellow-50 dark:bg-yellow-400/10 dark:text-yellow-500 px-4 py-2 text-yellow-800">
+                                <div class="flex items-start">
+                                    <x-pupi.icon.danger class="h-6 w-6"/>
+                                    <div class="ml-3 flex-1 pt-0.5">
+                                        <p class="text-sm font-medium">{{ __('Attention!') }}
+                                            <span class="ml-2 font-normal text-sm text-gray-600 dark:text-gray-400">{{ __('Trash will delete automatically all') }}</span>
+                                            <span class="font-medium">{{ __('7 Days') }}</span>
+                                            <span class="font-normal text-sm text-gray-600 dark:text-gray-400">{{ __('automatically permanently') }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endif
                     @forelse($users as $user)
                         <tr
                             wire:key="{{ $user->id }}"
@@ -98,6 +114,15 @@
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 {{ $user->roles->pluck('name')->implode(', ') }}
+                                <div class="flex items-center mt-1 {{ $user->days_until_permanent_delete <= 2 ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400' }}">
+                                    @if($user->trashed())
+                                        <div class="flex items-center mt-1 {{ $user->deletion_urgency_class }}">
+                                            <x-pupi.icon.clock class="h-4 w-4 mr-1"/>
+                                            {{ $user->deletion_message }}
+                                            <span class="text-gray-500 dark:text-gray-400 text-xs ml-1">({{ $user->permanent_deletion_date_for_humans }})</span>
+                                        </div>
+                                    @endif
+                                </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <div class="text-gray-500 dark:text-gray-400">01. Feb. 2019</div>

@@ -44,33 +44,6 @@ class EmployeeTable extends Component
         $this->dispatch('update-table');
     }
 
-    // Status-Filter auf die Abfrage anwenden
-    protected function applyStatusFilter(Builder $query): Builder
-    {
-        switch ($this->statusFilter) {
-            case 'inactive':
-                $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::INACTIVE->value);
-                break;
-
-            case 'archived':
-                $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::ARCHIVED->value);
-                break;
-
-            case 'trashed':
-                $query->onlyTrashed();
-                break;
-
-            case 'active':
-            default:
-                $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::ACTIVE->value);
-        }
-
-        return $query;
-    }
-
     // Sortierung auf die Abfrage anwenden
     protected function applySorting(Builder $query): Builder
     {
