@@ -13,7 +13,10 @@
 
                 <x-pupi.actions.reset-filters wire:click="resetFilters"/>
 
-                <flux:select variant="listbox" wire:model.live="statusFilter" id="statusFilter">
+                <flux:select variant="listbox"
+                             wire:model.live="statusFilter"
+{{--                             wire:change="$set('selectedIds', [])"--}}
+                             id="statusFilter">
                     <flux:option value="active">{{ __('Active') }}</flux:option>
                     <flux:option value="inactive">{{ __('Inactive') }}</flux:option>
                     <flux:option value="archived">{{ __('Archived') }}</flux:option>

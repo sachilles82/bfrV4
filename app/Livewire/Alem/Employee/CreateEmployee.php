@@ -64,8 +64,8 @@ class CreateEmployee extends Component
                 'user_type'      => UserType::Employee,
                 'company_id'     => auth()->user()->company_id,
                 'created_by'     => auth()->id(),
-                // Wird als "active" gespeichert, wenn $isActive true ist, ansonsten "not_activated"
-                'account_status' => $this->isActive ? 'active' : 'not_activated',
+                // Wird als "active" gespeichert, wenn $isActive true ist, ansonsten "inactive"
+                'account_status' => $this->isActive ? 'active' : 'inactive',
             ]);
             $user->assignRole($this->role);
 

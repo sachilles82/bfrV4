@@ -21,6 +21,19 @@ class EmployeeTable extends Component
     public $name = '';
     public $statusFilter = 'active';
 
+    /**
+     * Lifecycle-Hook: Wird aufgerufen, wenn sich eine Property ändert
+     */
+    public function updated($property): void
+    {
+        // Wenn sich der Status-Filter ändert, die Auswahl zurücksetzen
+        if ($property === 'statusFilter') {
+            $this->selectedIds = [];
+            $this->idsOnPage = [];
+            $this->dispatch('update-table');
+        }
+    }
+
     /* Status-Filter */
     public function setStatusFilter(string $status): void
     {

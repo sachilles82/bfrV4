@@ -59,8 +59,8 @@
 
                 @case('active')
                     {{-- Options for active users --}}
-                    <flux:menu.item wire:click="bulkUpdateStatus('inactive')" icon="x-circle">
-                        {{ __('Set as Not Activated') }}
+                    <flux:menu.item wire:click="bulkUpdateStatus('inactive')" icon="clock">
+                        {{ __('Set as Inactive') }}
                     </flux:menu.item>
                     <flux:menu.item wire:click="bulkUpdateStatus('archived')" icon="archive-box">
                         {{ __('Archive') }}
@@ -100,8 +100,8 @@
                     <flux:menu.item wire:click="bulkUpdateStatus('active')" icon="check-circle">
                         {{ __('Set Active') }}
                     </flux:menu.item>
-                    <flux:menu.item wire:click="bulkUpdateStatus('inactive')" icon="x-circle">
-                        {{ __('Set as Not Activated') }}
+                    <flux:menu.item wire:click="bulkUpdateStatus('inactive')" icon="clock">
+                        {{ __('Set as Inactive') }}
                     </flux:menu.item>
 
                     <flux:separator class="my-1"/>
