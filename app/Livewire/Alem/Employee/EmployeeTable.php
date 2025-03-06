@@ -21,7 +21,7 @@ class EmployeeTable extends Component
     public $name = '';
     public $statusFilter = 'active';
 
-    // Status-Filter setzen bei Klick in der Tabelle
+    /* Status-Filter */
     public function setStatusFilter(string $status): void
     {
         $this->statusFilter = $status;
@@ -44,9 +44,9 @@ class EmployeeTable extends Component
                 if ($user->trashed()) $user->restore();
                 $user->update(['account_status' => AccountStatus::ACTIVE->value]);
             }
-            elseif ($action === 'not_activated') {
+            elseif ($action === 'inactive') {
                 if ($user->trashed()) $user->restore();
-                $user->update(['account_status' => AccountStatus::NOT_ACTIVATED->value]);
+                $user->update(['account_status' => AccountStatus::Inactive->value]);
             }
             elseif ($action === 'archived') {
                 if ($user->trashed()) $user->restore();
@@ -136,8 +136,8 @@ class EmployeeTable extends Component
     public function notActivate($userId): void
     {
         $user = User::find($userId);
-        if ($user && $user->account_status !== AccountStatus::NOT_ACTIVATED->value) {
-            $user->update(['account_status' => AccountStatus::NOT_ACTIVATED->value]);
+        if ($user && $user->account_status !== AccountStatus::Inactive->value) {
+            $user->update(['account_status' => AccountStatus::Inactive->value]);
             $this->dispatch('employeeUpdated');
             $this->dispatch('update-table');
 
@@ -251,9 +251,9 @@ class EmployeeTable extends Component
     protected function applyStatusFilter(Builder $query): Builder
     {
         switch ($this->statusFilter) {
-            case 'not_activated':
+            case 'inactive':
                 $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::NOT_ACTIVATED->value);
+                    ->where('account_status', AccountStatus::Inactive->value);
                 break;
 
             case 'archived':

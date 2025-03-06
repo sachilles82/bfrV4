@@ -5,7 +5,7 @@ namespace App\Enums\User;
 enum AccountStatus: string
 {
     case ACTIVE = 'active';
-    case NOT_ACTIVATED = 'not_activated';
+    case Inactive = 'inactive';
     case ARCHIVED = 'archived';
     case TRASHED = 'trashed';
 
@@ -13,19 +13,30 @@ enum AccountStatus: string
     {
         return match($this) {
             self::ACTIVE => __('Active'),
-            self::NOT_ACTIVATED => __('Not Activated'),
+            self::Inactive => __('Inactive'),
             self::ARCHIVED => __('Archived'),
             self::TRASHED => __('In Trash'),
         };
     }
 
-    public function fullColorClasses(): string
+    public function colors(): string
     {
-        return match($this->value) {
-            'active'         => 'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-green-600/20 dark:ring-green-500/20',
-            'not_activated'  => 'bg-yellow-50 dark:bg-yellow-400/10 text-yellow-800 dark:text-yellow-500 ring-yellow-600/20 dark:ring-yellow-400/20',
-            'archived'       => 'bg-gray-50 dark:bg-gray-400/10 text-gray-600 dark:text-gray-400 ring-gray-500/10 dark:ring-gray-400/20',
-            'trashed'        => 'bg-red-50 dark:bg-red-400/10 text-red-700 dark:text-red-400 ring-red-600/10 dark:ring-red-400/20',
+        return match ($this) {
+            static::ACTIVE => ' dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20 ring-green-600/20 text-green-700 bg-green-50',
+            static::Inactive => 'dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20 ring-yellow-600/20 text-yellow-800 bg-yellow-50',
+            static::TRASHED => 'dark:bg-red-400/10 dark:ring-red-400/20 dark:text-red-400 text-red-700 ring-red-600/10 bg-red-50',
+            static::ARCHIVED => 'dark:bg-gray-400/10 dark:ring-gray-400/20 dark:text-gray-400 text-gray-600 ring-gray-500/10 bg-gray-50',
+//            default => 'dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20 ring-yellow-600/20 text-yellow-800 bg-yellow-50',
+        };
+    }
+
+    public function icon(): string
+    {
+        return match ($this) {
+            static::ACTIVE => 'icon.check',
+            static::Inactive => 'icon.clock',
+            static::ARCHIVED => 'icon.archive-box',
+            static::TRASHED => 'icon.trash',
         };
     }
 
