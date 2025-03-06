@@ -18,11 +18,11 @@
                 {{__('A list of all departments in this table') }}
             </x-slot:description>
 
-{{--            <!--Create Button, open the Create Component-->--}}
-{{--            <x-slot:create>--}}
-{{--                <livewire:alem.employee.create-employee--}}
-{{--                />--}}
-{{--            </x-slot:create>--}}
+            <!--Create Button, open the Create Component-->
+            <x-slot:create>
+                <livewire:alem.employee.create-employee
+                />
+            </x-slot:create>
 
 {{--            <flux:modal.trigger name="create-profession">--}}
 {{--                <flux:separator class="mt-2 mb-1"/>--}}

@@ -10,18 +10,17 @@
             <div class="flex items-center justify-end w-full space-x-1 md:w-auto">
                 <!-- Bulk-Actions Dropdown wird hier eingebunden -->
                 <x-pupi.actions.bulkactions :statusFilter="$statusFilter"/>
-
+                <div>
+                    <flux:select variant="listbox"
+                                 wire:model.live="statusFilter"
+                                 id="statusFilter">
+                        <flux:option value="active">{{ __('Active') }}</flux:option>
+                        <flux:option value="inactive">{{ __('Inactive') }}</flux:option>
+                        <flux:option value="archived">{{ __('Archived') }}</flux:option>
+                        <flux:option value="trash">{{ __('Trash') }}</flux:option>
+                    </flux::select>
+                </div>
                 <x-pupi.actions.reset-filters wire:click="resetFilters"/>
-
-                <flux:select variant="listbox"
-                             wire:model.live="statusFilter"
-{{--                             wire:change="$set('selectedIds', [])"--}}
-                             id="statusFilter">
-                    <flux:option value="active">{{ __('Active') }}</flux:option>
-                    <flux:option value="inactive">{{ __('Inactive') }}</flux:option>
-                    <flux:option value="archived">{{ __('Archived') }}</flux:option>
-                    <flux:option value="trash">{{ __('Trash') }}</flux:option>
-                </flux::select>
                 <x-pupi.actions.per-page/>
             </div>
         </div>
@@ -30,7 +29,7 @@
 
     <!-- Tabelle -->
     <x-pupi.table.container>
-        @json($selectedIds) @json($idsOnPage)
+{{--        @json($selectedIds) @json($idsOnPage)--}}
         <div x-data="{ checked:false }">
             <x-pupi.table.main>
                 <x-slot:head>
@@ -38,11 +37,12 @@
                     <x-pupi.table.th.sort column="name" :$sortCol :$sortAsc class="pl-2">
                         {{ __('Name') }}
                     </x-pupi.table.th.sort>
+                    <x-pupi.table.th.notsort>{{ __('Contact') }}</x-pupi.table.th.notsort>
                     <x-pupi.table.th.notsort>{{ __('Team') }}</x-pupi.table.th.notsort>
-                    <x-pupi.table.th.notsort>{{ __('Roles') }}</x-pupi.table.th.notsort>
                     <!-- Spalte Account Status -->
-                    <x-pupi.table.th.notsort>{{ __('Employee Status') }}</x-pupi.table.th.notsort>
-                    <x-pupi.table.th.notsort>{{ __('Account Status') }}</x-pupi.table.th.notsort>
+                    <x-pupi.table.th.notsort>{{ __('Role') }}</x-pupi.table.th.notsort>
+                    <x-pupi.table.th.notsort>{{ __('Joined Date') }}</x-pupi.table.th.notsort>
+                    <x-pupi.table.th.notsort>{{ __('Status') }}</x-pupi.table.th.notsort>
                     <x-pupi.table.th.actions/>
                 </x-slot:head>
                 <x-slot:body>
@@ -101,6 +101,9 @@
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 {{ $user->roles->pluck('name')->implode(', ') }}
+                            </x-pupi.table.tr.cell>
+                            <x-pupi.table.tr.cell>
+                                <div class="text-gray-500 dark:text-gray-400">01. Feb. 2019</div>
                             </x-pupi.table.tr.cell>
                             <!-- Account Status Spalte: Mit Status Badge -->
                             <x-pupi.table.tr.cell>
@@ -205,7 +208,7 @@
                         </tr>
                     @empty
                         <x-pupi.table.tr.empty>
-                            <x-pupi.table.tr.empty-cell colspan="7"/>
+                            <x-pupi.table.tr.empty-cell colspan="8"/>
                         </x-pupi.table.tr.empty>
                     @endforelse
                 </x-slot:body>
