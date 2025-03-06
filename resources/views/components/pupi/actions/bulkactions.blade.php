@@ -38,7 +38,7 @@
 
             {{-- Status-specific action items using switch statement for cleaner code --}}
             @switch($statusFilter)
-                @case('trash')
+                @case('trashed')
                     {{-- Options for trashed users --}}
                     <flux:menu.item wire:click="bulkUpdateStatus('active')" icon="arrow-uturn-up">
                         {{ __('Restore to Active') }}
@@ -68,7 +68,7 @@
 
                     <flux:separator class="my-1"/>
 
-                    <flux:menu.item wire:click="bulkUpdateStatus('trash')"
+                    <flux:menu.item wire:click="bulkUpdateStatus('trashed')"
                                     wire:confirm="{{ __('Are you sure you want to move all selected employees to trash?') }}"
                                     icon="trash"
                                     variant="danger">
@@ -87,7 +87,7 @@
 
                     <flux:separator class="my-1"/>
 
-                    <flux:menu.item wire:click="bulkUpdateStatus('trash')"
+                    <flux:menu.item wire:click="bulkUpdateStatus('trashed')"
                                     wire:confirm="{{ __('Are you sure you want to move all selected employees to trash?') }}"
                                     icon="trash"
                                     variant="danger">
@@ -106,7 +106,7 @@
 
                     <flux:separator class="my-1"/>
 
-                    <flux:menu.item wire:click="bulkUpdateStatus('trash')"
+                    <flux:menu.item wire:click="bulkUpdateStatus('trashed')"
                                     wire:confirm="{{ __('Are you sure you want to move all selected employees to trash?') }}"
                                     icon="trash"
                                     variant="danger">
@@ -118,7 +118,7 @@
                     {{-- Default options for any other status --}}
                     <flux:separator class="my-1"/>
 
-                    <flux:menu.item wire:click="bulkUpdateStatus('trash')"
+                    <flux:menu.item wire:click="bulkUpdateStatus('trashed')"
                                     wire:confirm="{{ __('Are you sure you want to move all selected employees to trash?') }}"
                                     icon="trash"
                                     variant="danger">

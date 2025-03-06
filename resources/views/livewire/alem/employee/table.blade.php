@@ -11,13 +11,10 @@
                 <!-- Bulk-Actions Dropdown wird hier eingebunden -->
                 <x-pupi.actions.bulkactions :statusFilter="$statusFilter"/>
                 <div>
-                    <flux:select variant="listbox"
-                                 wire:model.live="statusFilter"
-                                 id="statusFilter">
-                        <flux:option value="active">{{ __('Active') }}</flux:option>
-                        <flux:option value="inactive">{{ __('Inactive') }}</flux:option>
-                        <flux:option value="archived">{{ __('Archived') }}</flux:option>
-                        <flux:option value="trash">{{ __('Trash') }}</flux:option>
+                    <flux:select variant="listbox" wire:model.live="statusFilter" id="statusFilter">
+                        @foreach($statuses as $status)
+                            <flux:option value="{{ $status->value }}">{{ __($status->label()) }}</flux:option>
+                        @endforeach
                     </flux::select>
                 </div>
                 <x-pupi.actions.reset-filters wire:click="resetFilters"/>
@@ -157,7 +154,7 @@
                                                             icon="trash" variant="danger">
                                                 {{ __('Move to Trash') }}
                                             </flux:menu.item>
-                                        @elseif($user->account_status === \App\Enums\User\AccountStatus::Inactive)
+                                        @elseif($user->account_status === \App\Enums\User\AccountStatus::INACTIVE)
                                             <!-- Options for not activated users -->
                                             <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
                                                 {{ __('Edit') }}

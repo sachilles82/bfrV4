@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('slug')->unique()->nullable()->after('theme');
             $table->string('last_name')->after('slug')->nullable(); // Changed from foreignId to string
             $table->timestamp('archived_at')->nullable()->after('last_name');
-            $table->string('account_status')->default(AccountStatus::Inactive->value)->after('archived_at'); // Changed from timestamp to string
+            $table->string('account_status')->default(AccountStatus::INACTIVE->value)->after('archived_at'); // Changed from timestamp to string
 
             $table->index(['name', 'team_id', 'company_id', 'user_type', 'archived_at', 'account_status']);
         });
