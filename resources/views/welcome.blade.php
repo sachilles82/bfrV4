@@ -14,6 +14,385 @@
     <style>
         /* ! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Figtree, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]{display:none}*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: }.absolute{position:absolute}.relative{position:relative}.-left-20{left:-5rem}.top-0{top:0px}.-bottom-16{bottom:-4rem}.-left-16{left:-4rem}.-mx-3{margin-left:-0.75rem;margin-right:-0.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}.aspect-video{aspect-ratio:16 / 9}.size-12{width:3rem;height:3rem}.size-5{width:1.25rem;height:1.25rem}.size-6{width:1.5rem;height:1.5rem}.h-12{height:3rem}.h-40{height:10rem}.h-full{height:100%}.min-h-screen{min-height:100vh}.w-full{width:100%}.w-\[calc\(100\%\+8rem\)\]{width:calc(100% + 8rem)}.w-auto{width:auto}.max-w-\[877px\]{max-width:877px}.max-w-2xl{max-width:42rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-center{align-items:center}.items-stretch{align-items:stretch}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.self-center{align-self:center}.overflow-hidden{overflow:hidden}.rounded-\[10px\]{border-radius:10px}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-sm{border-radius:0.125rem}.bg-\[\#FF2D20\]\/10{background-color:rgb(255 45 32 / 0.1)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity))}.bg-gradient-to-b{background-image:linear-gradient(to bottom, var(--tw-gradient-stops))}.from-transparent{--tw-gradient-from:transparent var(--tw-gradient-from-position);--tw-gradient-to:rgb(0 0 0 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-white{--tw-gradient-to:rgb(255 255 255 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #fff var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-white{--tw-gradient-to:#fff var(--tw-gradient-to-position)}.stroke-\[\#FF2D20\]{stroke:#FF2D20}.object-cover{object-fit:cover}.object-top{object-position:top}.p-6{padding:1.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-10{padding-top:2.5rem;padding-bottom:2.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.pt-3{padding-top:0.75rem}.text-center{text-align:center}.font-sans{font-family:Figtree, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-sm\/relaxed{font-size:0.875rem;line-height:1.625}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-semibold{font-weight:600}.text-black{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-\[0px_14px_34px_0px_rgba\(0\2c 0\2c 0\2c 0\.08\)\]{--tw-shadow:0px 14px 34px 0px rgba(0,0,0,0.08);--tw-shadow-colored:0px 14px 34px 0px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.ring-1{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.ring-transparent{--tw-ring-color:transparent}.ring-white\/\[0\.05\]{--tw-ring-color:rgb(255 255 255 / 0.05)}.drop-shadow-\[0px_4px_34px_rgba\(0\2c 0\2c 0\2c 0\.06\)\]{--tw-drop-shadow:drop-shadow(0px 4px 34px rgba(0,0,0,0.06));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.drop-shadow-\[0px_4px_34px_rgba\(0\2c 0\2c 0\2c 0\.25\)\]{--tw-drop-shadow:drop-shadow(0px 4px 34px rgba(0,0,0,0.25));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.selection\:bg-\[\#FF2D20\] *::selection{--tw-bg-opacity:1;background-color:rgb(255 45 32 / var(--tw-bg-opacity))}.selection\:text-white *::selection{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.selection\:bg-\[\#FF2D20\]::selection{--tw-bg-opacity:1;background-color:rgb(255 45 32 / var(--tw-bg-opacity))}.selection\:text-white::selection{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.hover\:text-black:hover{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity))}.hover\:text-black\/70:hover{color:rgb(0 0 0 / 0.7)}.hover\:ring-black\/20:hover{--tw-ring-color:rgb(0 0 0 / 0.2)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus-visible\:ring-1:focus-visible{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus-visible\:ring-\[\#FF2D20\]:focus-visible{--tw-ring-opacity:1;--tw-ring-color:rgb(255 45 32 / var(--tw-ring-opacity))}@media (min-width: 640px){.sm\:size-16{width:4rem;height:4rem}.sm\:size-6{width:1.5rem;height:1.5rem}.sm\:pt-5{padding-top:1.25rem}}@media (min-width: 768px){.md\:row-span-3{grid-row:span 3 / span 3}}@media (min-width: 1024px){.lg\:col-start-2{grid-column-start:2}.lg\:h-16{height:4rem}.lg\:max-w-7xl{max-width:80rem}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.lg\:flex-col{flex-direction:column}.lg\:items-end{align-items:flex-end}.lg\:justify-center{justify-content:center}.lg\:gap-8{gap:2rem}.lg\:p-10{padding:2.5rem}.lg\:pb-10{padding-bottom:2.5rem}.lg\:pt-0{padding-top:0px}.lg\:text-\[\#FF2D20\]{--tw-text-opacity:1;color:rgb(255 45 32 / var(--tw-text-opacity))}}@media (prefers-color-scheme: dark){.dark\:block{display:block}.dark\:hidden{display:none}.dark\:bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity))}.dark\:bg-zinc-900{--tw-bg-opacity:1;background-color:rgb(24 24 27 / var(--tw-bg-opacity))}.dark\:via-zinc-900{--tw-gradient-to:rgb(24 24 27 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #18181b var(--tw-gradient-via-position), var(--tw-gradient-to)}.dark\:to-zinc-900{--tw-gradient-to:#18181b var(--tw-gradient-to-position)}.dark\:text-white\/50{color:rgb(255 255 255 / 0.5)}.dark\:text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.dark\:text-white\/70{color:rgb(255 255 255 / 0.7)}.dark\:ring-zinc-800{--tw-ring-opacity:1;--tw-ring-color:rgb(39 39 42 / var(--tw-ring-opacity))}.dark\:hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.dark\:hover\:text-white\/70:hover{color:rgb(255 255 255 / 0.7)}.dark\:hover\:text-white\/80:hover{color:rgb(255 255 255 / 0.8)}.dark\:hover\:ring-zinc-700:hover{--tw-ring-opacity:1;--tw-ring-color:rgb(63 63 70 / var(--tw-ring-opacity))}.dark\:focus-visible\:ring-\[\#FF2D20\]:focus-visible{--tw-ring-opacity:1;--tw-ring-color:rgb(255 45 32 / var(--tw-ring-opacity))}.dark\:focus-visible\:ring-white:focus-visible{--tw-ring-opacity:1;--tw-ring-color:rgb(255 255 255 / var(--tw-ring-opacity))}}
     </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a86e8;
+            --primary-hover: #3a76d8;
+            --secondary-color: #34a853;
+            --text-color: #333;
+            --light-bg: #f5f5f5;
+            --white: #fff;
+            --border-color: #ddd;
+            --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background-color: var(--white);
+            box-shadow: var(--box-shadow);
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .header-subtitle {
+            text-align: center;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .nav-container {
+            background-color: var(--white);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: var(--white);
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            flex: 1;
+            text-align: center;
+        }
+
+        .tab:hover {
+            background-color: rgba(74, 134, 232, 0.1);
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .content {
+            background-color: var(--white);
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .content-title {
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .chart-container {
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 20px;
+            background-color: var(--white);
+            height: 400px;
+            position: relative;
+        }
+
+        @media (max-width: 992px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #555;
+        }
+
+        .chart-note {
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 10px;
+        }
+
+        .info-list {
+            padding-left: 20px;
+        }
+
+        .info-list li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+        }
+
+        .data-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        .data-table .number {
+            text-align: right;
+        }
+
+        /* Control panels */
+        .control-panel {
+            background-color: #f9f9f9;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-panel h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .control-item {
+            margin-bottom: 15px;
+        }
+
+        .control-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .control-item input, .control-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .control-item input:focus, .control-item select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 134, 232, 0.2);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* Premium features section */
+        .pricing-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pricing-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .pricing-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pricing-card .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: var(--text-color);
+        }
+
+        .pricing-card .price-period {
+            font-size: 0.9rem;
+            color: #777;
+            font-weight: normal;
+        }
+
+        .pricing-card ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .pricing-card li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .pricing-card li:before {
+            content: "✓";
+            color: var(--secondary-color);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .pricing-card .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Recommendations section */
+        .recommendations {
+            margin-top: 40px;
+        }
+
+        .recommendations ul {
+            padding-left: 25px;
+        }
+
+        .recommendations li {
+            margin-bottom: 15px;
+        }
+
+        .recommendations li strong {
+            color: var(--text-color);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Hidden section */
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        /* Print specific styles */
+        @media print {
+            .nav-container, .control-panel, .btn, .btn-group {
+                display: none !important;
+            }
+
+            .section-content {
+                display: block !important;
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+
+            .chart-container {
+                page-break-inside: avoid;
+                height: 300px;
+            }
+
+            body {
+                font-size: 11pt;
+                line-height: 1.3;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body class="font-sans antialiased dark:bg-black dark:text-white/50">
 <div class="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
@@ -55,111 +434,2135 @@
             </header>
 
             <main class="mt-6">
-                <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
-                    <a
-                        href="https://laravel.com/docs"
-                        id="docs-card"
-                        class="flex flex-col items-start gap-6 overflow-hidden rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3 lg:p-10 lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                    >
-                        <div id="screenshot-container" class="relative flex w-full flex-1 items-stretch">
-                            <img
-                                src="https://laravel.com/assets/img/welcome/docs-light.svg"
-                                alt="Laravel documentation screenshot"
-                                class="aspect-video h-full w-full flex-1 rounded-[10px] object-top object-cover drop-shadow-[0px_4px_34px_rgba(0,0,0,0.06)] dark:hidden"
-                                onerror="
-                                            document.getElementById('screenshot-container').classList.add('!hidden');
-                                            document.getElementById('docs-card').classList.add('!row-span-1');
-                                            document.getElementById('docs-card-content').classList.add('!flex-row');
-                                            document.getElementById('background').classList.add('!hidden');
-                                        "
-                            />
-                            <img
-                                src="https://laravel.com/assets/img/welcome/docs-dark.svg"
-                                alt="Laravel documentation screenshot"
-                                class="hidden aspect-video h-full w-full flex-1 rounded-[10px] object-top object-cover drop-shadow-[0px_4px_34px_rgba(0,0,0,0.25)] dark:block"
-                            />
-                            <div
-                                class="absolute -bottom-16 -left-16 h-40 w-[calc(100%+8rem)] bg-gradient-to-b from-transparent via-white to-white dark:via-zinc-900 dark:to-zinc-900"
-                            ></div>
-                        </div>
+                <main class="mt-6">
 
-                        <div class="relative flex items-center gap-6 lg:items-end">
-                            <div id="docs-card-content" class="flex items-start gap-6 lg:flex-col">
-                                <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                    <svg class="size-5 sm:size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path fill="#FF2D20" d="M23 4a1 1 0 0 0-1.447-.894L12.224 7.77a.5.5 0 0 1-.448 0L2.447 3.106A1 1 0 0 0 1 4v13.382a1.99 1.99 0 0 0 1.105 1.79l9.448 4.728c.14.065.293.1.447.1.154-.005.306-.04.447-.105l9.453-4.724a1.99 1.99 0 0 0 1.1-1.789V4ZM3 6.023a.25.25 0 0 1 .362-.223l7.5 3.75a.251.251 0 0 1 .138.223v11.2a.25.25 0 0 1-.362.224l-7.5-3.75a.25.25 0 0 1-.138-.22V6.023Zm18 11.2a.25.25 0 0 1-.138.224l-7.5 3.75a.249.249 0 0 1-.329-.099.249.249 0 0 1-.033-.12V9.772a.251.251 0 0 1 .138-.224l7.5-3.75a.25.25 0 0 1 .362.224v11.2Z"/><path fill="#FF2D20" d="m3.55 1.893 8 4.048a1.008 1.008 0 0 0 .9 0l8-4.048a1 1 0 0 0-.9-1.785l-7.322 3.706a.506.506 0 0 1-.452 0L4.454.108a1 1 0 0 0-.9 1.785H3.55Z"/></svg>
-                                </div>
-
-                                <div class="pt-3 sm:pt-5 lg:pt-0">
-                                    <h2 class="text-xl font-semibold text-black dark:text-white">Documentation</h2>
-
-                                    <p class="mt-4 text-sm/relaxed">
-                                        Laravel has wonderful documentation covering every aspect of the framework. Whether you are a newcomer or have prior experience with Laravel, we recommend reading our documentation from beginning to end.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <svg class="size-6 shrink-0 stroke-[#FF2D20]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/></svg>
-                        </div>
-                    </a>
-
-                    <a
-                        href="https://laracasts.com"
-                        class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                    >
-                        <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                            <svg class="size-5 sm:size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g fill="#FF2D20"><path d="M24 8.25a.5.5 0 0 0-.5-.5H.5a.5.5 0 0 0-.5.5v12a2.5 2.5 0 0 0 2.5 2.5h19a2.5 2.5 0 0 0 2.5-2.5v-12Zm-7.765 5.868a1.221 1.221 0 0 1 0 2.264l-6.626 2.776A1.153 1.153 0 0 1 8 18.123v-5.746a1.151 1.151 0 0 1 1.609-1.035l6.626 2.776ZM19.564 1.677a.25.25 0 0 0-.177-.427H15.6a.106.106 0 0 0-.072.03l-4.54 4.543a.25.25 0 0 0 .177.427h3.783c.027 0 .054-.01.073-.03l4.543-4.543ZM22.071 1.318a.047.047 0 0 0-.045.013l-4.492 4.492a.249.249 0 0 0 .038.385.25.25 0 0 0 .14.042h5.784a.5.5 0 0 0 .5-.5v-2a2.5 2.5 0 0 0-1.925-2.432ZM13.014 1.677a.25.25 0 0 0-.178-.427H9.101a.106.106 0 0 0-.073.03l-4.54 4.543a.25.25 0 0 0 .177.427H8.4a.106.106 0 0 0 .073-.03l4.54-4.543ZM6.513 1.677a.25.25 0 0 0-.177-.427H2.5A2.5 2.5 0 0 0 0 3.75v2a.5.5 0 0 0 .5.5h1.4a.106.106 0 0 0 .073-.03l4.54-4.543Z"/></g></svg>
-                        </div>
-
-                        <div class="pt-3 sm:pt-5">
-                            <h2 class="text-xl font-semibold text-black dark:text-white">Laracasts</h2>
-
-                            <p class="mt-4 text-sm/relaxed">
-                                Laracasts offers thousands of video tutorials on Laravel, PHP, and JavaScript development. Check them out, see for yourself, and massively level up your development skills in the process.
-                            </p>
-                        </div>
-
-                        <svg class="size-6 shrink-0 self-center stroke-[#FF2D20]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/></svg>
-                    </a>
-
-                    <a
-                        href="https://laravel-news.com"
-                        class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                    >
-                        <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                            <svg class="size-5 sm:size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g fill="#FF2D20"><path d="M8.75 4.5H5.5c-.69 0-1.25.56-1.25 1.25v4.75c0 .69.56 1.25 1.25 1.25h3.25c.69 0 1.25-.56 1.25-1.25V5.75c0-.69-.56-1.25-1.25-1.25Z"/><path d="M24 10a3 3 0 0 0-3-3h-2V2.5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2V20a3.5 3.5 0 0 0 3.5 3.5h17A3.5 3.5 0 0 0 24 20V10ZM3.5 21.5A1.5 1.5 0 0 1 2 20V3a.5.5 0 0 1 .5-.5h14a.5.5 0 0 1 .5.5v17c0 .295.037.588.11.874a.5.5 0 0 1-.484.625L3.5 21.5ZM22 20a1.5 1.5 0 1 1-3 0V9.5a.5.5 0 0 1 .5-.5H21a1 1 0 0 1 1 1v10Z"/><path d="M12.751 6.047h2a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-.75.75h-2A.75.75 0 0 1 12 7.3v-.5a.75.75 0 0 1 .751-.753ZM12.751 10.047h2a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-.75.75h-2A.75.75 0 0 1 12 11.3v-.5a.75.75 0 0 1 .751-.753ZM4.751 14.047h10a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-.75.75h-10A.75.75 0 0 1 4 15.3v-.5a.75.75 0 0 1 .751-.753ZM4.75 18.047h7.5a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-.75.75h-7.5A.75.75 0 0 1 4 19.3v-.5a.75.75 0 0 1 .75-.753Z"/></g></svg>
-                        </div>
-
-                        <div class="pt-3 sm:pt-5">
-                            <h2 class="text-xl font-semibold text-black dark:text-white">Laravel News</h2>
-
-                            <p class="mt-4 text-sm/relaxed">
-                                Laravel News is a community driven portal and newsletter aggregating all of the latest and most important news in the Laravel ecosystem, including new package releases and tutorials.
-                            </p>
-                        </div>
-
-                        <svg class="size-6 shrink-0 self-center stroke-[#FF2D20]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/></svg>
-                    </a>
-
-                    <div class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
-                        <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                            <svg class="size-5 sm:size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <g fill="#FF2D20">
-                                    <path
-                                        d="M16.597 12.635a.247.247 0 0 0-.08-.237 2.234 2.234 0 0 1-.769-1.68c.001-.195.03-.39.084-.578a.25.25 0 0 0-.09-.267 8.8 8.8 0 0 0-4.826-1.66.25.25 0 0 0-.268.181 2.5 2.5 0 0 1-2.4 1.824.045.045 0 0 0-.045.037 12.255 12.255 0 0 0-.093 3.86.251.251 0 0 0 .208.214c2.22.366 4.367 1.08 6.362 2.118a.252.252 0 0 0 .32-.079 10.09 10.09 0 0 0 1.597-3.733ZM13.616 17.968a.25.25 0 0 0-.063-.407A19.697 19.697 0 0 0 8.91 15.98a.25.25 0 0 0-.287.325c.151.455.334.898.548 1.328.437.827.981 1.594 1.619 2.28a.249.249 0 0 0 .32.044 29.13 29.13 0 0 0 2.506-1.99ZM6.303 14.105a.25.25 0 0 0 .265-.274 13.048 13.048 0 0 1 .205-4.045.062.062 0 0 0-.022-.07 2.5 2.5 0 0 1-.777-.982.25.25 0 0 0-.271-.149 11 11 0 0 0-5.6 2.815.255.255 0 0 0-.075.163c-.008.135-.02.27-.02.406.002.8.084 1.598.246 2.381a.25.25 0 0 0 .303.193 19.924 19.924 0 0 1 5.746-.438ZM9.228 20.914a.25.25 0 0 0 .1-.393 11.53 11.53 0 0 1-1.5-2.22 12.238 12.238 0 0 1-.91-2.465.248.248 0 0 0-.22-.187 18.876 18.876 0 0 0-5.69.33.249.249 0 0 0-.179.336c.838 2.142 2.272 4 4.132 5.353a.254.254 0 0 0 .15.048c1.41-.01 2.807-.282 4.117-.802ZM18.93 12.957l-.005-.008a.25.25 0 0 0-.268-.082 2.21 2.21 0 0 1-.41.081.25.25 0 0 0-.217.2c-.582 2.66-2.127 5.35-5.75 7.843a.248.248 0 0 0-.09.299.25.25 0 0 0 .065.091 28.703 28.703 0 0 0 2.662 2.12.246.246 0 0 0 .209.037c2.579-.701 4.85-2.242 6.456-4.378a.25.25 0 0 0 .048-.189 13.51 13.51 0 0 0-2.7-6.014ZM5.702 7.058a.254.254 0 0 0 .2-.165A2.488 2.488 0 0 1 7.98 5.245a.093.093 0 0 0 .078-.062 19.734 19.734 0 0 1 3.055-4.74.25.25 0 0 0-.21-.41 12.009 12.009 0 0 0-10.4 8.558.25.25 0 0 0 .373.281 12.912 12.912 0 0 1 4.826-1.814ZM10.773 22.052a.25.25 0 0 0-.28-.046c-.758.356-1.55.635-2.365.833a.25.25 0 0 0-.022.48c1.252.43 2.568.65 3.893.65.1 0 .2 0 .3-.008a.25.25 0 0 0 .147-.444c-.526-.424-1.1-.917-1.673-1.465ZM18.744 8.436a.249.249 0 0 0 .15.228 2.246 2.246 0 0 1 1.352 2.054c0 .337-.08.67-.23.972a.25.25 0 0 0 .042.28l.007.009a15.016 15.016 0 0 1 2.52 4.6.25.25 0 0 0 .37.132.25.25 0 0 0 .096-.114c.623-1.464.944-3.039.945-4.63a12.005 12.005 0 0 0-5.78-10.258.25.25 0 0 0-.373.274c.547 2.109.85 4.274.901 6.453ZM9.61 5.38a.25.25 0 0 0 .08.31c.34.24.616.561.8.935a.25.25 0 0 0 .3.127.631.631 0 0 1 .206-.034c2.054.078 4.036.772 5.69 1.991a.251.251 0 0 0 .267.024c.046-.024.093-.047.141-.067a.25.25 0 0 0 .151-.23A29.98 29.98 0 0 0 15.957.764a.25.25 0 0 0-.16-.164 11.924 11.924 0 0 0-2.21-.518.252.252 0 0 0-.215.076A22.456 22.456 0 0 0 9.61 5.38Z"
-                                    />
-                                </g>
-                            </svg>
-                        </div>
-
-                        <div class="pt-3 sm:pt-5">
-                            <h2 class="text-xl font-semibold text-black dark:text-white">Vibrant Ecosystem</h2>
-
-                            <p class="mt-4 text-sm/relaxed">
-                                Laravel's robust library of first-party tools and libraries, such as <a href="https://forge.laravel.com" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white dark:focus-visible:ring-[#FF2D20]">Forge</a>, <a href="https://vapor.laravel.com" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Vapor</a>, <a href="https://nova.laravel.com" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Nova</a>, <a href="https://envoyer.io" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Envoyer</a>, and <a href="https://herd.laravel.com" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Herd</a> help you take your projects to the next level. Pair them with powerful open source libraries like <a href="https://laravel.com/docs/billing" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Cashier</a>, <a href="https://laravel.com/docs/dusk" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Dusk</a>, <a href="https://laravel.com/docs/broadcasting" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Echo</a>, <a href="https://laravel.com/docs/horizon" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Horizon</a>, <a href="https://laravel.com/docs/sanctum" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Sanctum</a>, <a href="https://laravel.com/docs/telescope" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Telescope</a>, and more.
-                            </p>
+                    <div class="header">
+                        <div class="container">
+                            <h1>Venditorix Freemium-Modell</h1>
+                            <p class="header-subtitle">Interaktive Datenanalyse und Prognose</p>
                         </div>
                     </div>
-                </div>
+
+                    <div class="container">
+                        <div class="nav-container">
+                            <div class="tabs">
+                                <button class="tab active" data-section="overview">Übersicht</button>
+                                <button class="tab" data-section="market">Marktpotenzial</button>
+                                <button class="tab" data-section="conversion">Konversion</button>
+                                <button class="tab" data-section="revenue">Umsatzprognose</button>
+                                <button class="tab" data-section="costs">Betriebskosten</button>
+                                <button class="tab" data-section="growth">Wachstum</button>
+                                <button class="tab" data-section="roi">ROI Analyse</button>
+                                <button class="tab" data-section="premium">Premium-Features</button>
+                            </div>
+                        </div>
+
+                        <!-- Overview Section -->
+                        <div id="overview" class="section-content active">
+                            <div class="content">
+                                <h2 class="content-title">Übersicht: Venditorix Freemium-Modell</h2>
+
+                                <p>Das Venditorix Freemium-Modell bietet eine skalierbare Lösung für die Vermarktung der Verkaufstextgenerator-Software. Basierend auf umfassenden Datenanalysen zeigt dieser interaktive Report alle relevanten Metriken und Prognosen.</p>
+
+                                <div class="control-panel">
+                                    <h3>Datenparameter anpassen</h3>
+                                    <p>Passen Sie die Parameter an, um verschiedene Szenarien zu simulieren.</p>
+
+                                    <div class="control-grid">
+                                        <div class="control-item">
+                                            <label for="conversionRate">Free-zu-Paid Konversionsrate (%)</label>
+                                            <input type="number" id="conversionRate" min="0.1" max="20" step="0.1" value="5">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="userBase">Geplante Nutzerbasis</label>
+                                            <input type="number" id="userBase" min="1000" max="1000000" step="1000" value="100000">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="proPrice">Professional Abo-Preis (€/Monat)</label>
+                                            <input type="number" id="proPrice" min="1" max="200" step="0.5" value="29.99">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="businessPrice">Business Abo-Preis (€/Monat)</label>
+                                            <input type="number" id="businessPrice" min="1" max="500" step="0.5" value="79.99">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button id="updateDataBtn" class="btn">Daten aktualisieren</button>
+                                        <button id="printReportBtn" class="btn btn-secondary">Report drucken</button>
+                                    </div>
+                                </div>
+
+                                <div class="chart-grid">
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Umsatzverteilung nach Nutzertyp</h3>
+                                        <canvas id="overviewRevenueChart"></canvas>
+                                    </div>
+
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Nutzerwachstum und Umsatzentwicklung</h3>
+                                        <canvas id="overviewGrowthChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="recommendations">
+                                    <h3>Zusammenfassung der wichtigsten Erkenntnisse</h3>
+                                    <ul>
+                                        <li><strong>Marktpotenzial:</strong> 20-25 Millionen potenzielle Nutzer weltweit, mit Schwerpunkt auf B2B- und B2C-Vertriebsmitarbeitern.</li>
+                                        <li><strong>Umsatzpotenzial:</strong> <span id="revenuePotential">284.950 €</span> monatlich bei <span id="userBaseDisplay">100.000</span> Nutzern.</li>
+                                        <li><strong>Gewinnmarge:</strong> <span id="profitMargin">43%</span> bei optimaler Skalierung.</li>
+                                        <li><strong>ROI:</strong> Deutlich höherer ROI des Freemium-Modells im Vergleich zum traditionellen Modell.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Market Potential Section -->
+                        <div id="market" class="section-content">
+                            <div class="content">
+                                <h2 class="content-title">1. Marktpotenzial und Zielgruppensegmentierung</h2>
+
+                                <div class="control-panel">
+                                    <h3>Marktdaten anpassen</h3>
+
+                                    <div class="control-grid">
+                                        <div class="control-item">
+                                            <label for="totalMarketSize">Gesamtes Marktpotenzial (Mio. Nutzer)</label>
+                                            <input type="number" id="totalMarketSize" min="10" max="100" step="1" value="25">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="b2bPercentage">Anteil B2B-Verkäufer (%)</label>
+                                            <input type="number" id="b2bPercentage" min="1" max="100" step="1" value="38">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="b2cPercentage">Anteil B2C-Vertriebsmitarbeiter (%)</label>
+                                            <input type="number" id="b2cPercentage" min="1" max="100" step="1" value="32">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="naPercentage">Anteil Nordamerika (%)</label>
+                                            <input type="number" id="naPercentage" min="1" max="100" step="1" value="40">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button id="updateMarketBtn" class="btn">Marktdaten aktualisieren</button>
+                                    </div>
+                                </div>
+
+                                <div class="chart-grid">
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Servicefähiger adressierbarer Markt (SAM) nach Regionen</h3>
+                                        <canvas id="marketRegionsChart"></canvas>
+                                        <p class="chart-note">SAM von insgesamt ca. <span id="samTotal">20-25</span> Millionen potenziellen Nutzern.</p>
+                                    </div>
+
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Zielgruppenanalyse nach Berufstypen</h3>
+                                        <canvas id="targetGroupsChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3>Marktanalyse und Potenzial</h3>
+                                    <p>Der servicefähige adressierbare Markt (SAM) für Venditorix umfasst Vertriebsmitarbeiter, die regelmäßig Verkaufsgespräche führen und strukturierte Verkaufstechniken anwenden. Die Analyse zeigt, dass der Hauptmarkt in Nordamerika und Europa liegt, mit wachsendem Potenzial in Asien-Pazifik.</p>
+
+                                    <p>Bei einer realistischen Marktdurchdringung von 0.5-1% des SAM könnten mittelfristig (3-5 Jahre) 100.000-250.000 Benutzer erreicht werden.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Conversion Section -->
+                        <div id="conversion" class="section-content">
+                            <div class="content">
+                                <h2 class="content-title">2. Freemium-Konversionstrichter</h2>
+
+                                <div class="control-panel">
+                                    <h3>Konversionsraten anpassen</h3>
+
+                                    <div class="control-grid">
+                                        <div class="control-item">
+                                            <label for="visitorToRegistration">Besucher zu Registrierung (%)</label>
+                                            <input type="number" id="visitorToRegistration" min="0.1" max="20" step="0.1" value="6.5">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="registrationToActive">Registrierung zu aktiven Free-Nutzern (%)</label>
+                                            <input type="number" id="registrationToActive" min="1" max="100" step="1" value="50">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="activeToPayingTotal">Free zu Paid - insgesamt (%)</label>
+                                            <input type="number" id="activeToPayingTotal" min="0.1" max="20" step="0.1" value="5">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="activeToPayingEngaged">Free zu Paid - nach 90 Tagen Aktivität (%)</label>
+                                            <input type="number" id="activeToPayingEngaged" min="0.1" max="30" step="0.1" value="10">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button id="updateConversionBtn" class="btn">Konversionsdaten aktualisieren</button>
+                                    </div>
+                                </div>
+
+                                <div class="chart-grid">
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Konversionstrichter-Visualisierung</h3>
+                                        <canvas id="conversionFunnelChart"></canvas>
+                                    </div>
+
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Erwartete Konversionsraten</h3>
+                                        <ul class="info-list">
+                                            <li>
+                                                <span class="dot" style="background-color: #4a86e8;"></span>
+                                                Besucher zu Registrierung: <strong id="visitorToRegistrationDisplay">5-8%</strong>
+                                            </li>
+                                            <li>
+                                                <span class="dot" style="background-color: #4bd086;"></span>
+                                                Registrierung zu aktiven Free-Nutzern: <strong id="registrationToActiveDisplay">40-60%</strong>
+                                            </li>
+                                            <li>
+                                                <span class="dot" style="background-color: #ffd044;"></span>
+                                                Free zu Paid (insgesamt): <strong id="activeToPayingTotalDisplay">3-5%</strong>
+                                            </li>
+                                            <li>
+                                                <span class="dot" style="background-color: #9c60e9;"></span>
+                                                Free zu Paid (nach 90 Tagen Aktivität): <strong id="activeToPayingEngagedDisplay">8-12%</strong>
+                                            </li>
+                                        </ul>
+
+                                        <div style="margin-top: 30px;">
+                                            <h4>Konversionsstrategie</h4>
+                                            <p>Die Konversionsraten basieren auf Benchmarks erfolgreicher SaaS-Freemium-Modelle. Strategien zur Optimierung der Konversion umfassen:</p>
+                                            <ul>
+                                                <li>Optimierung des Onboarding-Prozesses</li>
+                                                <li>Strategisch platzierte Upgrade-CTAs</li>
+                                                <li>Feature-Discovery für Premium-Funktionen</li>
+                                                <li>Zeitlich begrenzte Angebote für aktive Free-Nutzer</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Revenue Section -->
+                        <div id="revenue" class="section-content">
+                            <div class="content">
+                                <h2 class="content-title">3. Umsatzprognose bei verschiedenen Nutzerzahlen</h2>
+
+                                <div class="control-panel">
+                                    <h3>Umsatzparameter anpassen</h3>
+
+                                    <div class="control-grid">
+                                        <div class="control-item">
+                                            <label for="professionalPrice">Professional Abo (€/Monat)</label>
+                                            <input type="number" id="professionalPrice" min="1" max="200" step="0.01" value="29.99">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="businessPrice2">Business Abo (€/Monat)</label>
+                                            <input type="number" id="businessPrice2" min="1" max="500" step="0.01" value="79.99">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="enterprisePrice">Enterprise Abo (€/Monat)</label>
+                                            <input type="number" id="enterprisePrice" min="1" max="1000" step="0.01" value="199.99">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="professionalPercent">Anteil Professional Abos (%)</label>
+                                            <input type="number" id="professionalPercent" min="1" max="100" step="1" value="70">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="businessPercent">Anteil Business Abos (%)</label>
+                                            <input type="number" id="businessPercent" min="0" max="99" step="1" value="25">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="additionalRevenue">Zusatzumsatz pro Nutzer (€/Monat)</label>
+                                            <input type="number" id="additionalRevenue" min="0" max="100" step="0.1" value="6">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button id="updateRevenueBtn" class="btn">Umsatzdaten aktualisieren</button>
+                                    </div>
+                                </div>
+
+                                <div class="chart-grid">
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Umsatzentwicklung bei wachsender Nutzerbasis</h3>
+                                        <canvas id="revenueByUserCountChart"></canvas>
+                                    </div>
+
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Umsatzverteilung nach Einnahmequellen (bei <span id="revenueUserCount">100.000</span> Nutzern)</h3>
+                                        <canvas id="revenueDistributionChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 30px;">
+                                    <h3>Umsatzprognose bei verschiedenen Nutzergrößen</h3>
+                                    <table class="data-table" id="revenueProjectionTable">
+                                        <thead>
+                                        <tr>
+                                            <th>Nutzerzahl</th>
+                                            <th class="number">Freemium-Nutzer</th>
+                                            <th class="number">Zahlende Nutzer</th>
+                                            <th class="number">Monatlicher Umsatz</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>10.000</td>
+                                            <td class="number">9.500</td>
+                                            <td class="number">500</td>
+                                            <td class="number">28.495 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>25.000</td>
+                                            <td class="number">23.750</td>
+                                            <td class="number">1.250</td>
+                                            <td class="number">71.238 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>50.000</td>
+                                            <td class="number">47.500</td>
+                                            <td class="number">2.500</td>
+                                            <td class="number">142.475 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>100.000</td>
+                                            <td class="number">95.000</td>
+                                            <td class="number">5.000</td>
+                                            <td class="number">284.950 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>250.000</td>
+                                            <td class="number">237.500</td>
+                                            <td class="number">12.500</td>
+                                            <td class="number">712.375 €</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Costs Section -->
+                        <div id="costs" class="section-content">
+                            <div class="content">
+                                <h2 class="content-title">4. Betriebskosten und Marge</h2>
+
+                                <div class="control-panel">
+                                    <h3>Kostenparameter anpassen</h3>
+
+                                    <div class="control-grid">
+                                        <div class="control-item">
+                                            <label for="aiCostPerUser">KI-Kosten pro Nutzer (€/Monat)</label>
+                                            <input type="number" id="aiCostPerUser" min="0.01" max="10" step="0.01" value="0.52">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="supportCostPerUser">Support & Personal pro 1000 Nutzer (€/Monat)</label>
+                                            <input type="number" id="supportCostPerUser" min="10" max="2000" step="10" value="500">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="marketingPercentage">
+                                                <label for="marketingPercentage">Marketing & Akquise (% vom Umsatz)</label>
+                                                <input type="number" id="marketingPercentage" min="1" max="50" step="1" value="15">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="hostingCostPerUser">Hosting & Infrastruktur pro 10.000 Nutzer (€/Monat)</label>
+                                            <input type="number" id="hostingCostPerUser" min="100" max="5000" step="100" value="750">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="paymentProcessingPercentage">Zahlungsabwicklung (% vom Umsatz)</label>
+                                            <input type="number" id="paymentProcessingPercentage" min="0.5" max="10" step="0.1" value="3.5">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button id="updateCostsBtn" class="btn">Kostendaten aktualisieren</button>
+                                    </div>
+                                </div>
+
+                                <div class="chart-grid">
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Kostenstruktur bei verschiedenen Nutzergrößen</h3>
+                                        <table class="data-table" id="costStructureTable">
+                                            <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th class="number">10.000 Nutzer</th>
+                                                <th class="number">50.000 Nutzer</th>
+                                                <th class="number">100.000 Nutzer</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>Monatl. Umsatz</td>
+                                                <td class="number">28.495 €</td>
+                                                <td class="number">142.475 €</td>
+                                                <td class="number">284.950 €</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Kosten</td>
+                                                <td class="number">17.910 €</td>
+                                                <td class="number">85.485 €</td>
+                                                <td class="number">162.420 €</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Gewinn</td>
+                                                <td class="number">10.585 €</td>
+                                                <td class="number">56.990 €</td>
+                                                <td class="number">122.530 €</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Marge</td>
+                                                <td class="number">37%</td>
+                                                <td class="number">40%</td>
+                                                <td class="number">43%</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Detaillierte Kostenaufschlüsselung bei 100.000 Nutzern</h3>
+                                        <canvas id="costStructureChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 30px;">
+                                    <h3>Kosten-Skalierung und Effizienz</h3>
+                                    <p>Mit zunehmendem Wachstum verbessert sich die Kosteneffizienz durch:</p>
+                                    <ul>
+                                        <li><strong>Skaleneffekte bei KI-Kosten</strong> durch Volumenrabatte und optimierte Prompts</li>
+                                        <li><strong>Effizientere Support-Strukturen</strong> mit zunehmendem Automatisierungsgrad</li>
+                                        <li><strong>Geringere relative Hosting-Kosten</strong> durch bessere Server-Auslastung</li>
+                                        <li><strong>Optimierte Marketing-Ausgaben</strong> durch höhere Conversion-Rates und organisches Wachstum</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Growth Section -->
+                        <div id="growth" class="section-content">
+                            <div class="content">
+                                <h2 class="content-title">5. Nutzerwachstumsprognose</h2>
+
+                                <div class="control-panel">
+                                    <h3>Wachstumsparameter anpassen</h3>
+
+                                    <div class="control-grid">
+                                        <div class="control-item">
+                                            <label for="initialUsers">Nutzer nach 6 Monaten</label>
+                                            <input type="number" id="initialUsers" min="100" max="50000" step="100" value="5000">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="growthRate1">Wachstumsrate Jahr 1 (%/Halbjahr)</label>
+                                            <input type="number" id="growthRate1" min="10" max="500" step="10" value="200">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="growthRate2">Wachstumsrate Jahr 2 (%/Halbjahr)</label>
+                                            <input type="number" id="growthRate2" min="10" max="300" step="10" value="100">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="growthRate3">Wachstumsrate Jahr 3 (%/Halbjahr)</label>
+                                            <input type="number" id="growthRate3" min="10" max="200" step="10" value="50">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="conversionGrowth">Konversionsraten-Steigerung pro Jahr (%-Punkte)</label>
+                                            <input type="number" id="conversionGrowth" min="0" max="5" step="0.1" value="1">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button id="updateGrowthBtn" class="btn">Wachstumsdaten aktualisieren</button>
+                                    </div>
+                                </div>
+
+                                <div class="chart-container" style="width: 100%; height: 500px;">
+                                    <h3 class="chart-title">Prognostiziertes Nutzerwachstum über 36 Monate</h3>
+                                    <canvas id="userGrowthChart"></canvas>
+                                </div>
+
+                                <div style="margin-top: 30px;">
+                                    <h3>Wachstumsprognose über 36 Monate</h3>
+                                    <table class="data-table" id="growthProjectionTable">
+                                        <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th class="number">Monat 6</th>
+                                            <th class="number">Monat 12</th>
+                                            <th class="number">Monat 18</th>
+                                            <th class="number">Monat 24</th>
+                                            <th class="number">Monat 30</th>
+                                            <th class="number">Monat 36</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>Gesamtnutzer</td>
+                                            <td class="number">5.000</td>
+                                            <td class="number">15.000</td>
+                                            <td class="number">30.000</td>
+                                            <td class="number">60.000</td>
+                                            <td class="number">100.000</td>
+                                            <td class="number">150.000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Zahlende Nutzer</td>
+                                            <td class="number">150</td>
+                                            <td class="number">600</td>
+                                            <td class="number">1.350</td>
+                                            <td class="number">2.700</td>
+                                            <td class="number">5.000</td>
+                                            <td class="number">7.500</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Conversion-Rate</td>
+                                            <td class="number">3,0%</td>
+                                            <td class="number">4,0%</td>
+                                            <td class="number">4,5%</td>
+                                            <td class="number">4,5%</td>
+                                            <td class="number">5,0%</td>
+                                            <td class="number">5,0%</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROI Section -->
+                        <div id="roi" class="section-content">
+                            <div class="content">
+                                <h2 class="content-title">6. Schlüsselkennzahlen und ROI-Analyse</h2>
+
+                                <div class="control-panel">
+                                    <h3>ROI-Parameter anpassen</h3>
+
+                                    <div class="control-grid">
+                                        <div class="control-item">
+                                            <label for="freemiumInvestmentY1">Freemium Investition Jahr 1 (€)</label>
+                                            <input type="number" id="freemiumInvestmentY1" min="10000" max="1000000" step="10000" value="350000">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="traditionalInvestmentY1">Traditionell Investition Jahr 1 (€)</label>
+                                            <input type="number" id="traditionalInvestmentY1" min="10000" max="1000000" step="10000" value="280000">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="cacYear1">CAC Jahr 1 (€)</label>
+                                            <input type="number" id="cacYear1" min="50" max="1000" step="10" value="230">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="cacYear3">CAC Jahr 3 (€)</label>
+                                            <input type="number" id="cacYear3" min="50" max="1000" step="10" value="190">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="ltvYear1">LTV Jahr 1 (€)</label>
+                                            <input type="number" id="ltvYear1" min="100" max="5000" step="10" value="780">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="ltvYear3">LTV Jahr 3 (€)</label>
+                                            <input type="number" id="ltvYear3" min="100" max="5000" step="10" value="1050">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="churnYear1">Churn-Rate Jahr 1 (%)</label>
+                                            <input type="number" id="churnYear1" min="0.1" max="20" step="0.1" value="5.8">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="churnYear3">Churn-Rate Jahr 3 (%)</label>
+                                            <input type="number" id="churnYear3" min="0.1" max="20" step="0.1" value="3.8">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button id="updateRoiBtn" class="btn">ROI-Daten aktualisieren</button>
+                                    </div>
+                                </div>
+
+                                <div class="chart-grid">
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">Wichtige SaaS-Metriken im Freemium-Modell</h3>
+                                        <table class="data-table" id="saasMetricsTable">
+                                            <thead>
+                                            <tr>
+                                                <th>Metrik</th>
+                                                <th class="number">Jahr 1</th>
+                                                <th class="number">Jahr 2</th>
+                                                <th class="number">Jahr 3</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>Free-zu-Paid Konversionsrate</td>
+                                                <td class="number">3,2%</td>
+                                                <td class="number">4,5%</td>
+                                                <td class="number">5,0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>CAC (Customer Acquisition Cost)</td>
+                                                <td class="number">230 €</td>
+                                                <td class="number">210 €</td>
+                                                <td class="number">190 €</td>
+                                            </tr>
+                                            <tr>
+                                                <td>LTV (Lifetime Value)</td>
+                                                <td class="number">780 €</td>
+                                                <td class="number">920 €</td>
+                                                <td class="number">1.050 €</td>
+                                            </tr>
+                                            <tr>
+                                                <td>LTV:CAC Ratio</td>
+                                                <td class="number">3,4</td>
+                                                <td class="number">4,4</td>
+                                                <td class="number">5,5</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Churn-Rate</td>
+                                                <td class="number">5,8%</td>
+                                                <td class="number">4,5%</td>
+                                                <td class="number">3,8%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>ARPU (zahlende Nutzer)</td>
+                                                <td class="number">42 €</td>
+                                                <td class="number">46 €</td>
+                                                <td class="number">49 €</td>
+                                            </tr>
+                                            <tr>
+                                                <td>ARPU (alle Nutzer)</td>
+                                                <td class="number">1,34 €</td>
+                                                <td class="number">2,07 €</td>
+                                                <td class="number">2,45 €</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">ROI-Analyse: Freemium vs. traditionelles Modell</h3>
+                                        <canvas id="roiComparisonChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 30px;">
+                                    <h3>ROI-Vergleich über 3 Jahre</h3>
+                                    <table class="data-table" id="roiComparisonTable">
+                                        <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th class="number">Jahr 1</th>
+                                            <th class="number">Jahr 2</th>
+                                            <th class="number">Jahr 3</th>
+                                            <th class="number">3-Jahres-Summe</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="5"><strong>Freemium:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Investition</td>
+                                            <td class="number">350.000 €</td>
+                                            <td class="number">250.000 €</td>
+                                            <td class="number">200.000 €</td>
+                                            <td class="number">800.000 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Umsatz</td>
+                                            <td class="number">520.000 €</td>
+                                            <td class="number">1.750.000 €</td>
+                                            <td class="number">3.420.000 €</td>
+                                            <td class="number">5.690.000 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>ROI</td>
+                                            <td class="number">48%</td>
+                                            <td class="number">600%</td>
+                                            <td class="number">1610%</td>
+                                            <td class="number">611%</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5"><strong>Traditionell:</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Investition</td>
+                                            <td class="number">280.000 €</td>
+                                            <td class="number">220.000 €</td>
+                                            <td class="number">180.000 €</td>
+                                            <td class="number">680.000 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Umsatz</td>
+                                            <td class="number">380.000 €</td>
+                                            <td class="number">1.100.000 €</td>
+                                            <td class="number">1.950.000 €</td>
+                                            <td class="number">3.430.000 €</td>
+                                        </tr>
+                                        <tr>
+                                            <td>ROI</td>
+                                            <td class="number">36%</td>
+                                            <td class="number">400%</td>
+                                            <td class="number">983%</td>
+                                            <td class="number">404%</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Premium Features Section -->
+                        <div id="premium" class="section-content">
+                            <div class="content">
+                                <h2 class="content-title">Premium-Features und Preisgestaltung</h2>
+
+                                <div class="control-panel">
+                                    <h3>Preisgestaltung anpassen</h3>
+
+                                    <div class="control-grid">
+                                        <div class="control-item">
+                                            <label for="freeSpeeches">Free-Tier: Anzahl Speeches</label>
+                                            <input type="number" id="freeSpeeches" min="1" max="10" step="1" value="1">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="professionalSpeeches">Professional: Anzahl Speeches</label>
+                                            <input type="number" id="professionalSpeeches" min="1" max="100" step="1" value="10">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="businessSpeeches">Business: Anzahl Speeches</label>
+                                            <input type="number" id="businessSpeeches" min="1" max="500" step="1" value="50">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="professionalPrice3">Professional Preis (€/Monat)</label>
+                                            <input type="number" id="professionalPrice3" min="1" max="200" step="0.1" value="29.99">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="businessPrice3">Business Preis (€/Monat)</label>
+                                            <input type="number" id="businessPrice3" min="1" max="500" step="0.1" value="79.99">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="enterprisePrice3">Enterprise Preis (€/Monat)</label>
+                                            <input type="number" id="enterprisePrice3" min="1" max="1000" step="0.1" value="199.99">
+                                        </div>
+
+                                        <div class="control-item">
+                                            <label for="yearlyDiscount">Rabatt bei jährlicher Zahlung (%)</label>
+                                            <input type="number" id="yearlyDiscount" min="0" max="50" step="1" value="16.7">
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <button id="updatePricingBtn" class="btn">Preisgestaltung aktualisieren</button>
+                                    </div>
+                                </div>
+
+                                <div class="pricing-container">
+                                    <div class="pricing-card">
+                                        <h3>Free</h3>
+                                        <div class="price">0 €</div>
+                                        <ul>
+                                            <li><span id="freeSpeeches2">1</span> Speech erstellen und speichern</li>
+                                            <li>Zugriff auf grundlegende Textbausteine</li>
+                                            <li>Basis-Export (PDF)</li>
+                                            <li>Community-Support</li>
+                                        </ul>
+                                        <button class="btn">Kostenlos starten</button>
+                                    </div>
+
+                                    <div class="pricing-card">
+                                        <h3>Professional</h3>
+                                        <div class="price"><span id="professionalPriceDisplay">29,99 €</span> <span class="price-period">/ Monat</span></div>
+                                        <ul>
+                                            <li><span id="professionalSpeeches2">10</span> Speeches erstellen und verwalten</li>
+                                            <li>50 KI-Optimierungen pro Monat</li>
+                                            <li>Zugriff auf erweiterte Textbausteine</li>
+                                            <li>Alle Einwandtechniken</li>
+                                            <li>Alle Export-Optionen (PDF, Word, E-Mail)</li>
+                                            <li>Standard-Support</li>
+                                        </ul>
+                                        <button class="btn">Jetzt upgraden</button>
+                                    </div>
+
+                                    <div class="pricing-card">
+                                        <h3>Business</h3>
+                                        <div class="price"><span id="businessPriceDisplay">79,99 €</span> <span class="price-period">/ Monat</span></div>
+                                        <ul>
+                                            <li><span id="businessSpeeches2">50</span> Speeches erstellen und verwalten</li>
+                                            <li>200 KI-Optimierungen pro Monat</li>
+                                            <li>Vollständiger Zugriff auf alle Textbausteine</li>
+                                            <li>Branchenspezifische Templates</li>
+                                            <li>Team-Funktionen für bis zu 3 Benutzer</li>
+                                            <li>Premium-Support</li>
+                                        </ul>
+                                        <button class="btn">Jetzt upgraden</button>
+                                    </div>
+
+                                    <div class="pricing-card">
+                                        <h3>Enterprise</h3>
+                                        <div class="price"><span id="enterprisePriceDisplay">199,99 €</span> <span class="price-period">/ Monat</span></div>
+                                        <ul>
+                                            <li>Unbegrenzte Speeches</li>
+                                            <li>500 KI-Optimierungen pro Monat</li>
+                                            <li>Team-Funktionen für bis zu 10 Benutzer</li>
+                                            <li>Maßgeschneiderte Textbausteine für Ihr Unternehmen</li>
+                                            <li>White-Label-Option</li>
+                                            <li>Dedizierter Account Manager</li>
+                                            <li>API-Zugang</li>
+                                        </ul>
+                                        <button class="btn">Kontakt aufnehmen</button>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 30px;">
+                                    <h3>Zusätzliche Credit-Pakete</h3>
+                                    <table class="data-table">
+                                        <thead>
+                                        <tr>
+                                            <th>Paket</th>
+                                            <th class="number">Preis</th>
+                                            <th>Beschreibung</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>5 zusätzliche Speeches</td>
+                                            <td class="number">19,99 €</td>
+                                            <td>Erweiterung zur Erstellung zusätzlicher Speeches</td>
+                                        </tr>
+                                        <tr>
+                                            <td>20 zusätzliche Speeches</td>
+                                            <td class="number">69,99 €</td>
+                                            <td>Paket für Teams mit erhöhtem Bedarf</td>
+                                        </tr>
+                                        <tr>
+                                            <td>50 zusätzliche KI-Optimierungen</td>
+                                            <td class="number">14,99 €</td>
+                                            <td>Für verbesserte Textqualität und Anpassungen</td>
+                                        </tr>
+                                        <tr>
+                                            <td>200 zusätzliche KI-Optimierungen</td>
+                                            <td class="number">49,99 €</td>
+                                            <td>Ideal für umfangreiche Content-Erstellung</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer with Recommendations -->
+                        <div class="content recommendations">
+                            <h2 class="content-title">Fazit und Handlungsempfehlungen</h2>
+
+                            <p>Die Datenanalyse zeigt, dass ein gut implementiertes Freemium-Modell für Venditorix erhebliche Wachstums- und Umsatzchancen bietet.</p>
+
+                            <h3>Die wichtigsten Handlungsempfehlungen:</h3>
+                            <ul>
+                                <li><strong>Implementieren Sie frühzeitig Nutzungstracking</strong> - Um das Verhalten von Free-Nutzern zu verstehen und Konversionstreiber zu identifizieren</li>
+                                <li><strong>Gestalten Sie klare Wertstufungen</strong> - Mit spürbaren Vorteilen zwischen Free und verschiedenen Premium-Tiers</li>
+                                <li><strong>Optimieren Sie kontinuierlich die Conversion-Touchpoints</strong> - Basierend auf Daten und A/B-Tests</li>
+                                <li><strong>Erwägen Sie eine schnelle Internationalisierung</strong> - Um das Marktpotenzial vor Wettbewerbern zu erschließen</li>
+                                <li><strong>Steuern Sie KI-Kosten aktiv</strong> - Durch effiziente Prompts und Caching-Strategien</li>
+                            </ul>
+
+                            <p>Mit diesem strategischen Ansatz kann Venditorix innerhalb von 2-3 Jahren eine führende Position im Markt für Verkaufstextgenerierung erreichen und eine solide Basis für weiteres Wachstum und Innovation schaffen.</p>
+
+                            <div class="btn-group">
+                                <button id="generateReportBtn" class="btn">Vollständigen Report generieren</button>
+                                <button id="printFullReportBtn" class="btn btn-secondary">Als PDF speichern</button>
+                            </div>
+                        </div>
+
+                        <div class="footer">
+                            <p>Venditorix Freemium-Modell: Interaktive Datenanalyse und Prognose</p>
+                            <p>Stand: 07.03.2025</p>
+                        </div>
+                    </div>
+
+                    <script>
+                        // Global chart instances for updating
+                        let marketRegionsChart, targetGroupsChart, conversionFunnelChart;
+                        let revenueByUserCountChart, revenueDistributionChart, costStructureChart;
+                        let userGrowthChart, roiComparisonChart, overviewRevenueChart, overviewGrowthChart;
+
+                        // Tab switching functionality
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const tabs = document.querySelectorAll('.tab');
+
+                            tabs.forEach(tab => {
+                                tab.addEventListener('click', function() {
+                                    // Update active tab
+                                    tabs.forEach(t => t.classList.remove('active'));
+                                    this.classList.add('active');
+
+                                    // Show corresponding section
+                                    const sectionId = this.getAttribute('data-section');
+                                    document.querySelectorAll('.section-content').forEach(section => {
+                                        section.classList.remove('active');
+                                    });
+                                    document.getElementById(sectionId).classList.add('active');
+                                });
+                            });
+
+                            // Initialize charts
+                            initializeCharts();
+
+                            // Setup event listeners for control panels
+                            setupEventListeners();
+                        });
+
+                        // Format number with thousand separator
+                        function formatNumber(number, decimals = 0) {
+                            return new Intl.NumberFormat('de-DE', {
+                                minimumFractionDigits: decimals,
+                                maximumFractionDigits: decimals
+                            }).format(number);
+                        }
+
+                        // Initialize all charts
+                        function initializeCharts() {
+                            initializeMarketCharts();
+                            initializeConversionCharts();
+                            initializeRevenueCharts();
+                            initializeCostCharts();
+                            initializeGrowthCharts();
+                            initializeRoiCharts();
+                            initializeOverviewCharts();
+                        }
+
+                        // Setup event listeners
+                        function setupEventListeners() {
+                            // Main data update
+                            document.getElementById('updateDataBtn').addEventListener('click', function() {
+                                updateAllData();
+                            });
+
+                            // Market data update
+                            document.getElementById('updateMarketBtn').addEventListener('click', function() {
+                                updateMarketData();
+                            });
+
+                            // Conversion data update
+                            document.getElementById('updateConversionBtn').addEventListener('click', function() {
+                                updateConversionData();
+                            });
+
+                            // Revenue data update
+                            document.getElementById('updateRevenueBtn').addEventListener('click', function() {
+                                updateRevenueData();
+                            });
+                            // Costs data update
+                            document.getElementById('updateCostsBtn').addEventListener('click', function() {
+                                updateCostsData();
+                            });
+
+                            // Growth data update
+                            document.getElementById('updateGrowthBtn').addEventListener('click', function() {
+                                updateGrowthData();
+                            });
+
+                            // ROI data update
+                            document.getElementById('updateRoiBtn').addEventListener('click', function() {
+                                updateRoiData();
+                            });
+
+                            // Pricing data update
+                            document.getElementById('updatePricingBtn').addEventListener('click', function() {
+                                updatePricingData();
+                            });
+
+                            // Print report button
+                            document.getElementById('printReportBtn').addEventListener('click', function() {
+                                window.print();
+                            });
+
+                            document.getElementById('printFullReportBtn').addEventListener('click', function() {
+                                window.print();
+                            });
+
+                            // Generate full report
+                            document.getElementById('generateReportBtn').addEventListener('click', function() {
+                                // Show all sections for printing
+                                document.querySelectorAll('.section-content').forEach(section => {
+                                    section.classList.add('active');
+                                });
+
+                                // Create a slight delay to ensure charts are rendered properly
+                                setTimeout(() => {
+                                    window.print();
+
+                                    // After printing, restore to current active tab
+                                    document.querySelectorAll('.section-content').forEach(section => {
+                                        section.classList.remove('active');
+                                    });
+
+                                    const activeTab = document.querySelector('.tab.active');
+                                    const sectionId = activeTab.getAttribute('data-section');
+                                    document.getElementById(sectionId).classList.add('active');
+                                }, 500);
+                            });
+                        }
+
+                        // Update all data based on main parameters
+                        function updateAllData() {
+                            const conversionRate = parseFloat(document.getElementById('conversionRate').value) / 100;
+                            const userBase = parseInt(document.getElementById('userBase').value);
+                            const proPrice = parseFloat(document.getElementById('proPrice').value);
+                            const businessPrice = parseFloat(document.getElementById('businessPrice').value);
+
+                            // Calculate revenue
+                            const payingUsers = Math.round(userBase * conversionRate);
+                            const freeUsers = userBase - payingUsers;
+
+                            // Assume distribution: 70% Pro, 25% Business, 5% Enterprise
+                            const proUsers = Math.round(payingUsers * 0.7);
+                            const businessUsers = Math.round(payingUsers * 0.25);
+                            const enterpriseUsers = payingUsers - proUsers - businessUsers;
+
+                            const proRevenue = proUsers * proPrice;
+                            const businessRevenue = businessUsers * businessPrice;
+                            const enterpriseRevenue = enterpriseUsers * 199.99;
+
+                            const totalRevenue = proRevenue + businessRevenue + enterpriseRevenue;
+                            const additionalRevenue = payingUsers * 6; // Average additional revenue per paying user (credits, etc.)
+
+                            const grandTotalRevenue = totalRevenue + additionalRevenue;
+
+                            // Update overview summary
+                            document.getElementById('revenuePotential').textContent = formatNumber(grandTotalRevenue) + ' €';
+                            document.getElementById('userBaseDisplay').textContent = formatNumber(userBase);
+
+                            // Calculate costs and profit margin
+                            const aiCosts = userBase * 0.52;
+                            const supportCosts = userBase * 0.5;
+                            const marketingCosts = grandTotalRevenue * 0.15;
+                            const hostingCosts = userBase * 0.075;
+                            const paymentCosts = grandTotalRevenue * 0.035;
+
+                            const totalCosts = aiCosts + supportCosts + marketingCosts + hostingCosts + paymentCosts;
+                            const profit = grandTotalRevenue - totalCosts;
+                            const margin = (profit / grandTotalRevenue * 100).toFixed(0);
+
+                            document.getElementById('profitMargin').textContent = margin + '%';
+
+                            // Update all other sections
+                            updateMarketData();
+                            updateConversionData();
+                            updateRevenueData();
+                            updateCostsData();
+                            updateGrowthData();
+                            updateRoiData();
+                            updatePricingData();
+                            updateOverviewCharts();
+                        }
+
+                        // Market section data update
+                        function updateMarketData() {
+                            const totalMarketSize = parseInt(document.getElementById('totalMarketSize').value);
+                            const b2bPercentage = parseInt(document.getElementById('b2bPercentage').value);
+                            const b2cPercentage = parseInt(document.getElementById('b2cPercentage').value);
+                            const naPercentage = parseInt(document.getElementById('naPercentage').value);
+
+                            // Calculate Europe percentage based on NA
+                            const europePercentage = Math.min(100 - naPercentage, Math.round(naPercentage * 0.7));
+
+                            // Calculate APAC percentage
+                            const apacPercentage = Math.min(100 - naPercentage - europePercentage, Math.round(naPercentage * 0.5));
+
+                            // Calculate LATAM and ROW
+                            const latamPercentage = Math.min(100 - naPercentage - europePercentage - apacPercentage, Math.round(naPercentage * 0.2));
+                            const rowPercentage = 100 - naPercentage - europePercentage - apacPercentage - latamPercentage;
+
+                            // Calculate values based on percentages and total size
+                            const naValue = (naPercentage / 100 * totalMarketSize).toFixed(1);
+                            const europeValue = (europePercentage / 100 * totalMarketSize).toFixed(1);
+                            const apacValue = (apacPercentage / 100 * totalMarketSize).toFixed(1);
+                            const latamValue = (latamPercentage / 100 * totalMarketSize).toFixed(1);
+                            const rowValue = (rowPercentage / 100 * totalMarketSize).toFixed(1);
+
+                            // Update the market regions chart
+                            marketRegionsChart.data.datasets[0].data = [naValue, europeValue, apacValue, latamValue, rowValue];
+                            marketRegionsChart.data.labels = [
+                                `Nordamerika (${naPercentage}%)`,
+                                `Europa (${europePercentage}%)`,
+                                `Asien-Pazifik (${apacPercentage}%)`,
+                                `Lateinamerika (${latamPercentage}%)`,
+                                `Rest der Welt (${rowPercentage}%)`
+                            ];
+                            marketRegionsChart.update();
+
+                            // Update the target groups chart
+                            const freelancerPercentage = Math.max(5, 100 - b2bPercentage - b2cPercentage - 15);
+                            const managerPercentage = Math.min(15, 100 - b2bPercentage - b2cPercentage - freelancerPercentage);
+                            const smbPercentage = 100 - b2bPercentage - b2cPercentage - freelancerPercentage - managerPercentage;
+
+                            targetGroupsChart.data.datasets[0].data = [
+                                b2bPercentage,
+                                b2cPercentage,
+                                freelancerPercentage,
+                                managerPercentage,
+                                smbPercentage
+                            ];
+                            targetGroupsChart.update();
+
+                            // Update SAM total display
+                            document.getElementById('samTotal').textContent = totalMarketSize;
+                        }
+
+                        // Conversion section data update
+                        function updateConversionData() {
+                            const visitorToRegistration = parseFloat(document.getElementById('visitorToRegistration').value);
+                            const registrationToActive = parseFloat(document.getElementById('registrationToActive').value);
+                            const activeToPayingTotal = parseFloat(document.getElementById('activeToPayingTotal').value);
+                            const activeToPayingEngaged = parseFloat(document.getElementById('activeToPayingEngaged').value);
+
+                            // Calculate funnel values based on 100,000 initial visitors
+                            const visitors = 100000;
+                            const registrations = Math.round(visitors * (visitorToRegistration / 100));
+                            const activeUsers = Math.round(registrations * (registrationToActive / 100));
+                            const payingUsers = Math.round(activeUsers * (activeToPayingTotal / 100));
+
+                            // Update the chart
+                            conversionFunnelChart.data.datasets[0].data = [visitors, registrations, activeUsers, payingUsers];
+                            conversionFunnelChart.update();
+
+                            // Update the text displays
+                            document.getElementById('visitorToRegistrationDisplay').textContent = `${visitorToRegistration}%`;
+                            document.getElementById('registrationToActiveDisplay').textContent = `${registrationToActive}%`;
+                            document.getElementById('activeToPayingTotalDisplay').textContent = `${activeToPayingTotal}%`;
+                            document.getElementById('activeToPayingEngagedDisplay').textContent = `${activeToPayingEngaged}%`;
+                        }
+
+                        // Revenue section data update
+                        function updateRevenueData() {
+                            const professionalPrice = parseFloat(document.getElementById('professionalPrice').value);
+                            const businessPrice = parseFloat(document.getElementById('businessPrice2').value);
+                            const enterprisePrice = parseFloat(document.getElementById('enterprisePrice').value);
+                            const professionalPercent = parseFloat(document.getElementById('professionalPercent').value);
+                            const businessPercent = parseFloat(document.getElementById('businessPercent').value);
+                            const additionalRevenue = parseFloat(document.getElementById('additionalRevenue').value);
+
+                            // Calculate enterprise percentage
+                            const enterprisePercent = 100 - professionalPercent - businessPercent;
+
+                            // Calculate revenue for different user counts
+                            const userCounts = [10000, 25000, 50000, 100000, 250000];
+                            const conversionRate = 0.05; // 5% conversion rate
+
+                            const revenueData = userCounts.map(userCount => {
+                                const payingUsers = Math.round(userCount * conversionRate);
+                                const freemiumUsers = userCount - payingUsers;
+
+                                const proUsers = Math.round(payingUsers * (professionalPercent / 100));
+                                const businessUsers = Math.round(payingUsers * (businessPercent / 100));
+                                const enterpriseUsers = payingUsers - proUsers - businessUsers;
+
+                                const proRevenue = proUsers * professionalPrice;
+                                const businessRevenue = businessUsers * businessPrice;
+                                const enterpriseRevenue = enterpriseUsers * enterprisePrice;
+                                const addRevenue = payingUsers * additionalRevenue;
+
+                                const totalRevenue = proRevenue + businessRevenue + enterpriseRevenue + addRevenue;
+
+                                return {
+                                    users: userCount,
+                                    freemium: freemiumUsers,
+                                    paying: payingUsers,
+                                    revenue: Math.round(totalRevenue)
+                                };
+                            });
+
+                            // Update the chart
+                            revenueByUserCountChart.data.labels = revenueData.map(item => `${item.users/1000}k`);
+                            revenueByUserCountChart.data.datasets[0].data = revenueData.map(item => item.revenue);
+                            revenueByUserCountChart.update();
+
+                            // Update revenue distribution chart
+                            const sampleRevenue = revenueData.find(item => item.users === 100000);
+                            const proTotalRevenue = sampleRevenue.paying * (professionalPercent / 100) * professionalPrice;
+                            const businessTotalRevenue = sampleRevenue.paying * (businessPercent / 100) * businessPrice;
+                            const enterpriseTotalRevenue = sampleRevenue.paying * (enterprisePercent / 100) * enterprisePrice;
+                            const speechCreditRevenue = sampleRevenue.paying * additionalRevenue * 0.55;
+                            const aiCreditRevenue = sampleRevenue.paying * additionalRevenue * 0.45;
+
+                            const totalRevenue = proTotalRevenue + businessTotalRevenue + enterpriseTotalRevenue + speechCreditRevenue + aiCreditRevenue;
+
+                            const proPct = (proTotalRevenue / totalRevenue * 100).toFixed(1);
+                            const businessPct = (businessTotalRevenue / totalRevenue * 100).toFixed(1);
+                            const enterprisePct = (enterpriseTotalRevenue / totalRevenue * 100).toFixed(1);
+                            const speechPct = (speechCreditRevenue / totalRevenue * 100).toFixed(1);
+                            const aiPct = (aiCreditRevenue / totalRevenue * 100).toFixed(1);
+
+                            revenueDistributionChart.data.datasets[0].data = [
+                                proTotalRevenue,
+                                businessTotalRevenue,
+                                enterpriseTotalRevenue,
+                                speechCreditRevenue,
+                                aiCreditRevenue
+                            ];
+
+                            revenueDistributionChart.data.labels = [
+                                `Professional-Abos (${proPct}%)`,
+                                `Business-Abos (${businessPct}%)`,
+                                `Enterprise-Abos (${enterprisePct}%)`,
+                                `Credit-Pakete (Speech) (${speechPct}%)`,
+                                `Credit-Pakete (KI) (${aiPct}%)`
+                            ];
+
+                            revenueDistributionChart.update();
+
+                            // Update revenue table
+                            const table = document.getElementById('revenueProjectionTable').getElementsByTagName('tbody')[0];
+                            const rows = table.getElementsByTagName('tr');
+
+                            for (let i = 0; i < rows.length; i++) {
+                                const cells = rows[i].getElementsByTagName('td');
+                                cells[1].textContent = formatNumber(revenueData[i].freemium);
+                                cells[2].textContent = formatNumber(revenueData[i].paying);
+                                cells[3].textContent = formatNumber(revenueData[i].revenue) + ' €';
+                            }
+
+                            // Update revenue user count label
+                            document.getElementById('revenueUserCount').textContent = formatNumber(100000);
+                        }
+
+                        // Costs section data update
+                        function updateCostsData() {
+                            const aiCostPerUser = parseFloat(document.getElementById('aiCostPerUser').value);
+                            const supportCostPerUser = parseFloat(document.getElementById('supportCostPerUser').value);
+                            const marketingPercentage = parseFloat(document.getElementById('marketingPercentage').value);
+                            const hostingCostPerUser = parseFloat(document.getElementById('hostingCostPerUser').value);
+                            const paymentProcessingPercentage = parseFloat(document.getElementById('paymentProcessingPercentage').value);
+
+                            // Calculate costs for 100,000 users
+                            const users100k = 100000;
+                            const revenuePer100k = 284950; // Using fixed revenue value for simplicity
+
+                            const aiCosts = users100k * aiCostPerUser;
+                            const supportCosts = users100k / 1000 * supportCostPerUser;
+                            const marketingCosts = revenuePer100k * (marketingPercentage / 100);
+                            const hostingCosts = users100k / 10000 * hostingCostPerUser;
+                            const paymentCosts = revenuePer100k * (paymentProcessingPercentage / 100);
+
+                            const totalCosts = aiCosts + supportCosts + marketingCosts + hostingCosts + paymentCosts;
+                            const profit = revenuePer100k - totalCosts;
+                            const margin = (profit / revenuePer100k * 100).toFixed(0);
+
+                            // Calculate costs for different user bases
+                            const userBases = [10000, 50000, 100000];
+                            const costData = userBases.map(users => {
+                                const revenue = (users / 100000) * revenuePer100k;
+                                const aiCost = users * aiCostPerUser;
+                                const supportCost = users / 1000 * supportCostPerUser;
+                                const marketingCost = revenue * (marketingPercentage / 100);
+                                const hostingCost = users / 10000 * hostingCostPerUser;
+                                const paymentCost = revenue * (paymentProcessingPercentage / 100);
+
+                                const totalCost = aiCost + supportCost + marketingCost + hostingCost + paymentCost;
+                                const profit = revenue - totalCost;
+                                const margin = (profit / revenue * 100).toFixed(0);
+
+                                return { users, revenue, cost: totalCost, profit, margin };
+                            });
+
+                            // Update cost structure pie chart
+                            const aiPct = (aiCosts / totalCosts * 100).toFixed(1);
+                            const supportPct = (supportCosts / totalCosts * 100).toFixed(1);
+                            const marketingPct = (marketingCosts / totalCosts * 100).toFixed(1);
+                            const paymentPct = (paymentCosts / totalCosts * 100).toFixed(1);
+                            const hostingPct = (hostingCosts / totalCosts * 100).toFixed(1);
+
+                            costStructureChart.data.datasets[0].data = [
+                                supportCosts,
+                                aiCosts,
+                                marketingCosts,
+                                paymentCosts,
+                                hostingCosts
+                            ];
+
+                            costStructureChart.data.labels = [
+                                `Support & Personal (${supportPct}%)`,
+                                `KI-Kosten (${aiPct}%)`,
+                                `Marketing & Akquise (${marketingPct}%)`,
+                                `Zahlungsabwicklung (${paymentPct}%)`,
+                                `Hosting & Infrastr. (${hostingPct}%)`
+                            ];
+
+                            costStructureChart.update();
+
+                            // Update cost structure table
+                            const table = document.getElementById('costStructureTable').getElementsByTagName('tbody')[0];
+                            const rows = table.getElementsByTagName('tr');
+
+                            for (let i = 0; i < costData.length; i++) {
+                                // Update revenue row
+                                rows[0].getElementsByTagName('td')[i+1].textContent = formatNumber(costData[i].revenue) + ' €';
+
+                                // Update costs row
+                                rows[1].getElementsByTagName('td')[i+1].textContent = formatNumber(costData[i].cost) + ' €';
+
+                                // Update profit row
+                                rows[2].getElementsByTagName('td')[i+1].textContent = formatNumber(costData[i].profit) + ' €';
+
+                                // Update margin row
+                                rows[3].getElementsByTagName('td')[i+1].textContent = costData[i].margin + '%';
+                            }
+                        }
+
+                        // Growth section data update
+                        function updateGrowthData() {
+                            const initialUsers = parseInt(document.getElementById('initialUsers').value);
+                            const growthRate1 = parseFloat(document.getElementById('growthRate1').value) / 100;
+                            const growthRate2 = parseFloat(document.getElementById('growthRate2').value) / 100;
+                            const growthRate3 = parseFloat(document.getElementById('growthRate3').value) / 100;
+                            const conversionGrowth = parseFloat(document.getElementById('conversionGrowth').value) / 100;
+
+                            // Calculate user growth over 36 months
+                            const month6Users = initialUsers;
+                            const month12Users = Math.round(month6Users * (1 + growthRate1));
+                            const month18Users = Math.round(month12Users * (1 + growthRate2));
+                            const month24Users = Math.round(month18Users * (1 + growthRate2));
+                            const month30Users = Math.round(month24Users * (1 + growthRate3));
+                            const month36Users = Math.round(month30Users * (1 + growthRate3));
+
+                            // Calculate conversion rates
+                            const month6Conv = 0.03;
+                            const month12Conv = month6Conv + conversionGrowth;
+                            const month18Conv = month12Conv + conversionGrowth/2;
+                            const month24Conv = month18Conv;
+                            const month30Conv = month24Conv + conversionGrowth/2;
+                            const month36Conv = month30Conv;
+
+                            // Calculate paying users
+                            const month6Paying = Math.round(month6Users * month6Conv);
+                            const month12Paying = Math.round(month12Users * month12Conv);
+                            const month18Paying = Math.round(month18Users * month18Conv);
+                            const month24Paying = Math.round(month24Users * month24Conv);
+                            const month30Paying = Math.round(month30Users * month30Conv);
+                            const month36Paying = Math.round(month36Users * month36Conv);
+
+                            // Update the user growth chart
+                            userGrowthChart.data.datasets[0].data = [
+                                month6Users,
+                                month12Users,
+                                month18Users,
+                                month24Users,
+                                month30Users,
+                                month36Users
+                            ];
+
+                            userGrowthChart.data.datasets[1].data = [
+                                month6Paying,
+                                month12Paying,
+                                month18Paying,
+                                month24Paying,
+                                month30Paying,
+                                month36Paying
+                            ];
+
+                            userGrowthChart.data.datasets[2].data = [
+                                month6Conv * 100,
+                                month12Conv * 100,
+                                month18Conv * 100,
+                                month24Conv * 100,
+                                month30Conv * 100,
+                                month36Conv * 100
+                            ];
+
+                            userGrowthChart.update();
+
+                            // Update growth projection table
+                            const table = document.getElementById('growthProjectionTable').getElementsByTagName('tbody')[0];
+                            const rows = table.getElementsByTagName('tr');
+
+                            // Update total users row
+                            const cells1 = rows[0].getElementsByTagName('td');
+                            cells1[1].textContent = formatNumber(month6Users);
+                            cells1[2].textContent = formatNumber(month12Users);
+                            cells1[3].textContent = formatNumber(month18Users);
+                            cells1[4].textContent = formatNumber(month24Users);
+                            cells1[5].textContent = formatNumber(month30Users);
+                            cells1[6].textContent = formatNumber(month36Users);
+
+                            // Update paying users row
+                            const cells2 = rows[1].getElementsByTagName('td');
+                            cells2[1].textContent = formatNumber(month6Paying);
+                            cells2[2].textContent = formatNumber(month12Paying);
+                            cells2[3].textContent = formatNumber(month18Paying);
+                            cells2[4].textContent = formatNumber(month24Paying);
+                            cells2[5].textContent = formatNumber(month30Paying);
+                            cells2[6].textContent = formatNumber(month36Paying);
+
+                            // Update conversion rate row
+                            const cells3 = rows[2].getElementsByTagName('td');
+                            cells3[1].textContent = (month6Conv * 100).toFixed(1) + '%';
+                            cells3[2].textContent = (month12Conv * 100).toFixed(1) + '%';
+                            cells3[3].textContent = (month18Conv * 100).toFixed(1) + '%';
+                            cells3[4].textContent = (month24Conv * 100).toFixed(1) + '%';
+                            cells3[5].textContent = (month30Conv * 100).toFixed(1) + '%';
+                            cells3[6].textContent = (month36Conv * 100).toFixed(1) + '%';
+                        }
+
+                        // ROI section data update
+                        function updateRoiData() {
+                            const freemiumInvestmentY1 = parseInt(document.getElementById('freemiumInvestmentY1').value);
+                            const traditionalInvestmentY1 = parseInt(document.getElementById('traditionalInvestmentY1').value);
+                            const cacYear1 = parseInt(document.getElementById('cacYear1').value);
+                            const cacYear3 = parseInt(document.getElementById('cacYear3').value);
+                            const ltvYear1 = parseInt(document.getElementById('ltvYear1').value);
+                            const ltvYear3 = parseInt(document.getElementById('ltvYear3').value);
+                            const churnYear1 = parseFloat(document.getElementById('churnYear1').value);
+                            const churnYear3 = parseFloat(document.getElementById('churnYear3').value);
+
+                            // Calculate intermediate values
+                            const cacYear2 = Math.round(cacYear1 - (cacYear1 - cacYear3) / 2);
+                            const ltvYear2 = Math.round(ltvYear1 + (ltvYear3 - ltvYear1) / 2);
+                            const churnYear2 = parseFloat((churnYear1 - (churnYear1 - churnYear3) / 2).toFixed(1));
+
+                            // Calculate LTV:CAC Ratio
+                            const ltvCacYear1 = (ltvYear1 / cacYear1).toFixed(1);
+                            const ltvCacYear2 = (ltvYear2 / cacYear2).toFixed(1);
+                            const ltvCacYear3 = (ltvYear3 / cacYear3).toFixed(1);
+
+                            // Calculate investments and revenue
+                            const freemiumInvestmentY2 = Math.round(freemiumInvestmentY1 * 0.71);
+                            const freemiumInvestmentY3 = Math.round(freemiumInvestmentY2 * 0.8);
+
+                            const traditionalInvestmentY2 = Math.round(traditionalInvestmentY1 * 0.79);
+                            const traditionalInvestmentY3 = Math.round(traditionalInvestmentY2 * 0.82);
+
+                            // Assume freemium revenue is higher due to network effects and conversion optimization
+                            const freemiumRevenueY1 = 520000;
+                            const freemiumRevenueY2 = 1750000;
+                            const freemiumRevenueY3 = 3420000;
+
+                            const traditionalRevenueY1 = 380000;
+                            const traditionalRevenueY2 = 1100000;
+                            const traditionalRevenueY3 = 1950000;
+
+                            // Calculate ROI percentages
+                            const freemiumRoiY1 = Math.round((freemiumRevenueY1 - freemiumInvestmentY1) / freemiumInvestmentY1 * 100);
+                            const freemiumRoiY2 = Math.round((freemiumRevenueY2 - freemiumInvestmentY2) / freemiumInvestmentY2 * 100);
+                            const freemiumRoiY3 = Math.round((freemiumRevenueY3 - freemiumInvestmentY3) / freemiumInvestmentY3 * 100);
+
+                            const traditionalRoiY1 = Math.round((traditionalRevenueY1 - traditionalInvestmentY1) / traditionalInvestmentY1 * 100);
+                            const traditionalRoiY2 = Math.round((traditionalRevenueY2 - traditionalInvestmentY2) / traditionalInvestmentY2 * 100);
+                            const traditionalRoiY3 = Math.round((traditionalRevenueY3 - traditionalInvestmentY3) / traditionalInvestmentY3 * 100);
+
+                            // Update ROI Comparison Chart
+                            roiComparisonChart.data.datasets[0].data = [freemiumRoiY1, freemiumRoiY2, freemiumRoiY3];
+                            roiComparisonChart.data.datasets[1].data = [traditionalRoiY1, traditionalRoiY2, traditionalRoiY3];
+                            roiComparisonChart.update();
+
+                            // Update SaaS Metrics Table
+                            const table = document.getElementById('saasMetricsTable').getElementsByTagName('tbody')[0];
+                            const rows = table.getElementsByTagName('tr');
+
+                            // Free-to-paid row
+                            rows[0].getElementsByTagName('td')[1].textContent = '3,2%';
+                            rows[0].getElementsByTagName('td')[2].textContent = '4,5%';
+                            rows[0].getElementsByTagName('td')[3].textContent = '5,0%';
+
+                            // CAC row
+                            rows[1].getElementsByTagName('td')[1].textContent = cacYear1 + ' €';
+                            rows[1].getElementsByTagName('td')[2].textContent = cacYear2 + ' €';
+                            rows[1].getElementsByTagName('td')[3].textContent = cacYear3 + ' €';
+
+                            // LTV row
+                            rows[2].getElementsByTagName('td')[1].textContent = ltvYear1 + ' €';
+                            rows[2].getElementsByTagName('td')[2].textContent = ltvYear2 + ' €';
+                            rows[2].getElementsByTagName('td')[3].textContent = ltvYear3 + ' €';
+
+                            // LTV:CAC ratio row
+                            rows[3].getElementsByTagName('td')[1].textContent = ltvCacYear1;
+                            rows[3].getElementsByTagName('td')[2].textContent = ltvCacYear2;
+                            rows[3].getElementsByTagName('td')[3].textContent = ltvCacYear3;
+
+                            // Churn rate row
+                            rows[4].getElementsByTagName('td')[1].textContent = churnYear1 + '%';
+                            rows[4].getElementsByTagName('td')[2].textContent = churnYear2 + '%';
+                            rows[4].getElementsByTagName('td')[3].textContent = churnYear3 + '%';
+
+                            // Update ROI Comparison Table
+                            const roiTable = document.getElementById('roiComparisonTable').getElementsByTagName('tbody')[0];
+                            const roiRows = roiTable.getElementsByTagName('tr');
+
+                            // Freemium investment row
+                            roiRows[1].getElementsByTagName('td')[1].textContent = formatNumber(freemiumInvestmentY1) + ' €';
+                            roiRows[1].getElementsByTagName('td')[2].textContent = formatNumber(freemiumInvestmentY2) + ' €';
+                            roiRows[1].getElementsByTagName('td')[3].textContent = formatNumber(freemiumInvestmentY3) + ' €';
+                            roiRows[1].getElementsByTagName('td')[4].textContent = formatNumber(freemiumInvestmentY1 + freemiumInvestmentY2 + freemiumInvestmentY3) + ' €';
+
+                            // Freemium revenue row
+                            roiRows[2].getElementsByTagName('td')[1].textContent = formatNumber(freemiumRevenueY1) + ' €';
+                            roiRows[2].getElementsByTagName('td')[2].textContent = formatNumber(freemiumRevenueY2) + ' €';
+                            roiRows[2].getElementsByTagName('td')[3].textContent = formatNumber(freemiumRevenueY3) + ' €';
+                            roiRows[2].getElementsByTagName('td')[4].textContent = formatNumber(freemiumRevenueY1 + freemiumRevenueY2 + freemiumRevenueY3) + ' €';
+
+                            // Freemium ROI row
+                            roiRows[3].getElementsByTagName('td')[1].textContent = freemiumRoiY1 + '%';
+                            roiRows[3].getElementsByTagName('td')[2].textContent = freemiumRoiY2 + '%';
+                            roiRows[3].getElementsByTagName('td')[3].textContent = freemiumRoiY3 + '%';
+                            const freemiumTotalRoi = Math.round(((freemiumRevenueY1 + freemiumRevenueY2 + freemiumRevenueY3) - (freemiumInvestmentY1 + freemiumInvestmentY2 + freemiumInvestmentY3)) / (freemiumInvestmentY1 + freemiumInvestmentY2 + freemiumInvestmentY3) * 100);
+                            roiRows[3].getElementsByTagName('td')[4].textContent = freemiumTotalRoi + '%';
+
+                            // Traditional investment row
+                            roiRows[5].getElementsByTagName('td')[1].textContent = formatNumber(traditionalInvestmentY1) + ' €';
+                            roiRows[5].getElementsByTagName('td')[2].textContent = formatNumber(traditionalInvestmentY2) + ' €';
+                            roiRows[5].getElementsByTagName('td')[3].textContent = formatNumber(traditionalInvestmentY3) + ' €';
+                            roiRows[5].getElementsByTagName('td')[4].textContent = formatNumber(traditionalInvestmentY1 + traditionalInvestmentY2 + traditionalInvestmentY3) + ' €';
+
+                            // Traditional revenue row
+                            roiRows[6].getElementsByTagName('td')[1].textContent = formatNumber(traditionalRevenueY1) + ' €';
+                            roiRows[6].getElementsByTagName('td')[2].textContent = formatNumber(traditionalRevenueY2) + ' €';
+                            roiRows[6].getElementsByTagName('td')[3].textContent = formatNumber(traditionalRevenueY3) + ' €';
+                            roiRows[6].getElementsByTagName('td')[4].textContent = formatNumber(traditionalRevenueY1 + traditionalRevenueY2 + traditionalRevenueY3) + ' €';
+
+                            // Traditional ROI row
+                            roiRows[7].getElementsByTagName('td')[1].textContent = traditionalRoiY1 + '%';
+                            roiRows[7].getElementsByTagName('td')[2].textContent = traditionalRoiY2 + '%';
+                            roiRows[7].getElementsByTagName('td')[3].textContent = traditionalRoiY3 + '%';
+                            const traditionalTotalRoi = Math.round(((traditionalRevenueY1 + traditionalRevenueY2 + traditionalRevenueY3) - (traditionalInvestmentY1 + traditionalInvestmentY2 + traditionalInvestmentY3)) / (traditionalInvestmentY1 + traditionalInvestmentY2 + traditionalInvestmentY3) * 100);
+                            roiRows[7].getElementsByTagName('td')[4].textContent = traditionalTotalRoi + '%';
+                        }
+
+                        // Pricing section data update
+                        function updatePricingData() {
+                            const freeSpeeches = parseInt(document.getElementById('freeSpeeches').value);
+                            const professionalSpeeches = parseInt(document.getElementById('professionalSpeeches').value);
+                            const businessSpeeches = parseInt(document.getElementById('businessSpeeches').value);
+                            const professionalPrice = parseFloat(document.getElementById('professionalPrice3').value).toFixed(2);
+                            const businessPrice = parseFloat(document.getElementById('businessPrice3').value).toFixed(2);
+                            const enterprisePrice = parseFloat(document.getElementById('enterprisePrice3').value).toFixed(2);
+                            const yearlyDiscount = parseFloat(document.getElementById('yearlyDiscount').value);
+
+                            // Update display
+                            document.getElementById('freeSpeeches2').textContent = freeSpeeches;
+                            document.getElementById('professionalSpeeches2').textContent = professionalSpeeches;
+                            document.getElementById('businessSpeeches2').textContent = businessSpeeches;
+
+                            document.getElementById('professionalPriceDisplay').textContent = professionalPrice.replace('.', ',') + ' €';
+                            document.getElementById('businessPriceDisplay').textContent = businessPrice.replace('.', ',') + ' €';
+                            document.getElementById('enterprisePriceDisplay').textContent = enterprisePrice.replace('.', ',') + ' €';
+                        }
+
+                        // Overview charts update
+                        function updateOverviewCharts() {
+                            const conversionRate = parseFloat(document.getElementById('conversionRate').value) / 100;
+                            const userBase = parseInt(document.getElementById('userBase').value);
+                            const proPrice = parseFloat(document.getElementById('proPrice').value);
+                            const businessPrice = parseFloat(document.getElementById('businessPrice').value);
+
+                            // Calculate revenue
+                            const payingUsers = Math.round(userBase * conversionRate);
+                            const freeUsers = userBase - payingUsers;
+
+                            // Assume distribution: 70% Pro, 25% Business, 5% Enterprise
+                            const proUsers = Math.round(payingUsers * 0.7);
+                            const businessUsers = Math.round(payingUsers * 0.25);
+                            const enterpriseUsers = payingUsers - proUsers - businessUsers;
+
+                            const proRevenue = proUsers * proPrice;
+                            const businessRevenue = businessUsers * businessPrice;
+                            const enterpriseRevenue = enterpriseUsers * 199.99;
+
+                            const totalRevenue = proRevenue + businessRevenue + enterpriseRevenue;
+                            const additionalRevenue = payingUsers * 6; // Average additional revenue per paying user (credits, etc.)
+
+                            const grandTotalRevenue = totalRevenue + additionalRevenue;
+
+                            // Update Overview Revenue Chart
+                            overviewRevenueChart.data.datasets[0].data = [proRevenue, businessRevenue, enterpriseRevenue, additionalRevenue];
+                            overviewRevenueChart.update();
+
+                            // Update Overview Growth Chart
+                            const months = [6, 12, 18, 24, 30, 36];
+
+                            // Recalculate user growth data
+                            const initialUsers = 5000;
+                            const userGrowthData = months.map((month, index) => {
+                                let totalUsers = initialUsers;
+                                if (index >= 1) totalUsers = 15000;
+                                if (index >= 2) totalUsers = 30000;
+                                if (index >= 3) totalUsers = 60000;
+                                if (index >= 4) totalUsers = 100000;
+                                if (index >= 5) totalUsers = 150000;
+
+                                let convRate = 0.03;
+                                if (index >= 1) convRate = 0.04;
+                                if (index >= 2) convRate = 0.045;
+                                if (index >= 4) convRate = 0.05;
+
+                                const payingUsers = Math.round(totalUsers * convRate);
+
+                                // Calculate revenue based on the current pricing model
+                                const proUsers = Math.round(payingUsers * 0.7);
+                                const businessUsers = Math.round(payingUsers * 0.25);
+                                const enterpriseUsers = payingUsers - proUsers - businessUsers;
+
+                                const proRev = proUsers * proPrice;
+                                const businessRev = businessUsers * businessPrice;
+                                const enterpriseRev = enterpriseUsers * 199.99;
+                                const additionalRev = payingUsers * 6;
+
+                                const totalRev = proRev + businessRev + enterpriseRev + additionalRev;
+
+                                return {
+                                    month,
+                                    totalUsers,
+                                    payingUsers,
+                                    revenue: Math.round(totalRev)
+                                };
+                            });
+
+                            overviewGrowthChart.data.labels = userGrowthData.map(item => `Monat ${item.month}`);
+                            overviewGrowthChart.data.datasets[0].data = userGrowthData.map(item => item.totalUsers);
+                            overviewGrowthChart.data.datasets[1].data = userGrowthData.map(item => item.revenue / 20); // Scaled for visibility
+                            overviewGrowthChart.update();
+                        }
+
+                        // Initialize Market Charts
+                        function initializeMarketCharts() {
+                            // Market Regions Chart
+                            const marketRegionsCtx = document.getElementById('marketRegionsChart').getContext('2d');
+                            marketRegionsChart = new Chart(marketRegionsCtx, {
+                                type: 'pie',
+                                data: {
+                                    labels: ['Nordamerika (40%)', 'Europa (28%)', 'Asien-Pazifik (20%)', 'Lateinamerika (8%)', 'Rest der Welt (4%)'],
+                                    datasets: [{
+                                        data: [9, 6.5, 4.5, 1.5, 1],
+                                        backgroundColor: ['#4a86e8', '#34a853', '#fbbc04', '#ea4335', '#673ab7'],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'right',
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const label = context.label || '';
+                                                    const value = context.raw || 0;
+                                                    return `${label}: ${value}M Nutzer`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                            // Target Groups Chart
+                            const targetGroupsCtx = document.getElementById('targetGroupsChart').getContext('2d');
+                            targetGroupsChart = new Chart(targetGroupsCtx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['B2B-Verkäufer', 'B2C-Vertriebsmitarbeiter', 'Freiberufliche Berater', 'Vertriebsleiter/Trainer', 'Unternehmer/KMUs'],
+                                    datasets: [{
+                                        label: 'Anteil in %',
+                                        data: [38, 32, 15, 8, 7],
+                                        backgroundColor: ['#4a86e8', '#34a853', '#fbbc04', '#ea4335', '#673ab7'],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    indexAxis: 'y',
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true,
+                                            max: 40,
+                                            title: {
+                                                display: true,
+                                                text: 'Anteil in %'
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        // Initialize Conversion Charts
+                        function initializeConversionCharts() {
+                            // Conversion Funnel Chart
+                            const conversionFunnelCtx = document.getElementById('conversionFunnelChart').getContext('2d');
+                            conversionFunnelChart = new Chart(conversionFunnelCtx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Website-Besucher', 'Registrierungen', 'Aktive Free-User', 'Zahlende Kunden'],
+                                    datasets: [{
+                                        label: 'Anzahl',
+                                        data: [100000, 6500, 3250, 162],
+                                        backgroundColor: ['#4a86e8', '#34a853', '#fbbc04', '#ea4335'],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    indexAxis: 'y',
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        x: {
+                                            type: 'logarithmic',
+                                            min: 100,
+                                            max: 100000,
+                                            title: {
+                                                display: true,
+                                                text: 'Anzahl (logarithmische Skala)'
+                                            },
+                                            ticks: {
+                                                callback: function(value) {
+                                                    if (value === 100 || value === 1000 || value === 10000 || value === 100000) {
+                                                        return formatNumber(value);
+                                                    }
+                                                    return '';
+                                                }
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const value = context.raw || 0;
+                                                    const percentage = [100, 6.5, 3.25, 0.162][context.dataIndex];
+                                                    return `Anzahl: ${formatNumber(value)} (${percentage}%)`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        // Initialize Revenue Charts
+                        function initializeRevenueCharts() {
+                            // Revenue by User Count Chart
+                            const revenueByUserCountCtx = document.getElementById('revenueByUserCountChart').getContext('2d');
+                            revenueByUserCountChart = new Chart(revenueByUserCountCtx, {
+                                type: 'line',
+                                data: {
+                                    labels: ['10k', '25k', '50k', '100k', '250k'],
+                                    datasets: [{
+                                        label: 'Monatlicher Umsatz (€)',
+                                        data: [28495, 71238, 142475, 284950, 712375],
+                                        borderColor: '#4a86e8',
+                                        backgroundColor: 'rgba(74, 134, 232, 0.2)',
+                                        borderWidth: 2,
+                                        fill: true,
+                                        tension: 0.4
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            title: {
+                                                display: true,
+                                                text: 'Monatlicher Umsatz (€)'
+                                            },
+                                            ticks: {
+                                                callback: value => formatNumber(value) + ' €'
+                                            }
+                                        },
+                                        x: {
+                                            title: {
+                                                display: true,
+                                                text: 'Anzahl Nutzer'
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const value = context.raw || 0;
+                                                    return `Umsatz: ${formatNumber(value)} €`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                            // Revenue Distribution Chart
+                            const revenueDistributionCtx = document.getElementById('revenueDistributionChart').getContext('2d');
+                            revenueDistributionChart = new Chart(revenueDistributionCtx, {
+                                type: 'pie',
+                                data: {
+                                    labels: [
+                                        'Professional-Abos (36.8%)',
+                                        'Business-Abos (35.1%)',
+                                        'Enterprise-Abos (17.5%)',
+                                        'Credit-Pakete (Speech) (5.8%)',
+                                        'Credit-Pakete (KI) (4.8%)'
+                                    ],
+                                    datasets: [{
+                                        data: [104965, 99988, 49998, 16500, 13500],
+                                        backgroundColor: ['#4a86e8', '#34a853', '#673ab7', '#fbbc04', '#ea4335'],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'right',
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const label = context.label || '';
+                                                    const value = context.raw || 0;
+                                                    return `${label}: ${formatNumber(value)} €`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        // Initialize Cost Charts
+                        function initializeCostCharts() {
+                            // Cost Structure Chart
+                            const costStructureCtx = document.getElementById('costStructureChart').getContext('2d');
+                            costStructureChart = new Chart(costStructureCtx, {
+                                type: 'pie',
+                                data: {
+                                    labels: [
+                                        'Support & Personal (30.8%)',
+                                        'KI-Kosten (32.0%)',
+                                        'Marketing & Akquise (26.3%)',
+                                        'Zahlungsabwicklung (6.3%)',
+                                        'Hosting & Infrastr. (4.6%)'
+                                    ],
+                                    datasets: [{
+                                        data: [50000, 52000, 42700, 10220, 7500],
+                                        backgroundColor: ['#4a86e8', '#ea4335', '#34a853', '#fbbc04', '#673ab7'],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'right',
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const label = context.label || '';
+                                                    const value = context.raw || 0;
+                                                    return `${label}: ${formatNumber(value)} €`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        // Initialize Growth Charts
+                        function initializeGrowthCharts() {
+                            // User Growth Chart
+                            const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+                            userGrowthChart = new Chart(userGrowthCtx, {
+                                type: 'line',
+                                data: {
+                                    labels: ['Monat 6', 'Monat 12', 'Monat 18', 'Monat 24', 'Monat 30', 'Monat 36'],
+                                    datasets: [
+                                        {
+                                            label: 'Gesamtnutzer',
+                                            data: [5000, 15000, 30000, 60000, 100000, 150000],
+                                            borderColor: '#4a86e8',
+                                            backgroundColor: 'rgba(74, 134, 232, 0.2)',
+                                            borderWidth: 2,
+                                            fill: true,
+                                            yAxisID: 'y-users'
+                                        },
+                                        {
+                                            label: 'Zahlende Nutzer',
+                                            data: [150, 600, 1350, 2700, 5000, 7500],
+                                            borderColor: '#34a853',
+                                            backgroundColor: 'rgba(52, 168, 83, 0.2)',
+                                            borderWidth: 2,
+                                            fill: true,
+                                            yAxisID: 'y-users'
+                                        },
+                                        {
+                                            label: 'Konversionsrate (%)',
+                                            data: [3, 4, 4.5, 4.5, 5, 5],
+                                            borderColor: '#fbbc04',
+                                            backgroundColor: 'transparent',
+                                            borderWidth: 2,
+                                            fill: false,
+                                            borderDash: [5, 5],
+                                            yAxisID: 'y-rate'
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        'y-users': {
+                                            beginAtZero: true,
+                                            position: 'left',
+                                            title: {
+                                                display: true,
+                                                text: 'Nutzer'
+                                            },
+                                            ticks: {
+                                                callback: value => `${value/1000}k`
+                                            }
+                                        },
+                                        'y-rate': {
+                                            beginAtZero: true,
+                                            position: 'right',
+                                            min: 0,
+                                            max: 8,
+                                            title: {
+                                                display: true,
+                                                text: 'Konversionsrate (%)'
+                                            },
+                                            ticks: {
+                                                callback: value => `${value}%`
+                                            },
+                                            grid: {
+                                                drawOnChartArea: false
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const datasetIndex = context.datasetIndex;
+                                                    const value = context.raw || 0;
+
+                                                    if (datasetIndex === 0) {
+                                                        return `Gesamtnutzer: ${formatNumber(value)}`;
+                                                    } else if (datasetIndex === 1) {
+                                                        return `Zahlende Nutzer: ${formatNumber(value)}`;
+                                                    } else {
+                                                        return `Konversionsrate: ${value}%`;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        // Initialize ROI Charts
+                        function initializeRoiCharts() {
+                            // ROI Comparison Chart
+                            const roiComparisonCtx = document.getElementById('roiComparisonChart').getContext('2d');
+                            roiComparisonChart = new Chart(roiComparisonCtx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Jahr 1', 'Jahr 2', 'Jahr 3'],
+                                    datasets: [
+                                        {
+                                            label: 'Freemium Modell',
+                                            data: [48, 600, 1610],
+                                            backgroundColor: '#4a86e8',
+                                            borderWidth: 1
+                                        },
+                                        {
+                                            label: 'Traditionelles Modell',
+                                            data: [36, 400, 983],
+                                            backgroundColor: '#34a853',
+                                            borderWidth: 1
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            title: {
+                                                display: true,
+                                                text: 'ROI (%)'
+                                            },
+                                            ticks: {
+                                                callback: value => `${value}%`
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const label = context.dataset.label || '';
+                                                    const value = context.raw || 0;
+                                                    return `${label}: ${value}% ROI`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        // Initialize Overview Charts
+                        function initializeOverviewCharts() {
+                            // Overview Revenue Chart
+                            const overviewRevenueCtx = document.getElementById('overviewRevenueChart').getContext('2d');
+                            overviewRevenueChart = new Chart(overviewRevenueCtx, {
+                                type: 'pie',
+                                data: {
+                                    labels: ['Professional Abos', 'Business Abos', 'Enterprise Abos', 'Zusatzumsätze'],
+                                    datasets: [{
+                                        data: [104965, 99988, 49998, 30000],
+                                        backgroundColor: ['#4a86e8', '#34a853', '#673ab7', '#fbbc04'],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'right',
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const label = context.label || '';
+                                                    const value = context.raw || 0;
+                                                    return `${label}: ${formatNumber(value)} €`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                            // Overview Growth Chart
+                            const overviewGrowthCtx = document.getElementById('overviewGrowthChart').getContext('2d');
+                            overviewGrowthChart = new Chart(overviewGrowthCtx, {
+                                type: 'line',
+                                data: {
+                                    labels: ['Monat 6', 'Monat 12', 'Monat 18', 'Monat 24', 'Monat 30', 'Monat 36'],
+                                    datasets: [
+                                        {
+                                            label: 'Nutzer',
+                                            data: [5000, 15000, 30000, 60000, 100000, 150000],
+                                            borderColor: '#4a86e8',
+                                            backgroundColor: 'rgba(74, 134, 232, 0.2)',
+                                            borderWidth: 2,
+                                            fill: true,
+                                            yAxisID: 'y-users'
+                                        },
+                                        {
+                                            label: 'Umsatz (skaliert)',
+                                            data: [465, 2070, 5175, 13800, 28500, 45000],
+                                            borderColor: '#34a853',
+                                            backgroundColor: 'transparent',
+                                            borderWidth: 2,
+                                            borderDash: [5, 5],
+                                            fill: false,
+                                            yAxisID: 'y-users'
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        'y-users': {
+                                            beginAtZero: true,
+                                            position: 'left',
+                                            title: {
+                                                display: true,
+                                                text: 'Nutzer'
+                                            },
+                                            ticks: {
+                                                callback: value => `${value/1000}k`
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const datasetIndex = context.datasetIndex;
+                                                    const value = context.raw || 0;
+
+                                                    if (datasetIndex === 0) {
+                                                        return `Nutzer: ${formatNumber(value)}`;
+                                                    } else {
+                                                        return `Umsatz: ${formatNumber(value * 20)} €`;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    </script>
+
+
+
+
+
+                </main>
             </main>
 
             <footer class="py-16 text-center text-sm text-black dark:text-white/70">
