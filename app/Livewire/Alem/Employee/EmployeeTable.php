@@ -4,7 +4,7 @@ namespace App\Livewire\Alem\Employee;
 
 use App\Enums\User\AccountStatus;
 use App\Livewire\Alem\Employee\Helper\Searchable;
-use App\Livewire\Alem\Employee\Helper\UserStatusAction;
+use App\Livewire\Alem\Traits\UserStatusAction;
 use App\Models\User;
 use App\Traits\Table\WithPerPagePagination;
 use App\Traits\Table\WithSorting;
@@ -20,6 +20,19 @@ class EmployeeTable extends Component
     public $idsOnPage = [];
     public $name = '';
     public $statusFilter = 'active';
+
+    /**
+     * Der Benutzertyp für die Filterung
+     */
+    protected string $userType = 'employee';
+
+    /**
+     * Name des Events, das nach Status-Änderungen ausgelöst wird
+     */
+    protected function getStatusUpdateEventName(): string
+    {
+        return 'employeeUpdated';
+    }
 
     /**
      * Lifecycle-Hook: Wird aufgerufen, wenn sich eine Property ändert
@@ -44,7 +57,9 @@ class EmployeeTable extends Component
         $this->dispatch('update-table');
     }
 
-    // Sortierung auf die Abfrage anwenden
+    /**
+     * Sortierung auf die Abfrage anwenden
+     */
     protected function applySorting(Builder $query): Builder
     {
         if ($this->sortCol) {
@@ -58,9 +73,6 @@ class EmployeeTable extends Component
         return $query;
     }
 
-    /**
-     * Render-Methode
-     */
     public function render(): View
     {
         $authUser = auth()->user();
@@ -68,7 +80,7 @@ class EmployeeTable extends Component
         $query = User::query()
             ->with(['employee', 'teams:id,name', 'roles:id,name'])
             ->where('company_id', $authUser->company_id)
-            ->where('user_type', 'employee');
+            ->where('user_type', $this->userType);
 
         $this->applySearch($query);
         $this->applySorting($query);

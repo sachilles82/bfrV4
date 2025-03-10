@@ -9,7 +9,22 @@
             class="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
             <div class="flex items-center justify-end w-full space-x-1 md:w-auto">
                 <!-- Bulk-Actions Dropdown wird hier eingebunden -->
-                <x-pupi.actions.bulkactions :statusFilter="$statusFilter"/>
+
+                <div class="flex space-x-1" x-show="$wire.selectedIds.length > 0" x-cloak>
+                    <div class="hidden sm:flex items-center justify-center">
+                        <span class="text-indigo-600 dark:text-indigo-400">
+                            <span x-text="$wire.selectedIds.length"
+                                  class="pr-2 text-sm font-semibold text-indigo-600 border-r border-gray-200 dark:border-gray-700 dark:text-indigo-600"></span>
+                            <span class="pl-2 pr-2">
+                                {{ __('Selected') }}
+                            </span>
+                        </span>
+                    </div>
+
+
+                    <x-pupi.actions.bulkexport :statusFilter="$statusFilter"/>
+                    <x-pupi.actions.bulkstatus :statusFilter="$statusFilter"/>
+                </div>
                 <div>
                     <flux:select variant="listbox" wire:model.live="statusFilter" id="statusFilter">
                         @foreach($statuses as $status)
@@ -26,7 +41,7 @@
 
     <!-- Tabelle -->
     <x-pupi.table.container>
-{{--        @json($selectedIds) @json($idsOnPage)--}}
+        {{--        @json($selectedIds) @json($idsOnPage)--}}
         <div x-data="{ checked:false }">
             <x-pupi.table.main>
                 <x-slot:head>
@@ -45,14 +60,17 @@
                 <x-slot:body>
                     @if($statusFilter === 'trashed')
                         <tr>
-                            <td colspan="8" class="bg-yellow-50 dark:bg-yellow-400/10 dark:text-yellow-500 px-4 py-2 text-yellow-800">
+                            <td colspan="8"
+                                class="bg-yellow-50 dark:bg-yellow-400/10 dark:text-yellow-500 px-4 py-2 text-yellow-800">
                                 <div class="flex items-start">
                                     <x-pupi.icon.danger class="h-6 w-6"/>
                                     <div class="ml-3 flex-1 pt-0.5">
                                         <p class="text-sm font-medium">{{ __('Attention!') }}
-                                            <span class="ml-2 font-normal text-sm text-gray-600 dark:text-gray-400">{{ __('Trash will delete automatically all') }}</span>
+                                            <span
+                                                class="ml-2 font-normal text-sm text-gray-600 dark:text-gray-400">{{ __('Trash will delete automatically all') }}</span>
                                             <span class="font-medium">{{ __('7 Days') }}</span>
-                                            <span class="font-normal text-sm text-gray-600 dark:text-gray-400">{{ __('automatically permanently') }}</span>
+                                            <span
+                                                class="font-normal text-sm text-gray-600 dark:text-gray-400">{{ __('automatically permanently') }}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -114,7 +132,8 @@
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 {{ $user->roles->pluck('name')->implode(', ') }}
-                                <div class="flex items-center mt-1 {{ $user->days_until_permanent_delete <= 2 ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400' }}">
+                                <div
+                                    class="flex items-center mt-1 {{ $user->days_until_permanent_delete <= 2 ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400' }}">
                                     @if($user->trashed())
                                         <div class="flex items-center mt-1 {{ $user->deletion_urgency_class }}">
                                             <x-pupi.icon.clock class="h-4 w-4 mr-1"/>
