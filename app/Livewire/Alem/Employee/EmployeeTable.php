@@ -4,8 +4,8 @@ namespace App\Livewire\Alem\Employee;
 
 use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Employee\Helper\Searchable;
-use App\Livewire\Alem\Traits\UserStatusAction;
 use App\Models\User;
+use App\Traits\Model\ModelStatusAction;
 use App\Traits\Table\WithPerPagePagination;
 use App\Traits\Table\WithSorting;
 use Illuminate\Contracts\View\View;
@@ -14,14 +14,36 @@ use Livewire\Component;
 
 class EmployeeTable extends Component
 {
-    use Searchable, WithPerPagePagination, WithSorting,
-        // Einbinden des Traits für alle User Typen (Employee, Customer, Supplier)
-        UserStatusAction;
+    use Searchable, WithPerPagePagination, WithSorting, ModelStatusAction;
 
     public $selectedIds = [];
     public $idsOnPage = [];
     public $name = '';
     public $statusFilter = 'active';
+
+    /**
+     * Die Modellklasse für ModelStatusAction
+     */
+    protected function getModelClass(): string
+    {
+        return User::class;
+    }
+
+    /**
+     * Der Anzeigename für das Modell
+     */
+    protected function getModelDisplayName(): string
+    {
+        return 'Employee';
+    }
+
+    /**
+     * Der pluralisierte Anzeigename für das Modell
+     */
+    protected function getModelDisplayNamePlural(): string
+    {
+        return 'Employees';
+    }
 
     /**
      * Der Benutzertyp für die Filterung
@@ -35,7 +57,6 @@ class EmployeeTable extends Component
     {
         return 'employeeUpdated';
     }
-
     /**
      * Lifecycle-Hook: Wird aufgerufen, wenn sich eine Property ändert
      */

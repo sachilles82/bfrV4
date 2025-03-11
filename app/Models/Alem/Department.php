@@ -2,16 +2,25 @@
 
 namespace App\Models\Alem;
 
+use App\Enums\Model\ModelStatus;
 use App\Traits\BelongsToTeam;
+use App\Traits\Model\ModelPermanentDeletion;
+use App\Traits\Model\ModelStatusManagement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Department extends Model
 {
-    use HasFactory;
+//    use HasFactory;
     use BelongsToTeam;
     use SoftDeletes;
+    use ModelPermanentDeletion;
+    use ModelStatusManagement{
+        ModelStatusManagement::restore insteadof SoftDeletes;
+        // Alias für die originale SoftDeletes::restore()-Methode.
+        SoftDeletes::restore as softRestore;
+    }
 
     /**
          * The attributes that are mass assignable.
@@ -23,5 +32,18 @@ class Department extends Model
             'company_id',
             'team_id',
             'created_by',
+            'model_status',
         ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'model_status' => ModelStatus::class,
+        ];
+    }
 }

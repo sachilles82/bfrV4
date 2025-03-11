@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Alem\Department;
 
+use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Department\Helper\Searchable;
 use App\Livewire\Alem\Department\Helper\ValidateDepartment;
 use App\Models\Alem\Department;
+use App\Traits\Model\ModelStatusAction;
 use App\Traits\Table\WithPerPagePagination;
 use App\Traits\Table\WithSorting;
 use Illuminate\Contracts\View\View;
@@ -13,13 +15,51 @@ use Livewire\Component;
 
 class DepartmentTable extends Component
 {
-    use Searchable, WithPerPagePagination, WithSorting, ValidateDepartment;
+    use Searchable, WithPerPagePagination, WithSorting, ValidateDepartment, ModelStatusAction;
 
     public $selectedIds = [];
     public $idsOnPage = [];
+    public $statusFilter = 'active';
 
     public $departmentId;
     public $name = '';
+
+    /**
+     * Die Modellklasse für ModelStatusAction
+     */
+    protected function getModelClass(): string
+    {
+        return Department::class;
+    }
+
+    /**
+     * Der Anzeigename für das Modell
+     */
+    protected function getModelDisplayName(): string
+    {
+        return 'Department';
+    }
+
+    /**
+     * Der pluralisierte Anzeigename für das Modell
+     */
+    protected function getModelDisplayNamePlural(): string
+    {
+        return 'Departments';
+    }
+
+    /**
+     * Der Benutzertyp für die Filterung
+     */
+    protected string $DepartmentType = 'department';
+
+    /**
+     * Name des Events, das nach Status-Änderungen ausgelöst wird
+     */
+    protected function getStatusUpdateEventName(): string
+    {
+        return 'departmentUpdated';
+    }
 
 
     public function loadDepartment(): void
@@ -80,6 +120,9 @@ class DepartmentTable extends Component
     {
         $query = Department::with(['creator', 'team', 'company']);
 
+        // Wende den Status-Filter an (aus dem ModelStatusAction Trait)
+        $this->applyStatusFilter($query);
+
         $query->orderBy('created_at', 'desc');
 
         $this->applySearch($query);
@@ -88,8 +131,9 @@ class DepartmentTable extends Component
 
         $this->idsOnPage = $departments->pluck('id')->map(fn($id) => (string)$id)->toArray();
 
-        return view('livewire.alem.department.table',
-            compact('departments')
-        );
+        return view('livewire.alem.department.table', [
+            'departments' => $departments,
+            'statuses' => ModelStatus::cases(),
+        ]);
     }
 }

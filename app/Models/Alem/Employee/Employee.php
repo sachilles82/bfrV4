@@ -13,7 +13,6 @@ class Employee extends Model
 {
     use HasFactory;
     use BelongsToTeam;
-    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

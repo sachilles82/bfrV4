@@ -7,9 +7,16 @@
         <div
             class="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
             <div class="flex items-center justify-end w-full space-x-1 md:w-auto">
-                <x-pupi.actions.bulkactions/>
+                <x-pupi.actions.bulkstatus :statusFilter="$statusFilter"/>
                 <x-pupi.actions.reset-filters wire:click="resetFilters"/>
                 <x-pupi.actions.per-page/>
+                <div>
+                    <flux:select variant="listbox" wire:model.live="statusFilter" id="statusFilter">
+                        @foreach($statuses as $status)
+                            <flux:option value="{{ $status->value }}">{{ __($status->label()) }}</flux:option>
+                        @endforeach
+                    </flux::select>
+                </div>
             </div>
         </div>
     </div>
@@ -67,7 +74,25 @@
                                 </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>{{ $department->team->name }}</x-pupi.table.tr.cell>
-                            <x-pupi.table.tr.cell>{{ $department->creator->name }}</x-pupi.table.tr.cell>
+                            <x-pupi.table.tr.cell>{{ $department->creator->name }}<div
+                                    class="flex items-center mt-1 {{ $department->days_until_permanent_delete <= 2 ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400' }}">
+                                    @if($department->trashed())
+                                        <div class="flex items-center mt-1 {{ $department->deletion_urgency_class }}">
+                                            <x-pupi.icon.clock class="h-4 w-4 mr-1"/>
+                                            {{ $department->deletion_message }}
+                                            <span class="text-gray-500 dark:text-gray-400 text-xs ml-1">({{ $department->permanent_deletion_date_for_humans }})</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </x-pupi.table.tr.cell>
+                            <x-pupi.table.tr.cell>
+                                <div class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
+                                   {{ $department->model_status->colors() }}">
+                                    <x-dynamic-component :component="$department->model_status->icon()"/>
+                                    <div>{{ $department->model_status->label() }}</div>
+
+                                </div>
+                            </x-pupi.table.tr.cell>
                             <td x-show="!checked"
                                 class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                 <!-- Edit Dropdown -->
@@ -87,6 +112,97 @@
                                                         icon="trash" variant="danger">
                                             {{ __('Delete') }}
                                         </flux:menu.item>
+                                        @if($department->trashed())
+                                            <!-- Options for departments in trash -->
+                                            <flux:menu.item wire:click="restore({{ $department->id }})" icon="arrow-uturn-up">
+                                                {{ __('Restore to Active') }}
+                                            </flux:menu.item>
+
+                                            <flux:menu.item wire:click="restoreToArchive({{ $department->id }})"
+                                                            icon="archive-box">
+                                                {{ __('Restore to Archive') }}
+                                            </flux:menu.item>
+
+                                            <!-- Neue Option hinzufügen -->
+                                            <flux:menu.item wire:click="restoreToInactive({{ $department->id }})"
+                                                            icon="clock">
+                                                {{ __('Restore to Inactive') }}
+                                            </flux:menu.item>
+
+                                            <flux:separator class="my-1"/>
+
+                                            <flux:menu.item wire:click="forceDelete({{ $department->id }})"
+                                                            wire:confirm="{{ __('Are you sure you want to permanently delete this employee?') }}"
+                                                            icon="trash" variant="danger">
+                                                {{ __('Delete Permanently') }}
+                                            </flux:menu.item>
+                                        @elseif($department->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
+                                            <!-- Options for archived departments -->
+                                            <flux:menu.item wire:click="edit({{ $department->id }})" icon="pencil-square">
+                                                {{ __('Edit') }}
+                                            </flux:menu.item>
+
+                                            <flux:separator class="my-1"/>
+
+                                            <flux:menu.item wire:click="activate({{ $department->id }})" icon="check-circle">
+                                                {{ __('Set Active') }}
+                                            </flux:menu.item>
+                                            <flux:menu.item wire:click="notActivate({{ $department->id }})" icon="x-mark">
+                                                {{ __('Set Inactive') }}
+                                            </flux:menu.item>
+
+                                            <flux:separator class="my-1"/>
+
+                                            <flux:menu.item wire:click="delete({{ $department->id }})"
+                                                            wire:confirm="{{ __('Are you sure you want to move this employee to trash?') }}"
+                                                            icon="trash" variant="danger">
+                                                {{ __('Move to Trash') }}
+                                            </flux:menu.item>
+                                        @elseif($department->model_status === \App\Enums\Model\ModelStatus::INACTIVE)
+                                            <!-- Options for not activated departments -->
+                                            <flux:menu.item wire:click="edit({{ $department->id }})" icon="pencil-square">
+                                                {{ __('Edit') }}
+                                            </flux:menu.item>
+
+                                            <flux:separator class="my-1"/>
+
+                                            <flux:menu.item wire:click="activate({{ $department->id }})" icon="check-circle">
+                                                {{ __('Set Active') }}
+                                            </flux:menu.item>
+                                            <flux:menu.item wire:click="archive({{ $department->id }})" icon="archive-box">
+                                                {{ __('Archive') }}
+                                            </flux:menu.item>
+
+                                            <flux:separator class="my-1"/>
+
+                                            <flux:menu.item wire:click="delete({{ $department->id }})"
+                                                            wire:confirm="{{ __('Are you sure you want to add this employee to trash?') }}"
+                                                            icon="trash" variant="danger">
+                                                {{ __('Move to Trash') }}
+                                            </flux:menu.item>
+                                        @else
+                                            <!-- Options for active departments -->
+                                            <flux:menu.item wire:click="edit({{ $department->id }})" icon="pencil-square">
+                                                {{ __('Edit') }}
+                                            </flux:menu.item>
+
+                                            <flux:separator class="my-1"/>
+
+                                            <flux:menu.item wire:click="notActivate({{ $department->id }})" icon="x-mark">
+                                                {{ __('Set Not Activated') }}
+                                            </flux:menu.item>
+                                            <flux:menu.item wire:click="archive({{ $department->id }})" icon="archive-box">
+                                                {{ __('Archive') }}
+                                            </flux:menu.item>
+
+                                            <flux:separator class="my-1"/>
+
+                                            <flux:menu.item wire:click="delete({{ $department->id }})"
+                                                            wire:confirm="{{ __('Are you sure you want to move this employee to trash?') }}"
+                                                            icon="trash" variant="danger">
+                                                {{ __('Move to Trash') }}
+                                            </flux:menu.item>
+                                        @endif
                                     </flux:menu>
                                 </flux:dropdown>
                             </td>
