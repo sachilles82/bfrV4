@@ -20,11 +20,10 @@ return new class extends Migration
             $table->foreignId('created_by')->after('gender')->nullable();
             $table->string('theme')->default('default')->after('created_by');
             $table->string('slug')->unique()->nullable()->after('theme');
-            $table->string('last_name')->after('slug')->nullable(); // Changed from foreignId to string
-            $table->timestamp('archived_at')->nullable()->after('last_name');
-            $table->string('account_status')->default(AccountStatus::INACTIVE->value)->after('archived_at'); // Changed from timestamp to string
+            $table->string('last_name')->after('slug')->nullable();
+            $table->string('account_status')->default(AccountStatus::INACTIVE)->after('last_name'); // Changed from timestamp to string
 
-            $table->index(['name', 'team_id', 'company_id', 'user_type', 'archived_at', 'account_status']);
+            $table->index(['name', 'team_id', 'company_id', 'user_type', 'account_status']);
         });
     }
 

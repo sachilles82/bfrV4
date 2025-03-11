@@ -18,6 +18,10 @@
                 <flux:menu.item wire:click="bulkUpdateStatus('restore_to_archive')" icon="archive-box">
                     {{ __('Restore to Archive') }}
                 </flux:menu.item>
+                {{-- Neue Option hinzufügen --}}
+                <flux:menu.item wire:click="bulkUpdateStatus('restore_to_inactive')" icon="clock">
+                    {{ __('Restore to Inactive') }}
+                </flux:menu.item>
 
                 <flux:separator class="my-1"/>
 

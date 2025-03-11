@@ -13,10 +13,8 @@ use Illuminate\Database\Eloquent\Builder;
  * Dieser Trait stellt Methoden bereit, um Benutzer-Status des USER MODELS zu ändern und zu filtern.
  * Er kann in verschiedenen Komponenten für Employee, Partner, Lieferanten etc. verwendet werden.
  */
-
 trait UserStatusAction
 {
-
     /**
      * Erforderliche Eigenschaften in der Komponente:
      * public $selectedIds = [];
@@ -48,28 +46,22 @@ trait UserStatusAction
         switch ($this->statusFilter) {
             case 'inactive':
                 $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::INACTIVE->value);
+                    ->where('account_status', AccountStatus::INACTIVE);
                 break;
-
             case 'archived':
                 $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::ARCHIVED->value);
+                    ->where('account_status', AccountStatus::ARCHIVED);
                 break;
-
             case 'trashed':
-                // Nutzt die SoftDeletes-Funktionalität, um gelöschte User zu finden
                 $query->onlyTrashed();
                 break;
-
             case 'active':
             default:
                 $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::ACTIVE->value);
+                    ->where('account_status', AccountStatus::ACTIVE);
         }
-
         return $query;
     }
-
 
     // Einzelne Benutzer-Statusänderungen
 
@@ -81,7 +73,7 @@ trait UserStatusAction
     public function activate($userId): void
     {
         $user = User::withTrashed()->find($userId);
-        if ($user && $user->account_status !== AccountStatus::ACTIVE->value) {
+        if ($user && $user->account_status !== AccountStatus::ACTIVE) {
             $this->setUserActive($user);
             $this->showToast(__('Account activated.'));
             $this->dispatchStatusEvents();
@@ -96,7 +88,7 @@ trait UserStatusAction
     public function notActivate($userId): void
     {
         $user = User::find($userId);
-        if ($user && $user->account_status !== AccountStatus::INACTIVE->value) {
+        if ($user && $user->account_status !== AccountStatus::INACTIVE) {
             $this->setUserInactive($user);
             $this->showToast(__('Account set to inactive.'));
             $this->dispatchStatusEvents();
@@ -111,7 +103,7 @@ trait UserStatusAction
     public function archive($userId): void
     {
         $user = User::find($userId);
-        if ($user && $user->account_status !== AccountStatus::ARCHIVED->value) {
+        if ($user && $user->account_status !== AccountStatus::ARCHIVED) {
             $this->setUserArchived($user);
             $this->showToast(__('Account moved to archive.'));
             $this->dispatchStatusEvents();
@@ -134,9 +126,9 @@ trait UserStatusAction
     }
 
     /**
-     * Benutzer wiederherstellen (aus Archiv oder Papierkorb)
-     *
-     * @param int|string $userId Die Benutzer-ID
+     * Wiederherstellung als Active.
+     * Wenn der Benutzer im Papierkorb ist, wird er mit restoreToActive() wiederhergestellt.
+     * Falls der Status archived oder inactive ist, wird setUserActive() aufgerufen.
      */
     public function restore($userId): void
     {
@@ -144,13 +136,14 @@ trait UserStatusAction
         if (!$user) return;
 
         if ($user->trashed()) {
-            $user->restore();
-            $this->showToast(__('Account restored from trash.'));
-        } elseif ($user->account_status === AccountStatus::ARCHIVED->value) {
+            $user->restoreToActive();
+            $this->showToast(__('Account restored to active.'));
+        } elseif (in_array($user->account_status, [AccountStatus::ARCHIVED, AccountStatus::INACTIVE])) {
             $this->setUserActive($user);
-            $this->showToast(__('Account restored from archive.'));
+            $this->showToast(__('Account set to active.'));
         }
 
+        $this->resetSelections();
         $this->dispatchStatusEvents();
     }
 
@@ -162,11 +155,36 @@ trait UserStatusAction
     public function restoreToArchive($userId): void
     {
         $user = User::withTrashed()->find($userId);
-        if ($user && $user->trashed()) {
-            $this->restoreUserToArchive($user);
+        if (!$user) return;
+
+        if ($user->trashed()) {
+            $user->restoreToArchive();
             $this->showToast(__('Account restored to archive.'));
-            $this->dispatchStatusEvents();
+        } elseif ($user->account_status !== AccountStatus::ARCHIVED) {
+            $this->setUserArchived($user);
+            $this->showToast(__('Account moved to archive.'));
         }
+        $this->dispatchStatusEvents();
+    }
+
+    /**
+     * Benutzer im inaktiven Zustand wiederherstellen
+     *
+     * @param int|string $userId Die Benutzer-ID
+     */
+    public function restoreToInactive($userId): void
+    {
+        $user = User::withTrashed()->find($userId);
+        if (!$user) return;
+
+        if ($user->trashed()) {
+            $user->restoreToInactive();
+            $this->showToast(__('Account restored to inactive.'));
+        } elseif ($user->account_status !== AccountStatus::INACTIVE) {
+            $this->setUserInactive($user);
+            $this->showToast(__('Account set to inactive.'));
+        }
+        $this->dispatchStatusEvents();
     }
 
     /**
@@ -184,38 +202,54 @@ trait UserStatusAction
         }
     }
 
+    /**
+     * Papierkorb leeren
+     */
+    public function emptyTrash(): void
+    {
+        $count = User::onlyTrashed()->count();
+        if ($count > 0) {
+            User::onlyTrashed()->forceDelete();
+            $this->showToast(__(':count accounts permanently deleted.'), 'Success', 'danger', ['count' => $count]);
+            $this->dispatchStatusEvents();
+        } else {
+            $this->showToast(__('Trash bin is already empty.'));
+        }
+    }
+
     // Bulk-Aktionen
 
     /**
      * Bulk-Status-Update für mehrere Benutzer
      *
-     * @param string $action Die durchzuführende Aktion ('active', 'inactive', 'archived', 'trashed', 'restore_to_archive')
+     * @param string $action Die durchzuführende Aktion ('active', 'inactive', 'archived', 'trashed', 'restore_to_archive', 'restore_to_inactive')
      */
     public function bulkUpdateStatus(string $action): void
     {
+        if (empty($this->selectedIds)) {
+            $this->showToast(__('No accounts selected.'), 'Info', 'info');
+            return;
+        }
+
         $users = User::withTrashed()->whereIn('id', $this->selectedIds)->get();
         $count = 0;
 
         foreach ($users as $user) {
             $count++;
-
             match($action) {
                 'active' => $this->setUserActive($user),
                 'inactive' => $this->setUserInactive($user),
                 'archived' => $this->setUserArchived($user),
                 'trashed' => $this->trashUser($user),
-                'restore_to_archive' => $this->restoreUserToArchive($user),
+                'restore_to_active' => $user->restoreToActive(),
+                'restore_to_archive' => $user->restoreToArchive(),
+                'restore_to_inactive' => $user->restoreToInactive(),
                 default => null,
             };
         }
 
         if ($count > 0) {
-            $this->showToast(
-                __(':count accounts status updated successfully.'),
-                'Success',
-                'success',
-                ['count' => $count]
-            );
+            $this->showToast(__(':count accounts status updated successfully.'), 'Success', 'success', ['count' => $count]);
         }
 
         $this->resetSelections();
@@ -227,9 +261,13 @@ trait UserStatusAction
      */
     public function bulkForceDelete(): void
     {
+        if (empty($this->selectedIds)) {
+            $this->showToast(__('No accounts selected.'), 'Info', 'info');
+            return;
+        }
+
         $users = User::withTrashed()->whereIn('id', $this->selectedIds)->get();
         $count = 0;
-
         foreach ($users as $user) {
             if ($user->trashed()) {
                 $user->forceDelete();
@@ -238,12 +276,7 @@ trait UserStatusAction
         }
 
         if ($count > 0) {
-            $this->showToast(
-                __(':count accounts permanently deleted.'),
-                'Success',
-                'danger',
-                ['count' => $count]
-            );
+            $this->showToast(__(':count accounts permanently deleted.'), 'Success', 'danger', ['count' => $count]);
         }
 
         $this->resetSelections();
@@ -259,8 +292,12 @@ trait UserStatusAction
      */
     private function setUserActive(User $user): void
     {
-        if ($user->trashed()) $user->restore();
-        $user->update(['account_status' => AccountStatus::ACTIVE->value]);
+        if ($user->trashed()) {
+            $user->restoreToActive();
+        } else {
+            $user->account_status = AccountStatus::ACTIVE;
+            $user->save();
+        }
     }
 
     /**
@@ -270,8 +307,12 @@ trait UserStatusAction
      */
     private function setUserInactive(User $user): void
     {
-        if ($user->trashed()) $user->restore();
-        $user->update(['account_status' => AccountStatus::INACTIVE->value]);
+        if ($user->trashed()) {
+            $user->restoreToInactive();
+        } else {
+            $user->account_status = AccountStatus::INACTIVE;
+            $user->save();
+        }
     }
 
     /**
@@ -281,8 +322,12 @@ trait UserStatusAction
      */
     private function setUserArchived(User $user): void
     {
-        if ($user->trashed()) $user->restore();
-        $user->update(['account_status' => AccountStatus::ARCHIVED->value]);
+        if ($user->trashed()) {
+            $user->restoreToArchive();
+        } else {
+            $user->account_status = AccountStatus::ARCHIVED;
+            $user->save();
+        }
     }
 
     /**
@@ -292,19 +337,8 @@ trait UserStatusAction
      */
     private function trashUser(User $user): void
     {
-        if (!$user->trashed()) $user->delete();
-    }
-
-    /**
-     * Stellt einen Benutzer im archivierten Zustand wieder her
-     *
-     * @param User $user Der zu ändernde Benutzer
-     */
-    private function restoreUserToArchive(User $user): void
-    {
-        if ($user->trashed()) {
-            $user->restore();
-            $user->update(['account_status' => AccountStatus::ARCHIVED->value]);
+        if (!$user->trashed()) {
+            $user->delete();
         }
     }
 

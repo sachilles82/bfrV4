@@ -36,8 +36,10 @@ class User extends Authenticatable
     use SoftDeletes;
     use HasRoles;
     use UserPermanentDeletion;
-    use UserStatusManagement {
+    use UserStatusManagement{
         UserStatusManagement::restore insteadof SoftDeletes;
+        // Alias für die originale SoftDeletes::restore()-Methode.
+        SoftDeletes::restore as softRestore;
     }
 
     /**

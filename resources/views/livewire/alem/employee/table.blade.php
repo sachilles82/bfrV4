@@ -171,6 +171,14 @@
                                                 {{ __('Restore to Archive') }}
                                             </flux:menu.item>
 
+                                            <!-- Neue Option hinzufügen -->
+                                            <flux:menu.item wire:click="restoreToInactive({{ $user->id }})"
+                                                            icon="clock">
+                                                {{ __('Restore to Inactive') }}
+                                            </flux:menu.item>
+
+                                            <flux:separator class="my-1"/>
+
                                             <flux:menu.item wire:click="forceDelete({{ $user->id }})"
                                                             wire:confirm="{{ __('Are you sure you want to permanently delete this employee?') }}"
                                                             icon="trash" variant="danger">
@@ -188,7 +196,7 @@
                                                 {{ __('Set Active') }}
                                             </flux:menu.item>
                                             <flux:menu.item wire:click="notActivate({{ $user->id }})" icon="x-mark">
-                                                {{ __('Set Not Activated') }}
+                                                {{ __('Set Inactive') }}
                                             </flux:menu.item>
 
                                             <flux:separator class="my-1"/>

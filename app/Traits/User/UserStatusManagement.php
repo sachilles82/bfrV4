@@ -3,91 +3,149 @@
 namespace App\Traits\User;
 
 use App\Enums\User\AccountStatus;
+use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Trait für die Verwaltung von Benutzer-Status.
+ *
+ * Stellt Methoden bereit, um den Status eines Benutzers zu prüfen und zu ändern.
+ * Interagiert mit SoftDeletes für eine korrekte Papierkorb-Funktionalität.
+ */
 trait UserStatusManagement
 {
-    /* Prüft, ob der Benutzer aktiv ist */
+    // --- Status-Checks und Scopes (unverändert) ---
+
     public function isActive(): bool
     {
-        return $this->account_status === AccountStatus::ACTIVE
-            && !$this->trashed();
+        return $this->account_status === AccountStatus::ACTIVE && !$this->trashed();
     }
 
-    /* Prüft, ob der Benutzer nicht aktiviert ist */
     public function isNotActivated(): bool
     {
-        return $this->account_status === AccountStatus::INACTIVE
-            && !$this->trashed();
+        return $this->account_status === AccountStatus::INACTIVE && !$this->trashed();
     }
 
-    /* Prüft, ob der Benutzer archiviert ist */
     public function isArchived(): bool
     {
-        return $this->account_status === AccountStatus::ARCHIVED
-            && !$this->trashed();
+        return $this->account_status === AccountStatus::ARCHIVED && !$this->trashed();
     }
 
-    /* Prüft, ob der Benutzer im Papierkorb ist */
     public function isTrashed(): bool
     {
         return $this->trashed();
     }
 
-    /* Prüft, ob der Benutzer in einem bestimmten Status ist */
     public function hasStatus(AccountStatus $status): bool
     {
         return $this->account_status === $status;
     }
 
-    /* Setzt den Status des Benutzers */
     public function setStatus(AccountStatus $status): self
     {
         $this->update(['account_status' => $status]);
         return $this;
     }
 
-    /* Scope for active users */
     public function scopeActive($query)
     {
-        return $query->where('account_status', AccountStatus::ACTIVE->value)
+        return $query->where('account_status', AccountStatus::ACTIVE)
             ->whereNull('deleted_at');
     }
 
-    /* Scope for not activated users */
     public function scopeNotActivated($query)
     {
-        return $query->where('account_status', AccountStatus::INACTIVE->value)
+        return $query->where('account_status', AccountStatus::INACTIVE)
             ->whereNull('deleted_at');
     }
 
-    /* Scope for archived users */
     public function scopeArchived($query)
     {
-        return $query->where('account_status', AccountStatus::ARCHIVED->value)
+        return $query->where('account_status', AccountStatus::ARCHIVED)
             ->whereNull('deleted_at');
     }
 
-    /* Scope for all non-deleted users */
     public function scopeNotTrashed($query)
     {
         return $query->whereNull('deleted_at');
     }
 
-    /* Override the SoftDeletes trait delete method to update account_status */
+    // --- Überschreiben von delete und restore ---
+
+    /**
+     * Überschreibt die delete()-Methode des SoftDeletes-Traits.
+     * Setzt den Account-Status auf TRASHED vor dem Soft-Delete.
+     *
+     * @return bool|null
+     */
     public function delete()
     {
-        $this->update(['account_status' => AccountStatus::TRASHED->value]);
+        $this->update(['account_status' => AccountStatus::TRASHED]);
         return parent::delete();
     }
 
-    /* Override the SoftDeletes trait's restore method to restore previous status */
+    /**
+     * Überschreibt die restore()-Methode des SoftDeletes-Traits.
+     * Führt zuerst die SoftDeletes-Logik aus und setzt dann (falls nötig) den Status auf ACTIVE.
+     *
+     * @return bool|null
+     */
     public function restore()
     {
-        $result = parent::restore();
-        // If account_status is trashed, change it back to active
+        // Rufe die originale restore()-Methode von SoftDeletes über den Alias auf.
+        $result = $this->softRestore();
+
+        // Falls der Account-Status auf TRASHED stand, setze ihn auf ACTIVE.
         if ($this->account_status === AccountStatus::TRASHED) {
-            $this->update(['account_status' => AccountStatus::ACTIVE->value]);
+            $this->update(['account_status' => AccountStatus::ACTIVE]);
         }
+
         return $result;
+    }
+
+    /**
+     * Stellt einen soft-deleted Benutzer wieder her und setzt den Account-Status auf den angegebenen Status.
+     *
+     * @param AccountStatus $status Der gewünschte Account-Status (z. B. INACTIVE oder ARCHIVED).
+     * @return bool True, wenn der Benutzer wiederhergestellt wurde.
+     */
+    public function restoreToStatus(AccountStatus $status): bool
+    {
+        $restored = false;
+        if ($this->trashed()) {
+            $this->softRestore();
+            $restored = true;
+        }
+        $this->update(['account_status' => $status]);
+        return $restored;
+    }
+
+    /**
+     * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf ACTIVE.
+     *
+     * @return bool
+     */
+    public function restoreToActive(): bool
+    {
+        return $this->restoreToStatus(AccountStatus::ACTIVE);
+    }
+
+    /**
+     * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf INACTIVE.
+     *
+     * @return bool
+     */
+    public function restoreToInactive(): bool
+    {
+        return $this->restoreToStatus(AccountStatus::INACTIVE);
+    }
+
+    /**
+     * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf ARCHIVED.
+     *
+     * @return bool
+     */
+    public function restoreToArchive(): bool
+    {
+        return $this->restoreToStatus(AccountStatus::ARCHIVED);
     }
 }
