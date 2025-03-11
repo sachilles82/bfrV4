@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Enums\User;
+namespace App\Enums\Model;
 
-enum AccountStatus: string
+enum ModelStatus: string
 {
     case ACTIVE = 'active';
     case INACTIVE = 'inactive';

@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Feature\Alem\User;
+namespace Tests\Feature\Alem\Model;
 
-use App\Enums\User\AccountStatus;
+use App\Enums\Model\ModelStatus;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class UserStatusManagementTest extends TestCase
+class ModelStatusManagementTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -16,42 +16,42 @@ class UserStatusManagementTest extends TestCase
     public function user_can_be_active()
     {
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $this->assertTrue($user->isActive());
         $this->assertFalse($user->isNotActivated());
         $this->assertFalse($user->isArchived());
         $this->assertFalse($user->isTrashed());
-        $this->assertTrue($user->hasStatus(AccountStatus::ACTIVE));
+        $this->assertTrue($user->hasStatus(ModelStatus::ACTIVE));
     }
 
     #[Test]
     public function user_can_be_inactive()
     {
         $user = User::factory()->create([
-            'account_status' => AccountStatus::INACTIVE
+            'model_status' => ModelStatus::INACTIVE
         ]);
 
         $this->assertFalse($user->isActive());
         $this->assertTrue($user->isNotActivated());
         $this->assertFalse($user->isArchived());
         $this->assertFalse($user->isTrashed());
-        $this->assertTrue($user->hasStatus(AccountStatus::INACTIVE));
+        $this->assertTrue($user->hasStatus(ModelStatus::INACTIVE));
     }
 
     #[Test]
     public function user_can_be_archived()
     {
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED
         ]);
 
         $this->assertFalse($user->isActive());
         $this->assertFalse($user->isNotActivated());
         $this->assertTrue($user->isArchived());
         $this->assertFalse($user->isTrashed());
-        $this->assertTrue($user->hasStatus(AccountStatus::ARCHIVED));
+        $this->assertTrue($user->hasStatus(ModelStatus::ARCHIVED));
     }
 
     #[Test]
@@ -70,16 +70,16 @@ class UserStatusManagementTest extends TestCase
     public function can_change_user_status()
     {
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
-        $user->setStatus(AccountStatus::INACTIVE);
+        $user->setStatus(ModelStatus::INACTIVE);
         $this->assertTrue($user->isNotActivated());
 
-        $user->setStatus(AccountStatus::ARCHIVED);
+        $user->setStatus(ModelStatus::ARCHIVED);
         $this->assertTrue($user->isArchived());
 
-        $user->setStatus(AccountStatus::ACTIVE);
+        $user->setStatus(ModelStatus::ACTIVE);
         $this->assertTrue($user->isActive());
     }
 
@@ -87,11 +87,11 @@ class UserStatusManagementTest extends TestCase
     public function scope_active_returns_only_active_users()
     {
         $activeUser = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $inactiveUser = User::factory()->create([
-            'account_status' => AccountStatus::INACTIVE
+            'model_status' => ModelStatus::INACTIVE
         ]);
 
         $users = User::active()->get();
@@ -104,11 +104,11 @@ class UserStatusManagementTest extends TestCase
     public function scope_not_activated_returns_only_not_activated_users()
     {
         $activeUser = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $inactiveUser = User::factory()->create([
-            'account_status' => AccountStatus::INACTIVE
+            'model_status' => ModelStatus::INACTIVE
         ]);
 
         $users = User::notActivated()->get();
@@ -121,11 +121,11 @@ class UserStatusManagementTest extends TestCase
     public function scope_archived_returns_only_archived_users()
     {
         $activeUser = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $archivedUser = User::factory()->create([
-            'account_status' => AccountStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED
         ]);
 
         $users = User::archived()->get();
@@ -148,10 +148,10 @@ class UserStatusManagementTest extends TestCase
     }
 
     #[Test]
-    public function delete_updates_account_status_and_soft_deletes()
+    public function delete_updates_model_status_and_soft_deletes()
     {
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $user->delete();
@@ -164,14 +164,14 @@ class UserStatusManagementTest extends TestCase
 
         // Reload the model to check the status
         $deletedUser = User::withTrashed()->find($user->id);
-        $this->assertEquals(AccountStatus::TRASHED, $deletedUser->account_status);
+        $this->assertEquals(ModelStatus::TRASHED, $deletedUser->model_status);
     }
 
     #[Test]
-    public function restore_updates_account_status_to_active()
+    public function restore_updates_model_status_to_active()
     {
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $user->delete();
@@ -179,21 +179,21 @@ class UserStatusManagementTest extends TestCase
         // Reload after deleting
         $user = User::withTrashed()->find($user->id);
         $this->assertTrue($user->trashed());
-        $this->assertEquals(AccountStatus::TRASHED, $user->account_status);
+        $this->assertEquals(ModelStatus::TRASHED, $user->model_status);
 
         $user->restore();
 
         // Reload after restoring
         $user = User::find($user->id);
         $this->assertFalse($user->trashed());
-        $this->assertEquals(AccountStatus::ACTIVE, $user->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user->model_status);
     }
 
     #[Test]
-    public function restore_updates_account_status_from_trashed()
+    public function restore_updates_model_status_from_trashed()
     {
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $user->delete();
@@ -208,21 +208,21 @@ class UserStatusManagementTest extends TestCase
         // Prüfe, ob er nicht mehr im Papierkorb ist
         $restoredUser = User::find($user->id);
         $this->assertFalse($restoredUser->trashed());
-        $this->assertEquals(AccountStatus::ACTIVE, $restoredUser->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $restoredUser->model_status);
     }
 
     #[Test]
-    public function restore_maintains_non_trashed_account_status()
+    public function restore_maintains_non_trashed_model_status()
     {
         // Da du immer ACTIVE setzt, sollte dieser Test geändert werden
         // Hier ändern wir die Erwartung, statt die Implementierung
 
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED
         ]);
 
         // Check initial state
-        $this->assertEquals(AccountStatus::ARCHIVED, $user->account_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user->model_status);
 
         // Delete the user
         $user->delete();
@@ -232,7 +232,7 @@ class UserStatusManagementTest extends TestCase
         $restoredUser->restore();
 
         // Should restore to ACTIVE status
-        $this->assertEquals(AccountStatus::ACTIVE, $restoredUser->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $restoredUser->model_status);
     }
 
     #[Test]
@@ -240,7 +240,7 @@ class UserStatusManagementTest extends TestCase
     {
         // Benutzer erstellen und in den Papierkorb legen
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
         $user->delete();
 
@@ -249,7 +249,7 @@ class UserStatusManagementTest extends TestCase
         $this->assertTrue($user->trashed());
 
         // Als ARCHIVED wiederherstellen
-        $restored = $user->restoreToStatus(AccountStatus::ARCHIVED);
+        $restored = $user->restoreToStatus(ModelStatus::ARCHIVED);
 
         // Prüfen, ob die Wiederherstellung erfolgreich war
         $this->assertTrue($restored);
@@ -257,7 +257,7 @@ class UserStatusManagementTest extends TestCase
         // Neuladen und Status prüfen
         $user = User::find($user->id);
         $this->assertFalse($user->trashed());
-        $this->assertEquals(AccountStatus::ARCHIVED, $user->account_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user->model_status);
     }
 
     #[Test]
@@ -265,17 +265,17 @@ class UserStatusManagementTest extends TestCase
     {
         // Benutzer ohne Löschung erstellen
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         // Status ändern, aber nicht löschen
-        $restored = $user->restoreToStatus(AccountStatus::INACTIVE);
+        $restored = $user->restoreToStatus(ModelStatus::INACTIVE);
 
         // Der Rückgabewert sollte false sein, da kein Restore stattfand
         $this->assertFalse($restored);
 
         // Aber der Status sollte trotzdem geändert sein
-        $this->assertEquals(AccountStatus::INACTIVE, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::INACTIVE, $user->fresh()->model_status);
     }
 
     #[Test]
@@ -283,7 +283,7 @@ class UserStatusManagementTest extends TestCase
     {
         // Benutzer erstellen und in den Papierkorb legen
         $user = User::factory()->create([
-            'account_status' => AccountStatus::INACTIVE
+            'model_status' => ModelStatus::INACTIVE
         ]);
         $user->delete();
 
@@ -299,7 +299,7 @@ class UserStatusManagementTest extends TestCase
         // Neuladen und Status prüfen
         $user = User::find($user->id);
         $this->assertFalse($user->trashed());
-        $this->assertEquals(AccountStatus::ACTIVE, $user->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user->model_status);
     }
 
     #[Test]
@@ -307,7 +307,7 @@ class UserStatusManagementTest extends TestCase
     {
         // Benutzer erstellen und in den Papierkorb legen
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
         $user->delete();
 
@@ -323,7 +323,7 @@ class UserStatusManagementTest extends TestCase
         // Neuladen und Status prüfen
         $user = User::find($user->id);
         $this->assertFalse($user->trashed());
-        $this->assertEquals(AccountStatus::INACTIVE, $user->account_status);
+        $this->assertEquals(ModelStatus::INACTIVE, $user->model_status);
     }
 
     #[Test]
@@ -331,7 +331,7 @@ class UserStatusManagementTest extends TestCase
     {
         // Benutzer erstellen und in den Papierkorb legen
         $user = User::factory()->create([
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
         $user->delete();
 
@@ -347,6 +347,6 @@ class UserStatusManagementTest extends TestCase
         // Neuladen und Status prüfen
         $user = User::find($user->id);
         $this->assertFalse($user->trashed());
-        $this->assertEquals(AccountStatus::ARCHIVED, $user->account_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user->model_status);
     }
 }

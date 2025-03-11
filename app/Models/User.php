@@ -3,13 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Enums\User\AccountStatus;
+use App\Enums\Model\ModelStatus;
 use App\Models\Address\State;
 use App\Models\Alem\Employee\Employee;
 use App\Traits\HasAddress;
+use App\Traits\Model\ModelPermanentDeletion;
+use App\Traits\Model\ModelStatusManagement;
 use App\Traits\TraitForUserModel;
-use App\Traits\User\UserPermanentDeletion;
-use App\Traits\User\UserStatusManagement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -35,9 +35,9 @@ class User extends Authenticatable
     use HasAddress;
     use SoftDeletes;
     use HasRoles;
-    use UserPermanentDeletion;
-    use UserStatusManagement{
-        UserStatusManagement::restore insteadof SoftDeletes;
+    use ModelPermanentDeletion;
+    use ModelStatusManagement{
+        ModelStatusManagement::restore insteadof SoftDeletes;
         // Alias für die originale SoftDeletes::restore()-Methode.
         SoftDeletes::restore as softRestore;
     }
@@ -56,7 +56,7 @@ class User extends Authenticatable
         'user_type',
         'gender',
         'created_by',
-        'account_status',
+        'model_status',
     ];
 
     /**
@@ -90,7 +90,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'account_status' => AccountStatus::class,
+            'model_status' => ModelStatus::class,
         ];
     }
 

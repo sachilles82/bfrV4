@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Alem\User;
 
-use App\Enums\User\AccountStatus;
+use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Traits\UserStatusAction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -47,9 +47,9 @@ class UserStatusActionTest extends TestCase
     public function it_can_apply_active_status_filter()
     {
         // Create users with different statuses
-        $activeUser = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $inactiveUser = User::factory()->create(['account_status' => AccountStatus::INACTIVE]);
-        $archivedUser = User::factory()->create(['account_status' => AccountStatus::ARCHIVED]);
+        $activeUser = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $inactiveUser = User::factory()->create(['model_status' => ModelStatus::INACTIVE]);
+        $archivedUser = User::factory()->create(['model_status' => ModelStatus::ARCHIVED]);
         $trashedUser = User::factory()->create();
         $trashedUser->delete();
 
@@ -77,8 +77,8 @@ class UserStatusActionTest extends TestCase
     public function it_can_apply_inactive_status_filter()
     {
         // Create users with different statuses
-        $activeUser = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $inactiveUser = User::factory()->create(['account_status' => AccountStatus::INACTIVE]);
+        $activeUser = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $inactiveUser = User::factory()->create(['model_status' => ModelStatus::INACTIVE]);
 
         // Create a test query
         $query = User::query();
@@ -102,8 +102,8 @@ class UserStatusActionTest extends TestCase
     public function it_can_apply_archived_status_filter()
     {
         // Create users with different statuses
-        $activeUser = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $archivedUser = User::factory()->create(['account_status' => AccountStatus::ARCHIVED]);
+        $activeUser = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $archivedUser = User::factory()->create(['model_status' => ModelStatus::ARCHIVED]);
 
         // Create a test query
         $query = User::query();
@@ -127,7 +127,7 @@ class UserStatusActionTest extends TestCase
     public function it_can_apply_trashed_status_filter()
     {
         // Create users with different statuses
-        $activeUser = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $activeUser = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $trashedUser = User::factory()->create();
         $trashedUser->delete();
 
@@ -168,7 +168,7 @@ class UserStatusActionTest extends TestCase
     public function it_can_activate_a_user()
     {
         // Erstelle einen inaktiven Benutzer
-        $user = User::factory()->create(['account_status' => AccountStatus::INACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::INACTIVE]);
 
         // Teste die Aktivierung
         Livewire::test(get_class($this->getTestComponent()))
@@ -177,14 +177,14 @@ class UserStatusActionTest extends TestCase
             ->assertDispatched('update-table');
 
         // Überprüfe, ob der Benutzer jetzt aktiv ist
-        $this->assertEquals(AccountStatus::ACTIVE, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_set_a_user_to_inactive()
     {
         // Erstelle einen aktiven Benutzer
-        $user = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
 
         // Teste die Deaktivierung
         Livewire::test(get_class($this->getTestComponent()))
@@ -193,14 +193,14 @@ class UserStatusActionTest extends TestCase
             ->assertDispatched('update-table');
 
         // Überprüfe, ob der Benutzer jetzt inaktiv ist
-        $this->assertEquals(AccountStatus::INACTIVE, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::INACTIVE, $user->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_archive_a_user()
     {
         // Erstelle einen aktiven Benutzer
-        $user = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
 
         // Teste die Archivierung
         Livewire::test(get_class($this->getTestComponent()))
@@ -209,14 +209,14 @@ class UserStatusActionTest extends TestCase
             ->assertDispatched('update-table');
 
         // Überprüfe, ob der Benutzer jetzt archiviert ist
-        $this->assertEquals(AccountStatus::ARCHIVED, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_move_a_user_to_trash()
     {
         // Erstelle einen Benutzer
-        $user = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
 
         // Teste das Löschen (in den Papierkorb)
         Livewire::test(get_class($this->getTestComponent()))
@@ -226,19 +226,19 @@ class UserStatusActionTest extends TestCase
 
         // Überprüfe, ob der Benutzer im Papierkorb ist
         $this->assertTrue($user->fresh()->trashed());
-        $this->assertEquals(AccountStatus::TRASHED, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::TRASHED, $user->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_restore_a_user_from_trash_to_active()
     {
         // Erstelle einen Benutzer und lege ihn in den Papierkorb
-        $user = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user->delete();
 
         // Überprüfe, ob der Benutzer im Papierkorb ist
         $this->assertTrue($user->fresh()->trashed());
-        $this->assertEquals(AccountStatus::TRASHED, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::TRASHED, $user->fresh()->model_status);
 
         // Teste die Wiederherstellung
         Livewire::test(get_class($this->getTestComponent()))
@@ -248,14 +248,14 @@ class UserStatusActionTest extends TestCase
 
         // Überprüfe, ob der Benutzer wiederhergestellt und aktiv ist
         $this->assertFalse($user->fresh()->trashed());
-        $this->assertEquals(AccountStatus::ACTIVE, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_restore_a_user_to_active_from_inactive_status()
     {
         // Erstelle einen inaktiven Benutzer
-        $user = User::factory()->create(['account_status' => AccountStatus::INACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::INACTIVE]);
 
         // Teste die Aktivierung via restore
         Livewire::test(get_class($this->getTestComponent()))
@@ -264,14 +264,14 @@ class UserStatusActionTest extends TestCase
             ->assertDispatched('update-table');
 
         // Überprüfe, ob der Benutzer jetzt aktiv ist
-        $this->assertEquals(AccountStatus::ACTIVE, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_restore_a_user_to_archive()
     {
         // Erstelle einen Benutzer und lege ihn in den Papierkorb
-        $user = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user->delete();
 
         // Teste die Wiederherstellung als archiviert
@@ -282,14 +282,14 @@ class UserStatusActionTest extends TestCase
 
         // Überprüfe, ob der Benutzer wiederhergestellt und archiviert ist
         $this->assertFalse($user->fresh()->trashed());
-        $this->assertEquals(AccountStatus::ARCHIVED, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_restore_a_user_to_inactive()
     {
         // Erstelle einen Benutzer und lege ihn in den Papierkorb
-        $user = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user->delete();
 
         // Teste die Wiederherstellung als inaktiv
@@ -300,14 +300,14 @@ class UserStatusActionTest extends TestCase
 
         // Überprüfe, ob der Benutzer wiederhergestellt und inaktiv ist
         $this->assertFalse($user->fresh()->trashed());
-        $this->assertEquals(AccountStatus::INACTIVE, $user->fresh()->account_status);
+        $this->assertEquals(ModelStatus::INACTIVE, $user->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_permanently_delete_a_user()
     {
         // Erstelle einen Benutzer und lege ihn in den Papierkorb
-        $user = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user->delete();
 
         // Teste das permanente Löschen
@@ -324,8 +324,8 @@ class UserStatusActionTest extends TestCase
     public function it_can_empty_trash()
     {
         // Erstelle einige Benutzer und lege sie in den Papierkorb
-        $user1 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user1->delete();
         $user2->delete();
 
@@ -347,8 +347,8 @@ class UserStatusActionTest extends TestCase
     public function it_can_bulk_update_status_to_active()
     {
         // Erstelle einige Benutzer mit unterschiedlichen Status
-        $user1 = User::factory()->create(['account_status' => AccountStatus::INACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::ARCHIVED]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::INACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::ARCHIVED]);
 
         // Teste die Bulk-Aktion
         Livewire::test(get_class($this->getTestComponent()))
@@ -358,16 +358,16 @@ class UserStatusActionTest extends TestCase
             ->assertDispatched('update-table');
 
         // Überprüfe, ob alle Benutzer aktiv sind
-        $this->assertEquals(AccountStatus::ACTIVE, $user1->fresh()->account_status);
-        $this->assertEquals(AccountStatus::ACTIVE, $user2->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user1->fresh()->model_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user2->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_bulk_update_status_to_inactive()
     {
         // Erstelle einige Benutzer mit unterschiedlichen Status
-        $user1 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::ARCHIVED]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::ARCHIVED]);
 
         // Teste die Bulk-Aktion
         Livewire::test(get_class($this->getTestComponent()))
@@ -377,16 +377,16 @@ class UserStatusActionTest extends TestCase
             ->assertDispatched('update-table');
 
         // Überprüfe, ob alle Benutzer inaktiv sind
-        $this->assertEquals(AccountStatus::INACTIVE, $user1->fresh()->account_status);
-        $this->assertEquals(AccountStatus::INACTIVE, $user2->fresh()->account_status);
+        $this->assertEquals(ModelStatus::INACTIVE, $user1->fresh()->model_status);
+        $this->assertEquals(ModelStatus::INACTIVE, $user2->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_bulk_update_status_to_archived()
     {
         // Erstelle einige Benutzer mit unterschiedlichen Status
-        $user1 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::INACTIVE]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::INACTIVE]);
 
         // Teste die Bulk-Aktion
         Livewire::test(get_class($this->getTestComponent()))
@@ -396,16 +396,16 @@ class UserStatusActionTest extends TestCase
             ->assertDispatched('update-table');
 
         // Überprüfe, ob alle Benutzer archiviert sind
-        $this->assertEquals(AccountStatus::ARCHIVED, $user1->fresh()->account_status);
-        $this->assertEquals(AccountStatus::ARCHIVED, $user2->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user1->fresh()->model_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user2->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_bulk_move_to_trash()
     {
         // Erstelle einige Benutzer
-        $user1 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::INACTIVE]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::INACTIVE]);
 
         // Teste die Bulk-Aktion
         Livewire::test(get_class($this->getTestComponent()))
@@ -417,16 +417,16 @@ class UserStatusActionTest extends TestCase
         // Überprüfe, ob alle Benutzer im Papierkorb sind
         $this->assertTrue($user1->fresh()->trashed());
         $this->assertTrue($user2->fresh()->trashed());
-        $this->assertEquals(AccountStatus::TRASHED, $user1->fresh()->account_status);
-        $this->assertEquals(AccountStatus::TRASHED, $user2->fresh()->account_status);
+        $this->assertEquals(ModelStatus::TRASHED, $user1->fresh()->model_status);
+        $this->assertEquals(ModelStatus::TRASHED, $user2->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_bulk_restore_to_active()
     {
         // Erstelle einige Benutzer und lege sie in den Papierkorb
-        $user1 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user1->delete();
         $user2->delete();
 
@@ -440,16 +440,16 @@ class UserStatusActionTest extends TestCase
         // Überprüfe, ob alle Benutzer aktiv sind
         $this->assertFalse($user1->fresh()->trashed());
         $this->assertFalse($user2->fresh()->trashed());
-        $this->assertEquals(AccountStatus::ACTIVE, $user1->fresh()->account_status);
-        $this->assertEquals(AccountStatus::ACTIVE, $user2->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user1->fresh()->model_status);
+        $this->assertEquals(ModelStatus::ACTIVE, $user2->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_bulk_restore_to_archive()
     {
         // Erstelle einige Benutzer und lege sie in den Papierkorb
-        $user1 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user1->delete();
         $user2->delete();
 
@@ -463,16 +463,16 @@ class UserStatusActionTest extends TestCase
         // Überprüfe, ob alle Benutzer archiviert sind
         $this->assertFalse($user1->fresh()->trashed());
         $this->assertFalse($user2->fresh()->trashed());
-        $this->assertEquals(AccountStatus::ARCHIVED, $user1->fresh()->account_status);
-        $this->assertEquals(AccountStatus::ARCHIVED, $user2->fresh()->account_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user1->fresh()->model_status);
+        $this->assertEquals(ModelStatus::ARCHIVED, $user2->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_bulk_restore_to_inactive()
     {
         // Erstelle einige Benutzer und lege sie in den Papierkorb
-        $user1 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user1->delete();
         $user2->delete();
 
@@ -486,16 +486,16 @@ class UserStatusActionTest extends TestCase
         // Überprüfe, ob alle Benutzer inaktiv sind
         $this->assertFalse($user1->fresh()->trashed());
         $this->assertFalse($user2->fresh()->trashed());
-        $this->assertEquals(AccountStatus::INACTIVE, $user1->fresh()->account_status);
-        $this->assertEquals(AccountStatus::INACTIVE, $user2->fresh()->account_status);
+        $this->assertEquals(ModelStatus::INACTIVE, $user1->fresh()->model_status);
+        $this->assertEquals(ModelStatus::INACTIVE, $user2->fresh()->model_status);
     }
 
     #[Test]
     public function it_can_bulk_force_delete()
     {
         // Erstelle einige Benutzer und lege sie in den Papierkorb
-        $user1 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
-        $user2 = User::factory()->create(['account_status' => AccountStatus::ACTIVE]);
+        $user1 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
+        $user2 = User::factory()->create(['model_status' => ModelStatus::ACTIVE]);
         $user1->delete();
         $user2->delete();
 
@@ -515,7 +515,7 @@ class UserStatusActionTest extends TestCase
     public function it_dispatches_status_events()
     {
         // Erstelle einen Benutzer zum Testen
-        $user = User::factory()->create(['account_status' => AccountStatus::INACTIVE]);
+        $user = User::factory()->create(['model_status' => ModelStatus::INACTIVE]);
 
         // Aktiviere den Benutzer (dies löst dispatchStatusEvents aus)
         Livewire::test(get_class($this->getTestComponent()))

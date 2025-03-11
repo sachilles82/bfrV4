@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Traits\User;
+namespace App\Traits\Model;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Prunable;
 
-trait UserPermanentDeletion
+trait ModelPermanentDeletion
 {
     use Prunable;
 

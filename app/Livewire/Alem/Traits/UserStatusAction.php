@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Alem\Traits;
 
-use App\Enums\User\AccountStatus;
+use App\Enums\Model\ModelStatus;
 use App\Models\User;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Builder;
@@ -46,11 +46,11 @@ trait UserStatusAction
         switch ($this->statusFilter) {
             case 'inactive':
                 $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::INACTIVE);
+                    ->where('model_status', ModelStatus::INACTIVE);
                 break;
             case 'archived':
                 $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::ARCHIVED);
+                    ->where('model_status', ModelStatus::ARCHIVED);
                 break;
             case 'trashed':
                 $query->onlyTrashed();
@@ -58,7 +58,7 @@ trait UserStatusAction
             case 'active':
             default:
                 $query->whereNull('deleted_at')
-                    ->where('account_status', AccountStatus::ACTIVE);
+                    ->where('model_status', ModelStatus::ACTIVE);
         }
         return $query;
     }
@@ -73,7 +73,7 @@ trait UserStatusAction
     public function activate($userId): void
     {
         $user = User::withTrashed()->find($userId);
-        if ($user && $user->account_status !== AccountStatus::ACTIVE) {
+        if ($user && $user->model_status !== ModelStatus::ACTIVE) {
             $this->setUserActive($user);
             $this->showToast(__('Account activated.'));
             $this->dispatchStatusEvents();
@@ -88,7 +88,7 @@ trait UserStatusAction
     public function notActivate($userId): void
     {
         $user = User::find($userId);
-        if ($user && $user->account_status !== AccountStatus::INACTIVE) {
+        if ($user && $user->model_status !== ModelStatus::INACTIVE) {
             $this->setUserInactive($user);
             $this->showToast(__('Account set to inactive.'));
             $this->dispatchStatusEvents();
@@ -103,7 +103,7 @@ trait UserStatusAction
     public function archive($userId): void
     {
         $user = User::find($userId);
-        if ($user && $user->account_status !== AccountStatus::ARCHIVED) {
+        if ($user && $user->model_status !== ModelStatus::ARCHIVED) {
             $this->setUserArchived($user);
             $this->showToast(__('Account moved to archive.'));
             $this->dispatchStatusEvents();
@@ -138,7 +138,7 @@ trait UserStatusAction
         if ($user->trashed()) {
             $user->restoreToActive();
             $this->showToast(__('Account restored to active.'));
-        } elseif (in_array($user->account_status, [AccountStatus::ARCHIVED, AccountStatus::INACTIVE])) {
+        } elseif (in_array($user->model_status, [ModelStatus::ARCHIVED, ModelStatus::INACTIVE])) {
             $this->setUserActive($user);
             $this->showToast(__('Account set to active.'));
         }
@@ -160,7 +160,7 @@ trait UserStatusAction
         if ($user->trashed()) {
             $user->restoreToArchive();
             $this->showToast(__('Account restored to archive.'));
-        } elseif ($user->account_status !== AccountStatus::ARCHIVED) {
+        } elseif ($user->model_status !== ModelStatus::ARCHIVED) {
             $this->setUserArchived($user);
             $this->showToast(__('Account moved to archive.'));
         }
@@ -180,7 +180,7 @@ trait UserStatusAction
         if ($user->trashed()) {
             $user->restoreToInactive();
             $this->showToast(__('Account restored to inactive.'));
-        } elseif ($user->account_status !== AccountStatus::INACTIVE) {
+        } elseif ($user->model_status !== ModelStatus::INACTIVE) {
             $this->setUserInactive($user);
             $this->showToast(__('Account set to inactive.'));
         }
@@ -295,7 +295,7 @@ trait UserStatusAction
         if ($user->trashed()) {
             $user->restoreToActive();
         } else {
-            $user->account_status = AccountStatus::ACTIVE;
+            $user->model_status = ModelStatus::ACTIVE;
             $user->save();
         }
     }
@@ -310,7 +310,7 @@ trait UserStatusAction
         if ($user->trashed()) {
             $user->restoreToInactive();
         } else {
-            $user->account_status = AccountStatus::INACTIVE;
+            $user->model_status = ModelStatus::INACTIVE;
             $user->save();
         }
     }
@@ -325,7 +325,7 @@ trait UserStatusAction
         if ($user->trashed()) {
             $user->restoreToArchive();
         } else {
-            $user->account_status = AccountStatus::ARCHIVED;
+            $user->model_status = ModelStatus::ARCHIVED;
             $user->save();
         }
     }

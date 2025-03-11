@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Feature\Alem\User;
+namespace Alem\Employee;
 
-use App\Enums\User\AccountStatus;
+use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Employee\EmployeeTable;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class EmployeeTableTest extends TestCase
 {
@@ -30,24 +30,24 @@ class EmployeeTableTest extends TestCase
         // Create an authenticated user with a valid company record
         $this->user = User::factory()->create([
             'user_type' => 'admin',
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         // Create test employees with different statuses
         $this->employees = [
             'active' => User::factory()->create([
                 'user_type' => 'employee',
-                'account_status' => AccountStatus::ACTIVE,
+                'model_status' => ModelStatus::ACTIVE,
                 'company_id' => $this->user->company_id
             ]),
             'inactive' => User::factory()->create([
                 'user_type' => 'employee',
-                'account_status' => AccountStatus::INACTIVE,
+                'model_status' => ModelStatus::INACTIVE,
                 'company_id' => $this->user->company_id
             ]),
             'archived' => User::factory()->create([
                 'user_type' => 'employee',
-                'account_status' => AccountStatus::ARCHIVED,
+                'model_status' => ModelStatus::ARCHIVED,
                 'company_id' => $this->user->company_id
             ])
         ];
@@ -121,7 +121,7 @@ class EmployeeTableTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->employees['inactive']->id,
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
     }
 
@@ -135,7 +135,7 @@ class EmployeeTableTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->employees['active']->id,
-            'account_status' => AccountStatus::INACTIVE
+            'model_status' => ModelStatus::INACTIVE
         ]);
     }
 
@@ -149,7 +149,7 @@ class EmployeeTableTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->employees['active']->id,
-            'account_status' => AccountStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED
         ]);
     }
 
@@ -176,7 +176,7 @@ class EmployeeTableTest extends TestCase
         // Verify initial state
         $trashedUser = User::withTrashed()->find($id);
         $this->assertTrue($trashedUser->trashed());
-        $this->assertEquals(AccountStatus::TRASHED, $trashedUser->account_status);
+        $this->assertEquals(ModelStatus::TRASHED, $trashedUser->model_status);
 
         // Test restoration
         Livewire::test(EmployeeTable::class)
@@ -189,7 +189,7 @@ class EmployeeTableTest extends TestCase
         $restoredUser = User::find($id);
         $this->assertNotNull($restoredUser, "User should exist after restore");
         $this->assertFalse($restoredUser->trashed(), "User should not be trashed after restore");
-        $this->assertEquals(AccountStatus::ACTIVE, $restoredUser->account_status, "User should be ACTIVE after restore");
+        $this->assertEquals(ModelStatus::ACTIVE, $restoredUser->model_status, "User should be ACTIVE after restore");
     }
 
     #[Test]
@@ -205,7 +205,7 @@ class EmployeeTableTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $id,
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
     }
 
@@ -223,7 +223,7 @@ class EmployeeTableTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $id,
             'deleted_at' => null,
-            'account_status' => AccountStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED
         ]);
     }
 
@@ -241,7 +241,7 @@ class EmployeeTableTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $id,
             'deleted_at' => null,
-            'account_status' => AccountStatus::INACTIVE
+            'model_status' => ModelStatus::INACTIVE
         ]);
     }
 
@@ -278,7 +278,7 @@ class EmployeeTableTest extends TestCase
         foreach ($selectedIds as $id) {
             $this->assertDatabaseHas('users', [
                 'id' => $id,
-                'account_status' => AccountStatus::ACTIVE
+                'model_status' => ModelStatus::ACTIVE
             ]);
         }
     }
@@ -300,7 +300,7 @@ class EmployeeTableTest extends TestCase
         foreach ($selectedIds as $id) {
             $this->assertDatabaseHas('users', [
                 'id' => $id,
-                'account_status' => AccountStatus::INACTIVE
+                'model_status' => ModelStatus::INACTIVE
             ]);
         }
     }
@@ -322,7 +322,7 @@ class EmployeeTableTest extends TestCase
         foreach ($selectedIds as $id) {
             $this->assertDatabaseHas('users', [
                 'id' => $id,
-                'account_status' => AccountStatus::ARCHIVED
+                'model_status' => ModelStatus::ARCHIVED
             ]);
         }
     }
@@ -374,7 +374,7 @@ class EmployeeTableTest extends TestCase
             $this->assertDatabaseHas('users', [
                 'id' => $id,
                 'deleted_at' => null,
-                'account_status' => AccountStatus::ARCHIVED
+                'model_status' => ModelStatus::ARCHIVED
             ]);
         }
     }
@@ -405,7 +405,7 @@ class EmployeeTableTest extends TestCase
             $this->assertDatabaseHas('users', [
                 'id' => $id,
                 'deleted_at' => null,
-                'account_status' => AccountStatus::INACTIVE
+                'model_status' => ModelStatus::INACTIVE
             ]);
         }
     }
@@ -436,7 +436,7 @@ class EmployeeTableTest extends TestCase
             $this->assertDatabaseHas('users', [
                 'id' => $id,
                 'deleted_at' => null,
-                'account_status' => AccountStatus::ACTIVE
+                'model_status' => ModelStatus::ACTIVE
             ]);
         }
     }
@@ -541,14 +541,14 @@ class EmployeeTableTest extends TestCase
         $userA = User::factory()->create([
             'name' => 'AAA User',
             'user_type' => 'employee',
-            'account_status' => AccountStatus::ACTIVE,
+            'model_status' => ModelStatus::ACTIVE,
             'company_id' => $this->user->company_id
         ]);
 
         $userZ = User::factory()->create([
             'name' => 'ZZZ User',
             'user_type' => 'employee',
-            'account_status' => AccountStatus::ACTIVE,
+            'model_status' => ModelStatus::ACTIVE,
             'company_id' => $this->user->company_id
         ]);
 
@@ -578,7 +578,7 @@ class EmployeeTableTest extends TestCase
         $uniqueUser = User::factory()->create([
             'name' => 'UniqueSearchTerm',
             'user_type' => 'employee',
-            'account_status' => AccountStatus::ACTIVE,
+            'model_status' => ModelStatus::ACTIVE,
             'company_id' => $this->user->company_id
         ]);
 
@@ -598,17 +598,17 @@ class EmployeeTableTest extends TestCase
         // Erstelle Benutzer, die als Owner und created_by dienen werden
         $creator = User::factory()->create([
             'user_type' => 'admin',
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $owner1 = User::factory()->create([
             'user_type' => 'owner',
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         $owner2 = User::factory()->create([
             'user_type' => 'owner',
-            'account_status' => AccountStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE
         ]);
 
         // Erstelle Firmen mit explizit gesetzten owner_id und created_by
@@ -631,13 +631,13 @@ class EmployeeTableTest extends TestCase
         // Erstelle Mitarbeiter für beide Firmen
         $employee1 = User::factory()->create([
             'user_type' => 'employee',
-            'account_status' => AccountStatus::ACTIVE,
+            'model_status' => ModelStatus::ACTIVE,
             'company_id' => $company1->id
         ]);
 
         $employee2 = User::factory()->create([
             'user_type' => 'employee',
-            'account_status' => AccountStatus::ACTIVE,
+            'model_status' => ModelStatus::ACTIVE,
             'company_id' => $company2->id
         ]);
 

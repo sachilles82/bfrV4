@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Alem\Employee;
 
-use App\Enums\User\AccountStatus;
+use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Employee\Helper\Searchable;
 use App\Livewire\Alem\Traits\UserStatusAction;
 use App\Models\User;
@@ -14,7 +14,9 @@ use Livewire\Component;
 
 class EmployeeTable extends Component
 {
-    use Searchable, WithPerPagePagination, WithSorting, UserStatusAction;
+    use Searchable, WithPerPagePagination, WithSorting,
+        // Einbinden des Traits für alle User Typen (Employee, Customer, Supplier)
+        UserStatusAction;
 
     public $selectedIds = [];
     public $idsOnPage = [];
@@ -91,7 +93,7 @@ class EmployeeTable extends Component
 
         return view('livewire.alem.employee.table', [
             'users' => $users,
-            'statuses' => AccountStatus::cases(),
+            'statuses' => ModelStatus::cases(),
         ]);
     }
 }

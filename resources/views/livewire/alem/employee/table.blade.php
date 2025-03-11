@@ -149,9 +149,9 @@
                             <!-- Account Status Spalte: Mit Status Badge -->
                             <x-pupi.table.tr.cell>
                                 <div class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
-                                   {{ $user->account_status->colors() }}">
-                                    <x-dynamic-component :component="$user->account_status->icon()"/>
-                                    <div>{{ $user->account_status->label() }}</div>
+                                   {{ $user->model_status->colors() }}">
+                                    <x-dynamic-component :component="$user->model_status->icon()"/>
+                                    <div>{{ $user->model_status->label() }}</div>
 
                                 </div>
                             </x-pupi.table.tr.cell>
@@ -184,7 +184,7 @@
                                                             icon="trash" variant="danger">
                                                 {{ __('Delete Permanently') }}
                                             </flux:menu.item>
-                                        @elseif($user->account_status === \App\Enums\User\AccountStatus::ARCHIVED)
+                                        @elseif($user->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
                                             <!-- Options for archived users -->
                                             <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
                                                 {{ __('Edit') }}
@@ -206,7 +206,7 @@
                                                             icon="trash" variant="danger">
                                                 {{ __('Move to Trash') }}
                                             </flux:menu.item>
-                                        @elseif($user->account_status === \App\Enums\User\AccountStatus::INACTIVE)
+                                        @elseif($user->model_status === \App\Enums\Model\ModelStatus::INACTIVE)
                                             <!-- Options for not activated users -->
                                             <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
                                                 {{ __('Edit') }}
