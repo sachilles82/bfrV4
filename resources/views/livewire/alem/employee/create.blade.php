@@ -1,8 +1,5 @@
 <div wire:ignore.self>
-    <flux:modal.trigger name="create-employee">
-        <flux:button variant="primary" class="ml-2">{{ __('Add Role') }}</flux:button>
-    </flux:modal.trigger>
-    <flux:modal name="create-employee" variant="flyout" position="left" class=" space-y-6" wire:model="showModal">
+    <flux:modal name="create-employee" variant="flyout" position="left" class="space-y-6" wire:model="showModal">
         <div>
             <flux:heading size="lg">{{ __('Create Employee') }}</flux:heading>
             <flux:subheading>{{ __('Fill out the details to create a new employee') }}</flux:subheading>

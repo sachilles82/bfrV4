@@ -10,6 +10,7 @@ use App\Traits\Table\WithPerPagePagination;
 use App\Traits\Table\WithSorting;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class EmployeeTable extends Component
@@ -19,6 +20,8 @@ class EmployeeTable extends Component
     public $selectedIds = [];
     public $idsOnPage = [];
     public $name = '';
+
+    #[Url]
     public $statusFilter = 'active';
 
     /**

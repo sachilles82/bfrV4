@@ -1,9 +1,50 @@
 <div>
+    <div>
+        <div class="flex flex-wrap items-center gap-6 sm:flex-nowrap my-4 sm:my-2">
+            <h1 class="dark:text-base text-base/7 font-semibold dark:text-white text-gray-900">  {{ __('Employees') }}</h1>
+
+            {{--            <x-pupi.actions.status-filter :statusFilter="$statusFilter"/>--}}
+            <div
+                class="order-last flex w-full gap-x-8 text-sm/6 font-semibold sm:order-none sm:w-auto sm:border-l sm:border-gray-200 sm:dark:border-gray-500 sm:pl-6 sm:text-sm/7">
+                <a href="#"
+                   wire:click.prevent="$set('statusFilter', 'active')"
+                   class="{{ $statusFilter === 'active' ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
+                    {{ __('Active') }}
+                </a>
+                <a href="#"
+                   wire:click.prevent="$set('statusFilter', 'archived')"
+                   class="{{ $statusFilter === 'archived' ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
+                    {{ __('Archived') }}
+                </a>
+                <a href="#"
+                   wire:click.prevent="$set('statusFilter', 'trashed')"
+                   class="{{ $statusFilter === 'trashed' ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
+                    {{ __('Trashed') }}
+                </a>
+            </div>
+
+            <flux:modal.trigger name="create-employee">
+                <div
+                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
+                    <svg class="-ml-1.5 size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
+                         data-slot="icon">
+                        <path
+                            d="M10.75 6.75a.75.75 0 0 0-1.5 0v2.5h-2.5a.75.75 0 0 0 0 1.5h2.5v2.5a.75.75 0 0 0 1.5 0v-2.5h2.5a.75.75 0 0 0 0-1.5h-2.5v-2.5Z"/>
+                    </svg>
+                    {{ __('Create') }}
+                </div>
+            </flux:modal.trigger>
+        </div>
+    </div>
+
     <!-- Such- und Filterleiste -->
     <div
-        class="xl:mt-2 mt-1 h-full flex flex-col items-center justify-between space-y-3 md:flex-row md:space-y-0 md:space-x-4">
+        class="xl:mt-5 mt-1 h-full flex flex-col items-center justify-between space-y-3 md:flex-row md:space-y-0 md:space-x-4">
         <div class="w-full lg:w-1/3 md:w-1/2">
-            <x-pupi.actions.search wire:model.live.debounce.400ms="search"/>
+            <div class="mt-3 flex sm:mt-0">
+                <x-pupi.actions.search/>
+                <x-pupi.actions.reset-filters/>
+            </div>
         </div>
         <div
             class="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
@@ -25,14 +66,10 @@
                     <x-pupi.actions.bulkexport :statusFilter="$statusFilter"/>
                     <x-pupi.actions.bulkstatus :statusFilter="$statusFilter"/>
                 </div>
-                <div>
-                    <flux:select variant="listbox" wire:model.live="statusFilter" id="statusFilter">
-                        @foreach($statuses as $status)
-                            <flux:option value="{{ $status->value }}">{{ __($status->label()) }}</flux:option>
-                        @endforeach
-                    </flux::select>
-                </div>
-                <x-pupi.actions.reset-filters wire:click="resetFilters"/>
+
+                <x-pupi.actions.status-filter :statusFilter="$statusFilter"/>
+
+                {{--                    <x-pupi.actions.reset-filters wire:click="resetFilters"/>--}}
                 <x-pupi.actions.per-page/>
             </div>
         </div>
@@ -41,7 +78,6 @@
 
     <!-- Tabelle -->
     <x-pupi.table.container>
-        {{--        @json($selectedIds) @json($idsOnPage)--}}
         <div x-data="{ checked:false }">
             <x-pupi.table.main>
                 <x-slot:head>
@@ -162,7 +198,8 @@
                                     <flux:menu class="min-w-32">
                                         @if($user->trashed())
                                             <!-- Options for users in trash -->
-                                            <flux:menu.item wire:click="restore({{ $user->id }})" icon="arrow-uturn-up">
+                                            <flux:menu.item wire:click="restore({{ $user->id }})"
+                                                            icon="arrow-uturn-up">
                                                 {{ __('Restore to Active') }}
                                             </flux:menu.item>
 
@@ -192,7 +229,8 @@
 
                                             <flux:separator class="my-1"/>
 
-                                            <flux:menu.item wire:click="activate({{ $user->id }})" icon="check-circle">
+                                            <flux:menu.item wire:click="activate({{ $user->id }})"
+                                                            icon="check-circle">
                                                 {{ __('Set Active') }}
                                             </flux:menu.item>
                                             <flux:menu.item wire:click="notActivate({{ $user->id }})" icon="x-mark">
@@ -214,10 +252,12 @@
 
                                             <flux:separator class="my-1"/>
 
-                                            <flux:menu.item wire:click="activate({{ $user->id }})" icon="check-circle">
+                                            <flux:menu.item wire:click="activate({{ $user->id }})"
+                                                            icon="check-circle">
                                                 {{ __('Set Active') }}
                                             </flux:menu.item>
-                                            <flux:menu.item wire:click="archive({{ $user->id }})" icon="archive-box">
+                                            <flux:menu.item wire:click="archive({{ $user->id }})"
+                                                            icon="archive-box">
                                                 {{ __('Archive') }}
                                             </flux:menu.item>
 
@@ -234,12 +274,12 @@
                                                 {{ __('Edit') }}
                                             </flux:menu.item>
 
-                                            <flux:separator class="my-1"/>
-
                                             <flux:menu.item wire:click="notActivate({{ $user->id }})" icon="x-mark">
                                                 {{ __('Set Not Activated') }}
                                             </flux:menu.item>
-                                            <flux:menu.item wire:click="archive({{ $user->id }})" icon="archive-box">
+
+                                            <flux:menu.item wire:click="archive({{ $user->id }})"
+                                                            icon="archive-box">
                                                 {{ __('Archive') }}
                                             </flux:menu.item>
 
