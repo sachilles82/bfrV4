@@ -123,12 +123,6 @@
                                                 {{ __('Restore to Archive') }}
                                             </flux:menu.item>
 
-                                            <!-- Neue Option hinzufügen -->
-                                            <flux:menu.item wire:click="restoreToInactive({{ $department->id }})"
-                                                            icon="clock">
-                                                {{ __('Restore to Inactive') }}
-                                            </flux:menu.item>
-
                                             <flux:separator class="my-1"/>
 
                                             <flux:menu.item wire:click="forceDelete({{ $department->id }})"
@@ -147,36 +141,11 @@
                                             <flux:menu.item wire:click="activate({{ $department->id }})" icon="check-circle">
                                                 {{ __('Set Active') }}
                                             </flux:menu.item>
-                                            <flux:menu.item wire:click="notActivate({{ $department->id }})" icon="x-mark">
-                                                {{ __('Set Inactive') }}
-                                            </flux:menu.item>
 
                                             <flux:separator class="my-1"/>
 
                                             <flux:menu.item wire:click="delete({{ $department->id }})"
                                                             wire:confirm="{{ __('Are you sure you want to move this employee to trash?') }}"
-                                                            icon="trash" variant="danger">
-                                                {{ __('Move to Trash') }}
-                                            </flux:menu.item>
-                                        @elseif($department->model_status === \App\Enums\Model\ModelStatus::INACTIVE)
-                                            <!-- Options for not activated departments -->
-                                            <flux:menu.item wire:click="edit({{ $department->id }})" icon="pencil-square">
-                                                {{ __('Edit') }}
-                                            </flux:menu.item>
-
-                                            <flux:separator class="my-1"/>
-
-                                            <flux:menu.item wire:click="activate({{ $department->id }})" icon="check-circle">
-                                                {{ __('Set Active') }}
-                                            </flux:menu.item>
-                                            <flux:menu.item wire:click="archive({{ $department->id }})" icon="archive-box">
-                                                {{ __('Archive') }}
-                                            </flux:menu.item>
-
-                                            <flux:separator class="my-1"/>
-
-                                            <flux:menu.item wire:click="delete({{ $department->id }})"
-                                                            wire:confirm="{{ __('Are you sure you want to add this employee to trash?') }}"
                                                             icon="trash" variant="danger">
                                                 {{ __('Move to Trash') }}
                                             </flux:menu.item>
@@ -188,9 +157,6 @@
 
                                             <flux:separator class="my-1"/>
 
-                                            <flux:menu.item wire:click="notActivate({{ $department->id }})" icon="x-mark">
-                                                {{ __('Set Not Activated') }}
-                                            </flux:menu.item>
                                             <flux:menu.item wire:click="archive({{ $department->id }})" icon="archive-box">
                                                 {{ __('Archive') }}
                                             </flux:menu.item>

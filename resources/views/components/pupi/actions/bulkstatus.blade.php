@@ -18,10 +18,6 @@
                 <flux:menu.item wire:click="bulkUpdateStatus('restore_to_archive')" icon="archive-box">
                     {{ __('Restore to Archive') }}
                 </flux:menu.item>
-                {{-- Neue Option hinzufügen --}}
-                <flux:menu.item wire:click="bulkUpdateStatus('restore_to_inactive')" icon="clock">
-                    {{ __('Restore to Inactive') }}
-                </flux:menu.item>
 
                 <flux:separator class="my-1"/>
 
@@ -35,28 +31,6 @@
 
             @case('active')
                 {{-- Options for active users --}}
-                <flux:menu.item wire:click="bulkUpdateStatus('inactive')" icon="clock">
-                    {{ __('Set as Inactive') }}
-                </flux:menu.item>
-                <flux:menu.item wire:click="bulkUpdateStatus('archived')" icon="archive-box">
-                    {{ __('Archive') }}
-                </flux:menu.item>
-
-                <flux:separator class="my-1"/>
-
-                <flux:menu.item wire:click="bulkUpdateStatus('trashed')"
-                                wire:confirm="{{ __('Are you sure you want to move all selected employees to trash?') }}"
-                                icon="trash"
-                                variant="danger">
-                    {{ __('Move to Trash') }}
-                </flux:menu.item>
-                @break
-
-            @case('inactive')
-                {{-- Options for not activated users --}}
-                <flux:menu.item wire:click="bulkUpdateStatus('active')" icon="check-circle">
-                    {{ __('Set Active') }}
-                </flux:menu.item>
                 <flux:menu.item wire:click="bulkUpdateStatus('archived')" icon="archive-box">
                     {{ __('Archive') }}
                 </flux:menu.item>
@@ -75,9 +49,6 @@
                 {{-- Options for archived users --}}
                 <flux:menu.item wire:click="bulkUpdateStatus('active')" icon="check-circle">
                     {{ __('Set Active') }}
-                </flux:menu.item>
-                <flux:menu.item wire:click="bulkUpdateStatus('inactive')" icon="clock">
-                    {{ __('Set as Inactive') }}
                 </flux:menu.item>
 
                 <flux:separator class="my-1"/>

@@ -86,7 +86,6 @@ class ModelStatusActionTest extends TestCase
     {
         // Create models with different statuses
         $activeModel = TestModel::create(['name' => 'Active Model', 'model_status' => ModelStatus::ACTIVE]);
-        $inactiveModel = TestModel::create(['name' => 'Inactive Model', 'model_status' => ModelStatus::INACTIVE]);
         $archivedModel = TestModel::create(['name' => 'Archived Model', 'model_status' => ModelStatus::ARCHIVED]);
         $trashedModel = TestModel::create(['name' => 'Trashed Model']);
         $trashedModel->delete();
@@ -106,34 +105,8 @@ class ModelStatusActionTest extends TestCase
         $models = $filteredQuery->get();
 
         $this->assertTrue($models->contains('id', $activeModel->id));
-        $this->assertFalse($models->contains('id', $inactiveModel->id));
         $this->assertFalse($models->contains('id', $archivedModel->id));
         $this->assertFalse($models->contains('id', $trashedModel->id));
-    }
-
-    #[Test]
-    public function it_can_apply_inactive_status_filter()
-    {
-        // Create models with different statuses
-        $activeModel = TestModel::create(['name' => 'Active Model', 'model_status' => ModelStatus::ACTIVE]);
-        $inactiveModel = TestModel::create(['name' => 'Inactive Model', 'model_status' => ModelStatus::INACTIVE]);
-
-        // Create a test query
-        $query = TestModel::query();
-
-        // Create a reflection to access protected method
-        $component = $this->getTestComponent();
-        $reflection = new \ReflectionClass($component);
-        $method = $reflection->getMethod('applyStatusFilter');
-        $method->setAccessible(true);
-
-        // Test inactive filter
-        $component->statusFilter = 'inactive';
-        $filteredQuery = $method->invokeArgs($component, [$query]);
-        $models = $filteredQuery->get();
-
-        $this->assertFalse($models->contains('id', $activeModel->id));
-        $this->assertTrue($models->contains('id', $inactiveModel->id));
     }
 
     #[Test]
@@ -195,8 +168,8 @@ class ModelStatusActionTest extends TestCase
             ->set('idsOnPage', [1, 2, 3, 4])
             ->set('statusFilter', 'active');
 
-        $component->call('setStatusFilter', 'inactive')
-            ->assertSet('statusFilter', 'inactive')
+        $component->call('setStatusFilter', 'archived')
+            ->assertSet('statusFilter', 'archived')
             ->assertSet('selectedIds', [])
             ->assertSet('idsOnPage', [])
             ->assertDispatched('update-table');
@@ -205,8 +178,8 @@ class ModelStatusActionTest extends TestCase
     #[Test]
     public function it_can_activate_a_model()
     {
-        // Create an inactive model
-        $model = TestModel::create(['name' => 'Inactive Model', 'model_status' => ModelStatus::INACTIVE]);
+        // Create an archived model
+        $model = TestModel::create(['name' => 'Archived Model', 'model_status' => ModelStatus::ARCHIVED]);
 
         // Test activation
         Livewire::test(get_class($this->getTestComponent()))
@@ -216,22 +189,6 @@ class ModelStatusActionTest extends TestCase
 
         // Check if the model is now active
         $this->assertEquals(ModelStatus::ACTIVE, $model->fresh()->model_status);
-    }
-
-    #[Test]
-    public function it_can_set_a_model_to_inactive()
-    {
-        // Create an active model
-        $model = TestModel::create(['name' => 'Active Model', 'model_status' => ModelStatus::ACTIVE]);
-
-        // Test deactivation
-        Livewire::test(get_class($this->getTestComponent()))
-            ->call('notActivate', $model->id)
-            ->assertDispatched('modelStatusUpdated')
-            ->assertDispatched('update-table');
-
-        // Check if the model is now inactive
-        $this->assertEquals(ModelStatus::INACTIVE, $model->fresh()->model_status);
     }
 
     #[Test]
@@ -290,22 +247,6 @@ class ModelStatusActionTest extends TestCase
     }
 
     #[Test]
-    public function it_can_restore_a_model_to_active_from_inactive_status()
-    {
-        // Create an inactive model
-        $model = TestModel::create(['name' => 'Inactive Model', 'model_status' => ModelStatus::INACTIVE]);
-
-        // Test activation via restore
-        Livewire::test(get_class($this->getTestComponent()))
-            ->call('restore', $model->id)
-            ->assertDispatched('modelStatusUpdated')
-            ->assertDispatched('update-table');
-
-        // Check if the model is now active
-        $this->assertEquals(ModelStatus::ACTIVE, $model->fresh()->model_status);
-    }
-
-    #[Test]
     public function it_can_restore_a_model_to_archive()
     {
         // Create a model and put it in trash
@@ -321,24 +262,6 @@ class ModelStatusActionTest extends TestCase
         // Check if the model is restored and archived
         $this->assertFalse($model->fresh()->trashed());
         $this->assertEquals(ModelStatus::ARCHIVED, $model->fresh()->model_status);
-    }
-
-    #[Test]
-    public function it_can_restore_a_model_to_inactive()
-    {
-        // Create a model and put it in trash
-        $model = TestModel::create(['name' => 'Active Model', 'model_status' => ModelStatus::ACTIVE]);
-        $model->delete();
-
-        // Test restoration as inactive
-        Livewire::test(get_class($this->getTestComponent()))
-            ->call('restoreToInactive', $model->id)
-            ->assertDispatched('modelStatusUpdated')
-            ->assertDispatched('update-table');
-
-        // Check if the model is restored and inactive
-        $this->assertFalse($model->fresh()->trashed());
-        $this->assertEquals(ModelStatus::INACTIVE, $model->fresh()->model_status);
     }
 
     #[Test]
@@ -385,7 +308,7 @@ class ModelStatusActionTest extends TestCase
     public function it_can_bulk_update_status_to_active()
     {
         // Create some models with different statuses
-        $model1 = TestModel::create(['name' => 'Model 1', 'model_status' => ModelStatus::INACTIVE]);
+        $model1 = TestModel::create(['name' => 'Model 1', 'model_status' => ModelStatus::ARCHIVED]);
         $model2 = TestModel::create(['name' => 'Model 2', 'model_status' => ModelStatus::ARCHIVED]);
 
         // Test bulk action
@@ -401,30 +324,11 @@ class ModelStatusActionTest extends TestCase
     }
 
     #[Test]
-    public function it_can_bulk_update_status_to_inactive()
-    {
-        // Create some models with different statuses
-        $model1 = TestModel::create(['name' => 'Model 1', 'model_status' => ModelStatus::ACTIVE]);
-        $model2 = TestModel::create(['name' => 'Model 2', 'model_status' => ModelStatus::ARCHIVED]);
-
-        // Test bulk action
-        Livewire::test(get_class($this->getTestComponent()))
-            ->set('selectedIds', [$model1->id, $model2->id])
-            ->call('bulkUpdateStatus', 'inactive')
-            ->assertDispatched('modelStatusUpdated')
-            ->assertDispatched('update-table');
-
-        // Check if all models are inactive
-        $this->assertEquals(ModelStatus::INACTIVE, $model1->fresh()->model_status);
-        $this->assertEquals(ModelStatus::INACTIVE, $model2->fresh()->model_status);
-    }
-
-    #[Test]
     public function it_can_bulk_update_status_to_archived()
     {
         // Create some models with different statuses
         $model1 = TestModel::create(['name' => 'Model 1', 'model_status' => ModelStatus::ACTIVE]);
-        $model2 = TestModel::create(['name' => 'Model 2', 'model_status' => ModelStatus::INACTIVE]);
+        $model2 = TestModel::create(['name' => 'Model 2', 'model_status' => ModelStatus::ACTIVE]);
 
         // Test bulk action
         Livewire::test(get_class($this->getTestComponent()))
@@ -443,7 +347,7 @@ class ModelStatusActionTest extends TestCase
     {
         // Create some models
         $model1 = TestModel::create(['name' => 'Model 1', 'model_status' => ModelStatus::ACTIVE]);
-        $model2 = TestModel::create(['name' => 'Model 2', 'model_status' => ModelStatus::INACTIVE]);
+        $model2 = TestModel::create(['name' => 'Model 2', 'model_status' => ModelStatus::ARCHIVED]);
 
         // Test bulk action
         Livewire::test(get_class($this->getTestComponent()))
@@ -506,29 +410,6 @@ class ModelStatusActionTest extends TestCase
     }
 
     #[Test]
-    public function it_can_bulk_restore_to_inactive()
-    {
-        // Create some models and put them in trash
-        $model1 = TestModel::create(['name' => 'Model 1', 'model_status' => ModelStatus::ACTIVE]);
-        $model2 = TestModel::create(['name' => 'Model 2', 'model_status' => ModelStatus::ACTIVE]);
-        $model1->delete();
-        $model2->delete();
-
-        // Test bulk action
-        Livewire::test(get_class($this->getTestComponent()))
-            ->set('selectedIds', [$model1->id, $model2->id])
-            ->call('bulkUpdateStatus', 'restore_to_inactive')
-            ->assertDispatched('modelStatusUpdated')
-            ->assertDispatched('update-table');
-
-        // Check if all models are inactive
-        $this->assertFalse($model1->fresh()->trashed());
-        $this->assertFalse($model2->fresh()->trashed());
-        $this->assertEquals(ModelStatus::INACTIVE, $model1->fresh()->model_status);
-        $this->assertEquals(ModelStatus::INACTIVE, $model2->fresh()->model_status);
-    }
-
-    #[Test]
     public function it_can_bulk_force_delete()
     {
         // Create some models and put them in trash
@@ -553,7 +434,7 @@ class ModelStatusActionTest extends TestCase
     public function it_dispatches_status_events()
     {
         // Create a model for testing
-        $model = TestModel::create(['name' => 'Inactive Model', 'model_status' => ModelStatus::INACTIVE]);
+        $model = TestModel::create(['name' => 'Archived Model', 'model_status' => ModelStatus::ARCHIVED]);
 
         // Activate the model (this triggers dispatchStatusEvents)
         Livewire::test(get_class($this->getTestComponent()))
@@ -611,11 +492,6 @@ class TestModel extends Model
         return $this->model_status === ModelStatus::ACTIVE && !$this->trashed();
     }
 
-    public function isNotActivated(): bool
-    {
-        return $this->model_status === ModelStatus::INACTIVE && !$this->trashed();
-    }
-
     public function isArchived(): bool
     {
         return $this->model_status === ModelStatus::ARCHIVED && !$this->trashed();
@@ -634,18 +510,6 @@ class TestModel extends Model
             $restored = true;
         }
         $this->model_status = ModelStatus::ACTIVE;
-        $this->save();
-        return $restored;
-    }
-
-    public function restoreToInactive(): bool
-    {
-        $restored = false;
-        if ($this->trashed()) {
-            $this->restore();
-            $restored = true;
-        }
-        $this->model_status = ModelStatus::INACTIVE;
         $this->save();
         return $restored;
     }

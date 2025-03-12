@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('theme')->default('default')->after('created_by');
             $table->string('slug')->unique()->nullable()->after('theme');
             $table->string('last_name')->after('slug')->nullable();
-            $table->string('model_status')->default(ModelStatus::INACTIVE)->after('last_name'); // Changed from timestamp to string
+            $table->string('model_status')->default(ModelStatus::ACTIVE)->after('last_name'); // Changed from timestamp to string
 
             $table->index(['name', 'team_id', 'company_id', 'user_type', 'model_status']);
         });

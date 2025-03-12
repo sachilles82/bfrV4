@@ -44,7 +44,7 @@ trait ModelStatusAction
     /**
      * Status-Filter setzen
      *
-     * @param string $status Der neue Status ('active', 'inactive', 'archived', 'trashed')
+     * @param string $status Der neue Status ('active', 'archived', 'trashed')
      */
     public function setStatusFilter(string $status): void
     {
@@ -63,10 +63,6 @@ trait ModelStatusAction
     protected function applyStatusFilter(Builder $query): Builder
     {
         switch ($this->statusFilter) {
-            case 'inactive':
-                $query->whereNull('deleted_at')
-                    ->where('model_status', ModelStatus::INACTIVE);
-                break;
             case 'archived':
                 $query->whereNull('deleted_at')
                     ->where('model_status', ModelStatus::ARCHIVED);
@@ -123,21 +119,6 @@ trait ModelStatusAction
     }
 
     /**
-     * Model auf "Inaktiv" setzen
-     *
-     * @param int|string $modelId Die Modell-ID
-     */
-    public function notActivate($modelId): void
-    {
-        $model = $this->getModelQuery()->find($modelId);
-        if ($model && $model->model_status !== ModelStatus::INACTIVE) {
-            $this->setModelInactive($model);
-            $this->showToast(__(':name set to inactive.', ['name' => $this->getModelDisplayName()]));
-            $this->dispatchStatusEvents();
-        }
-    }
-
-    /**
      * Model archivieren
      *
      * @param int|string $modelId Die Modell-ID
@@ -170,7 +151,7 @@ trait ModelStatusAction
     /**
      * Wiederherstellung als Active.
      * Wenn das Model im Papierkorb ist, wird es mit restoreToActive() wiederhergestellt.
-     * Falls der Status archived oder inactive ist, wird setModelActive() aufgerufen.
+     * Falls der Status archived ist, wird setModelActive() aufgerufen.
      *
      * @param int|string $modelId Die Modell-ID
      */
@@ -182,7 +163,7 @@ trait ModelStatusAction
         if ($model->trashed()) {
             $model->restoreToActive();
             $this->showToast(__(':name restored to active.', ['name' => $this->getModelDisplayName()]));
-        } elseif (in_array($model->model_status, [ModelStatus::ARCHIVED, ModelStatus::INACTIVE])) {
+        } elseif ($model->model_status === ModelStatus::ARCHIVED) {
             $this->setModelActive($model);
             $this->showToast(__(':name set to active.', ['name' => $this->getModelDisplayName()]));
         }
@@ -207,26 +188,6 @@ trait ModelStatusAction
         } elseif ($model->model_status !== ModelStatus::ARCHIVED) {
             $this->setModelArchived($model);
             $this->showToast(__(':name moved to archive.', ['name' => $this->getModelDisplayName()]));
-        }
-        $this->dispatchStatusEvents();
-    }
-
-    /**
-     * Model im inaktiven Zustand wiederherstellen
-     *
-     * @param int|string $modelId Die Modell-ID
-     */
-    public function restoreToInactive($modelId): void
-    {
-        $model = $this->getModelQuery(true)->find($modelId);
-        if (!$model) return;
-
-        if ($model->trashed()) {
-            $model->restoreToInactive();
-            $this->showToast(__(':name restored to inactive.', ['name' => $this->getModelDisplayName()]));
-        } elseif ($model->model_status !== ModelStatus::INACTIVE) {
-            $this->setModelInactive($model);
-            $this->showToast(__(':name set to inactive.', ['name' => $this->getModelDisplayName()]));
         }
         $this->dispatchStatusEvents();
     }
@@ -291,7 +252,7 @@ trait ModelStatusAction
     /**
      * Bulk-Status-Update für mehrere Modelle
      *
-     * @param string $action Die durchzuführende Aktion ('active', 'inactive', 'archived', 'trashed', 'restore_to_archive', 'restore_to_inactive')
+     * @param string $action Die durchzuführende Aktion ('active', 'archived', 'trashed', 'restore_to_archive')
      */
     public function bulkUpdateStatus(string $action): void
     {
@@ -307,12 +268,10 @@ trait ModelStatusAction
             $count++;
             match($action) {
                 'active' => $this->setModelActive($model),
-                'inactive' => $this->setModelInactive($model),
                 'archived' => $this->setModelArchived($model),
                 'trashed' => $this->trashModel($model),
                 'restore_to_active' => $model->restoreToActive(),
                 'restore_to_archive' => $model->restoreToArchive(),
-                'restore_to_inactive' => $model->restoreToInactive(),
                 default => null,
             };
         }
@@ -384,21 +343,6 @@ trait ModelStatusAction
             $model->restoreToActive();
         } else {
             $model->model_status = ModelStatus::ACTIVE;
-            $model->save();
-        }
-    }
-
-    /**
-     * Setzt ein Model auf inaktiv
-     *
-     * @param Model $model Das zu ändernde Model
-     */
-    private function setModelInactive(Model $model): void
-    {
-        if ($model->trashed()) {
-            $model->restoreToInactive();
-        } else {
-            $model->model_status = ModelStatus::INACTIVE;
             $model->save();
         }
     }

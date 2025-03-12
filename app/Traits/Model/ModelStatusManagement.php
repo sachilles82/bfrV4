@@ -21,11 +21,6 @@ trait ModelStatusManagement
         return $this->model_status === ModelStatus::ACTIVE && !$this->trashed();
     }
 
-    public function isNotActivated(): bool
-    {
-        return $this->model_status === ModelStatus::INACTIVE && !$this->trashed();
-    }
-
     public function isArchived(): bool
     {
         return $this->model_status === ModelStatus::ARCHIVED && !$this->trashed();
@@ -50,12 +45,6 @@ trait ModelStatusManagement
     public function scopeActive($query)
     {
         return $query->where('model_status', ModelStatus::ACTIVE)
-            ->whereNull('deleted_at');
-    }
-
-    public function scopeNotActivated($query)
-    {
-        return $query->where('model_status', ModelStatus::INACTIVE)
             ->whereNull('deleted_at');
     }
 
@@ -106,7 +95,7 @@ trait ModelStatusManagement
     /**
      * Stellt einen soft-deleted Benutzer wieder her und setzt den Account-Status auf den angegebenen Status.
      *
-     * @param ModelStatus $status Der gewünschte Account-Status (z. B. INACTIVE oder ARCHIVED).
+     * @param ModelStatus $status Der gewünschte Account-Status (z. B. ACTIVE oder ARCHIVED).
      * @return bool True, wenn der Benutzer wiederhergestellt wurde.
      */
     public function restoreToStatus(ModelStatus $status): bool
@@ -128,16 +117,6 @@ trait ModelStatusManagement
     public function restoreToActive(): bool
     {
         return $this->restoreToStatus(ModelStatus::ACTIVE);
-    }
-
-    /**
-     * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf INACTIVE.
-     *
-     * @return bool
-     */
-    public function restoreToInactive(): bool
-    {
-        return $this->restoreToStatus(ModelStatus::INACTIVE);
     }
 
     /**

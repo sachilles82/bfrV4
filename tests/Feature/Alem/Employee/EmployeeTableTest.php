@@ -40,11 +40,6 @@ class EmployeeTableTest extends TestCase
                 'model_status' => ModelStatus::ACTIVE,
                 'company_id' => $this->user->company_id
             ]),
-            'inactive' => User::factory()->create([
-                'user_type' => 'employee',
-                'model_status' => ModelStatus::INACTIVE,
-                'company_id' => $this->user->company_id
-            ]),
             'archived' => User::factory()->create([
                 'user_type' => 'employee',
                 'model_status' => ModelStatus::ARCHIVED,
@@ -76,7 +71,6 @@ class EmployeeTableTest extends TestCase
     {
         Livewire::test(EmployeeTable::class)
             ->assertSee($this->employees['active']->name)
-            ->assertDontSee($this->employees['inactive']->name)
             ->assertDontSee($this->employees['archived']->name)
             ->assertDontSee($this->employees['trashed']->name);
     }
@@ -84,11 +78,6 @@ class EmployeeTableTest extends TestCase
     #[Test]
     public function can_filter_employees_by_status()
     {
-        Livewire::test(EmployeeTable::class)
-            ->set('statusFilter', 'inactive')
-            ->assertSee($this->employees['inactive']->name)
-            ->assertDontSee($this->employees['active']->name);
-
         Livewire::test(EmployeeTable::class)
             ->set('statusFilter', 'archived')
             ->assertSee($this->employees['archived']->name)
@@ -104,38 +93,24 @@ class EmployeeTableTest extends TestCase
     public function can_reset_filters()
     {
         Livewire::test(EmployeeTable::class)
-            ->set('statusFilter', 'inactive')
+            ->set('statusFilter', 'archived')
             ->call('resetFilters')
             ->assertSet('statusFilter', 'active')
             ->assertSee($this->employees['active']->name)
-            ->assertDontSee($this->employees['inactive']->name);
+            ->assertDontSee($this->employees['archived']->name);
     }
 
     #[Test]
     public function can_activate_user()
     {
         Livewire::test(EmployeeTable::class)
-            ->call('activate', $this->employees['inactive']->id)
+            ->call('activate', $this->employees['archived']->id)
             ->assertDispatched('employeeUpdated')
             ->assertDispatched('update-table');
 
         $this->assertDatabaseHas('users', [
-            'id' => $this->employees['inactive']->id,
+            'id' => $this->employees['archived']->id,
             'model_status' => ModelStatus::ACTIVE
-        ]);
-    }
-
-    #[Test]
-    public function can_deactivate_user()
-    {
-        Livewire::test(EmployeeTable::class)
-            ->call('notActivate', $this->employees['active']->id)
-            ->assertDispatched('employeeUpdated')
-            ->assertDispatched('update-table');
-
-        $this->assertDatabaseHas('users', [
-            'id' => $this->employees['active']->id,
-            'model_status' => ModelStatus::INACTIVE
         ]);
     }
 
@@ -228,24 +203,6 @@ class EmployeeTableTest extends TestCase
     }
 
     #[Test]
-    public function can_restore_to_inactive()
-    {
-        $id = $this->employees['trashed']->id;
-
-        Livewire::test(EmployeeTable::class)
-            ->set('statusFilter', 'trashed')
-            ->call('restoreToInactive', $id)
-            ->assertDispatched('employeeUpdated')
-            ->assertDispatched('update-table');
-
-        $this->assertDatabaseHas('users', [
-            'id' => $id,
-            'deleted_at' => null,
-            'model_status' => ModelStatus::INACTIVE
-        ]);
-    }
-
-    #[Test]
     public function can_force_delete_user()
     {
         $id = $this->employees['trashed']->id;
@@ -265,7 +222,6 @@ class EmployeeTableTest extends TestCase
     public function can_bulk_activate_users()
     {
         $selectedIds = [
-            $this->employees['inactive']->id,
             $this->employees['archived']->id
         ];
 
@@ -284,33 +240,10 @@ class EmployeeTableTest extends TestCase
     }
 
     #[Test]
-    public function can_bulk_deactivate_users()
-    {
-        $selectedIds = [
-            $this->employees['active']->id,
-            $this->employees['archived']->id
-        ];
-
-        Livewire::test(EmployeeTable::class)
-            ->set('selectedIds', $selectedIds)
-            ->call('bulkUpdateStatus', 'inactive')
-            ->assertDispatched('employeeUpdated')
-            ->assertDispatched('update-table');
-
-        foreach ($selectedIds as $id) {
-            $this->assertDatabaseHas('users', [
-                'id' => $id,
-                'model_status' => ModelStatus::INACTIVE
-            ]);
-        }
-    }
-
-    #[Test]
     public function can_bulk_archive_users()
     {
         $selectedIds = [
-            $this->employees['active']->id,
-            $this->employees['inactive']->id
+            $this->employees['active']->id
         ];
 
         Livewire::test(EmployeeTable::class)
@@ -331,8 +264,7 @@ class EmployeeTableTest extends TestCase
     public function can_bulk_trash_users()
     {
         $selectedIds = [
-            $this->employees['active']->id,
-            $this->employees['inactive']->id
+            $this->employees['active']->id
         ];
 
         Livewire::test(EmployeeTable::class)
@@ -375,37 +307,6 @@ class EmployeeTableTest extends TestCase
                 'id' => $id,
                 'deleted_at' => null,
                 'model_status' => ModelStatus::ARCHIVED
-            ]);
-        }
-    }
-
-    #[Test]
-    public function can_bulk_restore_to_inactive()
-    {
-        // Create another trashed user
-        $anotherTrashed = User::factory()->create([
-            'user_type' => 'employee',
-            'company_id' => $this->user->company_id
-        ]);
-        $anotherTrashed->delete();
-
-        $selectedIds = [
-            $this->employees['trashed']->id,
-            $anotherTrashed->id
-        ];
-
-        Livewire::test(EmployeeTable::class)
-            ->set('statusFilter', 'trashed')
-            ->set('selectedIds', $selectedIds)
-            ->call('bulkUpdateStatus', 'restore_to_inactive')
-            ->assertDispatched('employeeUpdated')
-            ->assertDispatched('update-table');
-
-        foreach ($selectedIds as $id) {
-            $this->assertDatabaseHas('users', [
-                'id' => $id,
-                'deleted_at' => null,
-                'model_status' => ModelStatus::INACTIVE
             ]);
         }
     }
@@ -476,8 +377,8 @@ class EmployeeTableTest extends TestCase
         Livewire::test(EmployeeTable::class)
             ->set('statusFilter', 'active')
             ->assertSet('statusFilter', 'active')
-            ->set('statusFilter', 'inactive')
-            ->assertSet('statusFilter', 'inactive')
+            ->set('statusFilter', 'archived')
+            ->assertSet('statusFilter', 'archived')
             ->assertDispatched('update-table');
     }
 
@@ -495,7 +396,7 @@ class EmployeeTableTest extends TestCase
 
         // Ändere den statusFilter, was dazu führen sollte, dass die updated()-Methode
         // in der Komponente aufgerufen wird, die wiederum die Auswahl zurücksetzt
-        $component->set('statusFilter', 'inactive');
+        $component->set('statusFilter', 'archived');
 
         // Prüfe, ob die Eigenschaft zurückgesetzt wurde
         // Wir erwarten, dass selectedIds am Ende leer ist, egal was davor war

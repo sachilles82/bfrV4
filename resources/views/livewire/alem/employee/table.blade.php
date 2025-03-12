@@ -208,12 +208,6 @@
                                                 {{ __('Restore to Archive') }}
                                             </flux:menu.item>
 
-                                            <!-- Neue Option hinzufügen -->
-                                            <flux:menu.item wire:click="restoreToInactive({{ $user->id }})"
-                                                            icon="clock">
-                                                {{ __('Restore to Inactive') }}
-                                            </flux:menu.item>
-
                                             <flux:separator class="my-1"/>
 
                                             <flux:menu.item wire:click="forceDelete({{ $user->id }})"
@@ -233,9 +227,6 @@
                                                             icon="check-circle">
                                                 {{ __('Set Active') }}
                                             </flux:menu.item>
-                                            <flux:menu.item wire:click="notActivate({{ $user->id }})" icon="x-mark">
-                                                {{ __('Set Inactive') }}
-                                            </flux:menu.item>
 
                                             <flux:separator class="my-1"/>
 
@@ -244,38 +235,10 @@
                                                             icon="trash" variant="danger">
                                                 {{ __('Move to Trash') }}
                                             </flux:menu.item>
-                                        @elseif($user->model_status === \App\Enums\Model\ModelStatus::INACTIVE)
-                                            <!-- Options for not activated users -->
-                                            <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
-                                                {{ __('Edit') }}
-                                            </flux:menu.item>
-
-                                            <flux:separator class="my-1"/>
-
-                                            <flux:menu.item wire:click="activate({{ $user->id }})"
-                                                            icon="check-circle">
-                                                {{ __('Set Active') }}
-                                            </flux:menu.item>
-                                            <flux:menu.item wire:click="archive({{ $user->id }})"
-                                                            icon="archive-box">
-                                                {{ __('Archive') }}
-                                            </flux:menu.item>
-
-                                            <flux:separator class="my-1"/>
-
-                                            <flux:menu.item wire:click="delete({{ $user->id }})"
-                                                            wire:confirm="{{ __('Are you sure you want to add this employee to trash?') }}"
-                                                            icon="trash" variant="danger">
-                                                {{ __('Move to Trash') }}
-                                            </flux:menu.item>
                                         @else
                                             <!-- Options for active users -->
                                             <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
                                                 {{ __('Edit') }}
-                                            </flux:menu.item>
-
-                                            <flux:menu.item wire:click="notActivate({{ $user->id }})" icon="x-mark">
-                                                {{ __('Set Not Activated') }}
                                             </flux:menu.item>
 
                                             <flux:menu.item wire:click="archive({{ $user->id }})"
