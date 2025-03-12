@@ -67,7 +67,18 @@
                     <x-pupi.actions.bulkstatus :statusFilter="$statusFilter"/>
                 </div>
 
-                <x-pupi.actions.status-filter :statusFilter="$statusFilter"/>
+                <div>
+                    <flux:select
+                        variant="listbox"
+                        placeholder="{{ __('All Status') }}"
+                        wire:model.live="employeeStatusFilter"
+                        id="employeeStatusFilter">
+                        <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
+                        @foreach($employeeStatuses as $empStatus)
+                            <flux:option value="{{ $empStatus->value }}">{{ __($empStatus->label()) }}</flux:option>
+                        @endforeach
+                    </flux::select>
+                </div>
 
                 {{--                    <x-pupi.actions.reset-filters wire:click="resetFilters"/>--}}
                 <x-pupi.actions.per-page/>
@@ -181,6 +192,17 @@
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <div class="text-gray-500 dark:text-gray-400">01. Feb. 2019</div>
+                            </x-pupi.table.tr.cell>
+                            <x-pupi.table.tr.cell>
+                                @if($user->employee && $user->employee->employee_status)
+                                    <div class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
+             {{ $user->employee->employee_status->colors() }}">
+                                        <x-dynamic-component :component="$user->employee->employee_status->icon()"/>
+                                        <div>{{ __($user->employee->employee_status->label()) }}</div>
+                                    </div>
+                                @else
+                                    <div class="text-gray-400 text-xs">{{ __('No status') }}</div>
+                                @endif
                             </x-pupi.table.tr.cell>
                             <!-- Account Status Spalte: Mit Status Badge -->
                             <x-pupi.table.tr.cell>
