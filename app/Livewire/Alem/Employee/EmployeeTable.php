@@ -35,7 +35,12 @@ class EmployeeTable extends Component
     {
         if (in_array($property, ['statusFilter', 'employeeStatusFilter'])) {
             $this->selectedIds = [];
-            $this->reset('search','sortCol', 'sortAsc',);
+            $this->reset('search', 'sortCol', 'sortAsc');
+
+            if ($property === 'statusFilter') {
+                $this->reset('employeeStatusFilter');
+            }
+
             $this->dispatch('update-table');
         }
     }
