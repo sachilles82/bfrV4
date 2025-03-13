@@ -6,11 +6,9 @@ trait Searchable
 {
     public $search = '';
 
-    public function updatedSearchable($property): void
+    public function updatedSearch(): void
     {
-        if ($property === 'search'){
-            $this->resetPage();
-        }
+        $this->resetPage();
     }
 
     protected function applySearch($query)
