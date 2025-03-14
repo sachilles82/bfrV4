@@ -17,12 +17,13 @@ enum ModelStatus: string
         };
     }
 
-    public function colors(): string
+    public function dotColor(): string
     {
         return match ($this) {
-            static::ACTIVE => ' dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20 ring-green-600/20 text-green-700 bg-green-50',
-            static::ARCHIVED => 'dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20 ring-yellow-600/20 text-yellow-800 bg-yellow-50',
-            default => 'dark:bg-red-400/10 dark:ring-red-400/20 dark:text-red-400 text-red-700 ring-red-600/10 bg-red-50',
+
+            static::ACTIVE => 'fill-green-600 dark:fill-green-400/70',
+            static::ARCHIVED => 'fill-gray-600 dark:fill-gray-400/70',
+            default => 'fill-red-700 dark:fill-red-400',
         };
     }
 
@@ -34,5 +35,4 @@ enum ModelStatus: string
             static::TRASHED => 'icon.trash',
         };
     }
-
 }

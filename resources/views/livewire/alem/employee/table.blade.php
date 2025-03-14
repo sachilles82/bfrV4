@@ -75,9 +75,17 @@
                         id="employeeStatusFilter">
                         <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
                         @foreach($employeeStatuses as $empStatus)
-                            <flux:option value="{{ $empStatus->value }}">{{ __($empStatus->label()) }}</flux:option>
+                            <flux:option value="{{ $empStatus->value }}">
+                                <div class="flex items-center gap-2">
+                                    <svg class="size-1.5 {{ $empStatus->dotColor() }}" viewBox="0 0 6 6"
+                                         aria-hidden="true">
+                                        <circle cx="3" cy="3" r="3"/>
+                                    </svg>
+                                    <span>{{ $empStatus->label() }}</span>
+                                </div>
+                            </flux:option>
                         @endforeach
-                    </flux::select>
+                    </flux:select>
                 </div>
 
                 {{--                    <x-pupi.actions.reset-filters wire:click="resetFilters"/>--}}
@@ -169,8 +177,20 @@
                                 </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
-                                <div class="text-gray-900 dark:text-gray-300">+41 76 699 23 24</div>
-                                <div class="text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
+
+                                <x-pupi.table.tr.copiable-contact
+                                    :value="$user->phone"
+                                    linkPrefix="tel:"
+                                    fallbackText="+41 44 401 11 42"
+                                    id="phone-{{ $user->id }}"
+                                />
+
+                                <x-pupi.table.tr.copiable-contact
+                                    :value="$user->email"
+                                    linkPrefix="mailto:"
+                                    id="email-{{ $user->id }}"
+                                />
+
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <div
@@ -191,27 +211,27 @@
                                 </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
-                                <div class="text-gray-500 dark:text-gray-400">01. Feb. 2019</div>
+                                <flux:tooltip class="cursor-default" content="01 Feb. 2019" position="top">
+                                    <div class="text-gray-500 dark:text-gray-400">vor 4 Jahren</div>
+                                </flux:tooltip>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
-                                @if($user->employee && $user->employee->employee_status)
-                                    <div class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
-             {{ $user->employee->employee_status->colors() }}">
-                                        <x-dynamic-component :component="$user->employee->employee_status->icon()"/>
-                                        <div>{{ __($user->employee->employee_status->label()) }}</div>
+                                <flux:tooltip class="cursor-default" content="Settings">
+                                    <div
+                                        class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
+                                        {{  $user->employee->employee_status->colors() }}"
+                                    >
+                                        <x-dynamic-component class="h-5 w-5"
+                                                             :component="$user->employee->employee_status->icon()"
+                                        />
+                                        <div>{{ $user->employee->employee_status->label() }}</div>
+                                        <svg class="ml-1 size-1.5 {{ $user->model_status->dotColor() }}"
+                                             viewBox="0 0 6 6"
+                                             aria-hidden="true">
+                                            <circle cx="3" cy="3" r="3"/>
+                                        </svg>
                                     </div>
-                                @else
-                                    <div class="text-gray-400 text-xs">{{ __('No status') }}</div>
-                                @endif
-                            </x-pupi.table.tr.cell>
-                            <!-- Account Status Spalte: Mit Status Badge -->
-                            <x-pupi.table.tr.cell>
-                                <div class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
-                                   {{ $user->model_status->colors() }}">
-                                    <x-dynamic-component :component="$user->model_status->icon()"/>
-                                    <div>{{ $user->model_status->label() }}</div>
-
-                                </div>
+                                </flux:tooltip>
                             </x-pupi.table.tr.cell>
                             <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                 <flux:dropdown align="end" offset="-15">

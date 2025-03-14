@@ -64,6 +64,7 @@ class EmployeeTable extends Component
 
         $query = User::query()
             ->with(['employee', 'teams:id,name', 'roles:id,name'])
+            ->whereHas('employee')
             ->where('company_id', $authUser->company_id)
             ->where('user_type', $this->userType);
 
