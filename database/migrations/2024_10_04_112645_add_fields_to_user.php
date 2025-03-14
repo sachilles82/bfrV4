@@ -15,15 +15,19 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('company_id')->after('name')->nullable()->constrained('companies')->cascadeOnDelete()->index();
+            $table->foreignId('created_by')->after('gender')->nullable();
             $table->string('user_type')->default(UserType::Employee)->after('company_id');
             $table->string('gender')->default(\App\Enums\User\Gender::Male)->after('user_type')->nullable();
-            $table->foreignId('created_by')->after('gender')->nullable();
             $table->string('theme')->default('default')->after('created_by');
             $table->string('slug')->unique()->nullable()->after('theme');
             $table->string('last_name')->after('slug')->nullable();
-            $table->string('model_status')->default(ModelStatus::ACTIVE)->after('last_name'); // Changed from timestamp to string
+            $table->string('model_status')->default(ModelStatus::ACTIVE)->after('last_name');
+            $table->string('phone_1')->after('model_status')->nullable();
+            $table->string('phone_2')->after('phone_1')->nullable();
+            $table->timestamp('joined_at')->after('phone_2')->nullable();
 
-            $table->index(['name', 'team_id', 'company_id', 'user_type', 'model_status']);
+
+            $table->index(['name', 'company_id', 'team_id', 'created_by','user_type', 'model_status']);
         });
     }
 

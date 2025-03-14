@@ -12,19 +12,51 @@
             <div class="px-4 py-6 sm:p-8">
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
-                    <!-- Status -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Status') }}" for="status" badge="{{ __('Required') }}">
-                            <x-pupi.input.text wire:model="status" id="status" name="status" />
-                        </x-pupi.input.group>
-                    </div>
-
                     <!-- Anstellungsverhältnis -->
-                    <div class="sm:col-span-3">
+                    <div class="sm:col-span-4">
                         <x-pupi.input.group label="{{ __('Anstellungsverhältnis') }}" for="employment_type" badge="{{ __('Required') }}">
                             <x-pupi.input.text wire:model="employment_type" id="employment_type" name="employment_type" />
                         </x-pupi.input.group>
                     </div>
+
+                    <!-- Team Select -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Team') }}" for="team" badge="{{ __('Required') }}" :error="$errors->first('team')">
+                            <flux:select wire:model="team" id="team" name="team" variant="listbox" placeholder="{{ __('Select Team') }}">
+                                <flux:option value="sales">{{ __('Sales') }}</flux:option>
+                                <flux:option value="marketing">{{ __('Marketing') }}</flux:option>
+                                <flux:option value="development">{{ __('Development') }}</flux:option>
+                                <flux:option value="support">{{ __('Support') }}</flux:option>
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Department Select -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Department') }}" for="department" badge="{{ __('Required') }}" :error="$errors->first('department')">
+                            <flux:select wire:model="department" id="department" name="department" variant="listbox" placeholder="{{ __('Select Department') }}">
+                                <flux:option value="finance">{{ __('Finance') }}</flux:option>
+                                <flux:option value="hr">{{ __('HR') }}</flux:option>
+                                <flux:option value="it">{{ __('IT') }}</flux:option>
+                                <flux:option value="operations">{{ __('Operations') }}</flux:option>
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Profession -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Profession') }}" for="profession" badge="{{ __('Required') }}">
+                            <x-pupi.input.text wire:model="profession" id="profession" name="profession" />
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Stage -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Stage') }}" for="stage" badge="{{ __('Required') }}">
+                            <x-pupi.input.text wire:model="stage" id="stage" name="stage" />
+                        </x-pupi.input.group>
+                    </div>
+
 
                     <!-- Vorgesetzter -->
                     <div class="sm:col-span-3">
@@ -58,6 +90,13 @@
                     <div class="sm:col-span-3">
                         <x-pupi.input.group label="{{ __('Kündigungsfrist') }}" for="notice_period" badge="{{ __('Required') }}">
                             <x-pupi.input.text wire:model="notice_period" id="notice_period" name="notice_period" />
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group label="{{ __('Employee Status') }}" for="status" badge="{{ __('Required') }}">
+                            <x-pupi.input.text wire:model="employee_status" id="employee_status" name="employee_status" />
                         </x-pupi.input.group>
                     </div>
 

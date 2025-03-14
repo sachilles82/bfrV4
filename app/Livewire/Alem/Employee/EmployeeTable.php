@@ -4,6 +4,7 @@ namespace App\Livewire\Alem\Employee;
 
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
+use App\Enums\Role\RoleVisibility;
 use App\Livewire\Alem\Employee\Helper\Searchable;
 use App\Livewire\Alem\Employee\Helper\WithEmployeeSorting;
 use App\Livewire\Alem\Employee\Helper\WithEmployeeStatus;
@@ -21,6 +22,20 @@ class EmployeeTable extends Component
     public $idsOnPage = [];
     public $name = '';
 
+    public $teamFilter = null;
+
+    /**
+     * Apply team filter to the query
+     */
+    protected function applyTeamFilter($query)
+    {
+        if ($this->teamFilter) {
+            $query->whereHas('teams', function ($q) {
+                $q->where('teams.id', $this->teamFilter);
+            });
+        }
+    }
+
 
     /**
      * Filterung nach User-Typ aus der User-Tabelle. Nur für User nötig
@@ -33,7 +48,7 @@ class EmployeeTable extends Component
      */
     public function updated($property): void
     {
-        if (in_array($property, ['statusFilter', 'employeeStatusFilter'])) {
+        if (in_array($property, ['statusFilter', 'employeeStatusFilter', 'teamFilter'])) {
             $this->selectedIds = [];
             $this->reset('search', 'sortCol', 'sortAsc');
 
@@ -52,10 +67,19 @@ class EmployeeTable extends Component
     {
         $this->resetPage();
         $this->reset('search');
-        $this->reset('sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter');
+        $this->reset('sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter', 'teamFilter');
         $this->selectedIds = [];
+        $this->teamFilter = null;
         $this->dispatch('resetFilters');
         $this->dispatch('update-table');
+    }
+
+    /**
+     * Get available teams for filtering
+     */
+    public function getAvailableTeamsProperty()
+    {
+        return auth()->user()->allTeams();
     }
 
     public function render(): View
@@ -63,19 +87,22 @@ class EmployeeTable extends Component
         $authUser = auth()->user();
 
         $query = User::query()
-            ->with(['employee', 'teams:id,name', 'roles:id,name'])
+            ->with([
+                'employee',
+                'teams:id,name',
+                'roles' => function($query) {
+                    $query->where('visible', RoleVisibility::Visible->value)->select('id', 'name');
+                }
+            ])
             ->whereHas('employee')
             ->where('company_id', $authUser->company_id)
             ->where('user_type', $this->userType);
 
         $this->applySearch($query);
         $this->applySorting($query);
-
-        // Filter nach ModelStatus, falls gesetzt
         $this->applyStatusFilter($query);
-
-        // Filter nach EmployeeStatus, falls gesetzt
         $this->applyEmployeeStatusFilter($query);
+        $this->applyTeamFilter($query); // Apply team filter
 
         $users = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
         $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();
@@ -84,6 +111,7 @@ class EmployeeTable extends Component
             'users' => $users,
             'statuses' => ModelStatus::cases(),
             'employeeStatuses' => EmployeeStatus::cases(),
+            'availableTeams' => $this->availableTeams,
         ]);
     }
 }

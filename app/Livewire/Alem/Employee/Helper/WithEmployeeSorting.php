@@ -22,7 +22,7 @@ trait WithEmployeeSorting
         if ($this->sortCol) {
             $column = match ($this->sortCol) {
                 'name' => 'name',
-                'email' => 'email',
+                'joined_at' => 'joined_at',
                 default => 'created_at',
             };
             $query->orderBy($column, $this->sortAsc ? 'asc' : 'desc');

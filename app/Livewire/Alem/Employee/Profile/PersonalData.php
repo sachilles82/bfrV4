@@ -6,7 +6,7 @@ use Livewire\Component;
 
 class PersonalData extends Component
 {
-    public $status;
+    public $employee_status;
     public $employment_type;
     public $supervisor;
     public $personal_number;
@@ -18,7 +18,7 @@ class PersonalData extends Component
     public function mount()
     {
         // Dummy-Daten für das Formular
-        $this->status = 'aktiv';
+        $this->employee_status = 'probation';
         $this->employment_type = '80% an 4 Tagen pro Woche (seit 01.01.2025)';
         $this->supervisor = 'Fabienne Flückiger (Head of Finance)';
         $this->personal_number = '10567';

@@ -68,14 +68,14 @@ trait ModelPermanentDeletion
         }
 
         if ($this->days_until_permanent_delete <= 0) {
-            return __('Will be deleted soon');
+            return __('soon');
         }
 
         if ($this->days_until_permanent_delete === 1) {
-            return __('Will be deleted tomorrow');
+            return __('tomorrow');
         }
 
-        return __('Will be deleted in :days days', ['days' => $this->days_until_permanent_delete]);
+        return __('in :days days', ['days' => $this->days_until_permanent_delete]);
     }
 
     /**
@@ -89,8 +89,8 @@ trait ModelPermanentDeletion
 
         return $this->permanent_deletion_date->format(
             $this->permanent_deletion_date->year === now()->year
-                ? 'M d, g:i A'  // Ohne Jahresangabe, wenn im aktuellen Jahr
-                : 'M d, Y, g:i A'  // Mit Jahresangabe, wenn in einem anderen Jahr
+                ? 'd. M. H:i'          // Ohne Jahresangabe: "25. Feb 14:25"
+                : 'd. M \'y. H:i'     // Mit Jahresangabe: "25. Feb '25, 14:25"
         );
     }
 
@@ -104,11 +104,11 @@ trait ModelPermanentDeletion
         }
 
         if ($this->days_until_permanent_delete <= 1) {
-            return 'text-red-600 dark:text-red-400 font-medium';
+            return 'text-red-700 dark:text-red-400 font-medium';
         }
 
         if ($this->days_until_permanent_delete <= 3) {
-            return 'text-amber-600 dark:text-amber-400';
+            return 'text-yellow-800 dark:text-yellow-500';
         }
 
         return 'text-gray-600 dark:text-gray-400';

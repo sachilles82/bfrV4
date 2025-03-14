@@ -9,47 +9,57 @@ trait ValidateEmployee
     public function rules(): array
     {
         return [
-            // Für den zugehörigen User (Update: Name als employee_name, E-Mail, Gender)
-            'name'   => 'required|string|min:3',
-            'last_name'   => 'required|string|min:3',
-            'email'           => [
-                'required',
-                'email',
-                // Ignoriere die aktuelle E-Mail des Users beim Unique-Check
-                Rule::unique('users', 'email')->ignore($this->employee->user->id ?? null),
+            // User fields
+            'name' => 'required|string|min:3',
+            'last_name' => 'required|string|min:3',
+            'email' => [
+                'required', 'email', Rule::unique('users', 'email')->ignore($this->employee->user->id ?? null),
             ],
-            'gender'          => 'required|string',
+            'password' => 'required|string|min:8',
+            'gender' => 'required|string',
+//            'role' => 'required|string|exists:roles,name',
+            'model_status' => 'nullable|string',
 
-            // Für die Employee-Daten
-            'date_hired'      => 'required|date',
-            'date_fired'      => 'nullable|date',
-            'probation'       => 'nullable|date',
-            'social_number'   => 'nullable|string',
-            'personal_number' => 'nullable|string',
-//            'profession'      => 'nullable|string',
+            // Team selection
+            'selectedTeams' => ['sometimes', 'array'],
+            'selectedTeams.*' => ['exists:teams,id'],
+
+            // Employee fields
+            'joined_at' => 'required|date',
+            'employee_status' => 'required|string',
+//            'profession' => 'required|exists:professions,id',
+//            'stage' => 'required|exists:stages,id',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required'   => __('Employee name is required.'),
-            'name.min'        => __('Employee name must be at least 3 characters.'),
-            'last_name.required'   => __('Employee last name is required.'),
-            'last_name.min'        => __('Employee last name must be at least 3 characters.'),
-            'email.required'           => __('Email is required.'),
-            'email.email'              => __('Email must be valid.'),
-            'email.unique'             => __('Email already exists.'),
-            'gender.required'          => __('Gender is required.'),
-            'date_hired.required'      => __('Date hired is required.'),
-            'date_hired.date'          => __('Date hired must be a valid date.'),
-            'date_fired.date'          => __('Date fired must be a valid date.'),
-            'probation.date'           => __('Probation must be a valid date.'),
-            'social_number.string'     => __('Social number must be a string.'),
-            'personal_number.string'   => __('Personal number must be a string.'),
-            'profession.string'        => __('Profession must be a string.'),
+            // User field messages
+            'name.required' => __('Employee name is required.'),
+            'name.min' => __('Employee name must be at least 3 characters.'),
+            'last_name.required' => __('Employee last name is required.'),
+            'last_name.min' => __('Employee last name must be at least 3 characters.'),
+            'email.required' => __('Email is required.'),
+            'email.email' => __('Email must be valid.'),
+            'email.unique' => __('Email already exists.'),
+            'password.required' => __('Password is required.'),
+            'password.min' => __('Password must be at least 8 characters.'),
+            'gender.required' => __('Gender is required.'),
+            'role.required' => __('Role is required.'),
+            'role.exists' => __('The selected role is invalid.'),
 
-            // Weitere Meldungen nach Bedarf...
+            // Team messages
+            'selectedTeams.*.exists' => __('The selected team is invalid.'),
+
+            // Employee field messages
+            'joined_at.required' => __('Joined date is required.'),
+            'joined_at.date' => __('Joined date must be a valid date.'),
+            'employee_status.required' => __('Employee status is required.'),
+            'profession.required' => __('Profession is required.'),
+            'profession.exists' => __('The selected profession is invalid.'),
+            'stage.required' => __('Stage is required.'),
+            'stage.exists' => __('The selected stage is invalid.'),
         ];
     }
 }

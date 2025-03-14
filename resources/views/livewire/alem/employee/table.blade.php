@@ -1,39 +1,23 @@
 <div>
     <div>
         <div class="flex flex-wrap items-center gap-6 sm:flex-nowrap my-4 sm:my-2">
-            <h1 class="dark:text-base text-base/7 font-semibold dark:text-white text-gray-900">  {{ __('Employees') }}</h1>
+            <h1 class="dark:text-base text-base/7 font-semibold dark:text-white text-gray-900">
+                {{ __('Employees') }}
+            </h1>
 
-            {{--            <x-pupi.actions.status-filter :statusFilter="$statusFilter"/>--}}
-            <div
-                class="order-last flex w-full gap-x-8 text-sm/6 font-semibold sm:order-none sm:w-auto sm:border-l sm:border-gray-200 sm:dark:border-gray-500 sm:pl-6 sm:text-sm/7">
-                <a href="#"
-                   wire:click.prevent="$set('statusFilter', 'active')"
-                   class="{{ $statusFilter === 'active' ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
-                    {{ __('Active') }}
-                </a>
-                <a href="#"
-                   wire:click.prevent="$set('statusFilter', 'archived')"
-                   class="{{ $statusFilter === 'archived' ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
-                    {{ __('Archived') }}
-                </a>
-                <a href="#"
-                   wire:click.prevent="$set('statusFilter', 'trashed')"
-                   class="{{ $statusFilter === 'trashed' ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
-                    {{ __('Trashed') }}
-                </a>
-            </div>
+            <x-pupi.actions.status-filter
+                :statusFilter="$statusFilter"
+            />
 
             <flux:modal.trigger name="create-employee">
                 <div
                     class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
-                    <svg class="-ml-1.5 size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
-                         data-slot="icon">
-                        <path
-                            d="M10.75 6.75a.75.75 0 0 0-1.5 0v2.5h-2.5a.75.75 0 0 0 0 1.5h2.5v2.5a.75.75 0 0 0 1.5 0v-2.5h2.5a.75.75 0 0 0 0-1.5h-2.5v-2.5Z"/>
-                    </svg>
+
+                    <x-pupi.icon.create class="-ml-1.5 size-5"/>
                     {{ __('Create') }}
                 </div>
             </flux:modal.trigger>
+
         </div>
     </div>
 
@@ -63,8 +47,12 @@
                     </div>
 
 
-                    <x-pupi.actions.bulkexport :statusFilter="$statusFilter"/>
-                    <x-pupi.actions.bulkstatus :statusFilter="$statusFilter"/>
+                    <x-pupi.actions.bulkexport
+                        :statusFilter="$statusFilter"
+                    />
+                    <x-pupi.actions.bulkstatus
+                        :statusFilter="$statusFilter"
+                    />
                 </div>
 
                 <div>
@@ -73,7 +61,9 @@
                         placeholder="{{ __('All Status') }}"
                         wire:model.live="employeeStatusFilter"
                         id="employeeStatusFilter">
+
                         <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
+
                         @foreach($employeeStatuses as $empStatus)
                             <flux:option value="{{ $empStatus->value }}">
                                 <div class="flex items-center gap-2">
@@ -83,6 +73,21 @@
                                     </svg>
                                     <span>{{ $empStatus->label() }}</span>
                                 </div>
+                            </flux:option>
+                        @endforeach
+                    </flux:select>
+                </div>
+                <div>
+                    <flux:select
+                        variant="listbox"
+                        placeholder="{{ __('All Teams') }}"
+                        wire:model.live="teamFilter"
+                        id="teamFilter">
+
+                        <flux:option wire:click="resetFilters" value="">{{ __('All Teams') }}</flux:option>
+
+                        @foreach($availableTeams as $team)
+                            <flux:option value="{{ $team->id }}">{{ $team->name }}
                             </flux:option>
                         @endforeach
                     </flux:select>
@@ -108,7 +113,9 @@
                     <x-pupi.table.th.notsort>{{ __('Team') }}</x-pupi.table.th.notsort>
                     <!-- Spalte Account Status -->
                     <x-pupi.table.th.notsort>{{ __('Role') }}</x-pupi.table.th.notsort>
-                    <x-pupi.table.th.notsort>{{ __('Joined Date') }}</x-pupi.table.th.notsort>
+                    <x-pupi.table.th.sort column="joined_at" :$sortCol :$sortAsc class="pl-2">
+                        {{ __('Joined Date') }}
+                    </x-pupi.table.th.sort>
                     <x-pupi.table.th.notsort>{{ __('Status') }}</x-pupi.table.th.notsort>
                     <x-pupi.table.th.actions/>
                 </x-slot:head>
@@ -179,7 +186,7 @@
                             <x-pupi.table.tr.cell>
 
                                 <x-pupi.table.tr.copiable-contact
-                                    :value="$user->phone"
+                                    :value="$user->phone_1"
                                     linkPrefix="tel:"
                                     fallbackText="+41 44 401 11 42"
                                     id="phone-{{ $user->id }}"
@@ -193,27 +200,46 @@
 
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
-                                <div
-                                    class="text-gray-900 dark:text-gray-300">{{ optional($user->teams->first())->name }}</div>
+                                <div class="text-gray-900 dark:text-gray-300">
+                                    @if($user->teams->count() > 0)
+                                        {{ $user->teams->pluck('name')->join(', ') }}
+                                    @else
+                                        <span class="text-gray-400">No teams</span>
+                                    @endif
+                                </div>
                                 <div class="text-gray-500 dark:text-gray-400">Departement</div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
-                                {{ $user->roles->pluck('name')->implode(', ') }}
-                                <div
-                                    class="flex items-center mt-1 {{ $user->days_until_permanent_delete <= 2 ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400' }}">
-                                    @if($user->trashed())
-                                        <div class="flex items-center mt-1 {{ $user->deletion_urgency_class }}">
-                                            <x-pupi.icon.clock class="h-4 w-4 mr-1"/>
-                                            {{ $user->deletion_message }}
-                                            <span class="text-gray-500 dark:text-gray-400 text-xs ml-1">({{ $user->permanent_deletion_date_for_humans }})</span>
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($user->roles as $role)
+                                        <div class="inline-flex items-center rounded-lg px-2 py-0.5 text-sm font-medium ring-1 ring-inset mr-2
+                                bg-indigo-50 text-indigo-800 ring-indigo-700/10
+                                dark:bg-indigo-400/10 dark:text-indigo-400 dark:ring-indigo-400/30">
+                                            <x-pupi.icon.shield-check class="w-4 h-4 mr-1"/>
+                                            {{$role->name}}
                                         </div>
-                                    @endif
+
+                                    @endforeach
                                 </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
-                                <flux:tooltip class="cursor-default" content="01 Feb. 2019" position="top">
-                                    <div class="text-gray-500 dark:text-gray-400">vor 4 Jahren</div>
+                                <flux:tooltip class="cursor-default"
+                                              content="
+                                              {{ __('Hired on: ') }}
+                                              {{ $user->employee->date_hired->format('d.m.Y') }}"
+                                              position="top">
+                                    <div class="text-gray-500 dark:text-gray-400">
+                                        {{ $user->employee->date_hired->diffForHumans() }}
+
+                                    </div>
                                 </flux:tooltip>
+                                @if($user->trashed())
+                                    <div class="flex items-center mt-1 {{ $user->deletion_urgency_class }}">
+                                        <x-pupi.icon.trash class="h-5 w-5 mr-1"/>
+                                        {{ $user->deletion_message }}
+                                        <span class="text-gray-500 dark:text-gray-400 text-xs ml-1">({{ $user->permanent_deletion_date_for_humans }})</span>
+                                    </div>
+                                @endif
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <flux:tooltip class="cursor-default" content="Settings">

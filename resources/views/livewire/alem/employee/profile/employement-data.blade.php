@@ -13,14 +13,8 @@
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
                     <!-- AHV Number -->
-                    <div class="sm:col-span-3">
+                    <div class="sm:col-span-4">
                         <x-pupi.input.group label="{{ __('AHV Number') }}" for="ahv_number" badge="{{ __('Required') }}">
-                            <x-pupi.input.text wire:model="ahv_number" id="ahv_number" name="ahv_number" />
-                        </x-pupi.input.group>
-                    </div>
-
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Personal Number') }}" for="ahv_number" badge="{{ __('Required') }}">
                             <x-pupi.input.text wire:model="ahv_number" id="ahv_number" name="ahv_number" />
                         </x-pupi.input.group>
                     </div>

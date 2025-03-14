@@ -57,6 +57,9 @@ class User extends Authenticatable
         'gender',
         'created_by',
         'model_status',
+        'phone_1',
+        'phone_2',
+        'joined_at',
     ];
 
     /**
@@ -99,6 +102,7 @@ class User extends Authenticatable
      */
     protected $dates = [
         'deleted_at',
+        'joined_at',
     ];
 
     /* User & States Relation */

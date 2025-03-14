@@ -24,7 +24,7 @@
     @if($value)
         @if($linkValue)
             <a href="{{ $linkValue }}"
-               class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 mr-2">
+               class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 mr-2 decoration-1 hover:underline">
                 {{ $displayText }}
             </a>
         @else
