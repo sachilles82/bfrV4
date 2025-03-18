@@ -3,6 +3,8 @@
 namespace App\Models\Alem\Employee;
 
 use App\Enums\Employee\EmployeeStatus;
+use App\Enums\Employee\NoticePeriod;
+use App\Enums\Employee\Probation;
 use App\Models\User;
 use App\Traits\BelongsToTeam;
 use App\Traits\Employee\EmployeeStatusManagement;
@@ -23,14 +25,21 @@ class Employee extends Model
      */
     protected $fillable = [
         'user_id',
+        'uuid',
         'date_hired',
         'date_fired',
         'probation',
+        'probation_enum',
+        'notice_period',
+        'notice_period_enum',
         'social_number',
         'personal_number',
         'profession',
+        'stage',
+        'employment_type',
         'company_id',
         'team_id',
+        'supervisor',
         'created_by',
         'employee_status',
     ];
@@ -39,6 +48,9 @@ class Employee extends Model
         'date_hired' => 'date',
         'date_fired' => 'date',
         'probation' => 'date',
+        'probation_enum' => Probation::class,
+        'notice_period' => 'date',
+        'notice_period_enum' => NoticePeriod::class,
         'employee_status' => EmployeeStatus::class,
     ];
 

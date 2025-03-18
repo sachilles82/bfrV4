@@ -207,6 +207,7 @@
                                         <span class="text-gray-400">No teams</span>
                                     @endif
                                 </div>
+                                {{ $user->currentTeam ? $user->currentTeam->name : 'No Team' }}
                                 <div class="text-gray-500 dark:text-gray-400">Departement</div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>

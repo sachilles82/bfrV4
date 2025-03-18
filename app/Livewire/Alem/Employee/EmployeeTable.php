@@ -86,10 +86,23 @@ class EmployeeTable extends Component
     {
         $authUser = auth()->user();
 
+//        $query = User::query()
+//            ->with([
+//                'employee',
+//                'teams:id,name',
+//                'roles' => function($query) {
+//                    $query->where('visible', RoleVisibility::Visible->value)->select('id', 'name');
+//                }
+//            ])
+//            ->whereHas('employee')
+//            ->where('company_id', $authUser->company_id)
+//            ->where('user_type', $this->userType);
+
         $query = User::query()
             ->with([
                 'employee',
                 'teams:id,name',
+                'currentTeam:id,name', // Add this to load the current team explicitly
                 'roles' => function($query) {
                     $query->where('visible', RoleVisibility::Visible->value)->select('id', 'name');
                 }
