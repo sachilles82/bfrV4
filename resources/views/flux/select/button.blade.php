@@ -17,7 +17,7 @@
         ->add('group/select-button cursor-default py-1.5')
         ->add('overflow-hidden') // Overflow hidden is here to prevent the button from growing when selected text is too long.
         ->add('flex items-center')
-        ->add('rounded-md shadow-sm border')
+        ->add('rounded-md shadow-xs border')
         ->add('bg-white dark:bg-white/5')
         // Make the placeholder match the text color of standard input placeholders...
         ->add('disabled:shadow-none')
@@ -56,5 +56,5 @@
     </flux:button>
     <?php endif; ?>
 
-    <flux:icon.chevron-down variant="mini" class="ml-2 -mr-1 text-zinc-300 [[data-flux-select-button]:hover_&]:text-zinc-800 [[disabled]_&]:!text-zinc-200 dark:text-white/60 dark:[[data-flux-select-button]:hover_&]:text-white dark:[[disabled]_&]:!text-white/40" />
+    <flux:icon.chevron-down variant="mini" class="ml-2 -mr-1 text-zinc-300 [[data-flux-select-button]:hover_&]:text-zinc-800 in-[[disabled]]:text-zinc-200! dark:text-white/60 dark:[[data-flux-select-button]:hover_&]:text-white dark:in-[[disabled]]:text-white/40!" />
 </button>

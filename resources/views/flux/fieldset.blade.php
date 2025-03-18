@@ -9,12 +9,12 @@ $classes = Flux::classes()
     ->add('[&[disabled]_[data-flux-legend]]:opacity-50') // Dim legend when the fieldset is disabled...
 
     // Adjust spacing between fields...
-    ->add('[&>[data-flux-field]]:mb-3')
+    ->add('*:data-flux-field:mb-3')
 
     // Adjust spacing between fields...
-    ->add('[&>[data-flux-field]]:mb-3')
+    ->add('*:data-flux-field:mb-3')
     ->add('[&>[data-flux-field]:has(>[data-flux-description])]:mb-4')
-    ->add('[&>[data-flux-field]:last-child]:!mb-0')
+    ->add('[&>[data-flux-field]:last-child]:mb-0!')
 
     // Adjust spacing below legend...
     ->add('[&>legend]:mb-4')

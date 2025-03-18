@@ -16,7 +16,7 @@ $classes = Flux::classes()
         'sm' => 'h-8 py-1.5 text-sm rounded-md',
         'xs' => 'h-6 text-xs rounded-md',
     })
-    ->add('shadow-sm border')
+    ->add('shadow-xs border')
     ->add('bg-white dark:bg-white/10 dark:disabled:bg-white/[9%]')
     ->add('text-zinc-700 dark:text-zinc-300')
     // Make the placeholder match the text color of standard input placeholders...

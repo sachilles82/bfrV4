@@ -20,8 +20,8 @@
             <div class="mt-4 flex gap-4 flex-wrap">
                 <!-- Indigo -->
                 <label class="relative block w-32 border border-gray-200 dark:border-gray-700
-                      rounded-lg cursor-pointer overflow-hidden focus:outline-none
-                      hover:shadow-sm transition peer-checked:ring-2
+                      rounded-lg cursor-pointer overflow-hidden focus:outline-hidden
+                      hover:shadow-xs transition peer-checked:ring-2
                       peer-checked:ring-blue-500 dark:bg-gray-800">
                     <input
                         type="radio"
@@ -48,8 +48,8 @@
 
                 <!-- Orange -->
                 <label class="relative block w-32 border border-gray-200 dark:border-gray-700
-                      rounded-lg cursor-pointer overflow-hidden focus:outline-none
-                      hover:shadow-sm transition peer-checked:ring-2
+                      rounded-lg cursor-pointer overflow-hidden focus:outline-hidden
+                      hover:shadow-xs transition peer-checked:ring-2
                       peer-checked:ring-blue-500 dark:bg-gray-800">
                     <input
                         type="radio"
@@ -76,8 +76,8 @@
 
                 <!-- Green -->
                 <label class="relative block w-32 border border-gray-200 dark:border-gray-700
-                      rounded-lg cursor-pointer overflow-hidden focus:outline-none
-                      hover:shadow-sm transition peer-checked:ring-2
+                      rounded-lg cursor-pointer overflow-hidden focus:outline-hidden
+                      hover:shadow-xs transition peer-checked:ring-2
                       peer-checked:ring-blue-500 dark:bg-gray-800">
                     <input
                         type="radio"
@@ -104,8 +104,8 @@
 
                 <!-- Blue -->
                 <label class="relative block w-32 border border-gray-200 dark:border-gray-700
-                      rounded-lg cursor-pointer overflow-hidden focus:outline-none
-                      hover:shadow-sm transition peer-checked:ring-2
+                      rounded-lg cursor-pointer overflow-hidden focus:outline-hidden
+                      hover:shadow-xs transition peer-checked:ring-2
                       peer-checked:ring-blue-500 dark:bg-gray-800">
                     <input
                         type="radio"
@@ -132,8 +132,8 @@
 
                 <!-- Red -->
                 <label class="relative block w-32 border border-gray-200 dark:border-gray-700
-                      rounded-lg cursor-pointer overflow-hidden focus:outline-none
-                      hover:shadow-sm transition peer-checked:ring-2
+                      rounded-lg cursor-pointer overflow-hidden focus:outline-hidden
+                      hover:shadow-xs transition peer-checked:ring-2
                       peer-checked:ring-blue-500 dark:bg-gray-800">
                     <input
                         type="radio"
@@ -160,8 +160,8 @@
 
                 <!-- Lime -->
                 <label class="relative block w-32 border border-gray-200 dark:border-gray-700
-                      rounded-lg cursor-pointer overflow-hidden focus:outline-none
-                      hover:shadow-sm transition peer-checked:ring-2
+                      rounded-lg cursor-pointer overflow-hidden focus:outline-hidden
+                      hover:shadow-xs transition peer-checked:ring-2
                       peer-checked:ring-blue-500 dark:bg-gray-800">
                     <input
                         type="radio"

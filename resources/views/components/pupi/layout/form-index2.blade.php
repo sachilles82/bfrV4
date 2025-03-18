@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div
-                        class="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center">
+                        class="flex flex-col items-stretch justify-end shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center">
 
                         @isset($create)
                             {{ $create }}

@@ -14,7 +14,7 @@
         ->add('font-medium text-sm text-zinc-800 dark:text-white')
         ->add('pl-9') // Make room for magnifying glass icon...
         ->add('pr-9') // Make room for clear/clos button and loading indicator...
-        ->add('outline-none')
+        ->add('outline-hidden')
         ->add('border-0 border-b border-zinc-300 dark:border-zinc-700')
             ->add('bg-white dark:bg-zinc-800')
         ;
@@ -37,7 +37,7 @@
         <?php endif; ?>
     </div>
 
-    <input type="text" {{ $attributes->class($classes)->merge(['placeholder' => 'Search...', 'class' => 'focus:outline-none focus:ring-0 focus:border-zinc-300']) }}  autofocus/>
+    <input type="text" {{ $attributes->class($classes)->merge(['placeholder' => 'Search...', 'class' => 'focus:outline-hidden focus:ring-0 focus:border-zinc-300']) }}  autofocus/>
 
     <?php if ($loading): ?>
     <div

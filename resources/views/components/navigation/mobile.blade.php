@@ -20,7 +20,7 @@
             <div class="flex items-center justify-between px-4">
                 <img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=white"
                      alt="Your Company">
-                <button @click="menu = false" class="text-navigation-txt2 focus:outline-none">
+                <button @click="menu = false" class="text-navigation-txt2 focus:outline-hidden">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -60,5 +60,5 @@
     </div>
 
     <!-- Sidebar Close Click Area -->
-    <div x-show="menu" class="w-14 flex-shrink-0" @click="menu = false"></div>
+    <div x-show="menu" class="w-14 shrink-0" @click="menu = false"></div>
 </div>

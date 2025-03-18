@@ -17,7 +17,7 @@ $classes = Flux::classes()
         '[ui-option[data-selected]_&]:bg-zinc-800 dark:[ui-option[data-selected]_&]:bg-white',
         '[ui-option[disabled][data-selected]_&]:bg-zinc-500 dark:[ui-option[disabled][data-selected]_&]:bg-white/60',
         '[ui-option[data-selected]:hover_&]:bg-zinc-800 dark:[ui-option[data-selected]:hover_&]:bg-white',
-        '[ui-option[data-selected]_&]:focus:bg-zinc-800 dark:[ui-option[data-selected]_&]:focus:bg-white',
+        'focus:[ui-option[data-selected]_&]:bg-zinc-800 dark:focus:[ui-option[data-selected]_&]:bg-white',
     ])
     ;
 @endphp

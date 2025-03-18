@@ -61,7 +61,7 @@ if ($attributes['@close'] ?? null) {
             {{-- This "[&[hidden]]:block" hack is here to prevent this element from effecting classes like "space-y-6" --}}
             <div class="absolute top-0 right-0 mt-4 mr-4 [&[hidden]]:block" hidden>
                 <flux:modal.close>
-                    <flux:button variant="ghost" icon="x-mark" size="sm" alt="Close modal" class="!text-zinc-400 hover:!text-zinc-800 dark:!text-zinc-500 dark:hover:!text-white"></flux:button>
+                    <flux:button variant="ghost" icon="x-mark" size="sm" alt="Close modal" class="text-zinc-400! hover:text-zinc-800! dark:text-zinc-500! dark:hover:text-white!"></flux:button>
                 </flux:modal.close>
             </div>
         <?php endif; ?>

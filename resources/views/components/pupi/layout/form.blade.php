@@ -13,7 +13,7 @@
         </p>
     </div>
 
-    <div class="bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-900/5 sm:rounded-md md:col-span-2">
+    <div class="bg-white dark:bg-gray-900 shadow-xs ring-1 ring-gray-900/5 sm:rounded-md md:col-span-2">
 
         {{$form}}
 

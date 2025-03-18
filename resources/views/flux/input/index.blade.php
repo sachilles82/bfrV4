@@ -49,7 +49,7 @@ $classes = Flux::classes()
         'filled'  => 'text-zinc-900 placeholder-zinc-500 disabled:placeholder-zinc-400 dark:text-zinc-300 dark:placeholder-white/60 dark:disabled:placeholder-white/40',
     })
     ->add(match ($variant) { // Border...
-        'outline' => $invalid ? 'border-red-400' : 'block w-full border-0 dark:text-white text-zinc-900 shadow-sm ring-1 ring-inset ring-zinc-300 dark:focus-within:ring-inset dark:focus-within:ring-indigo-500 dark:bg-white/5 dark:ring-white/10 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600',
+        'outline' => $invalid ? 'border-red-400' : 'block w-full border-0 dark:text-white text-zinc-900 shadow-xs ring-1 ring-inset ring-zinc-300 dark:focus-within:ring-inset dark:focus-within:ring-indigo-500 dark:bg-white/5 dark:ring-white/10 placeholder:text-zinc-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600',
         'filled'  => $invalid ? 'border-red-400' : 'border-0',
     })
     ;

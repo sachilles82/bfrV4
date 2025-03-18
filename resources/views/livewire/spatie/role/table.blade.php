@@ -5,7 +5,7 @@
             <x-pupi.actions.search wire:model.live.debounce.400ms="search"/>
         </div>
         <div
-            class="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
+            class="flex flex-col items-stretch justify-end shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
             <div class="flex items-center justify-end w-full space-x-1 md:w-auto">
                 <x-pupi.actions.reset-filters wire:click="resetFilters"/>
                 <x-pupi.actions.per-page/>

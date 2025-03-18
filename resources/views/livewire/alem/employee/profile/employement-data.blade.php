@@ -43,7 +43,7 @@
                     <!-- Religion -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group label="{{ __('Religion') }}" for="religion" badge="{{ __('Required') }}">
-                            <flux:select class="!mt-2" wire:model="religion" id="religion" name="religion" variant="listbox" placeholder="{{ __('Select Religion') }}">
+                            <flux:select class="mt-2!" wire:model="religion" id="religion" name="religion" variant="listbox" placeholder="{{ __('Select Religion') }}">
                                 @foreach(\App\Enums\Employee\Religion::options() as $value => $label)
                                     <flux:option value="{{ $value }}">{{ __($label) }}</flux:option>
                                 @endforeach

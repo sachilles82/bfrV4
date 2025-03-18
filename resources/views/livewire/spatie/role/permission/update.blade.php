@@ -15,7 +15,7 @@
     <x-slot name="form">
 
         <form wire:submit.prevent="updateRole"
-              class="bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg md:col-span-2">
+              class="bg-white dark:bg-gray-900 shadow-xs ring-1 ring-gray-900/5 sm:rounded-lg md:col-span-2">
 
             <div class="flex items-center gap-x-4 p-6 pb-1">
                 <div class="flex items-center gap-x-6">
@@ -57,9 +57,9 @@
                                         <div class="absolute right-4 top-6 h-6 w-4 dark:yellow-400/20 text-yellow-600">
                                             <div x-data="checkAll"
                                                  x-on:update-table.window="$refs.checkbox.checked = false; $refs.checkbox.indeterminate = false;"
-                                                 class="flex rounded-md shadow-sm">
+                                                 class="flex rounded-md shadow-xs">
                                                 <input x-ref="checkbox" @change="handleCheck" type="checkbox"
-                                                       class="absolute -mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-indigo-500 dark:checked:border-indigo-500 dark:focus:ring-offset-gray-800">
+                                                       class="absolute -mt-1 h-4 w-4 rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-indigo-500 dark:checked:border-indigo-500 dark:focus:ring-offset-gray-800">
                                             </div>
                                         </div>
                                     </div>

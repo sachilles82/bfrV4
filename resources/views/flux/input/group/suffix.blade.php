@@ -5,7 +5,7 @@ $classes = Flux::classes([
     'bg-zinc-800/5 dark:bg-white/20',
     'border-zinc-200 dark:border-white/10',
     'rounded-r-lg',
-    'border-r border-t border-b shadow-sm',
+    'border-r border-t border-b shadow-xs',
 ]);
 @endphp
 

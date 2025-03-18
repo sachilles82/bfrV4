@@ -12,7 +12,7 @@
 
 
         <form wire:submit.prevent="save"
-              class="bg-white dark:bg-gray-900 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+              class="bg-white dark:bg-gray-900 shadow-xs ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
             <div x-data="addressInputs()" x-init="init()" class="px-4 py-6 sm:p-8">
 
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -29,7 +29,7 @@
                             >
                                 <div class="relative mt-2">
                                     <div
-                                        class="cursor-pointer flex-shrink-0 z-10 inline-flex min-w-[140px] items-center py-1 text-left px-2 text-sm font-medium sm:text-sm sm:leading-5 text-gray-500 bg-gray-100 border-0 border-gray-300 rounded-s-lg dark:bg-white/5 ring-1 ring-inset ring-gray-300 dark:ring-white/10"
+                                        class="cursor-pointer shrink-0 z-10 inline-flex min-w-[140px] items-center py-1 text-left px-2 text-sm font-medium sm:text-sm sm:leading-5 text-gray-500 bg-gray-100 border-0 border-gray-300 rounded-s-lg dark:bg-white/5 ring-1 ring-inset ring-gray-300 dark:ring-white/10"
                                         @click.prevent="toggleSelectCountry"
                                         @click.away="closeSelectCountry"
                                         @keydown.escape="closeSelectCountry"
@@ -89,7 +89,7 @@
                                                            @click.prevent.stop="openCountryDropdown=true"
                                                            @click="searchCountry = ''"
                                                            placeholder="{{ __('Search..') }}"
-                                                           class="block w-full px-2.5 pl-10 text-gray-900 placeholder:dark:text-gray-500 placeholder:text-gray-400 rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:focus:ring-indigo-500 dark:ring-gray-700/50 dark:bg-white/5 dark:text-white">
+                                                           class="block w-full px-2.5 pl-10 text-gray-900 dark:placeholder:text-gray-500 placeholder:text-gray-400 rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:focus:ring-indigo-500 dark:ring-gray-700/50 dark:bg-white/5 dark:text-white">
                                                 </div>
                                             </div>
                                             <div x-ref="dropdown" class="relative z-30 p-2 overflow-y-auto max-h-60">
@@ -187,7 +187,7 @@
                                                        @click.prevent.stop="openStateDropdown=true"
                                                        @click="searchState = ''"
                                                        placeholder="{{ __('Search..') }}"
-                                                       class="block w-full px-2.5 pl-10 text-gray-900 placeholder:dark:text-gray-500 placeholder:text-gray-400 rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:focus:ring-indigo-500 dark:ring-gray-700/50 dark:bg-white/5 dark:text-white">
+                                                       class="block w-full px-2.5 pl-10 text-gray-900 dark:placeholder:text-gray-500 placeholder:text-gray-400 rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:focus:ring-indigo-500 dark:ring-gray-700/50 dark:bg-white/5 dark:text-white">
                                             </div>
                                         </div>
                                         <div x-ref="dropdown" class="relative z-30 p-2 overflow-y-auto max-h-60">
@@ -304,7 +304,7 @@
                                                        @click.prevent.stop="openCityDropdown=true"
                                                        @click="searchCity = ''"
                                                        placeholder="{{ __('Search..') }}"
-                                                       class="block w-full px-2.5 pl-10 text-gray-900 placeholder:dark:text-gray-500 placeholder:text-gray-400 rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:focus:ring-indigo-500 dark:ring-gray-700/50 dark:bg-white/5 dark:text-white">
+                                                       class="block w-full px-2.5 pl-10 text-gray-900 dark:placeholder:text-gray-500 placeholder:text-gray-400 rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:focus:ring-indigo-500 dark:ring-gray-700/50 dark:bg-white/5 dark:text-white">
                                             </div>
                                         </div>
                                         <div x-ref="dropdown" class="relative z-30 p-2 overflow-y-auto max-h-60">

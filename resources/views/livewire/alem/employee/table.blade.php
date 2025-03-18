@@ -11,7 +11,7 @@
 
             <flux:modal.trigger name="create-employee">
                 <div
-                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
+                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
 
                     <x-pupi.icon.create class="-ml-1.5 size-5"/>
                     {{ __('Create') }}
@@ -31,7 +31,7 @@
             </div>
         </div>
         <div
-            class="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
+            class="flex flex-col items-stretch justify-end shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
             <div class="flex items-center justify-end w-full space-x-1 md:w-auto">
                 <!-- Bulk-Actions Dropdown wird hier eingebunden -->
 
@@ -161,7 +161,7 @@
                             </td>
                             <x-pupi.table.tr.cell>
                                 <div class="flex items-center">
-                                    <div class="h-11 w-11 flex-shrink-0">
+                                    <div class="h-11 w-11 shrink-0">
                                         @if($user->profile_photo_path)
                                             <img src="{{ asset('storage/' . $user->profile_photo_path) }}"
                                                  alt="{{ $user->name }}" class="h-11 w-11 rounded-full">

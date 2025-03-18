@@ -4,7 +4,7 @@
 
 @php
 $class = Flux::classes()
-    ->add('text-xs font-medium rounded px-1 py-0.5')
+    ->add('text-xs font-medium rounded-sm px-1 py-0.5')
     ->add(match ($color) {
         default => 'text-zinc-700 dark:text-zinc-200 bg-zinc-400/15 dark:bg-zinc-400/40',
         'red' => 'text-red-700 dark:text-red-200 bg-red-400/20 dark:bg-red-400/40',

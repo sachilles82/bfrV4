@@ -18,7 +18,7 @@
                             alt="" class="h-24 w-24 flex-none rounded-lg bg-gray-800 object-cover">
                         <div>
                             <button type="button"
-                                    class="rounded-md dark:bg-white/10 px-3 py-2 text-sm font-semibold dark:text-white shadow-sm dark:hover:bg-white/20 dark:ring-transparent bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                    class="rounded-md dark:bg-white/10 px-3 py-2 text-sm font-semibold dark:text-white shadow-xs dark:hover:bg-white/20 dark:ring-transparent bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                                 Change avatar
                             </button>
                             <p class="mt-2 text-xs leading-5 dark:text-gray-400 text-gray-500">JPG,

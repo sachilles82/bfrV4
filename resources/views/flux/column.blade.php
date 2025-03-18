@@ -15,12 +15,12 @@ $classes = Flux::classes()
 
 <th {{ $attributes->class($classes) }} data-flux-column>
     <?php if ($sortable): ?>
-        <div class="flex group-[]/right-align:justify-end">
+        <div class="flex in-[.group\/right-align]:justify-end">
             <flux:table.sortable :$sorted :direction="$direction">
                 <div>{{ $slot }}</div>
             </flux:table.sortable>
         </div>
     <?php else: ?>
-        <div class="flex group-[]/right-align:justify-end">{{ $slot }}</div>
+        <div class="flex in-[.group\/right-align]:justify-end">{{ $slot }}</div>
     <?php endif; ?>
 </th>

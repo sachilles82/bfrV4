@@ -13,7 +13,7 @@
         </p>
     </div>
 
-    <div class="animate-pulse bg-gray-50 dark:bg-white/5 shadow-sm ring-1 ring-gray-700/5 sm:rounded-md rounded-lg md:col-span-2">
+    <div class="animate-pulse bg-gray-50 dark:bg-white/5 shadow-xs ring-1 ring-gray-700/5 sm:rounded-md rounded-lg md:col-span-2">
 
         {{$form}}
 

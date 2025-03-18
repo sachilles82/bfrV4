@@ -12,7 +12,7 @@
 {{--                    <!-- Tab Navs -->--}}
 {{--                    <nav class="grid gap-4 mt-5 md:mt-10" aria-label="Tabs" role="tablist" aria-orientation="vertical">--}}
 {{--                        <button type="button"--}}
-{{--                                class="hs-tab-active:bg-white hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start hover:bg-gray-200 focus:outline-none focus:bg-gray-200 p-4 md:p-5 rounded-xl dark:hs-tab-active:bg-neutral-700 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 active"--}}
+{{--                                class="hs-tab-active:bg-white hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 p-4 md:p-5 rounded-xl dark:hs-tab-active:bg-neutral-700 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 active"--}}
 {{--                                id="tabs-with-card-item-1" aria-selected="true" data-hs-tab="#tabs-with-card-1"--}}
 {{--                                aria-controls="tabs-with-card-1" role="tab">--}}
 {{--                        <span class="flex gap-x-6">--}}
@@ -35,7 +35,7 @@
 {{--                        </button>--}}
 
 {{--                        <div--}}
-{{--                                class="hs-tab-active:bg-white hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start hover:bg-gray-200 focus:outline-none focus:bg-gray-200 p-4 md:p-5 rounded-xl dark:hs-tab-active:bg-neutral-700 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"--}}
+{{--                                class="hs-tab-active:bg-white hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 p-4 md:p-5 rounded-xl dark:hs-tab-active:bg-neutral-700 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"--}}
 {{--                                id="tabs-with-card-item-2" aria-selected="false" data-hs-tab="#tabs-with-card-2"--}}
 {{--                                aria-controls="tabs-with-card-2" role="tab">--}}
 {{--                            <!-- Card Section -->--}}
@@ -43,7 +43,7 @@
 {{--                                <!-- Grid -->--}}
 {{--                                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">--}}
 {{--                                    <!-- Card -->--}}
-{{--                                    <a class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md focus:outline-none focus:shadow-md transition dark:bg-neutral-900 dark:border-neutral-800" href="#">--}}
+{{--                                    <a class="group flex flex-col bg-white border shadow-xs rounded-xl hover:shadow-md focus:outline-hidden focus:shadow-md transition dark:bg-neutral-900 dark:border-neutral-800" href="#">--}}
 {{--                                        <div class="p-4 md:p-5">--}}
 {{--                                            <div class="flex gap-x-5">--}}
 {{--                                                <svg class="mt-1 shrink-0 size-5 text-gray-800 dark:text-neutral-200" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>--}}
@@ -62,7 +62,7 @@
 {{--                                    <!-- End Card -->--}}
 
 {{--                                    <!-- Card -->--}}
-{{--                                    <a class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md focus:outline-none focus:shadow-md transition dark:bg-neutral-900 dark:border-neutral-800" href="#">--}}
+{{--                                    <a class="group flex flex-col bg-white border shadow-xs rounded-xl hover:shadow-md focus:outline-hidden focus:shadow-md transition dark:bg-neutral-900 dark:border-neutral-800" href="#">--}}
 {{--                                        <div class="p-4 md:p-5">--}}
 {{--                                            <div class="flex gap-x-5">--}}
 {{--                                                <svg class="mt-1 shrink-0 size-5 text-gray-800 dark:text-neutral-200" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>--}}
@@ -81,7 +81,7 @@
 {{--                                    <!-- End Card -->--}}
 
 {{--                                    <!-- Card -->--}}
-{{--                                    <a class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md focus:outline-none focus:shadow-md transition dark:bg-neutral-900 dark:border-neutral-800" href="#">--}}
+{{--                                    <a class="group flex flex-col bg-white border shadow-xs rounded-xl hover:shadow-md focus:outline-hidden focus:shadow-md transition dark:bg-neutral-900 dark:border-neutral-800" href="#">--}}
 {{--                                        <div class="p-4 md:p-5">--}}
 {{--                                            <div class="flex gap-x-5">--}}
 {{--                                                <svg class="mt-1 shrink-0 size-5 text-gray-800 dark:text-neutral-200" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"/><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10"/></svg>--}}
@@ -105,7 +105,7 @@
 {{--                        </div>--}}
 
 {{--                        <button type="button"--}}
-{{--                                class="hs-tab-active:bg-white hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start hover:bg-gray-200 focus:outline-none focus:bg-gray-200 p-4 md:p-5 rounded-xl dark:hs-tab-active:bg-neutral-700 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"--}}
+{{--                                class="hs-tab-active:bg-white hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 p-4 md:p-5 rounded-xl dark:hs-tab-active:bg-neutral-700 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"--}}
 {{--                                id="tabs-with-card-item-3" aria-selected="false" data-hs-tab="#tabs-with-card-3"--}}
 {{--                                aria-controls="tabs-with-card-3" role="tab">--}}
 {{--            <span class="flex gap-x-6">--}}
@@ -176,51 +176,51 @@
             <div id="level-selection" class="flex flex-wrap gap-2">
                 <!-- 12 Buttons für 12 Levels -->
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="1">1
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="2">2
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="3">3
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="4">4
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="5">5
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="6">6
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="7">7
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="8">8
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="9">9
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="10">10
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="11">11
                 </button>
                 <button
-                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-none"
+                    class="level-btn rounded-full bg-blue-500 text-white w-10 h-10 hover:bg-blue-600 focus:outline-hidden"
                     data-level="12">12
                 </button>
             </div>
@@ -258,35 +258,35 @@
                     </h3>
                     <div id="answer-slots" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div
-                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"
+                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"
                             data-slot="0"
                             data-selected-index="-1"
                         >
                             1. (Leer)
                         </div>
                         <div
-                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"
+                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"
                             data-slot="1"
                             data-selected-index="-1"
                         >
                             2. (Leer)
                         </div>
                         <div
-                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"
+                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"
                             data-slot="2"
                             data-selected-index="-1"
                         >
                             3. (Leer)
                         </div>
                         <div
-                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"
+                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"
                             data-slot="3"
                             data-selected-index="-1"
                         >
                             4. (Leer)
                         </div>
                         <div
-                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700 sm:col-span-2"
+                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700 sm:col-span-2"
                             data-slot="4"
                             data-selected-index="-1"
                         >
@@ -311,13 +311,13 @@
                 <div class="flex items-center gap-4">
                     <button
                         id="check-button"
-                        class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+                        class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-blue-700"
                     >
                         Prüfen
                     </button>
                     <button
                         id="reset-button"
-                        class="inline-flex items-center justify-center rounded-md border border-blue-600 bg-white px-4 py-2 text-sm font-medium text-blue-600 shadow-sm hover:bg-gray-50"
+                        class="inline-flex items-center justify-center rounded-md border border-blue-600 bg-white px-4 py-2 text-sm font-medium text-blue-600 shadow-xs hover:bg-gray-50"
                     >
                         Neustart
                     </button>
@@ -546,7 +546,7 @@
                 div.classList.add(
                     'option',
                     'border',
-                    'rounded',
+                    'rounded-sm',
                     'p-2',
                     'cursor-pointer',
                     'hover:bg-gray-100',

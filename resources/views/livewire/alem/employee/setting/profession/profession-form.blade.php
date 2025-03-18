@@ -50,8 +50,8 @@
     <!-- Tabelle mit vorhandenen Professions -->
     <flux:table>
         <flux:columns>
-            <flux:column class="!text-sm font-semibold">{{ __('Profession') }}</flux:column>
-            <flux:column class="!text-sm font-semibold">{{ __('Actions') }}</flux:column>
+            <flux:column class="text-sm! font-semibold">{{ __('Profession') }}</flux:column>
+            <flux:column class="text-sm! font-semibold">{{ __('Actions') }}</flux:column>
         </flux:columns>
 
         <flux:rows>

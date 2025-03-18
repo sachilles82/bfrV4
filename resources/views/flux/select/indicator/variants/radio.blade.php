@@ -8,16 +8,16 @@ $classes = Flux::classes()
         'border',
         'border-zinc-300 dark:border-white/10',
         '[ui-option[disabled]_&]:border-zinc-200 dark:[ui-option[disabled]_&]:border-white/5',
-        '[ui-option[data-selected]_&]:border-transparent data-[indeterminate]:border-transparent',
-        '[ui-option[disabled]_&]:[ui-option[data-selected]_&]:border-transparent data-[indeterminate]:border-transparent',
+        '[ui-option[data-selected]_&]:border-transparent data-indeterminate:border-transparent',
+        '[ui-option[data-selected]_&]:[ui-option[disabled]_&]:border-transparent data-indeterminate:border-transparent',
     ])
     ->add([
         'bg-white dark:bg-white/10',
         'dark:[ui-option[disabled]_&]:bg-white/5',
         '[ui-option[data-selected]_&]:bg-zinc-800 dark:[ui-option[data-selected]_&]:bg-white',
         '[ui-option[disabled][data-selected]_&]:bg-zinc-500 dark:[ui-option[disabled][data-selected]_&]:bg-white/60',
-        '[ui-option[data-selected]_&]:hover:bg-zinc-800 dark:[ui-option[data-selected]_&]:hover:bg-white',
-        '[ui-option[data-selected]_&]:focus:bg-zinc-800 dark:[ui-option[data-selected]_&]:focus:bg-white',
+        'hover:[ui-option[data-selected]_&]:bg-zinc-800 dark:hover:[ui-option[data-selected]_&]:bg-white',
+        'focus:[ui-option[data-selected]_&]:bg-zinc-800 dark:focus:[ui-option[data-selected]_&]:bg-white',
     ])
     ;
 @endphp

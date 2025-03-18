@@ -34,7 +34,7 @@
             <div class="relative z-30 w-full p-2 bg-white dark:bg-gray-800">
                 <input type="search" x-model="searchIndustry" @click.prevent.stop="openIndustry=true"
                        placeholder="{{ __('Search..') }}"
-                       class="block w-full px-2.5 pl-10 text-gray-900 placeholder:dark:text-gray-500 placeholder:text-gray-400 rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:focus:ring-indigo-500 dark:ring-gray-700/50 dark:bg-white/5 dark:text-white">
+                       class="block w-full px-2.5 pl-10 text-gray-900 dark:placeholder:text-gray-500 placeholder:text-gray-400 rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300 focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:focus:ring-indigo-500 dark:ring-gray-700/50 dark:bg-white/5 dark:text-white">
             </div>
             <div x-ref="dropdown" class="relative z-30 p-2 overflow-y-auto max-h-60">
                 <div x-cloak x-show="filteredIndustries().length === 0"

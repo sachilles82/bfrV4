@@ -16,10 +16,10 @@
     $custom = ! in_array($variant, [null, 'default']);
 
     $classes = Flux::classes()
-        ->add('group/option data-[hidden]:hidden group flex items-center px-2 py-1.5 w-full focus:outline-none cursor-pointer')
+        ->add('group/option data-hidden:hidden group flex items-center px-2 py-1.5 w-full focus:outline-hidden cursor-pointer')
             ->add('rounded-md')
             ->add('text-left text-sm font-medium')
-            ->add('text-zinc-800 data-[active]:bg-zinc-100 [&[disabled]]:text-zinc-400 dark:text-zinc-400 data-[active]:dark:bg-zinc-700/50 data-[active]:dark:text-zinc-300 dark:[&[disabled]]:text-zinc-400')
+            ->add('text-zinc-800 data-active:bg-zinc-100 [&[disabled]]:text-zinc-400 dark:text-zinc-400 dark:data-active:bg-zinc-700/50 dark:data-active:text-zinc-300 dark:[&[disabled]]:text-zinc-400')
             ->add('scroll-my-[.3125rem]')  // This is here so that when a user scrolls to the top or bottom of the list, the padding is included...
         ;
 
@@ -42,7 +42,7 @@
     {{ $attributes->class($classes) }}
     data-flux-option
 >
-    <div class="w-4 mx shrink-0 [ui-selected_&]:hidden">
+    <div class="w-4 mx shrink-0 in-[ui-selected]:hidden">
         <flux:select.indicator :variant="$indicator" />
     </div>
 

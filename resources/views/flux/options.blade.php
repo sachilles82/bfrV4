@@ -11,7 +11,7 @@
 @php
     $classes = Flux::classes()
         ->add('[:where(&)]:min-w-48 [:where(&)]:max-h-[20rem] p-[.3125rem]')
-        ->add('rounded-lg shadow-sm')
+        ->add('rounded-lg shadow-xs')
         ->add('border border-zinc-300 dark:border-white/10')
             ->add('bg-white dark:bg-zinc-800')
         ;
@@ -26,7 +26,7 @@
     {{ $slot }}
 </ui-options>
 <?php else: ?>
-<div popover="manual" class="rounded-lg shadow-sm border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-800 p-[.3125rem]" data-flux-options>
+<div popover="manual" class="rounded-lg shadow-xs border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-800 p-[.3125rem]" data-flux-options>
         <?php if ($search): ?> {{ $search }} <?php else: ?>
     <flux:select.search />
     <?php endif; ?>
@@ -35,7 +35,7 @@
         {{ $slot }}
 
             <?php if ($empty): ?>
-        <ui-empty class="data-[hidden]:hidden">{{ $empty }}</ui-empty>
+        <ui-empty class="data-hidden:hidden">{{ $empty }}</ui-empty>
 
         <?php else: ?>
         <flux:select.empty>{!! __('No results found') !!}</flux:select.empty>

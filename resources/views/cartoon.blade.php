@@ -1,7 +1,7 @@
 <x-game-layout>
 {{--    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">--}}
 {{--        <!-- Content goes here -->--}}
-{{--        <div class="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">--}}
+{{--        <div class="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow-sm">--}}
 {{--            <div class="px-4 py-5 sm:px-6">--}}
 {{--                <!-- Content goes here -->--}}
 {{--                <!-- We use less vertical padding on card headers on desktop than on body sections -->--}}
@@ -55,35 +55,35 @@
 {{--                    </h3>--}}
 {{--                    <div id="answer-slots" class="grid grid-cols-1 sm:grid-cols-2 gap-2">--}}
 {{--                        <div--}}
-{{--                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"--}}
+{{--                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"--}}
 {{--                            data-slot="0"--}}
 {{--                            data-selected-index="-1"--}}
 {{--                        >--}}
 {{--                            1. (Leer)--}}
 {{--                        </div>--}}
 {{--                        <div--}}
-{{--                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"--}}
+{{--                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"--}}
 {{--                            data-slot="1"--}}
 {{--                            data-selected-index="-1"--}}
 {{--                        >--}}
 {{--                            2. (Leer)--}}
 {{--                        </div>--}}
 {{--                        <div--}}
-{{--                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"--}}
+{{--                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"--}}
 {{--                            data-slot="2"--}}
 {{--                            data-selected-index="-1"--}}
 {{--                        >--}}
 {{--                            3. (Leer)--}}
 {{--                        </div>--}}
 {{--                        <div--}}
-{{--                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"--}}
+{{--                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700"--}}
 {{--                            data-slot="3"--}}
 {{--                            data-selected-index="-1"--}}
 {{--                        >--}}
 {{--                            4. (Leer)--}}
 {{--                        </div>--}}
 {{--                        <div--}}
-{{--                            class="slot border rounded p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700 sm:col-span-2"--}}
+{{--                            class="slot border rounded-sm p-2 text-gray-800 dark:text-neutral-100 bg-white dark:bg-neutral-700 sm:col-span-2"--}}
 {{--                            data-slot="4"--}}
 {{--                            data-selected-index="-1"--}}
 {{--                        >--}}
@@ -108,13 +108,13 @@
 {{--                <div class="flex items-center gap-4">--}}
 {{--                    <button--}}
 {{--                        id="check-button"--}}
-{{--                        class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"--}}
+{{--                        class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-blue-700"--}}
 {{--                    >--}}
 {{--                        Prüfen--}}
 {{--                    </button>--}}
 {{--                    <button--}}
 {{--                        id="reset-button"--}}
-{{--                        class="inline-flex items-center justify-center rounded-md border border-blue-600 bg-white px-4 py-2 text-sm font-medium text-blue-600 shadow-sm hover:bg-gray-50"--}}
+{{--                        class="inline-flex items-center justify-center rounded-md border border-blue-600 bg-white px-4 py-2 text-sm font-medium text-blue-600 shadow-xs hover:bg-gray-50"--}}
 {{--                    >--}}
 {{--                        Neustart--}}
 {{--                    </button>--}}
@@ -343,7 +343,7 @@
 {{--                div.classList.add(--}}
 {{--                    'option',--}}
 {{--                    'border',--}}
-{{--                    'rounded',--}}
+{{--                    'rounded-sm',--}}
 {{--                    'p-2',--}}
 {{--                    'cursor-pointer',--}}
 {{--                    'hover:bg-gray-100',--}}

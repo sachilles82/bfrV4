@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+    /* Fonts */
+    --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+
+    /* Specific feature flags */
+    --dark-mode: selector;
+
+    /* Hier kannst du deine benutzerdefinierten Farben hinzufügen */
+    --color-primary: #3490dc;
+    --color-secondary: #ffed4a;
+}
+
+/* Plugins einbinden */
+@import "@tailwindcss/forms";
+@import "@tailwindcss/typography";
+
+/* Content-Pfade angeben */
+@content [
+"./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
+"./vendor/laravel/jetstream/**/*.blade.php",
+"./storage/framework/views/*.php",
+"./resources/views/**/*.blade.php",
+"./vendor/livewire/flux-pro/stubs/**/*.blade.php",
+"./vendor/livewire/flux/stubs/**/*.blade.php"
+];

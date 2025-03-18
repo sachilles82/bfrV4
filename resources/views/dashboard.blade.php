@@ -562,7 +562,7 @@
 {{--                for (let i = 0; i < questions.length; i++) {--}}
 {{--                    const cell = document.createElement("div");--}}
 {{--                    cell.textContent = `Q${i + 1}`;--}}
-{{--                    cell.className = "bg-gray-800 text-yellow-300 font-bold flex items-center justify-center rounded shadow";--}}
+{{--                    cell.className = "bg-gray-800 text-yellow-300 font-bold flex items-center justify-center rounded-sm shadow-sm";--}}
 {{--                    if (i === currentIndex) {--}}
 {{--                        cell.classList.add("bg-yellow-500", "text-black");--}}
 {{--                    }--}}

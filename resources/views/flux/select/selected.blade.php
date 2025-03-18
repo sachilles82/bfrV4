@@ -4,9 +4,9 @@
     'max' => null,
 ])
 
-<ui-selected x-ignore wire:ignore class="truncate flex gap-2 text-left flex-1 text-zinc-700 [[disabled]_&]:text-zinc-500 dark:text-zinc-300 dark:[[disabled]_&]:text-zinc-400">
+<ui-selected x-ignore wire:ignore class="truncate flex gap-2 text-left flex-1 text-zinc-700 in-[[disabled]]:text-zinc-500 dark:text-zinc-300 dark:in-[[disabled]]:text-zinc-400">
     <template name="placeholder">
-        <span class="text-zinc-400 [[disabled]_&]:text-zinc-400/70 dark:text-zinc-400 dark:[[disabled]_&]:text-zinc-500" data-flux-select-placeholder>
+        <span class="text-zinc-400 in-[[disabled]]:text-zinc-400/70 dark:text-zinc-400 dark:in-[[disabled]]:text-zinc-500" data-flux-select-placeholder>
             {{ $placeholder }}
         </span>
     </template>

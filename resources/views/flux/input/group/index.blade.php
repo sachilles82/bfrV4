@@ -1,7 +1,7 @@
 @php
 $classes = Flux::classes()
     ->add('w-full flex')
-    ->add('[&>[data-flux-input]]:grow')
+    ->add('*:data-flux-input:grow')
     ->add([
         '[&>*:first-child]:rounded-r-none [&>*:last-child]:rounded-l-none',
         '[&>*:first-child>input]:rounded-r-none [&>*:last-child>input]:rounded-l-none',

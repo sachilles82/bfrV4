@@ -1,6 +1,6 @@
 <div class="hidden w-30 overflow-y-auto bg-indigo-700 dark:bg-gray-900 md:block border-r border-white/5">
     <div class="flex w-28 flex-col items-center py-6">
-        <div class="flex flex-shrink-0 items-center">
+        <div class="flex shrink-0 items-center">
             <img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=white" alt="Your Company">
         </div>
         <div class="mt-6 w-full flex-1 space-y-1 px-2">

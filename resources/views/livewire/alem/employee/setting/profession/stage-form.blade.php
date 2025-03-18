@@ -38,8 +38,8 @@
     <!-- Tabelle mit vorhandenen Stages -->
     <flux:table>
         <flux:columns>
-            <flux:column class="!text-sm font-semibold">{{ __('Stage') }}</flux:column>
-            <flux:column class="!text-sm font-semibold">{{ __('Actions') }}</flux:column>
+            <flux:column class="text-sm! font-semibold">{{ __('Stage') }}</flux:column>
+            <flux:column class="text-sm! font-semibold">{{ __('Actions') }}</flux:column>
         </flux:columns>
 
         <flux:rows>

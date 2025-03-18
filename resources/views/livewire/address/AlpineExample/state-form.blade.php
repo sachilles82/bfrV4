@@ -32,7 +32,7 @@
                             >
                                 <div class="relative mt-2">
                                     <div
-                                        class="cursor-pointer flex-shrink-0 z-10 inline-flex min-w-[140px] items-center py-1
+                                        class="cursor-pointer shrink-0 z-10 inline-flex min-w-[140px] items-center py-1
                                    text-left px-2 text-sm font-medium sm:text-sm sm:leading-5 text-gray-500
                                    bg-gray-100 border-0 border-gray-300 rounded-s-lg dark:bg-white/5
                                    ring-1 ring-inset ring-gray-300 dark:ring-white/10"
@@ -106,7 +106,7 @@
                                                        @click="searchCountry = ''"
                                                        placeholder="{{ __('Search..') }}"
                                                        class="block w-full px-2.5 pl-10 text-gray-900
-                                                  placeholder:dark:text-gray-500 placeholder:text-gray-400
+                                                  dark:placeholder:text-gray-500 placeholder:text-gray-400
                                                   rounded-md text-sm border-0 ring-1 ring-inset ring-gray-300
                                                   focus:ring-2 focus-within:ring-inset focus-within:ring-indigo-600
                                                   dark:focus:ring-indigo-500 dark:ring-gray-700/50
@@ -174,7 +174,7 @@
                                 <x-pupi.input.text
                                     id="stateName"
                                     wire:model.defer="name"
-                                    class="block w-full rounded-md rounded-l-none border-0 py-1.5 dark:text-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 dark:focus-within:ring-inset dark:focus-within:ring-indigo-500 dark:bg-white/5 dark:ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    class="block w-full rounded-md rounded-l-none border-0 py-1.5 dark:text-white text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 dark:focus-within:ring-inset dark:focus-within:ring-indigo-500 dark:bg-white/5 dark:ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     autocomplete="off"
                                     placeholder="z.B. Bayern"
                                 />
@@ -217,9 +217,9 @@
 
         <flux:table>
             <flux:columns>
-                <flux:column class="!text-sm font-semibold">{{ __('State') }}</flux:column>
-                <flux:column class="!text-sm font-semibold">{{ __('Country') }}</flux:column>
-                <flux:column class="!text-sm font-semibold">{{ __('') }}</flux:column>
+                <flux:column class="text-sm! font-semibold">{{ __('State') }}</flux:column>
+                <flux:column class="text-sm! font-semibold">{{ __('Country') }}</flux:column>
+                <flux:column class="text-sm! font-semibold">{{ __('') }}</flux:column>
             </flux:columns>
 
             <!-- Die eigentlichen Daten -->
@@ -243,11 +243,11 @@
                             </div>
                         </flux:cell>
 
-                        {{--                        <flux:cell class="!whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-300">--}}
+                        {{--                        <flux:cell class="whitespace-nowrap! px-3 py-4 text-sm text-gray-500 dark:text-gray-300">--}}
                         {{--                            {{ $state->code }}--}}
                         {{--                        </flux:cell>--}}
 
-                        <flux:cell class="!whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-300">
+                        <flux:cell class="whitespace-nowrap! px-3 py-4 text-sm text-gray-500 dark:text-gray-300">
                             {{ optional($state->country)->code }}
                         </flux:cell>
 

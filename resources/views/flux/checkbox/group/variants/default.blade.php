@@ -1,8 +1,8 @@
 @php
 $classes = Flux::classes()
-    ->add('[&>[data-flux-field]]:mb-3')
+    ->add('*:data-flux-field:mb-3')
     ->add('[&>[data-flux-field]:has(>[data-flux-description])]:mb-4')
-    ->add('[&>[data-flux-field]:last-child]:!mb-0')
+    ->add('[&>[data-flux-field]:last-child]:mb-0!')
     ;
 @endphp
 

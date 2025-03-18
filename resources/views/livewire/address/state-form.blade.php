@@ -41,7 +41,7 @@
                                     @endforeach
                                 </flux:select>
                                 <div wire:loading
-                                     class="absolute inset-0 rounded-lg rounded-l-none flex items-center justify-center backdrop-blur-sm">
+                                     class="absolute inset-0 rounded-lg rounded-l-none flex items-center justify-center backdrop-blur-xs">
                                 </div>
                             </div>
                         </x-pupi.input.group>
@@ -61,12 +61,12 @@
                                 <x-pupi.input.text
                                     wire:model.defer="name"
                                     id="name"
-                                    class="block w-full rounded-md rounded-l-none border-0 py-1.5 dark:text-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 dark:focus-within:ring-inset dark:focus-within:ring-indigo-500 dark:bg-white/5 dark:ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    class="block w-full rounded-md rounded-l-none border-0 py-1.5 dark:text-white text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 dark:focus-within:ring-inset dark:focus-within:ring-indigo-500 dark:bg-white/5 dark:ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     autocomplete="off"
                                     placeholder="z.B. Bayern"
                                 />
                                 <div wire:loading
-                                     class="absolute inset-0 rounded-lg rounded-l-none flex items-center justify-center backdrop-blur-sm">
+                                     class="absolute inset-0 rounded-lg rounded-l-none flex items-center justify-center backdrop-blur-xs">
                                 </div>
                             </div>
                         </x-pupi.input.group>
@@ -86,14 +86,14 @@
 
             <flux:table>
                 <flux:columns>
-                    <flux:column class="!text-sm font-semibold">{{ __('State') }}</flux:column>
-                    <flux:column class="!text-sm font-semibold">{{ __('Country') }}</flux:column>
+                    <flux:column class="text-sm! font-semibold">{{ __('State') }}</flux:column>
+                    <flux:column class="text-sm! font-semibold">{{ __('Country') }}</flux:column>
                     @if(auth()->user()
                         ->can(\App\Enums\Role\Permission::EDIT_ALL_STATE_CITY)
                         ||
                         auth()->user()
                         ->can(\App\Enums\Role\Permission::EDIT_OWN_STATE_CITY))
-                        <flux:column class="!text-sm font-semibold">{{ __('Actions') }}</flux:column>
+                        <flux:column class="text-sm! font-semibold">{{ __('Actions') }}</flux:column>
                     @endif
                 </flux:columns>
 
@@ -117,7 +117,7 @@
                                 </div>
                             </flux:cell>
 
-                            <flux:cell class="!whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-300">
+                            <flux:cell class="whitespace-nowrap! px-3 py-4 text-sm text-gray-500 dark:text-gray-300">
                                 {{ optional($state->country)->code }}
                             </flux:cell>
                             <!-- 4. Spalte: Aktion -->

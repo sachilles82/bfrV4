@@ -10,11 +10,11 @@
 @php
 $classes = Flux::classes()
     ->add('flex justify-between gap-3 flex-1 p-4')
-    ->add('rounded-lg shadow-sm')
-    ->add('bg-white hover:bg-zinc-50 data-[checked]:bg-zinc-50')
-    ->add('dark:bg-white/10 dark:hover:bg-white/15 dark:data-[checked]:bg-white/15')
-    ->add('border border-zinc-800/15 data-[checked]:border-zinc-800')
-    ->add('dark:border-white/10 dark:data-[checked]:border-white')
+    ->add('rounded-lg shadow-xs')
+    ->add('bg-white hover:bg-zinc-50 data-checked:bg-zinc-50')
+    ->add('dark:bg-white/10 dark:hover:bg-white/15 dark:data-checked:bg-white/15')
+    ->add('border border-zinc-800/15 data-checked:border-zinc-800')
+    ->add('dark:border-white/10 dark:data-checked:border-white')
     ->add('[&[disabled]]:opacity-50 dark:[&[disabled]]:opacity-75 [&[disabled]]:cursor-default [&[disabled]]:pointer-events-none')
     ;
 @endphp

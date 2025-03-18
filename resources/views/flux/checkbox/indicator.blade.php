@@ -3,7 +3,7 @@
 $classes = Flux::classes()
     ->add('shrink-0 size-[1.125rem] rounded-[.3rem] flex justify-center items-center')
     ->add('text-sm text-zinc-700 dark:text-zinc-800')
-    ->add('shadow-sm [ui-checkbox[disabled]_&]:shadow-none [ui-checkbox[data-checked]_&]:shadow-none [ui-checkbox[data-indeterminate]_&]:shadow-none')
+    ->add('shadow-xs [ui-checkbox[disabled]_&]:shadow-none [ui-checkbox[data-checked]_&]:shadow-none [ui-checkbox[data-indeterminate]_&]:shadow-none')
     ->add('[ui-checkbox[data-checked]:not([data-indeterminate])_&>svg:first-child]:block [ui-checkbox[data-indeterminate]_&>svg:last-child]:block')
     ->add([
         'border',
@@ -18,10 +18,10 @@ $classes = Flux::classes()
         '[ui-checkbox[data-checked]_&]:bg-zinc-800 dark:[ui-checkbox[data-checked]_&]:bg-white',
         '[ui-checkbox[disabled][data-checked]_&]:bg-zinc-500 dark:[ui-checkbox[disabled][data-checked]_&]:bg-white/60',
         '[ui-checkbox[data-checked]:hover_&]:bg-zinc-800 dark:[ui-checkbox[data-checked]:hover_&]:bg-white',
-        '[ui-checkbox[data-checked]_&]:focus:bg-zinc-800 dark:[ui-checkbox[data-checked]_&]:focus:bg-white',
+        'focus:[ui-checkbox[data-checked]_&]:bg-zinc-800 dark:focus:[ui-checkbox[data-checked]_&]:bg-white',
         '[ui-checkbox[data-indeterminate]_&]:bg-zinc-800 dark:[ui-checkbox[data-indeterminate]_&]:bg-white',
-        '[ui-checkbox[data-indeterminate]_&]:hover:bg-zinc-800 dark:[ui-checkbox[data-indeterminate]_&]:hover:bg-white',
-        '[ui-checkbox[data-indeterminate]_&]:focus:bg-zinc-800 dark:[ui-checkbox[data-indeterminate]_&]:focus:bg-white',
+        'hover:[ui-checkbox[data-indeterminate]_&]:bg-zinc-800 dark:hover:[ui-checkbox[data-indeterminate]_&]:bg-white',
+        'focus:[ui-checkbox[data-indeterminate]_&]:bg-zinc-800 dark:focus:[ui-checkbox[data-indeterminate]_&]:bg-white',
     ])
     ;
 @endphp
