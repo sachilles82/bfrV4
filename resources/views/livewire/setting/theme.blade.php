@@ -1,4 +1,4 @@
-<x-pupi.layout.form>
+<x-pupi.layout.form wire:key="theme-settings-form">
 
     <x-slot name="title">
         {{ __('Theme Settings') }}
@@ -28,7 +28,8 @@
                         wire:model.live="theme"
                         value="default"
                         class="sr-only peer"
-                        x-on:change="applyTheme($el.value)"
+                        x-data
+                        x-on:click="setTimeout(() => applyTheme('default'), 10)"
                     />
                     <div class="h-36 w-full bg-gray-100 dark:bg-gray-700">
                         <img
@@ -56,7 +57,8 @@
                         wire:model.live="theme"
                         value="orange"
                         class="sr-only peer"
-                        x-on:change="applyTheme($el.value)"
+                        x-data
+                        x-on:click="setTimeout(() => applyTheme('orange'), 10)"
                     />
                     <div class="h-36 w-full bg-gray-100 dark:bg-gray-700">
                         <img
@@ -84,12 +86,13 @@
                         wire:model.live="theme"
                         value="green"
                         class="sr-only peer"
-                        x-on:change="applyTheme($el.value)"
+                        x-data
+                        x-on:click="setTimeout(() => applyTheme('green'), 10)"
                     />
                     <div class="h-36 w-full bg-gray-100 dark:bg-gray-700">
                         <img
                             src="https://preline.co/assets/svg/pro/account-dark-image.svg"
-                            alt="Orange"
+                            alt="Green"
                             class="h-full w-full object-cover"
                         />
                     </div>
@@ -112,12 +115,13 @@
                         wire:model.live="theme"
                         value="blue"
                         class="sr-only peer"
-                        x-on:change="applyTheme($el.value)"
+                        x-data
+                        x-on:click="setTimeout(() => applyTheme('blue'), 10)"
                     />
                     <div class="h-36 w-full bg-gray-100 dark:bg-gray-700">
                         <img
                             src="https://preline.co/assets/svg/pro/account-dark-image.svg"
-                            alt="Orange"
+                            alt="Blue"
                             class="h-full w-full object-cover"
                         />
                     </div>
@@ -140,12 +144,13 @@
                         wire:model.live="theme"
                         value="red"
                         class="sr-only peer"
-                        x-on:change="applyTheme($el.value)"
+                        x-data
+                        x-on:click="setTimeout(() => applyTheme('red'), 10)"
                     />
                     <div class="h-36 w-full bg-gray-100 dark:bg-gray-700">
                         <img
                             src="https://preline.co/assets/svg/pro/account-dark-image.svg"
-                            alt="Orange"
+                            alt="Red"
                             class="h-full w-full object-cover"
                         />
                     </div>
@@ -168,12 +173,13 @@
                         wire:model.live="theme"
                         value="lime"
                         class="sr-only peer"
-                        x-on:change="applyTheme($el.value)"
+                        x-data
+                        x-on:click="setTimeout(() => applyTheme('lime'), 10)"
                     />
                     <div class="h-36 w-full bg-gray-100 dark:bg-gray-700">
                         <img
                             src="https://preline.co/assets/svg/pro/account-dark-image.svg"
-                            alt="Orange"
+                            alt="Lime"
                             class="h-full w-full object-cover"
                         />
                     </div>

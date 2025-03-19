@@ -22,17 +22,17 @@
     @fluxAppearance
 
     <script>
-        (function() {
-            let localTheme = localStorage.getItem('theme');
-            if (localTheme) {
-                const htmlRoot = document.getElementById('htmlRoot');
-                htmlRoot.classList.remove(
-                    'theme-default', 'theme-orange', 'theme-green', 'theme-blue', 'theme-red', 'theme-lime', 'theme-pink'
-                );
-                htmlRoot.classList.add('theme-' + localTheme);
-            }
-        })
-        ();
+        // (function() {
+        //     let localTheme = localStorage.getItem('theme');
+        //     if (localTheme) {
+        //         const htmlRoot = document.getElementById('htmlRoot');
+        //         htmlRoot.classList.remove(
+        //             'theme-default', 'theme-orange', 'theme-green', 'theme-blue', 'theme-red', 'theme-lime', 'theme-pink'
+        //         );
+        //         htmlRoot.classList.add('theme-' + localTheme);
+        //     }
+        // })
+        // ();
     </script>
 
 </head>

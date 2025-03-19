@@ -1,22 +1,135 @@
 @import "tailwindcss";
 
+/* Base theme variables - Default theme (indigo) */
 @theme {
-    /* Fonts */
-    --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
-
-    /* Specific feature flags */
-    --dark-mode: selector;
-
-    /* Hier kannst du deine benutzerdefinierten Farben hinzufügen */
-    --color-primary: #3490dc;
-    --color-secondary: #ffed4a;
+    /* Default accent colors */
+    --color-accent: var(--color-indigo-600);
+    --color-accent-content: var(--color-indigo-600);
+    --color-accent-foreground: var(--color-white);
 }
 
-/* Plugins einbinden */
-@import "@tailwindcss/forms";
-@import "@tailwindcss/typography";
+/* Green theme */
+.theme-green {
+    /* Accent colors */
+    --color-accent: var(--color-green-600);
+    --color-accent-content: var(--color-green-600);
+    --color-accent-foreground: var(--color-white);
 
-/* Content-Pfade angeben */
+    /* Redefine indigo to use green colors - solid */
+    --color-indigo-50: var(--color-green-50);
+    --color-indigo-100: var(--color-green-100);
+    --color-indigo-200: var(--color-green-200);
+    --color-indigo-300: var(--color-green-300);
+    --color-indigo-400: var(--color-green-400);
+    --color-indigo-500: var(--color-green-500);
+    --color-indigo-600: var(--color-green-600);
+    --color-indigo-700: var(--color-green-700);
+    --color-indigo-800: var(--color-green-800);
+    --color-indigo-900: var(--color-green-900);
+    --color-indigo-950: var(--color-green-950);
+
+    /* Gray reassignment */
+    --color-gray-50: var(--color-neutral-50);
+    --color-gray-100: var(--color-neutral-100);
+    --color-gray-200: var(--color-neutral-200);
+    --color-gray-300: var(--color-neutral-300);
+    --color-gray-400: var(--color-neutral-400);
+    --color-gray-500: var(--color-neutral-500);
+    --color-gray-600: var(--color-neutral-600);
+    --color-gray-700: var(--color-neutral-700);
+    --color-gray-800: var(--color-neutral-800);
+    --color-gray-900: var(--color-neutral-900);
+    --color-gray-950: var(--color-neutral-950);
+
+    /*!* Transparent variations - indigo-700 *!*/
+    /*--color-indigo-700/10: var(--color-green-700/10);*/
+    /*--color-indigo-700/20: var(--color-green-700/20);*/
+    /*--color-indigo-700/30: var(--color-green-700/30);*/
+    /*--color-indigo-700/40: var(--color-green-700/40);*/
+    /*--color-indigo-700/50: var(--color-green-700/50);*/
+    /*--color-indigo-700/60: var(--color-green-700/60);*/
+    /*--color-indigo-700/70: var(--color-green-700/70);*/
+    /*--color-indigo-700/80: var(--color-green-700/80);*/
+    /*--color-indigo-700/90: var(--color-green-700/90);*/
+
+    /*!* Transparent variations - indigo-800 *!*/
+    /*--color-indigo-800/10: var(--color-green-800/10);*/
+    /*--color-indigo-800/20: var(--color-green-800/20);*/
+    /*--color-indigo-800/30: var(--color-green-800/30);*/
+    /*--color-indigo-800/40: var(--color-green-800/40);*/
+    /*--color-indigo-800/50: var(--color-green-800/50);*/
+    /*--color-indigo-800/60: var(--color-green-800/60);*/
+    /*--color-indigo-800/70: var(--color-green-800/70);*/
+    /*--color-indigo-800/80: var(--color-green-800/80);*/
+    /*--color-indigo-800/90: var(--color-green-800/90);*/
+
+    /*!* Transparent variations - indigo-900 *!*/
+    /*--color-indigo-900/10: var(--color-green-900/10);*/
+    /*--color-indigo-900/20: var(--color-green-900/20);*/
+    /*--color-indigo-900/30: var(--color-green-900/30);*/
+    /*--color-indigo-900/40: var(--color-green-900/40);*/
+    /*--color-indigo-900/50: var(--color-green-900/50);*/
+    /*--color-indigo-900/60: var(--color-green-900/60);*/
+    /*--color-indigo-900/70: var(--color-green-900/70);*/
+    /*--color-indigo-900/80: var(--color-green-900/80);*/
+    /*--color-indigo-900/90: var(--color-green-900/90);*/
+}
+
+
+.dark.theme-green {
+    --color-accent: var(--color-green-600);
+    --color-accent-content: var(--color-green-400);
+    --color-accent-foreground: var(--color-white);
+
+    /* Gray to zinc mapping in dark mode */
+    --color-gray-50: var(--color-zinc-50);
+    --color-gray-100: var(--color-zinc-100);
+    --color-gray-200: var(--color-zinc-200);
+    --color-gray-300: var(--color-zinc-300);
+    --color-gray-400: var(--color-zinc-400);
+    --color-gray-500: var(--color-zinc-500);
+    --color-gray-600: var(--color-zinc-600);
+    --color-gray-700: var(--color-zinc-700);
+    --color-gray-800: var(--color-zinc-800);
+    --color-gray-900: var(--color-zinc-900);
+    --color-gray-950: var(--color-zinc-950);
+
+    /*!* Transparent variations - gray-700 *!*/
+    /*--color-gray-700/10: var(--color-zinc-700/10);*/
+    /*--color-gray-700/20: var(--color-zinc-700/20);*/
+    /*--color-gray-700/30: var(--color-zinc-700/30);*/
+    /*--color-gray-700/40: var(--color-zinc-700/40);*/
+    /*--color-gray-700/50: var(--color-zinc-700/50);*/
+    /*--color-gray-700/60: var(--color-zinc-700/60);*/
+    /*--color-gray-700/70: var(--color-zinc-700/70);*/
+    /*--color-gray-700/80: var(--color-zinc-700/80);*/
+    /*--color-gray-700/90: var(--color-zinc-700/90);*/
+
+    /*!* Transparent variations - gray-800 *!*/
+    /*--color-gray-800/10: var(--color-zinc-800/10);*/
+    /*--color-gray-800/20: var(--color-zinc-800/20);*/
+    /*--color-gray-800/30: var(--color-zinc-800/30);*/
+    /*--color-gray-800/40: var(--color-zinc-800/40);*/
+    /*--color-gray-800/50: var(--color-zinc-800/50);*/
+    /*--color-gray-800/60: var(--color-zinc-800/60);*/
+    /*--color-gray-800/70: var(--color-zinc-800/70);*/
+    /*--color-gray-800/80: var(--color-zinc-800/80);*/
+    /*--color-gray-800/90: var(--color-zinc-800/90);*/
+
+    /*!* Transparent variations - gray-900 *!*/
+    /*--color-gray-900/10: var(--color-zinc-900/10);*/
+    /*--color-gray-900/20: var(--color-zinc-900/20);*/
+    /*--color-gray-900/30: var(--color-zinc-900/30);*/
+    /*--color-gray-900/40: var(--color-zinc-900/40);*/
+    /*--color-gray-900/50: var(--color-zinc-900/50);*/
+    /*--color-gray-900/60: var(--color-zinc-900/60);*/
+    /*--color-gray-900/70: var(--color-zinc-900/70);*/
+    /*--color-gray-900/80: var(--color-zinc-900/80);*/
+    /*--color-gray-900/90: var(--color-zinc-900/90);*/
+}
+
+
+/* Content paths */
 @content [
 "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
 "./vendor/laravel/jetstream/**/*.blade.php",
