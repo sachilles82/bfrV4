@@ -6,7 +6,7 @@
     <div x-show="menu" @click="menu = false" x-transition.opacity.duration.350ms
          class="fixed inset-0 bg-gray-600 bg-opacity-75 dark:bg-gray-900/80"></div>
     <!-- Sidebar Content -->
-    <div class="relative z-40 w-full max-w-xs bg-indigo-700 dark:bg-gray-900 dark:ring-1 dark:ring-white/10"
+    <div class="relative z-40 w-full max-w-xs bg-indigo-700 dark:bg-gray-900 dark:outline-1 dark:outline-white/10"
          x-show="menu"
          x-transition:enter="transform transition ease-in-out duration-150 sm:duration-350"
          x-transition:enter-start="-translate-x-full"
@@ -20,7 +20,7 @@
             <div class="flex items-center justify-between px-4">
                 <img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=white"
                      alt="Your Company">
-                <button @click="menu = false" class="text-navigation-txt2 focus:outline-hidden">
+                <button @click="menu = false" class="text-navigation-txt2 focus:outline-2">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -33,7 +33,7 @@
                 <nav class="space-y-1">
                     <a href="{{ route('dashboard') }}" @click="menu = false"
                        wire:navigate.hover
-                       class="{{ request()->routeIs('dashboard') ? 'text-white bg-indigo-800 dark:text-white dark:bg-gray-800' : 'dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 text-indigo-100 hover:bg-indigo-800 hover:text-white' }} group flex items-center rounded-md px-3 py-2 text-sm font-medium">
+                       class="{{ request()->routeIs('dashboard') ? 'text-white bg-indigo-800 dark:text-white dark:bg-gray-800' : 'dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 text-indigo-100 hover:bg-indigo-800 hover:text-white' }} group flex items-center rounded-md px-3 py-2 text-sm/6 font-medium">
                         <svg
                             class="{{ request()->routeIs('dashboard') ? 'dark:text-white dark:bg-gray-800' : 'text-indigo-300 dark:text-gray-400 group-hover:text-white' }} mr-3 h-6 w-6"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -45,7 +45,7 @@
 
                     <a href="{{ route('settings.roles') }}" @click="menu = false"
                        wire:navigate.hover
-                       class="{{ request()->routeIs('settings.roles') ? 'text-white bg-indigo-800 dark:text-white dark:bg-gray-800' : 'dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 text-indigo-100 hover:bg-indigo-800 hover:text-white' }} group flex items-center rounded-md px-3 py-2 text-sm font-medium">
+                       class="{{ request()->routeIs('settings.roles') ? 'text-white bg-indigo-800 dark:text-white dark:bg-gray-800' : 'dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 text-indigo-100 hover:bg-indigo-800 hover:text-white' }} group flex items-center rounded-md px-3 py-2 text-sm/6 font-medium">
                         <svg
                             class="{{ request()->routeIs('settings.roles') ? 'dark:text-white dark:bg-gray-800' : 'text-indigo-300 dark:text-gray-400 group-hover:text-white' }} mr-3 h-6 w-6"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">

@@ -1,5 +1,5 @@
 <div class="mt-2">
     <textarea {{ $attributes }} type="text"
-              class="block w-full rounded-md border-0 py-1.5 dark:text-white text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 dark:focus-within:ring-inset dark:focus-within:ring-indigo-500 dark:bg-white/5 dark:ring-white/10 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+              class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:focus:outline-indigo-500 sm:text-sm/6">
     </textarea>
 </div>

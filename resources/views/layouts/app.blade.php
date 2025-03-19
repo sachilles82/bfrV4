@@ -21,20 +21,6 @@
     @livewireStyles
     @fluxAppearance
 
-    <script>
-        // (function() {
-        //     let localTheme = localStorage.getItem('theme');
-        //     if (localTheme) {
-        //         const htmlRoot = document.getElementById('htmlRoot');
-        //         htmlRoot.classList.remove(
-        //             'theme-default', 'theme-orange', 'theme-green', 'theme-blue', 'theme-red', 'theme-lime', 'theme-pink'
-        //         );
-        //         htmlRoot.classList.add('theme-' + localTheme);
-        //     }
-        // })
-        // ();
-    </script>
-
 </head>
 <body class="font-sans antialiased h-full overflow-hidden dark:bg-gray-900">
 <div x-data="{ menu : false }" class="flex h-full">

@@ -23,7 +23,6 @@
 {{--    {{ $pagination }}--}}
 {{--</div>--}}
 
-
 <div class="relative">
     <table class="min-w-full divide-y divide-gray-200 dark:divide-white/5">
         <thead class="bg-gray-50 dark:bg-gray-800/50">
@@ -44,4 +43,3 @@
 <div class="border-t border-gray-200 bg-gray-50 dark:bg-gray-800/50 dark:border-gray-700/50 px-4 py-3 sm:px-6 rounded-b-lg">
     {{ $pagination }}
 </div>
-

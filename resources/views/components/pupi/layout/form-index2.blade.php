@@ -9,14 +9,14 @@
                     <div class="w-full md:w-1/2">
                         <div class="flex items-center">
                             <div>
-                                 Titel
+                                Titel
                                 @isset($title)
                                     <h1 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
                                         {{ $title }}
                                     </h1>
                                 @endisset
 
-                                 Untertitel
+                                Untertitel
                                 @isset($description)
                                     <p class="mt-0 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $description }}

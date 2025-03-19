@@ -17,7 +17,7 @@
                           clip-rule="evenodd"/>
                 </svg>
                 <input id="search-field"
-                       class="block h-full w-full border-0 bg-transparent py-0 pl-8 pr-0 dark:text-white text-gray-500 focus:ring-0 sm:text-sm"
+                       class="block h-full w-full border-0 bg-transparent py-0 pl-8 pr-0 dark:text-white text-gray-500 focus:outline-none sm:text-sm"
                        placeholder="Search..." type="search" name="search">
             </div>
         </form>
@@ -70,14 +70,14 @@
 
         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
             <button
-                class="flex text-sm border-2 border-transparent rounded-full focus:outline-hidden focus:border-gray-300 transition">
+                class="flex text-sm border-2 border-transparent rounded-full focus:outline-2 focus:border-gray-300 transition">
                 <img class="h-8 w-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}"
                      alt="{{ Auth::user()->name }}"/>
             </button>
         @else
             <span class="inline-flex rounded-md">
              <button type="button"
-                     class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-hidden focus:bg-gray-50 dark:focus:bg-gray-700 active:bg-gray-50 dark:active:bg-gray-700 transition ease-in-out duration-150">
+                     class="inline-flex items-center px-3 py-2 border border-transparent text-sm/4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-2 focus:bg-gray-50 dark:focus:bg-gray-700 active:bg-gray-50 dark:active:bg-gray-700 transition ease-in-out duration-150">
                       {{ Auth::user()->name }}
                  <svg class="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                       stroke-width="1.5" stroke="currentColor">
