@@ -14,7 +14,7 @@
             </label>
             @if ($badge)
                 <span
-                    x-show="!value"
+                    x-show="!value || (Array.isArray(value) && value.length === 0)"
                     x-cloak
                     @class([
                         'ml-2 inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium',

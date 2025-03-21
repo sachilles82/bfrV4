@@ -13,6 +13,11 @@
     <a href="#"
        wire:click.prevent="$set('statusFilter', 'archived')"
        class="{{ $statusFilter === 'archived' ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
+        {{ __('Inactive') }}
+    </a>
+    <a href="#"
+       wire:click.prevent="$set('statusFilter', 'archived')"
+       class="{{ $statusFilter === 'archived' ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
         {{ __('Archived') }}
     </a>
     <a href="#"

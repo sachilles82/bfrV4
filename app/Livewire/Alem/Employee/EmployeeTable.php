@@ -36,12 +36,10 @@ class EmployeeTable extends Component
         }
     }
 
-
     /**
      * Filterung nach User-Typ aus der User-Tabelle. Nur für User nötig
      */
     protected string $userType = 'employee';
-
 
     /**
      * Lifecycle-Hook: Wird aufgerufen, wenn sich ein Filter ändert, die Auswahl zurücksetzen
@@ -85,24 +83,13 @@ class EmployeeTable extends Component
     public function render(): View
     {
         $authUser = auth()->user();
-
-//        $query = User::query()
-//            ->with([
-//                'employee',
-//                'teams:id,name',
-//                'roles' => function($query) {
-//                    $query->where('visible', RoleVisibility::Visible->value)->select('id', 'name');
-//                }
-//            ])
-//            ->whereHas('employee')
-//            ->where('company_id', $authUser->company_id)
-//            ->where('user_type', $this->userType);
-
         $query = User::query()
             ->with([
-                'employee',
+                'employee' => function($query) {
+                    $query->with(['professionRelation', 'stageRelation']);
+                },
                 'teams:id,name',
-                'currentTeam:id,name', // Add this to load the current team explicitly
+                'currentTeam:id,name',
                 'roles' => function($query) {
                     $query->where('visible', RoleVisibility::Visible->value)->select('id', 'name');
                 }

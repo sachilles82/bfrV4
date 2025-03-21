@@ -3,7 +3,7 @@
     <x-pupi.layout.container>
 
         <x-slot:sidebar>
-            <x-navigation.alem.employee.sidebar />
+            <x-navigation.alem.employee.sidebar/>
         </x-slot:sidebar>
 
 
@@ -15,6 +15,18 @@
                 <livewire:alem.employee.create-employee
                 />
             </x-slot:create>
+
+
+            <!-- Create Profession -->
+
+
+{{--            <livewire:alem.employee.setting.profession.profession-form--}}
+{{--            />--}}
+
+{{--            <livewire:alem.employee.setting.profession.stage-form--}}
+{{--            />--}}
+
+
 
             <!-- Table -->
             <livewire:alem.employee.employee-table

@@ -14,7 +14,8 @@ use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
-use Carbon\Carbon;
+//use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -28,36 +29,64 @@ class CreateEmployee extends Component
 {
     use ValidateEmployee, AuthorizesRequests;
 
-    // User fields
+
+    /**
+     * Standardwerte für neue Mitarbeiter
+     */
+    public $selectedRoles = [];         // Employee User kann mehrere Rollen haben
+    public $model_status = null;       // Account Status des Benutzers
+    public $employee_status = null;    // Beschäftigungs Status des Mitarbeiters
+
+    /**
+     * Benutzer-Felder (User Fields)
+     */
+    public $gender = null;
     public $name;
     public $last_name;
     public $email;
     public $password;
-    public $joined_at;
-    public $gender = null;
-    public $role = 'employee';
-    public $selectedTeams = [];
-    public $model_status = null;
-    public $employee_status = null;
+    public ?Carbon $joined_at;
 
-    // Employee fields
-    public $profession;
-    public $stage;
+    /**
+     * Team-Zuordnung
+     */
+    public $selectedTeams = [];        // Ausgewählte Teams für den Mitarbeiter
 
-    // Notification settings
-    public $notifications = false;
-    public bool $isActive = false;
+    /**
+     * Mitarbeiter-spezifische Felder (Employee Fields)
+     */
+    public $profession;                // Beruf/Position
+    public $stage;                     // Karrierestufe
 
-    // Modal status
-    public bool $showModal = false;
+    /**
+     * Benachrichtigungseinstellungen
+     */
+    public $notifications = false;     // E-Mail-Benachrichtigung senden?
+    public bool $isActive = false;     // Konto sofort aktivieren?
 
-    public function mount()
+    /**
+     * Modal control
+     */
+    public bool $showModal = false;    // Zustand des Modals
+
+    /**
+     * Initialisiert die Komponente mit Standardwerten
+     */
+    public function mount(): void
     {
-        // Initialize model_status with ACTIVE value if null
-        $this->model_status = ModelStatus::ACTIVE->value;
-        $this->employee_status = EmployeeStatus::PROBATION->value;
+        $this->model_status = ModelStatus::ACTIVE;
+        $this->employee_status = EmployeeStatus::PROBATION;
+        $this->gender = Gender::Male;
     }
 
+    //-------------------------------------------------------------------------
+    // COMPUTED PROPERTIES (GETTER)
+    //-------------------------------------------------------------------------
+
+    /**
+     * Lädt die Liste der Berufe/Positionen für das Auswahlfeld
+     * Wird aktualisiert wenn das Event 'professionUpdated' ausgelöst wird
+     */
     #[On('professionUpdated')]
     public function getProfessionsProperty()
     {
@@ -66,6 +95,10 @@ class CreateEmployee extends Component
             ->get();
     }
 
+    /**
+     * Lädt die Liste der Karrierestufen für das Auswahlfeld
+     * Wird aktualisiert wenn das Event 'stageUpdated' ausgelöst wird
+     */
     #[On('stageUpdated')]
     public function getStagesProperty()
     {
@@ -74,68 +107,83 @@ class CreateEmployee extends Component
             ->get();
     }
 
-    public function getGendersProperty()
-    {
-        return collect(Gender::cases())->map(function ($gender) {
-            return [
-                'value' => $gender->value,
-                'name' => $gender->name
-            ];
-        });
-    }
-
-    public function getEmployeeStatusesProperty()
-    {
-        return collect(EmployeeStatus::cases())->map(function ($status) {
-            return [
-                'value' => $status->value,
-                'name' => $status->name
-            ];
-        });
-    }
-
+    /**
+     * Lädt alle verfügbaren Rollen für Mitarbeiter
+     * Wird aktualisiert wenn das Event 'roleUpdated' ausgelöst wird
+     */
     #[On('roleUpdated')]
     public function getRolesProperty()
     {
-        return Role::where(function($query) {
-            $query->where('access', RoleHasAccessTo::EmployeePanel->value)
-                ->where('visible', RoleVisibility::Visible->value);
+        return Role::where(function ($query) {
+            $query->where('access', RoleHasAccessTo::EmployeePanel)
+                ->where('visible', RoleVisibility::Visible);
         })
-            ->where('created_by', 1)
-            ->orWhere('created_by', auth()->id())
+            ->where('created_by', 1)                 // System-erstellte Rollen
+            ->orWhere('created_by', auth()->id())    // Oder vom aktuellen Benutzer erstellte Rollen
             ->get();
     }
 
+    /**
+     * Lädt alle Teams, auf die der aktuelle Benutzer Zugriff hat
+     */
     public function getTeamsProperty()
     {
         return auth()->user()->allTeams();
     }
 
+    //-------------------------------------------------------------------------
+    // AKTIONEN (ACTIONS)
+    //-------------------------------------------------------------------------
+
+    /**
+     * Speichert einen neuen Mitarbeiter in der Datenbank
+     *
+     * Diese Methode führt folgende Schritte aus:
+     * 1. Autorisierung prüfen
+     * 2. Formulardaten validieren
+     * 3. Benutzer erstellen
+     * 4. Rollen zuweisen
+     * 5. Mitarbeiter-Datensatz erstellen
+     * 6. Teams zuweisen
+     * 7. Optional: Benachrichtigung senden
+     */
     public function saveEmployee(): void
     {
+        // Autorisierung prüfen
         $this->authorize('create', Employee::class);
+
+        // Validierung durchführen (aus dem ValidateEmployee-Trait)
         $this->validate();
 
         try {
-            // Create new user
+            // 1. Benutzer erstellen
             $user = User::create([
+                // Persönliche Daten
                 'name' => $this->name,
                 'last_name' => $this->last_name,
                 'email' => $this->email,
-                'email_verified_at' => $this->isActive ? now() : null,
+                'gender' => $this->gender,
+
+                // Sicherheit und Status
                 'password' => Hash::make($this->password),
-                'user_type' => UserType::Employee,
-                'gender' => Gender::from($this->gender),
+                'email_verified_at' => $this->isActive ? now() : null,
+                'model_status' => $this->model_status ?? ModelStatus::ACTIVE,
+
+                // Organisations-Zugehörigkeit
                 'company_id' => auth()->user()->company_id,
                 'created_by' => auth()->id(),
-                'model_status' => $this->model_status ?? ModelStatus::ACTIVE->value,
                 'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
+
+                // Benutzertyp - immer Employee für diese Komponente
+                'user_type' => UserType::Employee,
             ]);
 
-            // Assign role
-            $user->assignRole($this->role);
+            // 2. Rollen zuweisen
+            if (!empty($this->selectedRoles)) {
+                $user->roles()->sync($this->selectedRoles);
+            }
 
-            // Create employee record
+            // 3. Mitarbeiter-Datensatz erstellen
             Employee::create([
                 'user_id' => $user->id,
                 'uuid' => (string)Str::uuid(),
@@ -145,11 +193,12 @@ class CreateEmployee extends Component
                 'company_id' => auth()->user()->company_id,
                 'team_id' => auth()->user()->currentTeam->id,
                 'created_by' => auth()->id(),
-                'employee_status' => $this->employee_status ?? EmployeeStatus::PROBATION->value,
+                'employee_status' => $this->employee_status ?? EmployeeStatus::PROBATION,
             ]);
 
-            // Add user to selected teams
+            // 4. Teams zuweisen
             if (!empty($this->selectedTeams)) {
+                // Zu allen ausgewählten Teams hinzufügen
                 foreach ($this->selectedTeams as $teamId) {
                     $team = auth()->user()->allTeams()->find($teamId);
                     if ($team) {
@@ -157,19 +206,21 @@ class CreateEmployee extends Component
                     }
                 }
             } else {
-                // If no teams selected, at least add the user to the current team
+                // Falls keine Teams ausgewählt wurden, zum aktuellen Team hinzufügen
                 $user->teams()->attach(auth()->user()->currentTeam, ['role' => 'member']);
             }
 
-            // Send notification email if toggled
+            // 5. Benachrichtigung senden (falls aktiviert)
             if ($this->notifications) {
-                // Implement email notification logic here
+                // Hier E-Mail-Benachrichtigung implementieren
                 // Mail::to($this->email)->send(new EmployeeInvitation($user));
             }
 
+            // Formular zurücksetzen und Event auslösen
             $this->resetForm();
             $this->dispatch('employeeCreated');
 
+            // Erfolgsmeldung anzeigen
             Flux::toast(
                 text: __('Employee created successfully.'),
                 heading: __('Success.'),
@@ -177,12 +228,14 @@ class CreateEmployee extends Component
             );
 
         } catch (AuthorizationException $ae) {
+            // Berechtigungsfehler
             Flux::toast(
                 text: __('You are not authorized to create employees.'),
                 heading: __('Error'),
                 variant: 'danger'
             );
         } catch (\Exception $e) {
+            // Allgemeiner Fehler
             Flux::toast(
                 text: __('Error: ') . $e->getMessage(),
                 heading: __('Error'),
@@ -191,20 +244,30 @@ class CreateEmployee extends Component
         }
     }
 
+    /**
+     * Setzt das Formular zurück und initialisiert Standardwerte
+     */
     public function resetForm(): void
     {
+        // Alle Formularfelder zurücksetzen
         $this->reset([
-            'name', 'last_name', 'email', 'password', 'gender', 'role',
+            'name', 'last_name', 'email', 'password', 'gender', 'selectedRoles',
             'joined_at', 'profession', 'stage', 'selectedTeams',
             'model_status', 'employee_status', 'notifications', 'isActive'
         ]);
+
+        // Modal schließen
         $this->showModal = false;
 
-        // Re-initialize default values
-        $this->model_status = ModelStatus::ACTIVE->value;
-        $this->employee_status = EmployeeStatus::PROBATION->value;
+        // Standardwerte neu initialisieren
+        $this->model_status = ModelStatus::ACTIVE;
+        $this->employee_status = EmployeeStatus::PROBATION;
+        $this->selectedRoles = []; // Leeres Array für Rollen
     }
 
+    /**
+     * Rendert die Komponentenansicht
+     */
     public function render(): View
     {
         return view('livewire.alem.employee.create');

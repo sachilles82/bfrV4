@@ -52,7 +52,7 @@
                  aria-label="Clear selected"
                  x-on:click.prevent.stop="let select = $el.closest('ui-select'); select.value = select.hasAttribute('multiple') ? [] : null; select.dispatchEvent(new Event('change', { bubbles: false })); select.dispatchEvent(new Event('input', { bubbles: false }))"
     >
-        <flux:icon.x-mark variant="micro" />
+        <flux:icon.x-mark variant="micro"/>
     </flux:button>
     <?php endif; ?>
 

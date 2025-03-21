@@ -2,9 +2,11 @@
 
 namespace App\Models\Alem\Employee\Setting;
 
+use App\Models\Alem\Employee\Employee;
 use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Stage extends Model
 {
@@ -16,4 +18,12 @@ class Stage extends Model
         'team_id',
         'created_by',
     ];
+
+    /**
+     * Gibt die Mitarbeiter die zu dieser Karrierestufe zugeorndet sind.
+     */
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class, 'stage');
+    }
 }

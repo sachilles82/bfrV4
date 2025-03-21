@@ -5,6 +5,8 @@ namespace App\Models\Alem\Employee;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
+use App\Models\Alem\Employee\Setting\Profession;
+use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
 use App\Traits\BelongsToTeam;
 use App\Traits\Employee\EmployeeStatusManagement;
@@ -54,10 +56,28 @@ class Employee extends Model
         'employee_status' => EmployeeStatus::class,
     ];
 
-    /** Employee gehört zu einem User */
+    /**
+     * Gibt den Benutzer zurück, dem der Mitarbeiter zugeordnet ist.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Gibt die Berufsbezeichnung/Position des Mitarbeiters zurück.
+     */
+    public function professionRelation(): BelongsTo
+    {
+        return $this->belongsTo(Profession::class, 'profession');
+    }
+
+    /**
+     * Gibt die Karrierestufe des Mitarbeiters zurück.
+     */
+    public function stageRelation(): BelongsTo
+    {
+        return $this->belongsTo(Stage::class, 'stage');
     }
 
     /**

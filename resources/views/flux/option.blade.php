@@ -42,7 +42,7 @@
     {{ $attributes->class($classes) }}
     data-flux-option
 >
-    <div class="w-4 mx shrink-0 in-[ui-selected]:hidden">
+    <div class="w-4 mr-2 shrink-0 in-[ui-selected]:hidden">
         <flux:select.indicator :variant="$indicator" />
     </div>
 

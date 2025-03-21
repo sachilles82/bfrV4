@@ -179,7 +179,19 @@
                                            class="font-medium text-gray-900 dark:text-gray-300 hover:text-indigo-700 decoration-1 hover:underline dark:hover:text-indigo-300">
                                             {{ $user->name }} {{ $user->last_name }}
                                         </a>
-                                        <div class="mt-1 text-gray-500 dark:text-gray-400">Malermeister</div>
+                                        <div class="mt-1 text-gray-500 dark:text-gray-400">
+                                            @if($user->employee->professionRelation)
+                                                {{ $user->employee->professionRelation->name }}
+                                            @endif
+
+                                            @if($user->employee->professionRelation && $user->employee->stageRelation)
+                                                <span class="mx-1">•</span>
+                                            @endif
+
+                                            @if($user->employee->stageRelation)
+                                                {{ $user->employee->stageRelation->name }}
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </x-pupi.table.tr.cell>
@@ -207,7 +219,6 @@
                                         <span class="text-gray-400">No teams</span>
                                     @endif
                                 </div>
-                                {{ $user->currentTeam ? $user->currentTeam->name : 'No Team' }}
                                 <div class="text-gray-500 dark:text-gray-400">Departement</div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
