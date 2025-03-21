@@ -102,6 +102,9 @@
                         {{ __('Joined Date') }}
                     </x-pupi.table.th.sort>
                     <x-pupi.table.th.notsort>{{ __('Status') }}</x-pupi.table.th.notsort>
+                    <x-pupi.table.th.sort column="updated_at" :$sortCol :$sortAsc class="pl-2">
+                        {{ __('Last Update') }}
+                    </x-pupi.table.th.sort>
                     <x-pupi.table.th.actions/>
                 </x-slot:head>
                 <x-slot:body>
@@ -262,6 +265,11 @@
                                     </div>
                                 </flux:tooltip>
                             </x-pupi.table.tr.cell>
+                            <x-pupi.table.tr.cell>
+                                <div class="text-gray-500 dark:text-gray-400">
+                                    {{ $user->updated_at->diffForHumans() }}
+                                </div>
+                            </x-pupi.table.tr.cell>
                             <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                 <flux:dropdown align="end" offset="-15">
                                     <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal" size="sm"
@@ -331,7 +339,7 @@
                         </tr>
                     @empty
                         <x-pupi.table.tr.empty>
-                            <x-pupi.table.tr.empty-cell colspan="8"/>
+                            <x-pupi.table.tr.empty-cell colspan="9"/>
                         </x-pupi.table.tr.empty>
                     @endforelse
                 </x-slot:body>
