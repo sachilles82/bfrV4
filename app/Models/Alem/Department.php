@@ -3,11 +3,13 @@
 namespace App\Models\Alem;
 
 use App\Enums\Model\ModelStatus;
+use App\Models\User;
 use App\Traits\BelongsToTeam;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Department extends Model
@@ -45,5 +47,13 @@ class Department extends Model
         return [
             'model_status' => ModelStatus::class,
         ];
+    }
+
+    /**
+     * Ein Department hat viele User (one-to-many)
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
     }
 }

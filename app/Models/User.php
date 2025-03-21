@@ -5,12 +5,14 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Model\ModelStatus;
 use App\Models\Address\State;
+use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
 use App\Traits\HasAddress;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
 use App\Traits\TraitForUserModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -60,6 +62,7 @@ class User extends Authenticatable
         'phone_1',
         'phone_2',
         'joined_at',
+        'department_id',
     ];
 
     /**
@@ -115,6 +118,12 @@ class User extends Authenticatable
     public function employee(): HasOne
     {
         return $this->hasOne(Employee::class);
+    }
+
+    /* Der User gehört zu einem Department (belongs to) */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     /* Verwende den "username" als Schlüssel für das Route Model Binding.*/

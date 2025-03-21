@@ -11,7 +11,9 @@ use App\Livewire\Alem\Employee\Helper\WithEmployeeStatus;
 use App\Livewire\Alem\Employee\Helper\WithModelStatus;
 use App\Models\User;
 use App\Traits\Table\WithPerPagePagination;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class EmployeeTable extends Component
@@ -24,26 +26,19 @@ class EmployeeTable extends Component
 
     public $teamFilter = null;
 
-    /**
-     * Apply team filter to the query
-     */
-    protected function applyTeamFilter($query)
-    {
-        if ($this->teamFilter) {
-            $query->whereHas('teams', function ($q) {
-                $q->where('teams.id', $this->teamFilter);
-            });
-        }
-    }
-
-    /**
-     * Filterung nach User-Typ aus der User-Tabelle. Nur für User nötig
-     */
+    /** Tabelle zeigt nur User mit user_typ employee */
     protected string $userType = 'employee';
 
     /**
-     * Lifecycle-Hook: Wird aufgerufen, wenn sich ein Filter ändert, die Auswahl zurücksetzen
+     * Hört auf das Event 'employee-created' und aktualisiert die Tabelle
      */
+    #[On('employee-created')]
+    public function refreshTable(): void
+    {
+        $this->resetPage();
+    }
+
+    /** Lifecycle-Hook: Wird aufgerufen, wenn sich ein Filter ändert, die Auswahl zurücksetzen */
     public function updated($property): void
     {
         if (in_array($property, ['statusFilter', 'employeeStatusFilter', 'teamFilter'])) {
@@ -90,6 +85,7 @@ class EmployeeTable extends Component
                 },
                 'teams:id,name',
                 'currentTeam:id,name',
+                'department:id,name',
                 'roles' => function($query) {
                     $query->where('visible', RoleVisibility::Visible->value)->select('id', 'name');
                 }
@@ -102,7 +98,6 @@ class EmployeeTable extends Component
         $this->applySorting($query);
         $this->applyStatusFilter($query);
         $this->applyEmployeeStatusFilter($query);
-        $this->applyTeamFilter($query); // Apply team filter
 
         $users = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
         $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();

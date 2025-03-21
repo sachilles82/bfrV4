@@ -29,6 +29,9 @@ trait ValidateEmployee
             'selectedTeams' => 'required|array|min:1',
             'selectedTeams.*' => ['exists:teams,id'],
 
+            // Department
+            'department' => ['nullable', 'exists:departments,id'],
+
             // Employee fields
             'profession' => 'nullable|exists:professions,id',
             'stage' => 'nullable|exists:stages,id',
@@ -70,6 +73,9 @@ trait ValidateEmployee
             'selectedTeams.array' => __('Teams must be provided as a list.'),
             'selectedTeams.min' => __('Please select at least one team.'),
             'selectedTeams.*.exists' => __('The selected team is invalid.'),
+
+            // Department messages
+            'department.exists' => __('The selected department is invalid.'),
 
             // Employee field messages
             'profession.exists' => __('The selected profession is invalid.'),

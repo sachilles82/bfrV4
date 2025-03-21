@@ -1,10 +1,10 @@
 <x-pupi.layout.form>
     <x-slot:title>
-        {{ __('Employee Account Details') }}
+        {{ __('User Account Details') }}
     </x-slot:title>
 
     <x-slot:description>
-        {{ __('Update the employee information below.') }}
+        {{ __('Update the user information below.') }}
     </x-slot:description>
 
     <x-slot name="form">
@@ -27,8 +27,10 @@
                     </div>
 
                     <div class="sm:col-span-4">
-                        <x-pupi.input.group label="{{ __('Gender') }}" for="gender" badge="{{ __('Required') }}" :error="$errors->first('gender')">
-                            <flux:select wire:model="gender" id="gender" name="gender" variant="listbox" placeholder="{{ __('Select Gender') }}">
+                        <x-pupi.input.group label="{{ __('Gender') }}" for="gender" badge="{{ __('Required') }}"
+                                            :error="$errors->first('gender')">
+                            <flux:select wire:model="gender" id="gender" name="gender" variant="listbox"
+                                         placeholder="{{ __('Select Gender') }}">
                                 @foreach(\App\Enums\User\Gender::options() as $value => $label)
                                     <flux:option value="{{ $value }}">{{ __($label) }}</flux:option>
                                 @endforeach
@@ -36,40 +38,129 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Employee Name -->
+                    <!-- User Name -->
                     <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('First Name') }}" for="name" badge="{{ __('Required') }}" :error="$errors->first('name')">
-                            <x-pupi.input.text wire:model="name" name="name" id="name" placeholder="{{ __('Employee Name') }}"/>
+                        <x-pupi.input.group label="{{ __('First Name') }}" for="name" badge="{{ __('Required') }}"
+                                            :error="$errors->first('name')">
+                            <x-pupi.input.text wire:model="name" name="name" id="name"
+                                               placeholder="{{ __('First Name') }}"/>
                         </x-pupi.input.group>
                     </div>
-                    <!-- Employee Name -->
+
+                    <!-- User Last Name -->
                     <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Last Name') }}" for="last_name" badge="{{ __('Required') }}" :error="$errors->first('last_name')">
-                            <x-pupi.input.text wire:model="last_name" name="last_name" id="last_name" placeholder="{{ __('Employee Last Name') }}"/>
+                        <x-pupi.input.group label="{{ __('Last Name') }}" for="last_name" badge="{{ __('Required') }}"
+                                            :error="$errors->first('last_name')">
+                            <x-pupi.input.text wire:model="last_name" name="last_name" id="last_name"
+                                               placeholder="{{ __('Last Name') }}"/>
                         </x-pupi.input.group>
                     </div>
+
                     <!-- Email -->
                     <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Email') }}" for="email" badge="{{ __('Required') }}" :error="$errors->first('email')">
-                            <x-pupi.input.text wire:model="email" name="email" id="email" placeholder="{{ __('Email') }}"/>
+                        <x-pupi.input.group label="{{ __('Email') }}" for="email" badge="{{ __('Required') }}"
+                                            :error="$errors->first('email')">
+                            <x-pupi.input.text wire:model="email" name="email" id="email"
+                                               placeholder="{{ __('Email') }}"/>
                         </x-pupi.input.group>
                     </div>
 
                     <!-- Phone -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group label="{{ __('Phone') }}" for="phone_1" :error="$errors->first('phone_1')">
-                            <x-pupi.input.text wire:model="phone_1" name="phone_1" id="phone_1" placeholder="{{ __('Phone') }}"/>
+                            <x-pupi.input.text wire:model="phone_1" name="phone_1" id="phone_1"
+                                               placeholder="{{ __('Phone') }}"/>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Rolle -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Role') }}"
+                            for="role"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('role')"
+                        >
+                            <flux:select
+                                wire:model="role"
+                                id="role"
+                                name="role"
+                                variant="listbox"
+                                placeholder="{{ __('Rolle auswählen') }}"
+                            >
+                                @foreach($this->availableRoles as $availableRole)
+                                    <flux:option value="{{ $availableRole->id }}">
+                                        {{ $availableRole->name }}
+                                    </flux:option>
+                                @endforeach
+                            </flux:select>
+                            <p class="mt-1 text-xs text-gray-500">{{ __('Die Rolle bestimmt die Berechtigungen des Benutzers.') }}</p>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Team Zugehörigkeit -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Team Zugehörigkeit') }}"
+                            for="selectedTeams"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('selectedTeams')"
+                        >
+                            <flux:select
+                                wire:model="selectedTeams"
+                                id="selectedTeams"
+                                name="selectedTeams"
+                                variant="listbox"
+                                multiple
+                                placeholder="{{ __('Teams auswählen') }}"
+                            >
+                                @foreach($this->availableTeams as $availableTeam)
+                                    <flux:option value="{{ $availableTeam->id }}">
+                                        {{ $availableTeam->name }}
+                                    </flux:option>
+                                @endforeach
+                            </flux:select>
+                            <p class="mt-1 text-xs text-gray-500">{{ __('Wähle Teams aus, zu denen der Benutzer gehören soll.') }}</p>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Department') }}"
+                            for="department"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('department')"
+                            model="department"
+                            help-text="{{ __('') }}"
+                        >
+                            <flux:select
+                                class="mt-2"
+                                wire:model="department"
+                                id="department"
+                                variant="listbox"
+                                placeholder="{{ __('Department auswählen') }}"
+                            >
+                                @forelse($this->departments as $department)
+                                    <flux:option value="{{ $department->id }}">
+                                        <span class="truncate">{{ $department->name }}</span>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No Departments found') }}</flux:option>
+                                @endforelse
+                            </flux:select>
                         </x-pupi.input.group>
                     </div>
 
                     <!-- Model Status Select -->
                     <div class="sm:col-span-3">
-                        <x-pupi.input.group label="{{ __('Account Status') }}"
-                                            for="model_status"
-                                            badge="{{ __('Required') }}"
-                                            :error="$errors->first('model_status')">
+                        <x-pupi.input.group
+                            label="{{ __('Account Status') }}"
+                            for="model_status"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('model_status')">
                             <flux:select wire:model="model_status"
-                                         id="model_status" name="model_status" variant="listbox" placeholder="{{ __('Account Status') }}">
+                                         id="model_status" name="model_status" variant="listbox"
+                                         placeholder="{{ __('Account Status') }}">
                                 @foreach($this->modelStatusOptions as $status)
                                     <flux:option value="{{ $status['value'] }}">
                                         <div class="flex items-center gap-2">
@@ -88,7 +179,7 @@
             </div>
             <!-- Button Container -->
             <x-pupi.button.container>
-                <x-pupi.button.fluxsubmit />
+                <x-pupi.button.fluxsubmit/>
             </x-pupi.button.container>
         </form>
     </x-slot>

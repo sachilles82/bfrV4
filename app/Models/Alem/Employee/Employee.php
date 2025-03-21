@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Employee extends Model
 {
     use HasFactory;
-    use BelongsToTeam;
     use EmployeeStatusManagement;
 
     /**
@@ -39,10 +38,7 @@ class Employee extends Model
         'profession',
         'stage',
         'employment_type',
-        'company_id',
-        'team_id',
         'supervisor',
-        'created_by',
         'employee_status',
     ];
 

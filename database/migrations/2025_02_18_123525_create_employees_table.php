@@ -26,9 +26,6 @@ return new class extends Migration {
             $table->string('supervisor')->nullable();
             $table->string('notice_period')->nullable();
             $table->string('notice_period_enum')->default(NoticePeriod::THREE_MONTHS->value);
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('team_id')->index()->constrained()->cascadeOnDelete();
-            $table->foreignId('created_by')->constrained('users')->nullOnDelete();
             $table->string('employee_status')->default(EmployeeStatus::PROBATION->value);
             $table->timestamps();
         });

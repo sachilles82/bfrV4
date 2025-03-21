@@ -18,7 +18,7 @@ trait ValidateInformation
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($this->employee->user->id),
+                Rule::unique('users', 'email')->ignore($this->user->id),
             ],
             'gender' => 'required|string',
             'phone_1' => [
@@ -28,8 +28,10 @@ trait ValidateInformation
                 'min:8',
                 'max:20',
             ],
+            'selectedTeams' => 'required|array|min:1',
+            'selectedTeams.*' => 'exists:teams,id',
+            'role' => 'nullable|exists:roles,id',
             'model_status' => 'required|string|in:' . implode(',', array_column(ModelStatus::cases(), 'value')),
-//            'password' => 'nullable|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
         ];
     }
 
@@ -47,13 +49,16 @@ trait ValidateInformation
             'email.required' => __('Email is required.'),
             'email.email' => __('Email must be valid.'),
             'email.unique' => __('Email already exists.'),
+            'selectedTeams.required' => __('Mindestens ein Team muss ausgewählt werden.'),
+            'selectedTeams.min' => __('Mindestens ein Team muss ausgewählt werden.'),
+            'selectedTeams.*.exists' => __('Ein ausgewähltes Team existiert nicht.'),
+            'role.required' => __('Eine Rolle muss ausgewählt werden.'),
+            'role.exists' => __('Die ausgewählte Rolle existiert nicht.'),
             'model_status.required' => __('Account status is required.'),
             'model_status.in' => __('The selected account status is invalid.'),
             'phone_1.regex' => __('Phone number format is invalid. Please enter a valid international or national phone number.'),
             'phone_1.min' => __('Phone number must be at least 8 characters.'),
             'phone_1.max' => __('Phone number cannot exceed 20 characters.'),
-//            'password.min' => __('Password must be at least 8 characters.'),
-//            'password.regex' => __('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'),
         ];
     }
 }

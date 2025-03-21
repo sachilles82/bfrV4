@@ -77,21 +77,6 @@
                         @endforeach
                     </flux:select>
                 </div>
-                <div>
-                    <flux:select
-                        variant="listbox"
-                        placeholder="{{ __('All Teams') }}"
-                        wire:model.live="teamFilter"
-                        id="teamFilter">
-
-                        <flux:option wire:click="resetFilters" value="">{{ __('All Teams') }}</flux:option>
-
-                        @foreach($availableTeams as $team)
-                            <flux:option value="{{ $team->id }}">{{ $team->name }}
-                            </flux:option>
-                        @endforeach
-                    </flux:select>
-                </div>
 
                 {{--                    <x-pupi.actions.reset-filters wire:click="resetFilters"/>--}}
                 <x-pupi.actions.per-page/>
@@ -219,7 +204,13 @@
                                         <span class="text-gray-400">No teams</span>
                                     @endif
                                 </div>
-                                <div class="text-gray-500 dark:text-gray-400">Departement</div>
+                                <div class="text-gray-500 dark:text-gray-400">
+                                    @if($user->department)
+                                        {{ $user->department->name }}
+                                    @else
+                                        <span class="text-gray-400">No department</span>
+                                    @endif
+                                </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <div class="flex flex-wrap gap-1">

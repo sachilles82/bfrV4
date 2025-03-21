@@ -11,13 +11,26 @@
             <div class="py-4">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                     <div class="sm:col-span-4">
-                        <x-pupi.input.group label="{{ __('Gender') }}" for="gender" badge="{{ __('Required') }}"
-                                            :error="$errors->first('gender')">
-                            <flux:select wire:model="gender" id="gender" variant="listbox"
-                                         placeholder="{{ __('Select gender') }}">
-                                <flux:option value="{{ \App\Enums\User\Gender::Male }}">{{ __('Male') }}</flux:option>
-                                <flux:option
-                                    value="{{ \App\Enums\User\Gender::Female }}">{{ __('Female') }}</flux:option>
+                        <x-pupi.input.group
+                            label="{{ __('Gender') }}"
+                            for="gender"
+                            badge="{{ __('Optional') }}"
+                            :error="$errors->first('gender')"
+                            model="gender"
+                            help-text="{{ __('') }}"
+                        >
+                            <flux:select
+                                class="mt-2"
+                                wire:model="gender"
+                                id="gender"
+                                variant="listbox"
+                                placeholder="{{ __('Select gender') }}"
+                            >
+                                @foreach(\App\Enums\User\Gender::cases() as $genderStatus)
+                                    <flux:option value="{{ $genderStatus }}">
+                                        {{ $genderStatus->label() }}
+                                    </flux:option>
+                                @endforeach
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -127,6 +140,46 @@
                                 @foreach($this->teams as $team)
                                     <flux:option value="{{ $team->id }}">{{ $team->name }}</flux:option>
                                 @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Department') }}"
+                            for="department"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('department')"
+                            model="department"
+                            help-text="{{ __('') }}"
+                        >
+                            <flux:select
+                                class="mt-2"
+                                wire:model="department"
+                                id="department"
+                                variant="listbox"
+                                placeholder="{{ __('Department auswählen') }}"
+                            >
+                                @forelse($this->departments as $department)
+                                    <flux:option value="{{ $department->id }}">
+                                        <span class="truncate">{{ $department->name }}</span>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No Departments found') }}</flux:option>
+                                @endforelse
+
+                                <!-- Trigger zum Öffnen des Profession-Modals -->
+                                <x-slot name="add">
+                                    <flux:modal.trigger name="create-department">
+                                        <flux:separator class="mt-2 mb-1"/>
+                                        <flux:button
+                                            icon="plus"
+                                            class="w-full rounded-b-lg rounded-t-none"
+                                            variant="filled">
+                                            {{ __('Create Department') }}
+                                        </flux:button>
+                                    </flux:modal.trigger>
+                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -252,14 +305,14 @@
                             <flux:date-picker
                                 with-today
                                 value="21-03-2025"
-{{--                                selectable-header--}}
+                                {{--                                selectable-header--}}
                                 week-numbers
                                 wire:model.defer="joined_at"
                                 id="joined_at"
                                 type="date">
                                 <x-slot name="trigger">
                                     <flux:date-picker.input
-                                    class="mt-2"
+                                        class="mt-2"
                                     />
                                 </x-slot>
                             </flux:date-picker>
@@ -274,20 +327,20 @@
 
                             <ul role="list"
                                 class="mt-2 divide-y divide-gray-200 dark:divide-white/10">
-                                <li class="flex items-center justify-between pt-0 pb-4">
-                                    <div class="flex flex-col">
-                                        <p class="text-sm font-medium leading-6 dark:text-white text-gray-900"
-                                           id="account-status-label">
-                                            {{ __('Account Status') }}
-                                        </p>
-                                        <p class="text-sm dark:text-gray-400 text-gray-500"
-                                           id="account-status-description">
-                                            {{ __('Toggle to set the Account Status to active. Default is Not Activated.') }}
-                                        </p>
-                                    </div>
-                                    <flux:switch wire:model.live="isActive"
-                                                 label="{{ $isActive ? __('Active') : __('Not Activated') }}"/>
-                                </li>
+                                {{--                                <li class="flex items-center justify-between pt-0 pb-4">--}}
+                                {{--                                    <div class="flex flex-col">--}}
+                                {{--                                        <p class="text-sm font-medium leading-6 dark:text-white text-gray-900"--}}
+                                {{--                                           id="account-status-label">--}}
+                                {{--                                            {{ __('Account Status') }}--}}
+                                {{--                                        </p>--}}
+                                {{--                                        <p class="text-sm dark:text-gray-400 text-gray-500"--}}
+                                {{--                                           id="account-status-description">--}}
+                                {{--                                            {{ __('Toggle to set the Account Status to active. Default is Not Activated.') }}--}}
+                                {{--                                        </p>--}}
+                                {{--                                    </div>--}}
+                                {{--                                    <flux:switch wire:model.live="isActive"--}}
+                                {{--                                                 label="{{ $isActive ? __('Active') : __('Not Activated') }}"/>--}}
+                                {{--                                </li>--}}
                                 <li class="flex items-center justify-between py-4">
                                     <div class="flex flex-col">
                                         <p class="text-sm font-medium leading-6 dark:text-white text-gray-900"

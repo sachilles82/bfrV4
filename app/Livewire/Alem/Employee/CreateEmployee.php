@@ -9,11 +9,13 @@ use App\Enums\Role\RoleVisibility;
 use App\Enums\User\Gender;
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
+use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
 use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
+
 //use Carbon\Carbon;
 use Illuminate\Support\Carbon;
 use Flux\Flux;
@@ -46,6 +48,7 @@ class CreateEmployee extends Component
     public $email;
     public $password;
     public ?Carbon $joined_at;
+    public $department = null;
 
     /**
      * Team-Zuordnung
@@ -62,12 +65,6 @@ class CreateEmployee extends Component
      * Benachrichtigungseinstellungen
      */
     public $notifications = false;     // E-Mail-Benachrichtigung senden?
-    public bool $isActive = false;     // Konto sofort aktivieren?
-
-    /**
-     * Modal control
-     */
-    public bool $showModal = false;    // Zustand des Modals
 
     /**
      * Initialisiert die Komponente mit Standardwerten
@@ -124,6 +121,26 @@ class CreateEmployee extends Component
     }
 
     /**
+     * Lädt die verfügbaren Departments
+     * Abhängig vom ausgewählten Team
+     */
+    public function getDepartmentsProperty()
+    {
+        // Alle aktiven Departments laden, die zum aktuellen Team gehören
+        // Filtere nach aktuellem Team, falls ein Team ausgewählt ist
+        $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
+
+        $query = Department::where('model_status', ModelStatus::ACTIVE->value)
+            ->where('company_id', auth()->user()->company_id);
+
+        if ($teamId) {
+            $query->where('team_id', $teamId);
+        }
+
+        return $query->get();
+    }
+
+    /**
      * Lädt alle Teams, auf die der aktuelle Benutzer Zugriff hat
      */
     public function getTeamsProperty()
@@ -149,33 +166,31 @@ class CreateEmployee extends Component
      */
     public function saveEmployee(): void
     {
-        // Autorisierung prüfen
-        $this->authorize('create', Employee::class);
+//        $this->authorize('create', Employee::class);
 
-        // Validierung durchführen (aus dem ValidateEmployee-Trait)
         $this->validate();
 
         try {
             // 1. Benutzer erstellen
             $user = User::create([
-                // Persönliche Daten
+
+                'gender' => $this->gender,
                 'name' => $this->name,
                 'last_name' => $this->last_name,
-                'email' => $this->email,
-                'gender' => $this->gender,
 
-                // Sicherheit und Status
+                'email' => $this->email,
                 'password' => Hash::make($this->password),
-                'email_verified_at' => $this->isActive ? now() : null,
+                'email_verified_at' => now(),
+
+                'department_id' => $this->department, // Department ID hinzugefügt
+
+                'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
                 'model_status' => $this->model_status ?? ModelStatus::ACTIVE,
 
-                // Organisations-Zugehörigkeit
+                // Organisations-Zugehörigkeit. Mitarbeiter sind immer vom Typ 'Employee'
+                'user_type' => UserType::Employee,
                 'company_id' => auth()->user()->company_id,
                 'created_by' => auth()->id(),
-                'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
-
-                // Benutzertyp - immer Employee für diese Komponente
-                'user_type' => UserType::Employee,
             ]);
 
             // 2. Rollen zuweisen
@@ -187,13 +202,12 @@ class CreateEmployee extends Component
             Employee::create([
                 'user_id' => $user->id,
                 'uuid' => (string)Str::uuid(),
-                'date_hired' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
+
                 'profession' => $this->profession,
                 'stage' => $this->stage,
-                'company_id' => auth()->user()->company_id,
-                'team_id' => auth()->user()->currentTeam->id,
-                'created_by' => auth()->id(),
+
                 'employee_status' => $this->employee_status ?? EmployeeStatus::PROBATION,
+                'date_hired' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
             ]);
 
             // 4. Teams zuweisen
@@ -216,16 +230,15 @@ class CreateEmployee extends Component
                 // Mail::to($this->email)->send(new EmployeeInvitation($user));
             }
 
-            // Formular zurücksetzen und Event auslösen
             $this->resetForm();
-            $this->dispatch('employeeCreated');
 
-            // Erfolgsmeldung anzeigen
             Flux::toast(
                 text: __('Employee created successfully.'),
                 heading: __('Success.'),
                 variant: 'success'
             );
+
+            $this->dispatch('employee-created');
 
         } catch (AuthorizationException $ae) {
             // Berechtigungsfehler
@@ -253,11 +266,11 @@ class CreateEmployee extends Component
         $this->reset([
             'name', 'last_name', 'email', 'password', 'gender', 'selectedRoles',
             'joined_at', 'profession', 'stage', 'selectedTeams',
-            'model_status', 'employee_status', 'notifications', 'isActive'
+            'model_status', 'employee_status', 'notifications'
         ]);
 
         // Modal schließen
-        $this->showModal = false;
+        $this->modal('create-employee')->close();
 
         // Standardwerte neu initialisieren
         $this->model_status = ModelStatus::ACTIVE;
