@@ -4,6 +4,7 @@ namespace App\Livewire\Alem\Employee\Setting\Profession;
 
 use App\Livewire\Alem\Employee\Setting\Profession\Helper\ValidateStageForm;
 use App\Models\Alem\Employee\Setting\Stage;
+use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ use Livewire\Component;
 
 class StageForm extends Component
 {
-    use ValidateStageForm, WithPerPagePagination;
+    use ValidateStageForm, WithPerPagePagination, WithPlaceholder;
 
     #[Locked]
     public ?int $stageId = null;

@@ -17,17 +17,6 @@
             </x-slot:create>
 
 
-            <!-- Create Profession -->
-
-
-{{--            <livewire:alem.employee.setting.profession.profession-form--}}
-{{--            />--}}
-
-{{--            <livewire:alem.employee.setting.profession.stage-form--}}
-{{--            />--}}
-
-
-
             <!-- Table -->
             <livewire:alem.employee.employee-table
             />

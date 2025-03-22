@@ -124,6 +124,7 @@ class CreateEmployee extends Component
      * Lädt die verfügbaren Departments
      * Abhängig vom ausgewählten Team
      */
+    #[On('departmentUpdated')]
     public function getDepartmentsProperty()
     {
         // Alle aktiven Departments laden, die zum aktuellen Team gehören

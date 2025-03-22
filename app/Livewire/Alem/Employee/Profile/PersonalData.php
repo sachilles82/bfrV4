@@ -13,6 +13,7 @@ use App\Models\User;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class PersonalData extends Component
@@ -117,6 +118,7 @@ class PersonalData extends Component
     /**
      * Get all available professions
      */
+    #[On('professionUpdated')]
     public function getProfessionsProperty()
     {
         // Alle verfügbaren Professions laden, gefiltered nach Team
@@ -130,6 +132,7 @@ class PersonalData extends Component
     /**
      * Get all available stages
      */
+    #[On('stageUpdated')]
     public function getStagesProperty()
     {
         // Alle verfügbaren Stages laden, gefiltered nach Team

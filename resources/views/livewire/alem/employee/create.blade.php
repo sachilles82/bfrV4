@@ -211,15 +211,11 @@
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
                                 <x-slot name="add">
-                                    <flux:modal.trigger name="create-profession">
-                                        <flux:separator class="mt-2 mb-1"/>
-                                        <flux:button
-                                            icon="plus"
-                                            class="w-full rounded-b-lg rounded-t-none"
-                                            variant="filled">
-                                            {{ __('Create Profession') }}
-                                        </flux:button>
-                                    </flux:modal.trigger>
+
+                                    <livewire:alem.employee.setting.profession.profession-form
+                                        lazy
+                                    />
+
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
@@ -252,13 +248,10 @@
 
                                 <!-- Trigger zum Öffnen des Stage-Modals -->
                                 <x-slot name="add">
-                                    <flux:modal.trigger name="create-stage">
-                                        <flux:separator class="mt-2 mb-1"/>
-                                        <flux:button icon="plus" class="w-full rounded-b-lg rounded-t-none"
-                                                     variant="filled">
-                                            {{ __('Create Stage') }}
-                                        </flux:button>
-                                    </flux:modal.trigger>
+
+                                    <livewire:alem.employee.setting.profession.stage-form
+                                        lazy
+                                    />
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
@@ -379,11 +372,4 @@
 
         </form>
     </flux:modal>
-
-
-    <livewire:alem.employee.setting.profession.profession-form
-    />
-
-    <livewire:alem.employee.setting.profession.stage-form
-    />
 </div>

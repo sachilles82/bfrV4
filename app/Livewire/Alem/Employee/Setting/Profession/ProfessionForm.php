@@ -4,6 +4,7 @@ namespace App\Livewire\Alem\Employee\Setting\Profession;
 
 use App\Livewire\Alem\Employee\Setting\Profession\Helper\ValidateProfessionForm;
 use App\Models\Alem\Employee\Setting\Profession;
+use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ use Livewire\Component;
 
 class ProfessionForm extends Component
 {
-    use ValidateProfessionForm, WithPerPagePagination;
+    use ValidateProfessionForm, WithPerPagePagination, WithPlaceholder;
 
     #[Locked]
     public ?int $professionId = null;
