@@ -67,11 +67,58 @@
                         @foreach($employeeStatuses as $empStatus)
                             <flux:option value="{{ $empStatus->value }}">
                                 <div class="flex items-center gap-2">
+                                    <div
+                                        class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1 {{ $empStatus->colors() }}">
+                                        <x-dynamic-component class="h-4 w-4" :component="$empStatus->icon()"/>
+                                    </div>
+                                    <span>{{ $empStatus->label() }}</span>
+                                </div>
+                            </flux:option>
+                        @endforeach
+                    </flux:select>
+                </div>
+
+                <div>
+                    <flux:select
+                        variant="listbox"
+                        placeholder="{{ __('All Status') }}"
+                        wire:model.live="employeeStatusFilter"
+                        id="employeeStatusFilter">
+
+                        <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
+
+                        @foreach($employeeStatuses as $empStatus)
+                            <flux:option value="{{ $empStatus->value }}">
+                                <div class="flex items-center gap-2">
                                     <svg class="size-1.5 {{ $empStatus->dotColor() }}" viewBox="0 0 6 6"
                                          aria-hidden="true">
                                         <circle cx="3" cy="3" r="3"/>
                                     </svg>
                                     <span>{{ $empStatus->label() }}</span>
+                                </div>
+                            </flux:option>
+                        @endforeach
+                    </flux:select>
+                </div>
+
+                <div>
+                    <flux:select
+                        variant="listbox"
+                        placeholder="{{ __('All Status') }}"
+                        wire:model.live="employeeStatusFilter"
+                        id="employeeStatusFilter">
+
+                        <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
+
+                        @foreach($employeeStatuses as $empStatus)
+                            <flux:option value="{{ $empStatus->value }}">
+                                <div class="inline-flex items-center">
+                                    <span class="mr-2">
+                                        <x-dynamic-component
+                                            :component="$empStatus->icon()"
+                                            class="h-4 w-4 rounded-md {{ $empStatus->colors() ?? '' }}"/>
+                                    </span>
+                                    {{ $empStatus->label() }}
                                 </div>
                             </flux:option>
                         @endforeach
@@ -102,8 +149,8 @@
                         {{ __('Joined Date') }}
                     </x-pupi.table.th.sort>
                     <x-pupi.table.th.notsort>{{ __('Status') }}</x-pupi.table.th.notsort>
-                    <x-pupi.table.th.sort column="updated_at" :$sortCol :$sortAsc class="pl-2">
-                        {{ __('Last Update') }}
+                    <x-pupi.table.th.sort column="created_at" :$sortCol :$sortAsc class="pl-2">
+                        {{ __('Created') }}
                     </x-pupi.table.th.sort>
                     <x-pupi.table.th.actions/>
                 </x-slot:head>
@@ -218,10 +265,10 @@
                             <x-pupi.table.tr.cell>
                                 <div class="flex flex-wrap gap-1">
                                     @foreach($user->roles as $role)
-                                        <div class="inline-flex items-center rounded-lg px-2 py-0.5 text-sm font-medium ring-1 ring-inset mr-2
+                                        <div class="inline-flex items-center rounded-lg px-2 py-1 text-sm font-medium ring-1 ring-inset mr-2
                                 bg-indigo-50 text-indigo-800 ring-indigo-700/10
                                 dark:bg-indigo-400/10 dark:text-indigo-400 dark:ring-indigo-400/30">
-                                            <x-pupi.icon.shield-check class="w-4 h-4 mr-1"/>
+                                            <x-pupi.icon.shield-check class="w-5 h-5 mr-1"/>
                                             {{$role->name}}
                                         </div>
 
@@ -257,17 +304,12 @@
                                                              :component="$user->employee->employee_status->icon()"
                                         />
                                         <div>{{ $user->employee->employee_status->label() }}</div>
-                                        <svg class="ml-1 size-1.5 {{ $user->model_status->dotColor() }}"
-                                             viewBox="0 0 6 6"
-                                             aria-hidden="true">
-                                            <circle cx="3" cy="3" r="3"/>
-                                        </svg>
                                     </div>
                                 </flux:tooltip>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <div class="text-gray-500 dark:text-gray-400">
-                                    {{ $user->updated_at->diffForHumans() }}
+                                    {{ $user->created_at->diffForHumans() }}
                                 </div>
                             </x-pupi.table.tr.cell>
                             <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">

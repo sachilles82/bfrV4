@@ -112,7 +112,10 @@ class Information extends Component
                 'value' => $status->value,
                 'label' => $status->label(),
                 'dotColor' => $status->dotColor(),
-                'icon' => $status->icon()
+                'icon' => $status->icon(),
+
+                'colors' => $status->colors(),
+
             ];
         });
     }
@@ -158,7 +161,7 @@ class Information extends Component
                 variant: 'success'
             );
 
-            $this->dispatch('update-table');
+            $this->dispatch('employee-created');
 
         } catch (\Exception $e) {
             Flux::toast(

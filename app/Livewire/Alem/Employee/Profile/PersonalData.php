@@ -5,141 +5,69 @@ namespace App\Livewire\Alem\Employee\Profile;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
+use App\Livewire\Alem\Employee\Profile\Helper\ValidatePersonalData;
 use App\Models\Alem\Employee\Employee;
-use App\Models\Team;
+use App\Models\Alem\Employee\Setting\Profession;
+use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
-use Livewire\Attributes\On;
 
 class PersonalData extends Component
 {
-    public $employee;
-    public $employee_status;
-    public $personal_number;
-    public $employment_type;
-    public $team;
-    public $supervisor;
-    public $date_hired;
-    public $date_fired;
-    public $probation;
-    public $probation_enum;
-    public $notice_period;
-    public $notice_period_enum;
-    public $user;
+    use ValidatePersonalData, AuthorizesRequests;
 
-    protected $rules = [
-        'employee_status' => 'required',
-        'personal_number' => 'required|string|max:255',
-        'employment_type' => 'required|string|max:255',
-        'team' => 'required',
-        'supervisor' => 'required|string|max:255',
-        'date_hired' => 'required|date',
-        'date_fired' => 'nullable|date',
-        'probation' => 'required|date',
-        'probation_enum' => 'required|string',
-        'notice_period' => 'required|string|max:255',
-        'notice_period_enum' => 'required|string',
-    ];
+    // User und Employee Datensätze
+    public User $user;
+    public ?Employee $employee = null;
 
-    protected $messages = [
-        'employee_status.required' => 'The employee status is required.',
-        'personal_number.required' => 'The personal number is required.',
-        'employment_type.required' => 'The employment type is required.',
-        'team.required' => 'Please select a team.',
-        'supervisor.required' => 'The supervisor is required.',
-        'date_hired.required' => 'The hire date is required.',
-        'date_fired.after_or_equal' => 'The end date must be after or equal to the hire date.',
-        'probation.required' => 'The probation period is required.',
-        'probation.date' => 'The probation period must be a valid date.',
-        'probation_enum.required' => 'The probation period type is required.',
-        'notice_period.required' => 'The notice period is required.',
-        'notice_period_enum.required' => 'The notice period type is required.',
-    ];
+    // Employee Daten
+    public $employee_status = '';
+    public $personal_number = '';
+    public $employment_type = '';
+    public $supervisor = '';
+    public $date_hired = '';
+    public $date_fired = '';
+    public $probation = '';
+    public $probation_enum = '';
+    public $notice_period = '';
+    public $notice_period_enum = '';
+    public $profession = '';
+    public $stage = '';
 
     /**
-     * Mount the component with the employee data
+     * Der Mount-Hook erhält einen User und lädt zusätzlich die Employee-Daten,
+     * falls vorhanden.
      */
-    public function mount(User $user = null)
+    public function mount(User $user): void
     {
-        // If user is passed, load their employee data
-        if ($user) {
-            // Store the user instance
-            $this->user = $user;
+        // Eager load relations, Employee mit seinen Beziehungen
+        $user->load(['employee.professionRelation', 'employee.stageRelation']);
 
-            // Load employee relation if not already loaded
-            $user->loadMissing('employee');
+        $this->user = $user;
+        $this->employee = $user->employee;
 
-            // Check if employee exists
-            if (!$user->employee) {
-                abort(404, __('Employee record not found for this user.'));
-            }
-
-            // Store the employee instance
-            $this->employee = $user->employee;
-
-            // Load all employee and user data
-            $this->loadEmployeeData();
-        } else {
-            // Handle the case when no user is provided
-            abort(404, __('User not found.'));
-        }
-    }
-
-    public function loadEmployeeData()
-    {
-        // Employee fields
-        $this->employee_status = $this->employee->employee_status ? $this->employee->employee_status->value : null;
-        $this->personal_number = $this->employee->personal_number ?? '';
-        $this->employment_type = $this->employee->employment_type ?? '';
-        $this->team = $this->employee->team_id ?? '';
-        $this->supervisor = $this->employee->supervisor ?? '';
-
-        // Handle date fields
-        $this->date_fired = $this->formatDateValue($this->employee->date_fired);
-        $this->date_hired = $this->formatDateValue($this->employee->date_hired);
-        $this->probation = $this->formatDateValue($this->employee->probation);
-        $this->notice_period = $this->formatDateValue($this->employee->notice_period);
-
-        // Handle enum fields
-        $this->probation_enum = $this->employee->probation_enum ? $this->employee->probation_enum->value : Probation::THREE_MONTHS->value;
-        $this->notice_period_enum = $this->employee->notice_period_enum ? $this->employee->notice_period_enum->value : NoticePeriod::THREE_MONTHS->value;
-    }
-
-    /**
-     * Helper method to format date values safely
-     */
-    protected function formatDateValue($value)
-    {
-        // If it's null, return empty string
-        if (is_null($value)) {
-            return '';
-        }
-
-        // If it's already a string, check if it's a valid date string
-        if (is_string($value)) {
-            // If it looks like a date, return it as is
-            if (preg_match('/^\d{4}-\d{2}-\d{2}/', $value)) {
-                return $value;
-            }
-            // Otherwise, try to convert it to a date
-            try {
-                return \Carbon\Carbon::parse($value)->format('Y-m-d');
-            } catch (\Exception $e) {
-                return $value; // Return as is if parsing fails
-            }
-        }
-
-        // If it's a Carbon instance or can be formatted, format it
-        try {
-            return $value->format('Y-m-d');
-        } catch (\Exception $e) {
-            return ''; // Return empty string if formatting fails
+        // Wenn ein Employee-Datensatz existiert, lade die Daten
+        if ($this->employee) {
+            $this->employee_status = $this->employee->employee_status?->value ?? '';
+            $this->personal_number = $this->employee->personal_number ?? '';
+            $this->employment_type = $this->employee->employment_type ?? '';
+            $this->supervisor = $this->employee->supervisor ?? '';
+            $this->date_hired = $this->employee->date_hired?->format('Y-m-d') ?? '';
+            $this->date_fired = $this->employee->date_fired?->format('Y-m-d') ?? '';
+            $this->probation = $this->employee->probation?->format('Y-m-d') ?? '';
+            $this->probation_enum = $this->employee->probation_enum?->value ?? '';
+            $this->notice_period = $this->employee->notice_period?->format('Y-m-d') ?? '';
+            $this->notice_period_enum = $this->employee->notice_period_enum?->value ?? '';
+            $this->profession = $this->employee->profession ?? '';
+            $this->stage = $this->employee->stage ?? '';
         }
     }
 
     /**
-     * Helper method to get all EmployeeStatus options for the dropdown
+     * Get all employee status options for the dropdown
      */
     public function getEmployeeStatusOptionsProperty()
     {
@@ -147,14 +75,31 @@ class PersonalData extends Component
             return [
                 'value' => $status->value,
                 'label' => $status->label(),
-                'dotColor' => $status->dotColor(),
-                'icon' => $status->icon()
+                'icon' => $status->icon(),
+                'colors' => $status->colors()
+
             ];
         });
     }
 
     /**
-     * Get probation period options for the dropdown
+     * Make computed properties available to the blade template
+     */
+    public function render(): View
+    {
+        $employeeStatusOptions = $this->employeeStatusOptions;
+        $probationOptions = $this->probationOptions;
+        $noticePeriodOptions = $this->noticePeriodOptions;
+
+        return view('livewire.alem.employee.profile.personal-data', [
+            'employeeStatusOptions' => $employeeStatusOptions,
+            'probationOptions' => $probationOptions,
+            'noticePeriodOptions' => $noticePeriodOptions
+        ]);
+    }
+
+    /**
+     * Get all probation options for the dropdown
      */
     public function getProbationOptionsProperty()
     {
@@ -162,7 +107,7 @@ class PersonalData extends Component
     }
 
     /**
-     * Get notice period options for the dropdown
+     * Get all notice period options for the dropdown
      */
     public function getNoticePeriodOptionsProperty()
     {
@@ -170,115 +115,91 @@ class PersonalData extends Component
     }
 
     /**
-     * Get available teams for the dropdown
+     * Get all available professions
      */
-    public function getAvailableTeamsProperty()
+    public function getProfessionsProperty()
     {
-        return auth()->user()->allTeams();
+        // Alle verfügbaren Professions laden, gefiltered nach Team
+        $teamId = $this->user->currentTeam?->id;
+
+        return Profession::when($teamId, function ($query) use ($teamId) {
+            return $query->where('team_id', $teamId);
+        })->get();
     }
 
     /**
-     * Update employee and user data
+     * Get all available stages
      */
-    public function updateEmployee()
+    public function getStagesProperty()
     {
-        $this->validate();
+        // Alle verfügbaren Stages laden, gefiltered nach Team
+        $teamId = $this->user->currentTeam?->id;
 
-        // Check if we have an employee to update
-        if (!$this->employee) {
-            Flux::toast(
-                text: __('No employee found to update.'),
-                heading: __('Error'),
-                variant: 'danger'
-            );
-            return;
-        }
+        return Stage::when($teamId, function ($query) use ($teamId) {
+            return $query->where('team_id', $teamId);
+        })->get();
+    }
+
+    /**
+     * Aktualisiert die Employee-Daten oder erstellt einen neuen Datensatz, falls noch keiner existiert.
+     */
+    public function updateEmployee(): void
+    {
+        //$this->authorize('update', $this->user);
+
+//        $this->validate();
 
         try {
-            // Get the old team ID before updating
-            $oldTeamId = $this->employee->team_id;
-
-            // Update employee data
-            $this->employee->update([
+            // Employee-Daten für Update vorbereiten
+            $employeeData = [
                 'employee_status' => $this->employee_status,
                 'personal_number' => $this->personal_number,
+                'employment_type' => $this->employment_type,
+                'supervisor' => $this->supervisor,
+                'date_hired' => $this->date_hired,
+                'date_fired' => $this->date_fired ?: null,
                 'probation' => $this->probation,
                 'probation_enum' => $this->probation_enum,
-                'date_fired' => $this->date_fired ?: null,
-                'date_hired' => $this->date_hired,
-                'employment_type' => $this->employment_type,
-                'team_id' => $this->team,
-                'supervisor' => $this->supervisor,
                 'notice_period' => $this->notice_period,
                 'notice_period_enum' => $this->notice_period_enum,
-            ]);
+                'profession' => $this->profession ?: null,
+                'stage' => $this->stage ?: null
+            ];
 
-            // If team has changed, ensure the user is a member of the new team
-            if ($oldTeamId != $this->team) {
-                $this->addUserToTeam($this->team);
+            // Update oder Create Employee
+            if ($this->employee) {
+                $this->employee->update($employeeData);
+            } else {
+                // Wenn noch kein Employee-Datensatz existiert, erstelle einen neuen
+                $employeeData['user_id'] = $this->user->id;
+
+                // UUID generieren falls benötigt
+                if (!isset($employeeData['uuid'])) {
+                    $employeeData['uuid'] = \Illuminate\Support\Str::uuid()->toString();
+                }
+
+                $this->employee = Employee::create($employeeData);
+
+                // Den Employee-Datensatz neu laden
+                $this->user->load('employee');
             }
 
             Flux::toast(
-                text: __('Employee data updated successfully!'),
-                heading: __('Success'),
+                text: __('Employee data updated successfully.'),
+                heading: __('Success.'),
                 variant: 'success'
             );
 
-            $this->dispatch('update-table');
+            $this->dispatch('employee-updated');
 
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error updating employee: ') . $e->getMessage(),
+                text: __('Error updating employee data: ') . $e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );
         }
     }
 
-    /**
-     * Add the employee's user to the specified team if not already a member
-     */
-    public function addUserToTeam($teamId)
-    {
-        // Get the team
-        $team = Team::find($teamId);
 
-        if (!$team) {
-            throw new \Exception(__('Selected team not found.'));
-        }
-
-        // Check if user is already a member of this team
-        if (!$this->user->belongsToTeam($team)) {
-            // Add user to the team as a member
-            $this->user->teams()->attach($team, ['role' => 'member']);
-
-            Flux::toast(
-                text: __('User added to the selected team.'),
-                heading: __('Team Updated'),
-                variant: 'info'
-            );
-        }
-    }
-
-    /**
-     * Refreshes the component when an update event is received
-     */
-    #[On('update-table')]
-    public function refresh()
-    {
-        $this->loadEmployeeData();
-    }
-
-    /**
-     * Render the component
-     */
-    public function render()
-    {
-        return view('livewire.alem.employee.profile.personal-data', [
-            'employeeStatusOptions' => $this->employeeStatusOptions,
-            'availableTeams' => $this->availableTeams,
-            'probationOptions' => $this->probationOptions,
-            'noticePeriodOptions' => $this->noticePeriodOptions,
-        ]);
-    }
 }

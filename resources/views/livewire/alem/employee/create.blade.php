@@ -280,12 +280,13 @@
                                 variant="listbox"
                             >
                                 @foreach(\App\Enums\Employee\EmployeeStatus::cases() as $empStatus)
-                                    <flux:option value="{{ $empStatus }}">
-                                        <div class="flex items-center gap-2">
-                                            <svg class="size-1.5 {{ $empStatus->dotColor() }}" viewBox="0 0 6 6"
-                                                 aria-hidden="true">
-                                                <circle cx="3" cy="3" r="3"/>
-                                            </svg>
+                                    <flux:option value="{{ $empStatus->value }}">
+                                        <div class="flex items-center">
+            <span class="mr-2">
+                <x-dynamic-component
+                    :component="$empStatus->icon()"
+                    class="h-4 w-4 {{ $empStatus->colors() ?? '' }}"/>
+            </span>
                                             <span>{{ $empStatus->label() }}</span>
                                         </div>
                                     </flux:option>

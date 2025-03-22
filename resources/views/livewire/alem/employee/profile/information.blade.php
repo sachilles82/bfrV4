@@ -122,38 +122,14 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Rolle -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Role') }}"
-                            for="role"
-                            badge="{{ __('Required') }}"
-                            model="role"
-                            help-text="{{ __('Die Rolle bestimmt die Berechtigungen des Benutzers.') }}"
-                            :error="$errors->first('role')">
-                            <flux:select
-                                wire:model="role"
-                                id="role"
-                                name="role"
-                                variant="listbox"
-                                placeholder="{{ __('Rolle auswählen') }}">
-                                @foreach($this->availableRoles as $availableRole)
-                                    <flux:option value="{{ $availableRole->id }}">
-                                        {{ $availableRole->name }}
-                                    </flux:option>
-                                @endforeach
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
-
                     <!-- Team Zugehörigkeit -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
-                            label="{{ __('Team Zugehörigkeit') }}"
+                            label="{{ __('Team`s`') }}"
                             for="selectedTeams"
                             badge="{{ __('Required') }}"
                             model="selectedTeams"
-                            help-text="{{ __('Wähle Teams aus, zu denen der Benutzer gehören soll.') }}"
+                            help-text="{{ __('Employee can belong to several teams') }}"
                             :error="$errors->first('selectedTeams')">
                             <flux:select
                                 wire:model="selectedTeams"
@@ -161,7 +137,7 @@
                                 name="selectedTeams"
                                 variant="listbox"
                                 multiple
-                                placeholder="{{ __('Teams auswählen') }}">
+                                placeholder="{{ __('Team') }}">
                                 @foreach($this->availableTeams as $availableTeam)
                                     <flux:option value="{{ $availableTeam->id }}">
                                         {{ $availableTeam->name }}
@@ -197,7 +173,30 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Model Status Select -->
+                    <!-- Rolle -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Role') }}"
+                            for="role"
+                            badge="{{ __('Required') }}"
+                            model="role"
+                            help-text="{{ __('') }}"
+                            :error="$errors->first('role')">
+                            <flux:select
+                                wire:model="role"
+                                id="role"
+                                name="role"
+                                variant="listbox"
+                            >
+                                @foreach($this->availableRoles as $availableRole)
+                                    <flux:option value="{{ $availableRole->id }}">
+                                        {{ $availableRole->name }}
+                                    </flux:option>
+                                @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Account Status') }}"
@@ -226,8 +225,41 @@
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
+
+                    <!-- Model Status Select -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Account Status') }}"
+                            for="model_status"
+                            badge="{{ __('Required') }}"
+                            model="model_status"
+                            help-text="{{ __('') }}"
+                            :error="$errors->first('model_status')">
+                            <flux:select
+                                wire:model="model_status"
+                                id="model_status"
+                                name="model_status"
+                                variant="listbox"
+                                placeholder="{{ __('Account Status') }}">
+                                @foreach($this->modelStatusOptions as $status)
+                                    <flux:option value="{{ $status['value'] }}">
+                                        <div class="flex items-center">
+                                            <span class="mr-2">
+                                                <x-dynamic-component
+                                                    :component="$status['icon'] ?? 'heroicon-o-question-mark-circle'"
+                                                    class="h-4 w-4 {{ $status['colors'] ?? '' }}"/>
+                                            </span>
+                                            <span>{{ $status['label'] }}</span>
+                                        </div>
+                                    </flux:option>
+                                @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
                 </div>
             </div>
+
             <!-- Button Container -->
             <x-pupi.button.container>
                 <x-pupi.button.fluxsubmit/>
