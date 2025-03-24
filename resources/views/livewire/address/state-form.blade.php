@@ -47,7 +47,7 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- State Dropdown -->
+                    <!-- Name -->
                     <div class="mt-4 relative w-full">
                         <x-pupi.input.group
                             label="{{ __('Name') }}"

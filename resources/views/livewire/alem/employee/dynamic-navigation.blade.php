@@ -10,6 +10,11 @@
     <div class="mt-6">
         <div class="space-y-10 divide-y dark:divide-white/5 divide-gray-900/5">
             @if($activeTab === 'employee-update')
+
+                <livewire:alem.employee.profile.employment-data
+                    :user="$user"
+                />
+
                 <livewire:alem.employee.profile.information
                     :user="$user"
                     key="employee-update-{{ $user->id }}"
@@ -22,10 +27,6 @@
 
                 <livewire:address.address-manager
                     :addressable="$user"
-                />
-
-                <livewire:alem.employee.profile.employement-data
-                    :user="$user"
                 />
             @elseif($activeTab === 'report')
                 <livewire:alem.employee.report.report-table

@@ -4,6 +4,7 @@ namespace App\Enums\Employee;
 
 enum Residence: string
 {
+    case S = 'Swiss';
     case C = 'C';
     case B = 'B';
     case B1 = 'B1';
@@ -14,6 +15,7 @@ enum Residence: string
     public static function options(): array
     {
         return [
+            self::S->value => 'Swiss',
             self::C->value => 'Residence C',
             self::B->value => 'Residence B',
             self::B1->value => 'Residence B1 - EU/EFTA',
@@ -26,6 +28,7 @@ enum Residence: string
     public function label(): string
     {
         return match ($this) {
+            self::S => 'Swiss Citizen',
             self::C => 'Residence C',
             self::B => 'Residence B',
             self::B1 => 'Residence B1 - EU/EFTA',

@@ -247,12 +247,14 @@
                             label="{{ __('Joined Date') }}"
                             for="joined_at"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('joined_at')">
+                            model="joined_at"
+                            :error="$errors->first('joined_at')"
+                        >
                             <flux:date-picker
+                                wire:model.defer="joined_at"
                                 with-today
                                 value="21-03-2025"
                                 week-numbers
-                                wire:model.defer="joined_at"
                                 id="joined_at"
                                 type="date">
                                 <x-slot name="trigger">

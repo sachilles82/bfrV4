@@ -2,9 +2,12 @@
 
 namespace App\Models\Alem\Employee;
 
+use App\Enums\Employee\CivilStatus;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
+use App\Enums\Employee\Religion;
+use App\Enums\Employee\Residence;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
@@ -40,8 +43,25 @@ class Employee extends Model
         'employment_type',
         'supervisor',
         'employee_status',
+
+        // Neue Felder
+        'ahv_number',
+        'birthdate',
+        'nationality',
+        'hometown',
+        'religion',
+        'civil_status',
+        'residence_permit',
     ];
 
+    /**
+     * Appends für häufig benötigte berechnete Attribute
+     */
+    protected $appends = ['full_status', 'years_of_service'];
+
+    /**
+     * Type-Casting für Attribute
+     */
     protected $casts = [
         'date_hired' => 'date',
         'date_fired' => 'date',
@@ -50,7 +70,72 @@ class Employee extends Model
         'notice_period' => 'date',
         'notice_period_enum' => NoticePeriod::class,
         'employee_status' => EmployeeStatus::class,
+        'birthdate' => 'date',
+        'religion' => Religion::class,
+        'civil_status' => CivilStatus::class,
+        'residence_permit' => Residence::class,
     ];
+
+    /**
+     * Boot-Methode mit Global Scopes
+     */
+    protected static function booted()
+    {
+        // Global Scope für aktive Mitarbeiter (optional, nur bei Bedarf verwenden)
+        // static::addGlobalScope('notLeft', function ($builder) {
+        //     $builder->where('employee_status', '!=', EmployeeStatus::LEAVE->value);
+        // });
+    }
+
+    /**
+     * Factory-Methode mit Standardrelationen
+     */
+    public static function withDefaultRelations()
+    {
+        return static::with(['user', 'professionRelation', 'stageRelation']);
+    }
+
+    /**
+     * Scope für aktive Mitarbeiter
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereIn('employee_status', [
+            EmployeeStatus::EMPLOYED->value,
+            EmployeeStatus::PROBATION->value,
+            EmployeeStatus::ONBOARDING->value
+        ]);
+    }
+
+    /**
+     * Scope für Mitarbeiter mit bestimmtem Status
+     */
+    public function scopeWithStatus($query, EmployeeStatus $status)
+    {
+        return $query->where('employee_status', $status->value);
+    }
+
+    /**
+     * Berechnet die Betriebszugehörigkeit in Jahren
+     */
+    public function getYearsOfServiceAttribute()
+    {
+        if (!$this->date_hired) {
+            return 0;
+        }
+        return $this->date_hired->diffInYears(now());
+    }
+
+    /**
+     * Liefert den formatierten Status
+     */
+    public function getFullStatusAttribute()
+    {
+        if (!$this->employee_status) {
+            return '';
+        }
+        return "{$this->employee_status->value}: {$this->employee_status->label()}";
+    }
 
     /**
      * Gibt den Benutzer zurück, dem der Mitarbeiter zugeordnet ist.
