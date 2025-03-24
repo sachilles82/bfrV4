@@ -66,52 +66,6 @@
 
                         @foreach($employeeStatuses as $empStatus)
                             <flux:option value="{{ $empStatus->value }}">
-                                <div class="flex items-center gap-2">
-                                    <div
-                                        class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1 {{ $empStatus->colors() }}">
-                                        <x-dynamic-component class="h-4 w-4" :component="$empStatus->icon()"/>
-                                    </div>
-                                    <span>{{ $empStatus->label() }}</span>
-                                </div>
-                            </flux:option>
-                        @endforeach
-                    </flux:select>
-                </div>
-
-                <div>
-                    <flux:select
-                        variant="listbox"
-                        placeholder="{{ __('All Status') }}"
-                        wire:model.live="employeeStatusFilter"
-                        id="employeeStatusFilter">
-
-                        <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
-
-                        @foreach($employeeStatuses as $empStatus)
-                            <flux:option value="{{ $empStatus->value }}">
-                                <div class="flex items-center gap-2">
-                                    <svg class="size-1.5 {{ $empStatus->dotColor() }}" viewBox="0 0 6 6"
-                                         aria-hidden="true">
-                                        <circle cx="3" cy="3" r="3"/>
-                                    </svg>
-                                    <span>{{ $empStatus->label() }}</span>
-                                </div>
-                            </flux:option>
-                        @endforeach
-                    </flux:select>
-                </div>
-
-                <div>
-                    <flux:select
-                        variant="listbox"
-                        placeholder="{{ __('All Status') }}"
-                        wire:model.live="employeeStatusFilter"
-                        id="employeeStatusFilter">
-
-                        <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
-
-                        @foreach($employeeStatuses as $empStatus)
-                            <flux:option value="{{ $empStatus->value }}">
                                 <div class="inline-flex items-center">
                                     <span class="mr-2">
                                         <x-dynamic-component

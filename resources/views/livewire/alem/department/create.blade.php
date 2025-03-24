@@ -1,9 +1,10 @@
 <div>
-    <flux:modal.trigger name="department-add">
-        <x-pupi.button.create/>
+
+    <flux:modal.trigger name="create-department">
+        <x-pupi.button.open-manager/>
     </flux:modal.trigger>
 
-    <flux:modal name="department-add"
+    <flux:modal name="create-department"
                 variant="flyout" class="space-y-6">
         <form wire:submit="save" class="space-y-6">
             <div>

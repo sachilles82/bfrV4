@@ -32,19 +32,6 @@ enum EmployeeStatus: string
         };
     }
 
-    public function dotColor(): string
-    {
-        return match ($this) {
-
-            static::ONBOARDING => 'fill-green-600 dark:fill-green-400/70',
-            static::PROBATION => 'fill-yellow-600 dark:fill-yellow-400/70',
-            static::EMPLOYED => 'fill-green-600 dark:fill-green-400/70',
-            static::ONLEAVE => 'fill-gray-600 dark:fill-gray-400/70',
-            default => 'fill-red-700 dark:fill-red-400',
-        };
-    }
-
-
     public function icon(): string
     {
         return match ($this) {

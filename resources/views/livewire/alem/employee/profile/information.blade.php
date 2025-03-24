@@ -197,35 +197,6 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Account Status') }}"
-                            for="model_status"
-                            badge="{{ __('Required') }}"
-                            model="model_status"
-                            help-text="{{ __('') }}"
-                            :error="$errors->first('model_status')">
-                            <flux:select
-                                wire:model="model_status"
-                                id="model_status"
-                                name="model_status"
-                                variant="listbox"
-                                placeholder="{{ __('Account Status') }}">
-                                @foreach($this->modelStatusOptions as $status)
-                                    <flux:option value="{{ $status['value'] }}">
-                                        <div class="flex items-center gap-2">
-                                            <svg class="size-1.5 {{ $status['dotColor'] }}" viewBox="0 0 6 6"
-                                                 aria-hidden="true">
-                                                <circle cx="3" cy="3" r="3"/>
-                                            </svg>
-                                            <span>{{ $status['label'] }}</span>
-                                        </div>
-                                    </flux:option>
-                                @endforeach
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
-
                     <!-- Model Status Select -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group

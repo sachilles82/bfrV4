@@ -4,19 +4,20 @@ namespace App\Livewire\Alem\Department;
 
 use App\Livewire\Alem\Department\Helper\ValidateDepartment;
 use App\Models\Alem\Department;
+use App\Traits\Modal\WithPlaceholder;
 use Illuminate\View\View;
 use Livewire\Component;
 
 class CreateDepartment extends Component
 {
-    use ValidateDepartment;
+    use ValidateDepartment, WithPlaceholder;
 
     public ?int $departmentId = null;
     public string $name = '';
 
     public function create(): void
     {
-        $this->modal('department-add')->show();
+        $this->modal('create-department')->show();
     }
 
 
@@ -24,12 +25,12 @@ class CreateDepartment extends Component
     {
         $this->validate();
 
-        $this->modal('department-add')->close();
+        $this->modal('create-department')->close();
         Department::create($this->only([
             'name'
         ]));
 
-        $this->dispatch('created' );
+        $this->dispatch('departmentUpdated' );
 
         $this->reset('name');
     }

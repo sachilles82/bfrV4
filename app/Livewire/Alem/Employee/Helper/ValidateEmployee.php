@@ -39,7 +39,7 @@ trait ValidateEmployee
             'employee_status' => ['required', Rule::in(array_column(EmployeeStatus::cases(), 'value'))],
             'joined_at' => 'required|date',
 
-//            'model_status' => ['required', Rule::in(array_column(ModelStatus::cases(), 'value'))],
+            'model_status' => ['required', Rule::in(array_column(ModelStatus::cases(), 'value'))],
         ];
     }
 

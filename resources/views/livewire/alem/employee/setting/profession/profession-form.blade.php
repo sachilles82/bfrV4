@@ -5,7 +5,7 @@
     </flux:modal.trigger>
 
 
-    <flux:modal name="create-profession" class="w-96">
+    <flux:modal name="create-profession" variant="flyout" class="w-96">
         <!-- Modal-Header -->
         <div>
             <flux:heading size="lg">

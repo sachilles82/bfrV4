@@ -3,7 +3,7 @@
         <x-pupi.button.open-manager/>
     </flux:modal.trigger>
 
-    <flux:modal name="create-stage" class="w-96">
+    <flux:modal name="create-stage" variant="flyout" class="w-96">
         <!-- Modal-Header -->
         <div>
             <flux:heading size="lg">

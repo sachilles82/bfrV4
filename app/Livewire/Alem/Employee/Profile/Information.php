@@ -111,9 +111,7 @@ class Information extends Component
             return [
                 'value' => $status->value,
                 'label' => $status->label(),
-                'dotColor' => $status->dotColor(),
                 'icon' => $status->icon(),
-
                 'colors' => $status->colors(),
 
             ];

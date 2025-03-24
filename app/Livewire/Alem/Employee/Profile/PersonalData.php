@@ -83,21 +83,6 @@ class PersonalData extends Component
         });
     }
 
-    /**
-     * Make computed properties available to the blade template
-     */
-    public function render(): View
-    {
-        $employeeStatusOptions = $this->employeeStatusOptions;
-        $probationOptions = $this->probationOptions;
-        $noticePeriodOptions = $this->noticePeriodOptions;
-
-        return view('livewire.alem.employee.profile.personal-data', [
-            'employeeStatusOptions' => $employeeStatusOptions,
-            'probationOptions' => $probationOptions,
-            'noticePeriodOptions' => $noticePeriodOptions
-        ]);
-    }
 
     /**
      * Get all probation options for the dropdown
@@ -202,6 +187,22 @@ class PersonalData extends Component
                 variant: 'danger'
             );
         }
+    }
+
+    /**
+     * Make computed properties available to the blade template
+     */
+    public function render(): View
+    {
+        $employeeStatusOptions = $this->employeeStatusOptions;
+        $probationOptions = $this->probationOptions;
+        $noticePeriodOptions = $this->noticePeriodOptions;
+
+        return view('livewire.alem.employee.profile.personal-data', [
+            'employeeStatusOptions' => $employeeStatusOptions,
+            'probationOptions' => $probationOptions,
+            'noticePeriodOptions' => $noticePeriodOptions
+        ]);
     }
 
 

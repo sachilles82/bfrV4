@@ -29,7 +29,7 @@ class ProfessionForm extends Component
     public function saveProfession(): void
     {
         try {
-            // Validierung durchführen – bei Fehlern wird automatisch eine ValidationException geworfen
+
             $this->validate();
 
             if ($this->editing && $this->professionId) {
@@ -109,6 +109,7 @@ class ProfessionForm extends Component
                 ->findOrFail($id);
 
             $profession->delete();
+            $this->finish();
             $this->dispatch('professionUpdated');
 
             Flux::toast(
@@ -116,8 +117,6 @@ class ProfessionForm extends Component
                 heading: __('Success.'),
                 variant: 'success'
             );
-
-            $this->finish();
 
         } catch (\Throwable $e) {
             Flux::toast(

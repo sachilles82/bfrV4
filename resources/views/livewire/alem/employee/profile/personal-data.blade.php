@@ -28,36 +28,6 @@
                             >
                                 @foreach($employeeStatusOptions as $status)
                                     <flux:option value="{{ $status['value'] }}">
-                                        <div class="flex items-center">
-                                            <div
-                                                class="mr-2 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1 {{ $status['colors'] }}">
-                                                <x-dynamic-component class="h-4 w-4" :component="$status['icon']"/>
-                                            </div>
-                                            <div>{{ $status['label'] }}</div>
-                                        </div>
-                                    </flux:option>
-                                @endforeach
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Employee Status') }}"
-                            for="employee_status"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('employee_status')"
-                        >
-                            <flux:select
-                                wire:model="employee_status"
-                                id="employee_status"
-                                name="employee_status"
-                                variant="listbox"
-                                placeholder="{{ __('Select Status') }}"
-                            >
-                                @foreach($employeeStatusOptions as $status)
-                                    <flux:option value="{{ $status['value'] }}">
                                         <div class="inline-flex items-center">
                                              <span class="mr-2">
                                                                                <x-dynamic-component
