@@ -53,6 +53,7 @@ class User extends Authenticatable
         'name',
         'last_name',
         'email',
+        'email_verified_at',
         'password',
         'company_id',
         'user_type',

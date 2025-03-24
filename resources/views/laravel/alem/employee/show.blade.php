@@ -6,7 +6,7 @@
             <x-navigation.alem.employee.sidebar />
         </x-slot:sidebar>
 
-        <livewire:alem.employee.employee-manager
+        <livewire:alem.employee.dynamic-navigation
             :user="$user"
             :activeTab="$activeTab"
         />

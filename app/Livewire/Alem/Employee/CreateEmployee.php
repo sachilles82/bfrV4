@@ -33,7 +33,7 @@ class CreateEmployee extends Component
     public $selectedRoles = [];         // Employee User kann mehrere Rollen haben
     public $model_status;               // Account Status des Benutzers
     public $employee_status;            // Beschäftigungs Status des Mitarbeiters
-    public $notifications = true;       // Flag for sending email notifications
+    public $invitations = true;       // Flag for sending email invitations
 
     /**
      * Benutzer-Felder (User Fields)
@@ -42,6 +42,7 @@ class CreateEmployee extends Component
     public $name;
     public $last_name;
     public $email;
+    public $email_verified_at;
     public $password;
     public ?Carbon $joined_at = null;
     public $department = null;
@@ -62,7 +63,7 @@ class CreateEmployee extends Component
         $this->model_status = ModelStatus::ACTIVE->value; // 'active'
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->gender = Gender::Male->value;
-        $this->notifications = true;
+        $this->invitations = true;
     }
 
     //-------------------------------------------------------------------------
@@ -185,7 +186,7 @@ class CreateEmployee extends Component
             }
 
             // 5. Benachrichtigung senden (falls aktiviert)
-            if ($this->notifications) {
+            if ($this->invitations) {
                 // Hier E-Mail-Benachrichtigung implementieren
                 // Mail::to($this->email)->send(new EmployeeInvitation($user));
             }
@@ -220,7 +221,7 @@ class CreateEmployee extends Component
         $this->reset([
             'name', 'last_name', 'email', 'password', 'gender', 'selectedRoles',
             'joined_at', 'profession', 'stage', 'selectedTeams',
-            'model_status', 'employee_status', 'notifications'
+            'model_status', 'employee_status', 'invitations'
         ]);
 
         $this->modal('create-employee')->close();
@@ -229,7 +230,7 @@ class CreateEmployee extends Component
         $this->model_status = ModelStatus::ACTIVE->value;
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->gender = Gender::Male->value;
-        $this->notifications = true;
+        $this->invitations = true;
         $this->selectedRoles = [];
     }
 

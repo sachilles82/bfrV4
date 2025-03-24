@@ -6,9 +6,11 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
-class EmployeeManager extends Component
+class DynamicNavigation extends Component
 {
+
     public User $user;
+
     public string $activeTab;
 
     public function mount(User $user, string $activeTab = 'employee-update'): void
@@ -19,6 +21,6 @@ class EmployeeManager extends Component
 
     public function render(): View
     {
-        return view('livewire.alem.employee.employee-manager');
+        return view('livewire.alem.employee.dynamic-navigation');
     }
 }

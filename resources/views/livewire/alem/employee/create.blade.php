@@ -269,12 +269,12 @@
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6"
                      x-data="{
                         modelStatus: '{{ $model_status }}',
-                        notificationsEnabled: {{ $notifications ? 'true' : 'false' }},
+                        invitationsEnabled: {{ $invitations ? 'true' : 'false' }},
 
                         init() {
                             this.$watch('modelStatus', value => {
                                 if (value !== 'active') {
-                                    this.notificationsEnabled = false;
+                                    this.invitationsEnabled = false;
                                 }
                             });
                         },
@@ -313,7 +313,7 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Account Status -->
+                    <!-- Model Status -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Account Status') }}"
@@ -361,24 +361,24 @@
                                 <div class="flex items-center">
                                     <!-- Tailwind Toggle Button -->
                                     <button x-ref="toggle"
-                                            @click="if(isActive()) { notificationsEnabled = !notificationsEnabled; }"
+                                            @click="if(isActive()) { invitationsEnabled = !invitationsEnabled; }"
                                             type="button"
                                             class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-gray-800"
                                             :class="{
-                                                'bg-indigo-600 dark:bg-indigo-500': notificationsEnabled,
-                                                'bg-gray-200 dark:bg-gray-700': !notificationsEnabled,
+                                                'bg-indigo-600 dark:bg-indigo-500': invitationsEnabled,
+                                                'bg-gray-200 dark:bg-gray-700': !invitationsEnabled,
                                                 'opacity-50 cursor-not-allowed': !isActive()
                                             }"
                                             role="switch"
                                             :disabled="!isActive()"
-                                            :aria-checked="notificationsEnabled.toString()"
+                                            :aria-checked="invitationsEnabled.toString()"
                                             aria-labelledby="invitation-label"
                                             aria-describedby="invitation-description">
                                         <span aria-hidden="true"
                                               class="pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
                                               :class="{
-                                                'translate-x-5': notificationsEnabled,
-                                                'translate-x-0': !notificationsEnabled,
+                                                'translate-x-5': invitationsEnabled,
+                                                'translate-x-0': !invitationsEnabled,
                                                 'opacity-75': !isActive()
                                             }">
                                         </span>
@@ -386,9 +386,9 @@
 
                                     <!-- Hidden input to sync with Livewire on form submit -->
                                     <input type="hidden"
-                                           wire:model.defer="notifications"
-                                           :value="notificationsEnabled"
-                                           name="notifications" />
+                                           wire:model.defer="invitations"
+                                           :value="invitationsEnabled"
+                                           name="invitations" />
                                 </div>
                             </div>
                         </div>
