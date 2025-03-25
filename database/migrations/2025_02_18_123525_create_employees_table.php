@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->uuid('uuid')->nullable()->unique();
-            $table->date('date_hired')->nullable();
-            $table->date('date_fired')->nullable();
-            $table->date('probation')->nullable();
+            $table->date('leave_at')->nullable();
+            $table->date('probation_at')->nullable();
             $table->string('probation_enum')->default(Probation::THREE_MONTHS->value);
             $table->string('social_number')->nullable();
             $table->string('personal_number')->nullable();
@@ -25,8 +24,8 @@ return new class extends Migration
             $table->string('stage')->nullable();
             $table->string('employment_type')->nullable();
             $table->string('supervisor')->nullable();
-            $table->string('notice_period')->nullable();
-            $table->string('notice_period_enum')->default(NoticePeriod::THREE_MONTHS->value);
+            $table->string('notice_at')->nullable();
+            $table->string('notice_enum')->default(NoticePeriod::THREE_MONTHS->value);
             $table->string('employee_status')->default(EmployeeStatus::PROBATION->value);
 
             $table->string('ahv_number')->nullable();
@@ -45,7 +44,6 @@ return new class extends Migration
             $table->index('employee_status');
 
             // Index für Datumsfilterung
-            $table->index('date_hired');
             $table->index('birthdate');
 
             // Zusammengesetzte Indizes für häufige Abfragen

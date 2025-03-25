@@ -9,7 +9,8 @@
         </p>
     </div>
 
-    <div class="bg-white dark:bg-gray-900 shadow-xs ring-1 ring-gray-900/5 sm:rounded-md md:col-span-2">
+    <div class="bg-white dark:bg-gray-900 shadow-xs ring-1 ring-gray-900/5 sm:rounded-md md:col-span-2 relative">
+        <div wire:loading class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs rounded-lg"></div>
         {{$form}}
     </div>
 

@@ -21,7 +21,6 @@ trait ValidateEmploymentData
             'religion' => 'required|string|in:' . implode(',', array_map(fn($item) => $item->value, Religion::cases())),
             'civil_status' => 'required|string|in:' . implode(',', array_map(fn($item) => $item->value, CivilStatus::cases())),
             'residence_permit' => 'required|string|in:' . implode(',', array_map(fn($item) => $item->value, Residence::cases())),
-            'iban' => 'required|string|max:100',
         ];
     }
 
@@ -39,7 +38,6 @@ trait ValidateEmploymentData
             'religion.required' => __('The religion is required.'),
             'civil_status.required' => __('The civil status is required.'),
             'residence_permit.required' => __('The residence permit is required.'),
-            'iban.required' => __('The IBAN is required.'),
         ];
     }
 }

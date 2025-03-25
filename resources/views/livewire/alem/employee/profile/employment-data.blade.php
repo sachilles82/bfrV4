@@ -12,9 +12,6 @@
 
         <form wire:submit.prevent="updateEmployee">
             <div class="px-4 py-6 sm:p-8 relative">
-                <div wire:loading class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs rounded-lg">
-
-                </div>
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
                     <!-- AHV Number -->
@@ -66,9 +63,6 @@
                                         </flux:option>
                                     @endforeach
                                 </flux:select>
-                                <div wire:loading
-                                     class="absolute inset-0 rounded-lg rounded-l-none flex items-center justify-center backdrop-blur-xs">
-                                </div>
                             </div>
                         </x-pupi.input.group>
                     </div>

@@ -10,18 +10,18 @@ trait ValidatePersonalData
     protected function rules(): array
     {
         return [
-//            'employee_status' => 'required|string',
-//            'personal_number' => 'required|string|max:255',
-//            'employment_type' => 'required|string|max:255',
-//            'supervisor' => 'required|string|max:255',
-//            'date_hired' => 'required|date',
-//            'date_fired' => 'nullable|date|after_or_equal:date_hired',
-//            'probation' => 'required|date',
-//            'probation_enum' => 'required|string',
-//            'notice_period' => 'required|date',
-//            'notice_period_enum' => 'required|string',
-//            'profession' => 'nullable|exists:professions,id',
-//            'stage' => 'nullable|exists:stages,id',
+            'employee_status' => 'required|string',
+            'personal_number' => 'required|string|max:255',
+            'employment_type' => 'required|string|max:255',
+            'supervisor' => 'required|string|max:255',
+            'joined_at' => 'required|date',
+            'leave_at' => 'nullable|date|after_or_equal:joined_at',
+            'probation_at' => 'required|date',
+            'probation_enum' => 'required|string',
+            'notice_at' => 'required|date',
+            'notice_enum' => 'required|string',
+            'profession' => 'nullable|exists:professions,id',
+            'stage' => 'nullable|exists:stages,id',
         ];
     }
 
@@ -35,12 +35,12 @@ trait ValidatePersonalData
             'personal_number' => __('personal number'),
             'employment_type' => __('employment type'),
             'supervisor' => __('supervisor'),
-            'date_hired' => __('hiring date'),
-            'date_fired' => __('termination date'),
-            'probation' => __('probation date'),
+            'joined_at' => __('hiring date'),
+            'leave_at' => __('termination date'),
+            'probation_at' => __('probation date'),
             'probation_enum' => __('probation period'),
-            'notice_period' => __('notice period date'),
-            'notice_period_enum' => __('notice period duration'),
+            'notice_at' => __('notice period date'),
+            'notice_enum' => __('notice period duration'),
             'profession' => __('profession'),
             'stage' => __('stage'),
         ];

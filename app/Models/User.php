@@ -98,6 +98,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'model_status' => ModelStatus::class,
+            'joined_at' => 'datetime',
+            'deleted_at' => 'datetime',
         ];
     }
 
@@ -108,6 +110,17 @@ class User extends Authenticatable
         'deleted_at',
         'joined_at',
     ];
+
+    /**
+     * Berechnet die Betriebszugehörigkeit in Jahren
+     */
+    public function getYearsOfServiceAttribute()
+    {
+        if (!$this->joined_at) {
+            return 0;
+        }
+        return $this->joined_at->diffInYears(now());
+    }
 
     /* User & States Relation */
     public function states(): HasMany
@@ -146,5 +159,4 @@ class User extends Authenticatable
             $user->slug = Str::slug($user->name);
         });
     }
-
 }

@@ -30,12 +30,11 @@ class Employee extends Model
     protected $fillable = [
         'user_id',
         'uuid',
-        'date_hired',
-        'date_fired',
-        'probation',
+        'leave_at',
+        'probation_at',
         'probation_enum',
-        'notice_period',
-        'notice_period_enum',
+        'notice_at',
+        'notice_enum',
         'social_number',
         'personal_number',
         'profession',
@@ -63,12 +62,11 @@ class Employee extends Model
      * Type-Casting für Attribute
      */
     protected $casts = [
-        'date_hired' => 'date',
-        'date_fired' => 'date',
-        'probation' => 'date',
+        'leave_at' => 'date',
+        'probation_at' => 'date',
         'probation_enum' => Probation::class,
-        'notice_period' => 'date',
-        'notice_period_enum' => NoticePeriod::class,
+        'notice_at' => 'date',
+        'notice_enum' => NoticePeriod::class,
         'employee_status' => EmployeeStatus::class,
         'birthdate' => 'date',
         'religion' => Religion::class,
@@ -113,17 +111,6 @@ class Employee extends Model
     public function scopeWithStatus($query, EmployeeStatus $status)
     {
         return $query->where('employee_status', $status->value);
-    }
-
-    /**
-     * Berechnet die Betriebszugehörigkeit in Jahren
-     */
-    public function getYearsOfServiceAttribute()
-    {
-        if (!$this->date_hired) {
-            return 0;
-        }
-        return $this->date_hired->diffInYears(now());
     }
 
     /**

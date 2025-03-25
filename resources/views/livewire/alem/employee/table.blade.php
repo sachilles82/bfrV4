@@ -232,12 +232,11 @@
                             <x-pupi.table.tr.cell>
                                 <flux:tooltip class="cursor-default"
                                               content="
-                                              {{ __('Hired on: ') }}
-                                              {{ $user->employee->date_hired->format('d.m.Y') }}"
+                  {{ __('Hired on: ') }}
+                  {{ $user->joined_at ? $user->joined_at->format('d.m.Y') : __('Not set') }}"
                                               position="top">
                                     <div class="text-gray-500 dark:text-gray-400">
-                                        {{ $user->employee->date_hired->diffForHumans() }}
-
+                                        {{ $user->joined_at ? $user->joined_at->diffForHumans() : __('Not available') }}
                                     </div>
                                 </flux:tooltip>
                                 @if($user->trashed())

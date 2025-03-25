@@ -170,7 +170,6 @@ class CreateEmployee extends Component
                 'profession' => $this->profession,
                 'stage' => $this->stage,
                 'employee_status' => $this->employee_status,
-                'date_hired' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
             ]);
 
             // 4. Teams zuweisen

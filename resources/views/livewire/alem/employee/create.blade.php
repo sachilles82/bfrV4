@@ -348,49 +348,40 @@
                     </div>
 
                     <!-- Email Invitation Toggle -->
-                    <div class="col-span-full">
+                    <div class="col-span-full" x-data="{ invitationsEnabled: @entangle('invitations').defer }">
                         <div class="divide-y divide-gray-200 dark:divide-white/10">
                             <div class="pb-2 flex items-center justify-between">
-                                <span class="flex grow flex-col">
-                                    <span class="text-sm/6 font-medium text-gray-900 dark:text-white" id="invitation-label">
-                                        {{ __('Send Email Invitation') }}
-                                    </span>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400" id="invitation-description">
-                                        {{ __('Toggle to send the user an invitation email.') }}
-                                    </span>
-                                </span>
+            <span class="flex grow flex-col">
+                <span class="text-sm/6 font-medium text-gray-900 dark:text-white" id="invitation-label">
+                    {{ __('Send Email Invitation') }}
+                </span>
+                <!-- Text based on toggle state -->
+                <span class="text-sm" :class="invitationsEnabled ? 'text-indigo-600 dark:text-indigo-500' : 'text-gray-500 dark:text-gray-400'">
+                    {{ __('Don\'t send the user an invitation email.') }}
+                    <span x-show="invitationsEnabled" x-cloak>{{ __('Send the user an invitation email.') }}</span>
+                </span>
+            </span>
 
                                 <div class="flex items-center">
-                                    <!-- Tailwind Toggle Button -->
-                                    <button x-ref="toggle"
-                                            @click="if(isActive()) { invitationsEnabled = !invitationsEnabled; }"
-                                            type="button"
-                                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-gray-800"
-                                            :class="{
-                                                'bg-indigo-600 dark:bg-indigo-500': invitationsEnabled,
-                                                'bg-gray-200 dark:bg-gray-700': !invitationsEnabled,
-                                                'opacity-50 cursor-not-allowed': !isActive()
-                                            }"
-                                            role="switch"
-                                            :disabled="!isActive()"
-                                            :aria-checked="invitationsEnabled.toString()"
-                                            aria-labelledby="invitation-label"
-                                            aria-describedby="invitation-description">
-                                        <span aria-hidden="true"
-                                              class="pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
-                                              :class="{
-                                                'translate-x-5': invitationsEnabled,
-                                                'translate-x-0': !invitationsEnabled,
-                                                'opacity-75': !isActive()
-                                            }">
-                                        </span>
+                                    <!-- Toggle Button -->
+                                    <button
+                                        @click="isActive() && (invitationsEnabled = !invitationsEnabled)"
+                                        type="button"
+                                        class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                                        :class="{
+                        'bg-indigo-600 dark:bg-indigo-500 cursor-pointer': invitationsEnabled && isActive(),
+                        'bg-gray-200 dark:bg-gray-700 cursor-pointer': !invitationsEnabled && isActive(),
+                        'bg-gray-200 dark:bg-gray-700 opacity-50 cursor-not-allowed': !isActive()
+                    }"
+                                        role="switch"
+                                        :disabled="!isActive()"
+                                        :aria-checked="invitationsEnabled"
+                                    >
+                    <span
+                        class="pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
+                        :class="invitationsEnabled ? 'translate-x-5' : 'translate-x-0'"
+                    ></span>
                                     </button>
-
-                                    <!-- Hidden input to sync with Livewire on form submit -->
-                                    <input type="hidden"
-                                           wire:model.defer="invitations"
-                                           :value="invitationsEnabled"
-                                           name="invitations" />
                                 </div>
                             </div>
                         </div>

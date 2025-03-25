@@ -29,12 +29,15 @@ class PersonalData extends Component
     public $personal_number = '';
     public $employment_type = '';
     public $supervisor = '';
-    public $date_hired = '';
-    public $date_fired = '';
-    public $probation = '';
+
+    public $joined_at = '';
+    public $probation_at = '';
     public $probation_enum = '';
-    public $notice_period = '';
-    public $notice_period_enum = '';
+
+    public $notice_at = '';
+    public $notice_enum = '';
+    public $leave_at = '';
+
     public $profession = '';
     public $stage = '';
 
@@ -50,18 +53,20 @@ class PersonalData extends Component
         $this->user = $user;
         $this->employee = $user->employee;
 
+        // Joined_at aus dem User-Modell laden
+        $this->joined_at = $user->joined_at ? $user->joined_at->format('Y-m-d') : '';
+
         // Wenn ein Employee-Datensatz existiert, lade die Daten
         if ($this->employee) {
             $this->employee_status = $this->employee->employee_status?->value ?? '';
             $this->personal_number = $this->employee->personal_number ?? '';
             $this->employment_type = $this->employee->employment_type ?? '';
             $this->supervisor = $this->employee->supervisor ?? '';
-            $this->date_hired = $this->employee->date_hired?->format('Y-m-d') ?? '';
-            $this->date_fired = $this->employee->date_fired?->format('Y-m-d') ?? '';
-            $this->probation = $this->employee->probation?->format('Y-m-d') ?? '';
+            $this->leave_at = $this->employee->leave_at?->format('Y-m-d') ?? '';
+            $this->probation_at = $this->employee->probation_at?->format('Y-m-d') ?? '';
             $this->probation_enum = $this->employee->probation_enum?->value ?? '';
-            $this->notice_period = $this->employee->notice_period?->format('Y-m-d') ?? '';
-            $this->notice_period_enum = $this->employee->notice_period_enum?->value ?? '';
+            $this->notice_at = $this->employee->notice_at?->format('Y-m-d') ?? '';
+            $this->notice_enum = $this->employee->notice_enum?->value ?? '';
             $this->profession = $this->employee->profession ?? '';
             $this->stage = $this->employee->stage ?? '';
         }
@@ -78,7 +83,6 @@ class PersonalData extends Component
                 'label' => $status->label(),
                 'icon' => $status->icon(),
                 'colors' => $status->colors()
-
             ];
         });
     }
@@ -135,21 +139,26 @@ class PersonalData extends Component
     {
         //$this->authorize('update', $this->user);
 
-//        $this->validate();
+        $this->validate();
 
         try {
+            // Zuerst den User aktualisieren für joined_at
+            $this->user->update([
+                'joined_at' => $this->joined_at,
+            ]);
+
             // Employee-Daten für Update vorbereiten
             $employeeData = [
                 'employee_status' => $this->employee_status,
                 'personal_number' => $this->personal_number,
                 'employment_type' => $this->employment_type,
                 'supervisor' => $this->supervisor,
-                'date_hired' => $this->date_hired,
-                'date_fired' => $this->date_fired ?: null,
-                'probation' => $this->probation,
+                'hired_at' => $this->joined_at, // Für die Kompatibilität mit vorhandenem Code
+                'leave_at' => $this->leave_at ?: null,
+                'probation_at' => $this->probation_at,
                 'probation_enum' => $this->probation_enum,
-                'notice_period' => $this->notice_period,
-                'notice_period_enum' => $this->notice_period_enum,
+                'notice_at' => $this->notice_at,
+                'notice_enum' => $this->notice_enum,
                 'profession' => $this->profession ?: null,
                 'stage' => $this->stage ?: null
             ];
@@ -204,6 +213,4 @@ class PersonalData extends Component
             'noticePeriodOptions' => $noticePeriodOptions
         ]);
     }
-
-
 }

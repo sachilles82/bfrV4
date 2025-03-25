@@ -19,7 +19,7 @@
                             badge="{{ __('Required') }}"
                             :error="$errors->first('employee_status')"
                         >
-                            <flux:select
+                            <flux:select class="mt-2"
                                 wire:model="employee_status"
                                 id="employee_status"
                                 name="employee_status"
@@ -91,82 +91,36 @@
                     </div>
 
                     <!-- Eintrittsdatum -->
-                    <div class="sm:col-span-3">
+                    <div class="sm:col-span-2 sm:col-start-1">
                         <x-pupi.input.group
-                            label="{{ __('Eintrittsdatum') }}"
-                            for="date_hired"
+                            label="{{ __('Joined Date') }}"
+                            for="joined_at"
+                            model="joined_at"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('date_hired')"
+                            :error="$errors->first('joined_at')"
                         >
-                            <x-pupi.input.text
-                                wire:model="date_hired"
-                                id="date_hired"
-                                name="date_hired"
-                                type="date"
-                            />
+                            <flux:date-picker
+                                with-today
+                                value="21-03-2025"
+                                wire:model.defer="joined_at"
+                                id="joined_at"
+                                type="date">
+                                <x-slot name="trigger">
+                                    <flux:date-picker.input class="mt-2"/>
+                                </x-slot>
+                            </flux:date-picker>
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Austrittsdatum (optional) -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Austrittsdatum') }}"
-                            for="date_fired"
-                            :error="$errors->first('date_fired')"
-                        >
-                            <x-pupi.input.text
-                                wire:model="date_fired"
-                                id="date_fired"
-                                name="date_fired"
-                                type="date"
-                                placeholder="{{ __('Optional') }}"
-                            />
-                        </x-pupi.input.group>
-                    </div>
-
-                    <!-- Probezeit Datum -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Probezeit Datum') }}"
-                            for="probation"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('probation')"
-                        >
-                            <x-pupi.input.text
-                                wire:model="probation"
-                                id="probation"
-                                name="probation"
-                                type="date"
-                            />
-                        </x-pupi.input.group>
-                    </div>
-
-                    <!-- Kündigungsfrist Datum -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Kündigungsfrist Datum') }}"
-                            for="notice_period"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('notice_period')"
-                        >
-                            <x-pupi.input.text
-                                wire:model="notice_period"
-                                id="notice_period"
-                                name="notice_period"
-                                type="date"
-                            />
-                        </x-pupi.input.group>
-                    </div>
-
-                    <!-- Probezeit Enum -->
-                    <div class="sm:col-span-3">
+                    <!-- Probezeit -->
+                    <div class="sm:col-span-2">
                         <x-pupi.input.group
                             label="{{ __('Probezeit Dauer') }}"
                             for="probation_enum"
                             badge="{{ __('Required') }}"
                             :error="$errors->first('probation_enum')"
                         >
-                            <flux:select
+                            <flux:select class="mt-2"
                                 wire:model="probation_enum"
                                 id="probation_enum"
                                 name="probation_enum"
@@ -182,20 +136,63 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Kündigungsfrist Enum -->
-                    <div class="sm:col-span-3">
+                    <!-- Kündigungsdatum -->
+                    <div class="sm:col-span-2">
+                        <x-pupi.input.group
+                            label="{{ __('Probation End Date') }}"
+                            for="probation_at"
+                            model="probation_at"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('probation_at')"
+                        >
+                            <flux:date-picker
+                                with-today
+                                value="21-03-2025"
+                                wire:model.defer="probation_at"
+                                id="probation_at"
+                                type="date">
+                                <x-slot name="trigger">
+                                    <flux:date-picker.input class="mt-2"/>
+                                </x-slot>
+                            </flux:date-picker>
+                        </x-pupi.input.group>
+
+                    </div>
+
+                    <div class="sm:col-span-2 sm:col-start-1">
+                        <x-pupi.input.group
+                            label="{{ __('Kündigung Datum') }}"
+                            for="notice_at"
+                            model="notice_at"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('notice_at')"
+                        >
+                            <flux:date-picker
+                                with-today
+                                value="21-03-2025"
+                                wire:model.defer="notice_at"
+                                id="notice_at"
+                                type="date">
+                                <x-slot name="trigger">
+                                    <flux:date-picker.input class="mt-2"/>
+                                </x-slot>
+                            </flux:date-picker>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <div class="sm:col-span-2">
                         <x-pupi.input.group
                             label="{{ __('Kündigungsfrist Dauer') }}"
-                            for="notice_period_enum"
+                            for="notice_enum"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('notice_period_enum')"
+                            :error="$errors->first('notice_enum')"
                         >
-                            <flux:select
-                                wire:model="notice_period_enum"
-                                id="notice_period_enum"
-                                name="notice_period_enum"
-                                variant="listbox"
-                                placeholder="{{ __('Select Notice Period') }}"
+                            <flux:select class="mt-2"
+                                         wire:model="notice_enum"
+                                         id="notice_enum"
+                                         name="notice_enum"
+                                         variant="listbox"
+                                         placeholder="{{ __('Select Notice Period') }}"
                             >
                                 @foreach($noticePeriodOptions as $value => $label)
                                     <flux:option value="{{ $value }}">
@@ -203,6 +200,27 @@
                                     </flux:option>
                                 @endforeach
                             </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <x-pupi.input.group
+                            label="{{ __('Leave Date') }}"
+                            for="leave_at"
+                            model="leave_at"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('leave_at')"
+                        >
+                            <flux:date-picker
+                                with-today
+                                value="21-03-2025"
+                                wire:model.defer="leave_at"
+                                id="leave_at"
+                                type="date">
+                                <x-slot name="trigger">
+                                    <flux:date-picker.input class="mt-2"/>
+                                </x-slot>
+                            </flux:date-picker>
                         </x-pupi.input.group>
                     </div>
 
