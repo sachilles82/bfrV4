@@ -21,9 +21,10 @@
             <livewire:alem.employee.employee-table
             />
 
-{{--            <!-- Edit Component -->--}}
-{{--            <livewire:alem.employee.edit-employee--}}
-{{--            />--}}
+            <!-- Edit Component -->
+            <livewire:alem.employee.edit-employee
+                lazy
+            />
 
         </x-pupi.layout.form-index>
 

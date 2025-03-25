@@ -52,11 +52,6 @@ class EditEmployee extends Component
     public $stage;
     public $supervisor_id;
 
-    public function mount(): void
-    {
-        // Die Komponente wird leer initialisiert und über loadUser() befüllt
-    }
-
     /**
      * Laden eines Benutzers zur Bearbeitung
      */
@@ -64,13 +59,16 @@ class EditEmployee extends Component
     public function loadUser($id): void
     {
         try {
-            $user = User::with([
-                'employee.profession',
-                'employee.stage',
-                'department',
-                'roles',
-                'teams'
-            ])->findOrFail($id);
+            $user = User::select(['id', 'name', 'last_name', 'email', 'gender', 'model_status', 'joined_at', 'department_id'])
+                ->with([
+                    'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
+                    'employee.profession:id,name',
+                    'employee.stage:id,name',
+                    'department:id,name',
+                    'roles:id,name',
+                    'teams:id,name'
+                ])
+                ->findOrFail($id);
 
             // Berechtigungsprüfung
 //            $this->authorize('update', $user);
@@ -100,8 +98,6 @@ class EditEmployee extends Component
                 $this->supervisor_id = $user->employee->supervisor_id;
             }
 
-            // Modal anzeigen
-            $this->modal('edit-employee')->show();
         } catch (AuthorizationException $ae) {
             Flux::toast(
                 text: __('You are not authorized to edit this employee.'),
@@ -169,12 +165,15 @@ class EditEmployee extends Component
 
 
             $this->closeModal();
+
             Flux::toast(
                 text: __('Employee updated successfully.'),
                 heading: __('Success'),
                 variant: 'success'
             );
+
             $this->dispatch('employee-updated');
+
         } catch (AuthorizationException $ae) {
             Flux::toast(
                 text: __('You are not authorized to update this employee.'),

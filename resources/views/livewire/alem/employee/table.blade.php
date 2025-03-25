@@ -349,8 +349,4 @@
             </x-pupi.table.main>
         </div>
     </x-pupi.table.container>
-
-    <!-- Edit Component -->
-    <livewire:alem.employee.edit-employee
-    />
 </div>
