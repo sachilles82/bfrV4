@@ -30,24 +30,25 @@ class Employee extends Model
     protected $fillable = [
         'user_id',
         'uuid',
-        'leave_at',
-        'probation_at',
+
+        // Personal Data
+        'personal_number',
+        'profession_id',
+        'stage_id',
+        'employment_type',
+        'supervisor_id',
+        //joined_at wird im User Model gespeichert
         'probation_enum',
         'notice_at',
         'notice_enum',
-        'social_number',
-        'personal_number',
-        'profession',
-        'stage',
-        'employment_type',
-        'supervisor_id', // Changed from supervisor to supervisor_id
+        'leave_at',
         'employee_status',
 
-        // Neue Felder
+        // Employment Data
         'ahv_number',
-        'birthdate',
         'nationality',
         'hometown',
+        'birthdate',
         'religion',
         'civil_status',
         'residence_permit',
@@ -101,7 +102,7 @@ class Employee extends Model
      */
     public static function withDefaultRelations()
     {
-        return static::with(['user', 'professionRelation', 'stageRelation', 'supervisorUser']);
+        return static::with(['user', 'profession', 'stage', 'supervisorUser']);
     }
 
     /**
@@ -154,17 +155,17 @@ class Employee extends Model
     /**
      * Gibt die Berufsbezeichnung/Position des Mitarbeiters zurück.
      */
-    public function professionRelation(): BelongsTo
+    public function profession(): BelongsTo
     {
-        return $this->belongsTo(Profession::class, 'profession');
+        return $this->belongsTo(Profession::class, 'profession_id');
     }
 
     /**
      * Gibt die Karrierestufe des Mitarbeiters zurück.
      */
-    public function stageRelation(): BelongsTo
+    public function stage(): BelongsTo
     {
-        return $this->belongsTo(Stage::class, 'stage');
+        return $this->belongsTo(Stage::class, 'stage_id');
     }
 
     /**

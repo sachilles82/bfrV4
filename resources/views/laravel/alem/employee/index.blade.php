@@ -21,6 +21,10 @@
             <livewire:alem.employee.employee-table
             />
 
+{{--            <!-- Edit Component -->--}}
+{{--            <livewire:alem.employee.edit-employee--}}
+{{--            />--}}
+
         </x-pupi.layout.form-index>
 
     </x-pupi.layout.container>

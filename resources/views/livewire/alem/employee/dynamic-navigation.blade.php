@@ -11,14 +11,14 @@
         <div class="space-y-10 divide-y dark:divide-white/5 divide-gray-900/5">
             @if($activeTab === 'employee-update')
 
-
-                <livewire:alem.employee.profile.personal-data
-                    :user="$user"
-                />
-
                 <livewire:alem.employee.profile.information
                     :user="$user"
                     key="employee-update-{{ $user->id }}"
+                />
+
+
+                <livewire:alem.employee.profile.personal-data
+                    :user="$user"
                 />
 
                 <livewire:alem.employee.profile.employment-data

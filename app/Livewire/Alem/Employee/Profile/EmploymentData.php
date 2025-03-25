@@ -19,10 +19,8 @@ class EmploymentData extends Component
 {
     use ValidateEmploymentData, AuthorizesRequests;
 
-    // Der User-Datensatz
     public User $user;
 
-    // Lokale Properties für Mitarbeiter-Daten
     public ?string $ahv_number = '';
     public ?string $birthdate = '';
     public ?string $nationality = '';

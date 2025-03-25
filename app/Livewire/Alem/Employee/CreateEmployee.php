@@ -3,6 +3,8 @@
 namespace App\Livewire\Alem\Employee;
 
 use App\Enums\Employee\EmployeeStatus;
+use App\Enums\Employee\NoticePeriod;
+use App\Enums\Employee\Probation;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
@@ -167,8 +169,8 @@ class CreateEmployee extends Component
             Employee::create([
                 'user_id' => $user->id,
                 'uuid' => (string)Str::uuid(),
-                'profession' => $this->profession,
-                'stage' => $this->stage,
+                'profession_id' => $this->profession,
+                'stage_id' => $this->stage,
                 'employee_status' => $this->employee_status,
             ]);
 

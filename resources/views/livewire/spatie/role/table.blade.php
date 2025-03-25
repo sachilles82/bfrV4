@@ -74,7 +74,7 @@
                             </flux:tooltip>
                         </x-pupi.table.tr.cell>
                         <flux:cell>
-                            @can('update', $role)
+{{--                            @can('update', $role)--}}
                                 <flux:dropdown align="end" offset="-15">
                                     <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal" size="sm"
                                                  variant="ghost" inset="top bottom"/>
@@ -93,7 +93,7 @@
                                         </flux:menu.item>
                                     </flux:menu>
                                 </flux:dropdown>
-                            @endcan
+{{--                            @endcan--}}
                         </flux:cell>
                     </tr>
                 @empty

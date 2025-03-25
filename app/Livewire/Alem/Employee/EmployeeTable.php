@@ -30,9 +30,9 @@ class EmployeeTable extends Component
     protected string $userType = 'employee';
 
     /**
-     * Hört auf das Event 'employee-created' und aktualisiert die Tabelle
+     * Hört auf das Event 'employee-created', 'employee-updated' und aktualisiert die Tabelle
      */
-    #[On('employee-created')]
+    #[On(['employee-created', 'employee-updated'])]
     public function refreshTable(): void
     {
         $this->resetPage();
@@ -75,13 +75,21 @@ class EmployeeTable extends Component
         return auth()->user()->allTeams();
     }
 
+    /**
+     * Öffnet den Bearbeitungsmodus für einen Mitarbeiter
+     */
+    public function edit($id): void
+    {
+        $this->dispatch('edit-employee', $id);
+    }
+
     public function render(): View
     {
         $authUser = auth()->user();
         $query = User::query()
             ->with([
                 'employee' => function($query) {
-                    $query->with(['professionRelation', 'stageRelation']);
+                    $query->with(['profession', 'stage']);
                 },
                 'teams:id,name',
                 'currentTeam:id,name',

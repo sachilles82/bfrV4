@@ -22,13 +22,14 @@ trait ValidatePersonalData
                 'max:20',
                 'regex:/^[a-zA-Z0-9äöüÄÖÜß\.\-_\/\s]*$/',
             ],
-            'employment_type' => [
-                'required',
-                'string',
-                'max:50',
-                'regex:/^[a-zA-Z0-9äöüÄÖÜß\.\-_\/\s]*$/',
-            ],
-            'supervisor' => 'required|exists:users,id',
+//            'employment_type' => [
+//                'required',
+//                'string',
+//                'max:50',
+//                'regex:/^[a-zA-Z0-9äöüÄÖÜß\.\-\/\s%\(\)]*$/',
+//            ],
+
+            'supervisor' => 'nullable|exists:users,id',
             'joined_at' => 'required|date|before_or_equal:today',
             'leave_at' => 'nullable|date|after_or_equal:joined_at',
             'probation_enum' => 'required|string|in:' . implode(',', array_column(Probation::cases(), 'value')),
@@ -56,7 +57,6 @@ trait ValidatePersonalData
             'employment_type.max' => __('Employment type cannot exceed 50 characters.'),
             'employment_type.regex' => __('Employment type may only contain letters, numbers, dots, dashes, underscores, slashes and spaces.'),
 
-            'supervisor.required' => __('Supervisor is required.'),
             'supervisor.exists' => __('The selected supervisor does not exist.'),
 
             'joined_at.required' => __('Joined date is required.'),

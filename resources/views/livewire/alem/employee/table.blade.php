@@ -169,16 +169,16 @@
                                             {{ $user->name }} {{ $user->last_name }}
                                         </a>
                                         <div class="mt-1 text-gray-500 dark:text-gray-400">
-                                            @if($user->employee->professionRelation)
-                                                {{ $user->employee->professionRelation->name }}
+                                            @if($user->employee->profession)
+                                                {{ $user->employee->profession->name }}
                                             @endif
 
-                                            @if($user->employee->professionRelation && $user->employee->stageRelation)
+                                            @if($user->employee->profession && $user->employee->stage)
                                                 <span class="mx-1">•</span>
                                             @endif
 
-                                            @if($user->employee->stageRelation)
-                                                {{ $user->employee->stageRelation->name }}
+                                            @if($user->employee->stage)
+                                                {{ $user->employee->stage->name }}
                                             @endif
                                         </div>
                                     </div>
@@ -291,9 +291,11 @@
                                             </flux:menu.item>
                                         @elseif($user->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
                                             <!-- Options for archived users -->
-                                            <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
-                                                {{ __('Edit') }}
-                                            </flux:menu.item>
+                                            <flux:modal.trigger name="edit-employee">
+                                                <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
+                                                    {{ __('Edit') }}
+                                                </flux:menu.item>
+                                            </flux:modal.trigger>
 
                                             <flux:separator class="my-1"/>
 
@@ -311,9 +313,12 @@
                                             </flux:menu.item>
                                         @else
                                             <!-- Options for active users -->
-                                            <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
-                                                {{ __('Edit') }}
-                                            </flux:menu.item>
+
+                                            <flux:modal.trigger name="edit-employee">
+                                                <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
+                                                    {{ __('Edit') }}
+                                                </flux:menu.item>
+                                            </flux:modal.trigger>
 
                                             <flux:menu.item wire:click="archive({{ $user->id }})"
                                                             icon="archive-box">
@@ -344,4 +349,8 @@
             </x-pupi.table.main>
         </div>
     </x-pupi.table.container>
+
+    <!-- Edit Component -->
+    <livewire:alem.employee.edit-employee
+    />
 </div>

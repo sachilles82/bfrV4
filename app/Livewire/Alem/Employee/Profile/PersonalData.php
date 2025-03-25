@@ -21,26 +21,31 @@ class PersonalData extends Component
 {
     use ValidatePersonalData, AuthorizesRequests;
 
-    // User und Employee Datensätze
+    // User mit den Daten
     public User $user;
-    public ?Employee $employee = null;
-
-    // Employee Daten
-    public $employee_status = '';
-    public $personal_number = '';
-    public $employment_type = '';
-    public $supervisor = ''; // This will store the supervisor_id
-
     public $joined_at = '';
-    public $probation_at = '';
+
+    // Employee mit den Daten
+    public ?Employee $employee = null;
+    public $personal_number = '';
+
+    public $profession = '';
+    public $stage = '';
+
+    public $employment_type = '';
+    public $supervisor = '';
+
+//    $joined_at; wird im User Model gespeichert
     public $probation_enum = '';
+    public $probation_at = '';
 
     public $notice_at = '';
     public $notice_enum = '';
     public $leave_at = '';
 
-    public $profession = '';
-    public $stage = '';
+    public $employee_status = '';
+
+
 
     /**
      * Der Mount-Hook erhält einen User und lädt zusätzlich die Employee-Daten,
@@ -48,16 +53,13 @@ class PersonalData extends Component
      */
     public function mount(User $user): void
     {
+
         // Eager load relations, Employee mit seinen Beziehungen
-        $user->load(['employee.professionRelation', 'employee.stageRelation', 'employee.supervisorUser']);
+        $user->load(['employee.profession', 'employee.stage', 'employee.supervisorUser']);
 
-        $this->user = $user;
-        $this->employee = $user->employee;
+        $this->employee = $this->user->employee;
+        $this->joined_at = $this->user->joined_at?->format('Y-m-d') ?? '';
 
-        // Joined_at aus dem User-Modell laden
-        $this->joined_at = $user->joined_at ? $user->joined_at->format('Y-m-d') : '';
-
-        // Wenn ein Employee-Datensatz existiert, lade die Daten
         if ($this->employee) {
             $this->employee_status = $this->employee->employee_status?->value ?? '';
             $this->personal_number = $this->employee->personal_number ?? '';
@@ -68,8 +70,8 @@ class PersonalData extends Component
             $this->probation_enum = $this->employee->probation_enum?->value ?? '';
             $this->notice_at = $this->employee->notice_at?->format('Y-m-d') ?? '';
             $this->notice_enum = $this->employee->notice_enum?->value ?? '';
-            $this->profession = $this->employee->profession ?? '';
-            $this->stage = $this->employee->stage ?? '';
+            $this->profession = $this->employee->profession_id ?? '';
+            $this->stage = $this->employee->stage_id ?? '';
         }
     }
 
@@ -159,7 +161,7 @@ class PersonalData extends Component
     {
         //$this->authorize('update', $this->user);
 
-//        $this->validate();
+        $this->validate();
 
         try {
             // Zuerst den User aktualisieren für joined_at
@@ -178,8 +180,8 @@ class PersonalData extends Component
                 'probation_enum' => $this->probation_enum,
                 'notice_at' => $this->notice_at ?: null,
                 'notice_enum' => $this->notice_enum,
-                'profession' => $this->profession ?: null,
-                'stage' => $this->stage ?: null
+                'profession_id' => $this->profession ?: null,
+                'stage_id' => $this->stage ?: null
             ];
 
             // Update oder Create Employee

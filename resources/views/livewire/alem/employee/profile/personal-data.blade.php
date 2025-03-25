@@ -126,7 +126,7 @@
                         <x-pupi.input.group
                             label="{{ __('Supervisor') }}"
                             for="supervisor"
-                            badge="{{ __('Required') }}"
+                            badge="{{ __('Optional') }}"
                             :error="$errors->first('supervisor')"
                             model="supervisor"
                             help-text="{{ __('') }}"
@@ -196,6 +196,7 @@
                                          id="probation_enum"
                                          name="probation_enum"
                                          variant="listbox"
+                                         searchable
                                          placeholder="{{ __('Select Probation Period') }}"
                             >
                                 @foreach($probationOptions as $value => $label)
@@ -266,6 +267,7 @@
                                          id="notice_enum"
                                          name="notice_enum"
                                          variant="listbox"
+                                         searchable
                                          placeholder="{{ __('Select Notice Period') }}"
                             >
                                 @foreach($noticePeriodOptions as $value => $label)
