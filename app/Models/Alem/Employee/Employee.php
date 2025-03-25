@@ -40,7 +40,7 @@ class Employee extends Model
         'profession',
         'stage',
         'employment_type',
-        'supervisor',
+        'supervisor_id', // Changed from supervisor to supervisor_id
         'employee_status',
 
         // Neue Felder
@@ -56,7 +56,7 @@ class Employee extends Model
     /**
      * Appends für häufig benötigte berechnete Attribute
      */
-    protected $appends = ['full_status', 'years_of_service'];
+    protected $appends = ['full_status'];
 
     /**
      * Type-Casting für Attribute
@@ -86,11 +86,22 @@ class Employee extends Model
     }
 
     /**
+     * Berechnet die Betriebszugehörigkeit in Jahren - nutzt User joined_at
+     */
+    public function getYearsOfServiceAttribute()
+    {
+        if ($this->user && $this->user->joined_at) {
+            return $this->user->joined_at->diffInYears(now());
+        }
+        return 0;
+    }
+
+    /**
      * Factory-Methode mit Standardrelationen
      */
     public static function withDefaultRelations()
     {
-        return static::with(['user', 'professionRelation', 'stageRelation']);
+        return static::with(['user', 'professionRelation', 'stageRelation', 'supervisorUser']);
     }
 
     /**
@@ -130,6 +141,14 @@ class Employee extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Gibt den Vorgesetzten (Supervisor) als User zurück
+     */
+    public function supervisorUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'supervisor_id');
     }
 
     /**

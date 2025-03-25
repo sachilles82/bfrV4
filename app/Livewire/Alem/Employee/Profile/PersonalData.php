@@ -15,6 +15,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Spatie\Permission\Models\Role;
 
 class PersonalData extends Component
 {
@@ -28,7 +29,7 @@ class PersonalData extends Component
     public $employee_status = '';
     public $personal_number = '';
     public $employment_type = '';
-    public $supervisor = '';
+    public $supervisor = ''; // This will store the supervisor_id
 
     public $joined_at = '';
     public $probation_at = '';
@@ -48,7 +49,7 @@ class PersonalData extends Component
     public function mount(User $user): void
     {
         // Eager load relations, Employee mit seinen Beziehungen
-        $user->load(['employee.professionRelation', 'employee.stageRelation']);
+        $user->load(['employee.professionRelation', 'employee.stageRelation', 'employee.supervisorUser']);
 
         $this->user = $user;
         $this->employee = $user->employee;
@@ -61,7 +62,7 @@ class PersonalData extends Component
             $this->employee_status = $this->employee->employee_status?->value ?? '';
             $this->personal_number = $this->employee->personal_number ?? '';
             $this->employment_type = $this->employee->employment_type ?? '';
-            $this->supervisor = $this->employee->supervisor ?? '';
+            $this->supervisor = $this->employee->supervisor_id ?? '';
             $this->leave_at = $this->employee->leave_at?->format('Y-m-d') ?? '';
             $this->probation_at = $this->employee->probation_at?->format('Y-m-d') ?? '';
             $this->probation_enum = $this->employee->probation_enum?->value ?? '';
@@ -87,6 +88,25 @@ class PersonalData extends Component
         });
     }
 
+    /**
+     * Get all users with the manager role for supervisor selection
+     */
+    public function getSupervisorsProperty()
+    {
+        // Get manager role
+        $managerRole = Role::where('name', 'Manager')->first();
+
+        if (!$managerRole) {
+            // If the role doesn't exist, return an empty collection
+            return collect();
+        }
+
+        // Get users with manager role, excluding current user
+        return User::role($managerRole)
+            ->where('id', '!=', $this->user->id) // Exclude current user
+            ->orderBy('name')
+            ->get();
+    }
 
     /**
      * Get all probation options for the dropdown
@@ -139,7 +159,7 @@ class PersonalData extends Component
     {
         //$this->authorize('update', $this->user);
 
-        $this->validate();
+//        $this->validate();
 
         try {
             // Zuerst den User aktualisieren für joined_at
@@ -152,12 +172,11 @@ class PersonalData extends Component
                 'employee_status' => $this->employee_status,
                 'personal_number' => $this->personal_number,
                 'employment_type' => $this->employment_type,
-                'supervisor' => $this->supervisor,
-                'hired_at' => $this->joined_at, // Für die Kompatibilität mit vorhandenem Code
+                'supervisor_id' => $this->supervisor ?: null,
                 'leave_at' => $this->leave_at ?: null,
-                'probation_at' => $this->probation_at,
+                'probation_at' => $this->probation_at ?: null,
                 'probation_enum' => $this->probation_enum,
-                'notice_at' => $this->notice_at,
+                'notice_at' => $this->notice_at ?: null,
                 'notice_enum' => $this->notice_enum,
                 'profession' => $this->profession ?: null,
                 'stage' => $this->stage ?: null
@@ -206,11 +225,13 @@ class PersonalData extends Component
         $employeeStatusOptions = $this->employeeStatusOptions;
         $probationOptions = $this->probationOptions;
         $noticePeriodOptions = $this->noticePeriodOptions;
+        $supervisors = $this->supervisors;
 
         return view('livewire.alem.employee.profile.personal-data', [
             'employeeStatusOptions' => $employeeStatusOptions,
             'probationOptions' => $probationOptions,
-            'noticePeriodOptions' => $noticePeriodOptions
+            'noticePeriodOptions' => $noticePeriodOptions,
+            'supervisors' => $supervisors
         ]);
     }
 }

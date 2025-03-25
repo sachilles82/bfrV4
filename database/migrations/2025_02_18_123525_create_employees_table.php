@@ -7,8 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('employees', function (Blueprint $table) {
@@ -23,7 +22,12 @@ return new class extends Migration
             $table->string('profession')->nullable();
             $table->string('stage')->nullable();
             $table->string('employment_type')->nullable();
-            $table->string('supervisor')->nullable();
+
+            // Zuerst die Spalte erstellen
+            $table->unsignedBigInteger('supervisor_id')->nullable();
+            // Dann den Foreign Key definieren
+            $table->foreign('supervisor_id')->references('id')->on('users')->nullOnDelete();
+
             $table->string('notice_at')->nullable();
             $table->string('notice_enum')->default(NoticePeriod::THREE_MONTHS->value);
             $table->string('employee_status')->default(EmployeeStatus::PROBATION->value);
@@ -59,6 +63,9 @@ return new class extends Migration
 
             // Indexe für häufige Join-Bedingungen
             $table->index(['user_id', 'employee_status']);
+
+            // Index für den Supervisor
+            $table->index('supervisor_id');
         });
     }
 
