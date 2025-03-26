@@ -11,7 +11,7 @@
 
             <flux:modal.trigger name="create-employee">
                 <div
-                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
+                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
 
                     <x-pupi.icon.create class="-ml-1.5 size-5"/>
                     {{ __('Create') }}
@@ -165,7 +165,7 @@
                                     </div>
                                     <div class="ml-4">
                                         <a wire:navigate.hover href="{{ route('employees.profile', $user) }}"
-                                           class="font-medium text-gray-900 dark:text-gray-300 hover:text-indigo-700 decoration-1 hover:underline dark:hover:text-indigo-300">
+                                           class="font-medium text-gray-900 dark:text-gray-300 hover:text-indigo-700 decoration-1 hover:underline dark:hover:text-indigo-400">
                                             {{ $user->name }} {{ $user->last_name }}
                                         </a>
                                         <div class="mt-1 text-gray-500 dark:text-gray-400">
@@ -212,7 +212,7 @@
                                     @if($user->department)
                                         {{ $user->department->name }}
                                     @else
-                                        <span class="text-gray-400">No department</span>
+                                        <span class="text-gray-500 dark:text-gray-400"> {{ __('No Department') }}</span>
                                     @endif
                                 </div>
                             </x-pupi.table.tr.cell>

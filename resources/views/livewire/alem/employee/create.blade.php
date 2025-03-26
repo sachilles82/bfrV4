@@ -7,6 +7,7 @@
 
         <!-- Formular: User- & Employee-Daten -->
         <form wire:submit.prevent="saveEmployee" class="space-y-4">
+            <div wire:loading class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs rounded-lg"></div>
             <!-- Personal Information Section -->
             <div class="py-4">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
