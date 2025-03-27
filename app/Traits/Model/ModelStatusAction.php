@@ -5,6 +5,7 @@ use App\Enums\Model\ModelStatus;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Livewire\Attributes\Url;
 
 /**
  * Trait für die Handhabung von Model-Status-Aktionen in Livewire-Komponenten
@@ -15,11 +16,17 @@ use Illuminate\Database\Eloquent\Model;
  */
 trait ModelStatusAction
 {
+
+    public $selectedIds = [];
+    public $idsOnPage = [];
+
+    #[Url]
+    public $statusFilter = 'active';
+
     /**
      * Erforderliche Eigenschaften in der Komponente:
      * public $selectedIds = [];
      * public $idsOnPage = [];
-     * public $statusFilter = 'active';
      */
 
     /**
@@ -51,7 +58,14 @@ trait ModelStatusAction
         $this->statusFilter = $status;
         $this->selectedIds = [];
         $this->idsOnPage = [];
-        $this->dispatch('update-table');
+        
+        // Modellspezifisches Table-Update-Event auslösen, wenn verfügbar
+        if (method_exists($this, 'dispatchTableUpdateEvent')) {
+            $this->dispatchTableUpdateEvent();
+        } else {
+            // Fallback auf generisches Event nur wenn nötig
+            $this->dispatch('update-table');
+        }
     }
 
     /**
@@ -406,10 +420,22 @@ trait ModelStatusAction
      */
     private function dispatchStatusEvents(): void
     {
-        // Standardmäßig "modelUpdated" senden, kann in der Komponente angepasst werden
+        // Standardmäßig modellspezifisches Event senden
         $updateEvent = $this->getStatusUpdateEventName() ?? 'modelUpdated';
         $this->dispatch($updateEvent);
-        $this->dispatch('update-table');
+        
+        // Modellspezifisches "updated" Event auslösen
+        if (method_exists($this, 'dispatchModelEvent')) {
+            $this->dispatchModelEvent('updated');
+        }
+        
+        // Modellspezifisches Table-Update-Event auslösen
+        if (method_exists($this, 'dispatchTableUpdateEvent')) {
+            $this->dispatchTableUpdateEvent();
+        } else {
+            // Fallback auf generisches Event nur wenn nötig
+            $this->dispatch('update-table');
+        }
     }
 
     /**

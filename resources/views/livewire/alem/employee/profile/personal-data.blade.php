@@ -316,7 +316,7 @@
                                          id="employee_status"
                                          name="employee_status"
                                          variant="listbox"
-                                         placeholder="{{ __('Select Status') }}"
+                                         placeholder="{{ __('Select Employee Status') }}"
                             >
                                 @foreach($employeeStatusOptions as $status)
                                     <flux:option value="{{ $status['value'] }}">
@@ -324,7 +324,7 @@
                                              <span class="mr-2">
                                                   <x-dynamic-component
                                                       :component="$status['icon']"
-                                                      class="h-4 w-4 rounded-md {{ $status['colors'] }}"/>
+                                                      class="rounded-md h-5 w-5 {{ $status['colors'] }}"/>
                                              </span>
                                             {{ $status['label'] }}
                                         </div>

@@ -1,163 +1,99 @@
-<div>
+<div wire:ignore.self>
     <flux:modal.trigger name="create-department">
         <x-pupi.button.open-manager/>
     </flux:modal.trigger>
 
-    <flux:modal name="create-department"
-                variant="flyout" class="space-y-6">
-        <form wire:submit="save" class="space-y-6">
-            <div>
-                <flux:heading size="lg">{{ __('Add New Department') }}</flux:heading>
-                <flux:subheading>{{ __('Create a new department in the database') }}</flux:subheading>
+    <flux:modal name="create-department" variant="flyout" position="left" class="space-y-6"
+                wire:model="showModal">
+        <div>
+            <flux:heading size="lg">{{ __('Create Department') }}</flux:heading>
+            <flux:subheading>{{ __('Fill out the details to create a new department') }}</flux:subheading>
+        </div>
+
+        <!-- Formular für Abteilungsdaten -->
+        <form wire:submit.prevent="save" class="space-y-4">
+            {{--            <div wire:loading class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs rounded-lg"></div>--}}
+
+            <!-- Department Information Section -->
+            <div class="py-4">
+                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3">
+                    <!-- Department Name -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Department Name') }}"
+                            for="name"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('name')"
+                            model="name"
+                            help-text="{{ __('Enter the name of the department') }}">
+                            <flux:input
+                                class="mt-2"
+                                wire:model="name"
+                                id="name"
+                                type="text"
+                                placeholder="{{ __('Enter department name') }}"
+                            />
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Description') }}"
+                            for="description"
+                            badge="{{ __('Optional') }}"
+                            :error="$errors->first('description')"
+                            model="description"
+                            help-text="{{ __('Provide a brief description of the department') }}">
+                            <flux:textarea
+                                class="mt-2"
+                                wire:model="description"
+                                id="description"
+                                placeholder="{{ __('Enter department description') }}"
+                                rows="3"
+                            />
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Model Status -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Account Status') }}"
+                            for="model_status"
+                            badge="{{ __('Required') }}"
+                            model="model_status"
+                            help-text="{{ __('') }}"
+                            :error="$errors->first('model_status')">
+                            <flux:select
+                                wire:model="model_status"
+                                id="model_status"
+                                name="model_status"
+                                variant="listbox"
+                                placeholder="{{ __('Account Status') }}">
+                                @foreach($this->modelStatusOptions as $status)
+                                    <flux:option value="{{ $status['value'] }}">
+                                        <div class="flex items-center">
+                                            <span class="mr-2">
+                                                <x-dynamic-component
+                                                    :component="$status['icon'] ?? 'heroicon-o-question-mark-circle'"
+                                                    class="{{ $status['colors'] ?? '' }}"/>
+                                            </span>
+                                            <span>{{ $status['label'] }}</span>
+                                        </div>
+                                    </flux:option>
+                                @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+                </div>
             </div>
-
-            <div class="space-y-4">
-                <!-- Department Name -->
-                <x-pupi.input.group
-                    label="{{ __('Department Name') }}"
-                    for="name"
-                    badge="{{ __('Required') }}"
-                    :error="$errors->first('name')"
-                    help-text="{{ __('') }}"
-                    model="name">
-                    <x-pupi.input.text 
-                        wire:model="name" 
-                        id="name" 
-                        placeholder="{{ __('Enter department name') }}"
-                    />
-                </x-pupi.input.group>
-
-                <!-- Description -->
-                <x-pupi.input.group
-                    label="{{ __('Description') }}"
-                    for="description"
-                    badge="{{ __('Optional') }}"
-                    :error="$errors->first('description')"
-                    help-text="{{ __('Provide a brief description of this department') }}"
-                    model="description">
-                    <x-pupi.input.textarea 
-                        wire:model="description" 
-                        id="description" 
-                        placeholder="{{ __('Enter department description') }}"
-                        rows="3"
-                    />
-                </x-pupi.input.group>
-
-                <!-- Status Selection -->
-                <x-pupi.input.group
-                    label="{{ __('Status') }}"
-                    for="status"
-                    badge="{{ __('Required') }}"
-                    :error="$errors->first('status')"
-                    model="status"
-                    help-text="{{ __('Select the current status of this department') }}">
-                    <flux:select
-                        class="mt-2"
-                        wire:model="status"
-                        id="status"
-                        variant="listbox">
-                        @foreach($statuses as $statusOption)
-                            <flux:option value="{{ $statusOption->value }}">
-                                <div class="flex items-center">
-                                    <span class="mr-2">
-                                        <x-dynamic-component
-                                            :component="$statusOption->icon()"
-                                            class="h-4 w-4 {{ $statusOption->colors() ?? '' }}"/>
-                                    </span>
-                                    <span>{{ $statusOption->label() }}</span>
-                                </div>
-                            </flux:option>
-                        @endforeach
-                    </flux:select>
-                </x-pupi.input.group>
-            </div>
-
-            <div class="flex justify-between">
-                <flux:button wire:click="resetForm" variant="ghost">
-                    {{ __('Reset') }}
-                </flux:button>
-                <flux:button type="submit" variant="primary">
-                    {{ __('Save') }}
-                </flux:button>
-            </div>
-        </form>
-    </flux:modal>
-
-    <!-- Edit Department Modal -->
-    <flux:modal name="department-edit" variant="flyout" class="space-y-6">
-        <form wire:submit="update" class="space-y-6">
-            <div>
-                <flux:heading size="lg">{{ __('Edit Department') }}</flux:heading>
-                <flux:subheading>{{ __('Update this department') }}</flux:subheading>
-            </div>
-
-            <div class="space-y-4">
-                <!-- Department Name -->
-                <x-pupi.input.group
-                    label="{{ __('Department Name') }}"
-                    for="edit-name"
-                    badge="{{ __('Required') }}"
-                    :error="$errors->first('name')"
-                    help-text="{{ __('') }}"
-                    model="name">
-                    <x-pupi.input.text 
-                        wire:model="name" 
-                        id="edit-name" 
-                        placeholder="{{ __('Enter department name') }}"
-                    />
-                </x-pupi.input.group>
-
-                <!-- Description -->
-                <x-pupi.input.group
-                    label="{{ __('Description') }}"
-                    for="edit-description"
-                    badge="{{ __('Optional') }}"
-                    :error="$errors->first('description')"
-                    help-text="{{ __('Provide a brief description of this department') }}"
-                    model="description">
-                    <x-pupi.input.textarea 
-                        wire:model="description" 
-                        id="edit-description" 
-                        placeholder="{{ __('Enter department description') }}"
-                        rows="3"
-                    />
-                </x-pupi.input.group>
-
-                <!-- Status Selection -->
-                <x-pupi.input.group
-                    label="{{ __('Status') }}"
-                    for="edit-status"
-                    badge="{{ __('Required') }}"
-                    :error="$errors->first('status')"
-                    model="status"
-                    help-text="{{ __('Select the current status of this department') }}">
-                    <flux:select
-                        class="mt-2"
-                        wire:model="status"
-                        id="edit-status"
-                        variant="listbox">
-                        @foreach($statuses as $statusOption)
-                            <flux:option value="{{ $statusOption->value }}">
-                                <div class="flex items-center">
-                                    <span class="mr-2">
-                                        <x-dynamic-component
-                                            :component="$statusOption->icon()"
-                                            class="h-4 w-4 {{ $statusOption->colors() ?? '' }}"/>
-                                    </span>
-                                    <span>{{ $statusOption->label() }}</span>
-                                </div>
-                            </flux:option>
-                        @endforeach
-                    </flux:select>
-                </x-pupi.input.group>
-            </div>
-
-            <div class="flex justify-between">
-                <flux:button wire:click="resetForm" variant="ghost">
+            <!-- Form Buttons -->
+            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
+                <flux:button wire:click="resetForm" type="button" variant="ghost">
                     {{ __('Cancel') }}
                 </flux:button>
-                <flux:button type="submit" variant="primary">
-                    {{ __('Update') }}
+                <flux:button type="submit">
+                    {{ __('Save') }}
                 </flux:button>
             </div>
         </form>

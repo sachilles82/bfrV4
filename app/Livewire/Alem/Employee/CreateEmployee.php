@@ -18,6 +18,8 @@ use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
 
+use App\Traits\Employee\WithEmployeeStatusOptions;
+use App\Traits\Model\WithModelStatusOptions;
 use Illuminate\Support\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -30,12 +32,13 @@ use Livewire\Component;
 
 class CreateEmployee extends Component
 {
-    use ValidateEmployee, AuthorizesRequests;
+    use ValidateEmployee, AuthorizesRequests,
+        WithModelStatusOptions, WithEmployeeStatusOptions;
 
     public $selectedRoles = [];         // Employee User kann mehrere Rollen haben
-    public $model_status;               // Account Status des Benutzers
-    public $employee_status;            // Beschäftigungs Status des Mitarbeiters
-    public $invitations = true;       // Flag for sending email invitations
+    public $model_status;               // Model Status wird im Trait WithModelStatusOptions definiert
+    public $employee_status;
+    public $invitations = true;
 
     /**
      * Benutzer-Felder (User Fields)
@@ -61,8 +64,7 @@ class CreateEmployee extends Component
      */
     public function mount(): void
     {
-        // Default values
-        $this->model_status = ModelStatus::ACTIVE->value; // 'active'
+        $this->model_status = ModelStatus::ACTIVE->value;
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->gender = Gender::Male->value;
         $this->invitations = true;
@@ -118,25 +120,6 @@ class CreateEmployee extends Component
         }
 
         return $query->get();
-    }
-
-    /**
-     * Gets all available model status options with their labels, colors, and icons
-     */
-    public function getModelStatusOptionsProperty()
-    {
-        $statuses = [];
-
-        foreach (ModelStatus::cases() as $status) {
-            $statuses[] = [
-                'value' => $status->value,
-                'label' => $status->label(),
-                'colors' => $status->colors(),
-                'icon' => $status->icon(),
-            ];
-        }
-
-        return $statuses;
     }
 
     public function saveEmployee(): void

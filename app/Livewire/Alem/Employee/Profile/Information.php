@@ -8,6 +8,7 @@ use App\Enums\Role\RoleVisibility;
 use App\Livewire\Alem\Employee\Profile\Helper\ValidateInformation;
 use App\Models\Alem\Department;
 use App\Models\User;
+use App\Traits\Model\WithModelStatusOptions;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -17,32 +18,29 @@ use Spatie\Permission\Models\Role;
 
 class Information extends Component
 {
-    use ValidateInformation, AuthorizesRequests;
+    use ValidateInformation, AuthorizesRequests,
+        WithModelStatusOptions;
 
-    // Der User-Datensatz
     public User $user;
 
-    // Lokale Properties für User-Daten
     public ?string $gender = '';
     public string $name;
     public string $last_name;
     public string $email;
     public ?string $phone_1 = '';
-    public $model_status = '';
+    public $model_status = '';  // Model Status wird im Trait WithModelStatusOptions definiert
     public $department = '';
 
-    // Team-Verwaltung - als Array für multiple Teams
     public array $selectedTeams = [];
 
-    // Rolle - einzelne Rolle für den Benutzer
     public $role = '';
+//    public $roles = []; User kann mehrere Rollen haben
 
     /**
      * Der Mount-Hook erhält einen User.
      */
     public function mount(User $user): void
     {
-        // Eager load teams, roles, and department to avoid N+1 issues
         $user->load(['ownedTeams', 'teams', 'roles', 'department']);
 
         $this->user = $user;
@@ -100,22 +98,6 @@ class Information extends Component
             ->where('created_by', 1)                 // System-erstellte Rollen
             ->orWhere('created_by', auth()->id())    // Oder vom aktuellen Benutzer erstellte Rollen
             ->get();
-    }
-
-    /**
-     * Hilfsmethode, um alle ModelStatus-Optionen für das Dropdown zu erhalten
-     */
-    public function getModelStatusOptionsProperty()
-    {
-        return collect(ModelStatus::cases())->map(function ($status) {
-            return [
-                'value' => $status->value,
-                'label' => $status->label(),
-                'icon' => $status->icon(),
-                'colors' => $status->colors(),
-
-            ];
-        });
     }
 
     /**

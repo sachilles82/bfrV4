@@ -218,7 +218,7 @@
                                             <span class="mr-2">
                                                 <x-dynamic-component
                                                     :component="$status['icon'] ?? 'heroicon-o-question-mark-circle'"
-                                                    class="h-4 w-4 {{ $status['colors'] ?? '' }}"/>
+                                                    class="{{ $status['colors'] ?? '' }}"/>
                                             </span>
                                             <span>{{ $status['label'] }}</span>
                                         </div>

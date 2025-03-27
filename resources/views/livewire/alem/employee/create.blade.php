@@ -252,7 +252,7 @@
                             :error="$errors->first('joined_at')"
                         >
                             <flux:date-picker
-                                wire:model.defer="joined_at"
+                                wire:model="joined_at"
                                 with-today
                                 value="21-03-2025"
                                 week-numbers
@@ -300,15 +300,15 @@
                                 wire:model="employee_status"
                                 id="employee_status"
                                 variant="listbox">
-                                @foreach(\App\Enums\Employee\EmployeeStatus::cases() as $empStatus)
-                                    <flux:option value="{{ $empStatus->value }}">
+                                @foreach($this->employeeStatusOptions as $status)
+                                    <flux:option value="{{ $status['value'] }}">
                                         <div class="flex items-center">
                                             <span class="mr-2">
                                                 <x-dynamic-component
-                                                    :component="$empStatus->icon()"
-                                                    class="h-4 w-4 {{ $empStatus->colors() ?? '' }}"/>
+                                                    :component="$status['icon']"
+                                                    class="rounded-md h-5 w-5 {{ $status['colors'] ?? '' }}"/>
                                             </span>
-                                            <span>{{ $empStatus->label() }}</span>
+                                            <span>{{ $status['label'] }}</span>
                                         </div>
                                     </flux:option>
                                 @endforeach
@@ -326,8 +326,9 @@
                             help-text="{{ __('') }}"
                             :error="$errors->first('model_status')">
                             <flux:select
+                                class="mt-2"
                                 x-model="modelStatus"
-                                wire:model.defer="model_status"
+                                wire:model="model_status"
                                 id="model_status"
                                 name="model_status"
                                 variant="listbox"
@@ -337,8 +338,8 @@
                                         <div class="flex items-center">
                                             <span class="mr-2">
                                                 <x-dynamic-component
-                                                    :component="$status['icon'] ?? 'heroicon-o-question-mark-circle'"
-                                                    class="h-4 w-4 {{ $status['colors'] ?? '' }}"/>
+                                                    :component="$status['icon']"
+                                                    class="rounded-md h-5 w-5 {{ $status['colors'] ?? '' }}"/>
                                             </span>
                                             <span>{{ $status['label'] }}</span>
                                         </div>

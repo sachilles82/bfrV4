@@ -33,7 +33,7 @@ trait ValidateDepartment
                 'regex:/^[a-zA-Z0-9äöüÄÖÜß\s\.,;:!?\-_()\/\'\"]+$/', // Erlaubte Zeichen: Buchstaben, Zahlen, Umlaute, Leerzeichen und gängige Satzzeichen
                 'not_regex:/<|>/', // Keine spitzen Klammern
             ],
-            'status' => [
+            'model_status' => [
                 'required',
                 'string',
                 new Enum(ModelStatus::class), // Status muss ein gültiger Wert aus dem ModelStatus-Enum sein
@@ -53,17 +53,17 @@ trait ValidateDepartment
             'name.regex' => __('Der Abteilungsname darf nur Buchstaben, Zahlen, Umlaute und Leerzeichen enthalten.'),
             'name.not_regex' => __('Der Abteilungsname darf keine spitzen Klammern (< oder >) enthalten.'),
             'name.unique' => __('Eine Abteilung mit diesem Namen existiert bereits in Ihrem Team.'),
-            
+
             // Beschreibung-Validierung Fehlermeldungen
             'description.string' => __('Die Beschreibung muss eine Zeichenkette sein.'),
             'description.max' => __('Die Beschreibung darf nicht länger als 1000 Zeichen sein.'),
             'description.regex' => __('Die Beschreibung darf nur Buchstaben, Zahlen, Umlaute, Leerzeichen und grundlegende Satzzeichen enthalten.'),
             'description.not_regex' => __('Die Beschreibung darf keine spitzen Klammern (< oder >) enthalten.'),
-            
+
             // Status-Validierung Fehlermeldungen
-            'status.required' => __('Bitte wählen Sie einen Status aus.'),
-            'status.string' => __('Der Status muss eine gültige Option sein.'),
-            'status.enum' => __('Der Status muss einer der folgenden Werte sein: Aktiv, Archiviert oder Im Papierkorb.'),
+            'model_status.required' => __('Bitte wählen Sie einen Status aus.'),
+            'model_status.string' => __('Der Status muss eine gültige Option sein.'),
+            'model_status.enum' => __('Der Status muss einer der folgenden Werte sein: Aktiv, Archiviert oder Im Papierkorb.'),
         ];
     }
 }

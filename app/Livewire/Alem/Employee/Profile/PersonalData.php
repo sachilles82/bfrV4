@@ -10,16 +10,17 @@ use App\Models\Alem\Employee\Employee;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
+use App\Traits\Employee\WithEmployeeStatusOptions;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Livewire\Attributes\On;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 
 class PersonalData extends Component
 {
-    use ValidatePersonalData, AuthorizesRequests;
+    use ValidatePersonalData, AuthorizesRequests,
+         WithEmployeeStatusOptions;
 
     // User mit den Daten
     public User $user;
@@ -73,21 +74,6 @@ class PersonalData extends Component
             $this->profession = $this->employee->profession_id ?? '';
             $this->stage = $this->employee->stage_id ?? '';
         }
-    }
-
-    /**
-     * Get all employee status options for the dropdown
-     */
-    public function getEmployeeStatusOptionsProperty()
-    {
-        return collect(EmployeeStatus::cases())->map(function ($status) {
-            return [
-                'value' => $status->value,
-                'label' => $status->label(),
-                'icon' => $status->icon(),
-                'colors' => $status->colors()
-            ];
-        });
     }
 
     /**
@@ -224,16 +210,16 @@ class PersonalData extends Component
      */
     public function render(): View
     {
-        $employeeStatusOptions = $this->employeeStatusOptions;
         $probationOptions = $this->probationOptions;
         $noticePeriodOptions = $this->noticePeriodOptions;
         $supervisors = $this->supervisors;
+        $employeeStatusOptions = $this->employeeStatusOptions;
 
         return view('livewire.alem.employee.profile.personal-data', [
-            'employeeStatusOptions' => $employeeStatusOptions,
             'probationOptions' => $probationOptions,
             'noticePeriodOptions' => $noticePeriodOptions,
-            'supervisors' => $supervisors
+            'supervisors' => $supervisors,
+            'employeeStatusOptions' => $employeeStatusOptions
         ]);
     }
 }

@@ -64,15 +64,15 @@
 
                         <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
 
-                        @foreach($employeeStatuses as $empStatus)
-                            <flux:option value="{{ $empStatus->value }}">
+                        @foreach($this->employeeStatusOptions as $status)
+                            <flux:option value="{{ $status['value'] }}">
                                 <div class="inline-flex items-center">
                                     <span class="mr-2">
                                         <x-dynamic-component
-                                            :component="$empStatus->icon()"
-                                            class="h-4 w-4 rounded-md {{ $empStatus->colors() ?? '' }}"/>
+                                            :component="$status['icon']"
+                                            class="rounded-md h-5 w-5 {{ $status['colors'] ?? '' }}"/>
                                     </span>
-                                    {{ $empStatus->label() }}
+                                    {{ $status['label'] }}
                                 </div>
                             </flux:option>
                         @endforeach
@@ -110,43 +110,15 @@
                 </x-slot:head>
                 <x-slot:body>
                     @if($statusFilter === 'trashed')
-                        <tr>
-                            <td colspan="8"
-                                class="bg-yellow-50 dark:bg-yellow-400/10 dark:text-yellow-500 px-4 py-2 text-yellow-800">
-                                <div class="flex items-start">
-                                    <x-pupi.icon.danger class="h-6 w-6"/>
-                                    <div class="ml-3 flex-1 pt-0.5">
-                                        <p class="text-sm font-medium">{{ __('Attention!') }}
-                                            <span
-                                                class="ml-2 font-normal text-sm text-gray-600 dark:text-gray-400">{{ __('Trash will delete automatically all') }}</span>
-                                            <span class="font-medium">{{ __('7 Days') }}</span>
-                                            <span
-                                                class="font-normal text-sm text-gray-600 dark:text-gray-400">{{ __('automatically permanently') }}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
+                        <x-pupi.table.tr.trash-warning :colspan="9"/>
                     @endif
                     @forelse($users as $user)
-                        <tr
-                            wire:key="{{ $user->id }}"
-                            x-on:check-all.window="checked = $event.detail"
-                            x-on:update-table.window="checked = false"
-                            x-on:employee-updated.window="checked = false"
-                            x-data="{ checked: false }"
-                            x-init="checked = $wire.selectedIds.includes('{{ $user->id }}')"
-                            x-bind:class="{
-                'bg-gray-100 dark:bg-gray-800/50': checked,
-                'hover:bg-gray-100 dark:hover:bg-gray-800/50': !checked
-              }"
-                        >
+                        <x-pupi.table.tr.selectable-row :id="$user->id">
                             <td class="relative px-7 sm:w-12 sm:px-6">
                                 <div x-show="checked" x-cloak
-                                     class="absolute inset-y-0 left-0 w-0.5 dark:bg-indigo-500 bg-indigo-600"></div>
-                                <x-pupi.table.tr.checkbox x-model="checked"
-                                                          wire:model="selectedIds"
-                                                          value="{{ $user->id}}"/>
+                                     class="absolute inset-y-0 left-0 w-0.5 bg-indigo-600"></div>
+                                <x-pupi.table.tr.checkbox x-model="checked" wire:model="selectedIds"
+                                                          value="{{ $user->id }}"/>
                             </td>
                             <x-pupi.table.tr.cell>
                                 <div class="flex items-center">
@@ -336,7 +308,7 @@
                                     </flux:menu>
                                 </flux:dropdown>
                             </td>
-                        </tr>
+                        </x-pupi.table.tr.selectable-row>
                     @empty
                         <x-pupi.table.tr.empty>
                             <x-pupi.table.tr.empty-cell colspan="9"/>

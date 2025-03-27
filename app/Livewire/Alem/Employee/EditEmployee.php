@@ -14,6 +14,8 @@ use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
+use App\Traits\Employee\WithEmployeeStatusOptions;
+use App\Traits\Model\WithModelStatusOptions;
 use Illuminate\Support\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -24,13 +26,13 @@ use Livewire\Component;
 
 class EditEmployee extends Component
 {
-    use ValidateEmployee, AuthorizesRequests;
+    use ValidateEmployee, AuthorizesRequests, WithModelStatusOptions, WithEmployeeStatusOptions;
 
     public $userId;
     public $employeeId;
 
     public $selectedRoles = [];
-    public $model_status;
+    public $model_status;               // Model Status wird im Trait WithModelStatusOptions definiert
     public $employee_status;
     public $invitations = false;
 
@@ -271,24 +273,6 @@ class EditEmployee extends Component
             ->get();
     }
 
-    /**
-     * Gets all available model status options with their labels, colors, and icons
-     */
-    public function getModelStatusOptionsProperty()
-    {
-        $statuses = [];
-
-        foreach (ModelStatus::cases() as $status) {
-            $statuses[] = [
-                'value' => $status->value,
-                'label' => $status->label(),
-                'colors' => $status->colors(),
-                'icon' => $status->icon(),
-            ];
-        }
-
-        return $statuses;
-    }
 
     public function render(): View
     {

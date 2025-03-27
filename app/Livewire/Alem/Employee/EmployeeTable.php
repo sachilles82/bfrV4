@@ -6,25 +6,24 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleVisibility;
 use App\Livewire\Alem\Employee\Helper\Searchable;
+use App\Livewire\Alem\Employee\Helper\WithEmployeeModelStatus;
 use App\Livewire\Alem\Employee\Helper\WithEmployeeSorting;
 use App\Livewire\Alem\Employee\Helper\WithEmployeeStatus;
-use App\Livewire\Alem\Employee\Helper\WithModelStatus;
 use App\Models\User;
+use App\Traits\Employee\WithEmployeeStatusOptions;
 use App\Traits\Table\WithPerPagePagination;
-use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class EmployeeTable extends Component
 {
-    use Searchable, WithPerPagePagination, WithEmployeeSorting, WithModelStatus, WithEmployeeStatus;
+    use Searchable, WithPerPagePagination, WithEmployeeSorting,
+        WithEmployeeStatusOptions,
+        WithEmployeeModelStatus,
+        WithEmployeeStatus;
 
-    public $selectedIds = [];
-    public $idsOnPage = [];
     public $name = '';
-
-    public $teamFilter = null;
 
     /** Tabelle zeigt nur User mit user_typ employee */
     protected string $userType = 'employee';
@@ -49,7 +48,7 @@ class EmployeeTable extends Component
                 $this->reset('employeeStatusFilter');
             }
 
-            $this->dispatch('update-table');
+            $this->dispatchTableUpdateEvent();
         }
     }
 
@@ -62,9 +61,9 @@ class EmployeeTable extends Component
         $this->reset('search');
         $this->reset('sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter', 'teamFilter');
         $this->selectedIds = [];
-        $this->teamFilter = null;
+//        $this->teamFilter = null;
         $this->dispatch('resetFilters');
-        $this->dispatch('update-table');
+        $this->dispatchTableUpdateEvent();
     }
 
     /**

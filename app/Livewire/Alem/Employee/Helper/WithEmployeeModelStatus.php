@@ -4,18 +4,14 @@ namespace App\Livewire\Alem\Employee\Helper;
 
 use App\Models\User;
 use App\Traits\Model\ModelStatusAction;
-use Livewire\Attributes\Url;
 
 /**
  * Trait für ModelStatus-Integration
  */
 
-trait WithModelStatus
+trait WithEmployeeModelStatus
 {
     use ModelStatusAction;
-
-    #[Url]
-    public $statusFilter = 'active';
 
     /**
      * Die Modellklasse für ModelStatusAction
@@ -49,4 +45,25 @@ trait WithModelStatus
         return 'employeeUpdated';
     }
 
+    /**
+     * Sendet ein modellspezifisches Event
+     * 
+     * @param string $action Die Aktion (z.B. 'created', 'updated', 'deleted')
+     */
+    protected function dispatchModelEvent(string $action): void
+    {
+        // Hier wird direkt der Modeltyp (z.B. 'employee') + Aktion gesendet
+        $modelType = strtolower($this->getModelDisplayName());
+        $this->dispatch("{$modelType}-{$action}");
+    }
+
+    /**
+     * Sendet ein Event zur Aktualisierung der modellspezifischen Tabelle
+     * Ersetzt den generischen 'update-table' Event
+     */
+    protected function dispatchTableUpdateEvent(): void
+    {
+        $modelType = strtolower($this->getModelDisplayName());
+        $this->dispatch("{$modelType}-table-updated");
+    }
 }
