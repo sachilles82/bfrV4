@@ -46,6 +46,9 @@ return new class extends Migration {
 
             $table->index('supervisor_id', 'idx_supervisor');
             $table->index('employee_status', 'idx_employee_status');
+            // Einzelne Indizes für optimierte Abfragen hinzufügen
+            $table->index('profession_id', 'idx_profession_id');
+            $table->index('stage_id', 'idx_stage_id');
             $table->index('birthdate', 'idx_birthdate');
             $table->index('ahv_number', 'idx_ahv_number');
             $table->index('nationality', 'idx_nationality');

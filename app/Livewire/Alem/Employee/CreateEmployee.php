@@ -97,8 +97,8 @@ class CreateEmployee extends Component
             $query->where('access', RoleHasAccessTo::EmployeePanel)
                 ->where('visible', RoleVisibility::Visible);
         })
-            ->where('created_by', 1)                 // System-erstellte Rollen
-            ->orWhere('created_by', auth()->id())    // Oder vom aktuellen Benutzer erstellte Rollen
+            ->where('created_by', 1)
+            ->orWhere('created_by', auth()->id())
             ->get();
     }
 
@@ -107,7 +107,7 @@ class CreateEmployee extends Component
         return auth()->user()->allTeams();
     }
 
-    #[On('departmentUpdated')]
+    #[On('department-created')]
     public function getDepartmentsProperty()
     {
         $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
@@ -125,6 +125,7 @@ class CreateEmployee extends Component
     public function saveEmployee(): void
     {
         $this->validate();
+        $this->modal('create-employee')->close();
 
         try {
             // 1. Benutzer erstellen
@@ -208,7 +209,6 @@ class CreateEmployee extends Component
             'model_status', 'employee_status', 'invitations'
         ]);
 
-        $this->modal('create-employee')->close();
 
         // Standardwerte neu initialisieren
         $this->model_status = ModelStatus::ACTIVE->value;

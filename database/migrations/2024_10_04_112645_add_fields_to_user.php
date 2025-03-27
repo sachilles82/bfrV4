@@ -29,6 +29,12 @@ return new class extends Migration
 
 
             $table->index(['name', 'company_id', 'team_id', 'created_by','user_type', 'model_status','department_id']);
+            
+            // Einzelne Indizes für optimierte Abfragen hinzufügen
+            $table->index('user_type', 'idx_user_type');
+            $table->index('company_id', 'idx_company_id');
+            $table->index('model_status', 'idx_model_status');
+            $table->index('department_id', 'idx_department_id');
         });
     }
 

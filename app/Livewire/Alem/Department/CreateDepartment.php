@@ -14,6 +14,9 @@ class CreateDepartment extends Component
 {
     use ValidateDepartment, WithDepartmentModelStatus;
 
+    // Anzeigeart: 'default' = Index-Seite, 'dropdown' = im Dropdown
+    public string $displayMode = 'default';
+
     public $departmentId = null; // ID um die Validierung für Create/Update zu unterscheiden
     public $name = '';
     public $description = '';
@@ -80,7 +83,6 @@ class CreateDepartment extends Component
             );
 
             $this->dispatch('department-created');
-            $this->dispatchModelEvent('created');
 
         } catch (\Exception $e) {
             Flux::toast(

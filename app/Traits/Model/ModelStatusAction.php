@@ -58,14 +58,6 @@ trait ModelStatusAction
         $this->statusFilter = $status;
         $this->selectedIds = [];
         $this->idsOnPage = [];
-        
-        // Modellspezifisches Table-Update-Event auslösen, wenn verfügbar
-        if (method_exists($this, 'dispatchTableUpdateEvent')) {
-            $this->dispatchTableUpdateEvent();
-        } else {
-            // Fallback auf generisches Event nur wenn nötig
-            $this->dispatch('update-table');
-        }
     }
 
     /**
@@ -268,8 +260,7 @@ trait ModelStatusAction
      *
      * @param string $action Die durchzuführende Aktion ('active', 'archived', 'trashed', 'restore_to_archive')
      */
-    public function bulkUpdateStatus(string $action): void
-    {
+    public function bulkUpdateStatus(string $action): void {
         if (empty($this->selectedIds)) {
             $this->showToast(__('No :name selected.', ['name' => $this->getModelDisplayNamePlural()]), 'Info', 'info');
             return;
@@ -291,16 +282,35 @@ trait ModelStatusAction
         }
 
         if ($count > 0) {
-            $this->showToast(
-                __(':count :name status updated successfully.', [
+            // Spezifische Meldungen je nach Aktion
+            $message = match($action) {
+                'active' => __(':count :name activated successfully.', [
                     'count' => $count,
-                    'name' => $count === 1
-                        ? $this->getModelDisplayName()
-                        : $this->getModelDisplayNamePlural()
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural()
                 ]),
-                'Success',
-                'success'
-            );
+                'archived' => __(':count :name moved to archive.', [
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural()
+                ]),
+                'trashed' => __(':count :name moved to trash.', [
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural()
+                ]),
+                'restore_to_active' => __(':count :name restored to active state.', [
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural()
+                ]),
+                'restore_to_archive' => __(':count :name restored to archive.', [
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural()
+                ]),
+                default => __(':count :name status updated successfully.', [
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural()
+                ]),
+            };
+
+            $this->showToast($message, 'Success', 'success');
         }
 
         $this->resetSelections();
@@ -423,18 +433,15 @@ trait ModelStatusAction
         // Standardmäßig modellspezifisches Event senden
         $updateEvent = $this->getStatusUpdateEventName() ?? 'modelUpdated';
         $this->dispatch($updateEvent);
-        
+
         // Modellspezifisches "updated" Event auslösen
         if (method_exists($this, 'dispatchModelEvent')) {
             $this->dispatchModelEvent('updated');
         }
-        
+
         // Modellspezifisches Table-Update-Event auslösen
         if (method_exists($this, 'dispatchTableUpdateEvent')) {
             $this->dispatchTableUpdateEvent();
-        } else {
-            // Fallback auf generisches Event nur wenn nötig
-            $this->dispatch('update-table');
         }
     }
 

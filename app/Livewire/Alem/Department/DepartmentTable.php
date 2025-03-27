@@ -37,7 +37,6 @@ class DepartmentTable extends Component
         if (in_array($property, ['statusFilter'])) {
             $this->selectedIds = [];
             $this->reset('search', 'sortCol', 'sortAsc');
-            $this->dispatchTableUpdateEvent();
         }
     }
 
@@ -50,7 +49,6 @@ class DepartmentTable extends Component
         $this->reset('search', 'sortCol', 'sortAsc', 'statusFilter');
         $this->selectedIds = [];
         $this->dispatch('resetFilters');
-        $this->dispatchTableUpdateEvent();
     }
 
     /**
@@ -61,14 +59,6 @@ class DepartmentTable extends Component
     public function edit(int $id): void
     {
         $this->dispatch('edit-department', $id);
-    }
-
-    #[On('created')]
-    public function handleCreated(): void
-    {
-        $this->resetPage();
-        $this->reset('search');
-        $this->dispatchTableUpdateEvent();
     }
 
     public function render(): View

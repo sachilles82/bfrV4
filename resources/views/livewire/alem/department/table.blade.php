@@ -242,6 +242,6 @@
     </x-pupi.table.container>
 
     <!-- Livewire Components für Create und Edit Modals -->
-    <livewire:alem.department.create-department lazy />
+{{--    <livewire:alem.department.create-department lazy />--}}
     <livewire:alem.department.edit-department lazy />
 </div>

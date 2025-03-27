@@ -26,10 +26,10 @@
             </x-slot:description>
 
             <!--Create Button, open the Create Component-->
-{{--            <x-slot:create>--}}
-{{--                <livewire:alem.department.create-department--}}
-{{--                />--}}
-{{--            </x-slot:create>--}}
+            <x-slot:create>
+                <livewire:alem.department.create-department
+                />
+            </x-slot:create>
 
             <!-- Table -->
             <livewire:alem.department.department-table

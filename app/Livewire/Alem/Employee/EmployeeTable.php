@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Traits\Employee\WithEmployeeStatusOptions;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -40,15 +41,13 @@ class EmployeeTable extends Component
     /** Lifecycle-Hook: Wird aufgerufen, wenn sich ein Filter ändert, die Auswahl zurücksetzen */
     public function updated($property): void
     {
-        if (in_array($property, ['statusFilter', 'employeeStatusFilter', 'teamFilter'])) {
+        if (in_array($property, ['statusFilter', 'employeeStatusFilter'])) {
             $this->selectedIds = [];
             $this->reset('search', 'sortCol', 'sortAsc');
 
             if ($property === 'statusFilter') {
                 $this->reset('employeeStatusFilter');
             }
-
-            $this->dispatchTableUpdateEvent();
         }
     }
 
@@ -59,11 +58,10 @@ class EmployeeTable extends Component
     {
         $this->resetPage();
         $this->reset('search');
-        $this->reset('sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter', 'teamFilter');
+        $this->reset('sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter');
         $this->selectedIds = [];
 //        $this->teamFilter = null;
         $this->dispatch('resetFilters');
-        $this->dispatchTableUpdateEvent();
     }
 
     /**
@@ -82,13 +80,28 @@ class EmployeeTable extends Component
         $this->dispatch('edit-employee', $id);
     }
 
+    /**
+     * Liefert die gecachten Employee-Status Enum-Werte
+     */
+    public function getEmployeeStatusesProperty()
+    {
+        return Cache::rememberForever('employee-statuses', function () {
+            return EmployeeStatus::cases();
+        });
+    }
+
     public function render(): View
     {
         $authUser = auth()->user();
         $query = User::query()
+            ->select(['id', 'name', 'last_name', 'email', 'model_status', 'company_id', 'department_id', 'user_type', 'slug', 'joined_at', 'created_at'])
             ->with([
                 'employee' => function($query) {
-                    $query->with(['profession', 'stage']);
+                    $query->select(['id', 'user_id', 'employee_status', 'profession_id', 'stage_id'])
+                          ->with([
+                              'profession:id,name',
+                              'stage:id,name'
+                          ]);
                 },
                 'teams:id,name',
                 'currentTeam:id,name',
@@ -112,7 +125,7 @@ class EmployeeTable extends Component
         return view('livewire.alem.employee.table', [
             'users' => $users,
             'statuses' => ModelStatus::cases(),
-            'employeeStatuses' => EmployeeStatus::cases(),
+            'employeeStatuses' => $this->employeeStatuses,
             'availableTeams' => $this->availableTeams,
         ]);
     }

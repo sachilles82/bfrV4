@@ -9,7 +9,6 @@ trait WithDepartmentModelStatus
 {
     use ModelStatusAction;
 
-
     /**
      * Die Modellklasse für ModelStatusAction
      */
@@ -32,40 +31,5 @@ trait WithDepartmentModelStatus
     protected function getModelDisplayNamePlural(): string
     {
         return 'Departments';
-    }
-
-    /**
-     * Der Benutzertyp für die Filterung
-     */
-    protected string $DepartmentType = 'department';
-
-    /**
-     * Name des Events, das nach Status-Änderungen ausgelöst wird
-     */
-    protected function getStatusUpdateEventName(): string
-    {
-        return 'departmentUpdated';
-    }
-
-    /**
-     * Sendet ein modellspezifisches Event
-     * 
-     * @param string $action Die Aktion (z.B. 'created', 'updated', 'deleted')
-     */
-    protected function dispatchModelEvent(string $action): void
-    {
-        // Hier wird direkt der Modeltyp (z.B. 'department') + Aktion gesendet
-        $modelType = strtolower($this->getModelDisplayName());
-        $this->dispatch("{$modelType}-{$action}");
-    }
-
-    /**
-     * Sendet ein Event zur Aktualisierung der modellspezifischen Tabelle
-     * Ersetzt den generischen 'update-table' Event
-     */
-    protected function dispatchTableUpdateEvent(): void
-    {
-        $modelType = strtolower($this->getModelDisplayName());
-        $this->dispatch("{$modelType}-table-updated");
     }
 }

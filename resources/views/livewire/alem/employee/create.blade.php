@@ -7,7 +7,7 @@
 
         <!-- Formular: User- & Employee-Daten -->
         <form wire:submit.prevent="saveEmployee" class="space-y-4">
-            <div wire:loading class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs rounded-lg"></div>
+{{--            <div wire:loading class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs rounded-lg"></div>--}}
             <!-- Personal Information Section -->
             <div class="py-4">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -166,10 +166,11 @@
                                     <flux:option value="">{{ __('No Departments found') }}</flux:option>
                                 @endforelse
 
-                                <!-- Trigger zum Öffnen des Profession-Modals -->
+                                <!-- Trigger zum Öffnen des Department-Modals -->
                                 <x-slot name="add">
                                     <livewire:alem.department.create-department
                                         lazy
+                                        displayMode="dropdown"
                                     />
                                 </x-slot>
                             </flux:select>
@@ -202,7 +203,9 @@
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
                                 <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.profession-form lazy/>
+                                    <livewire:alem.employee.setting.profession.profession-form
+                                        lazy
+                                    />
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>

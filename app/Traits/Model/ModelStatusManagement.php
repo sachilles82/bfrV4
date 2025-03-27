@@ -14,8 +14,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait ModelStatusManagement
 {
-// --- Status-Checks und Scopes (unverändert) ---
-
     public function isActive(): bool
     {
         return $this->model_status === ModelStatus::ACTIVE && !$this->trashed();

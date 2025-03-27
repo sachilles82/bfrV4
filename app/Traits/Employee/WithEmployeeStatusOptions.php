@@ -6,21 +6,16 @@ use App\Enums\Employee\EmployeeStatus;
 
 /**
  * Trait für die Bereitstellung von Employee-Status-Optionen
- * 
- * Dieses Trait stellt eine einheitliche Methode zur Verfügung, um Employee-Status-Optionen
- * in verschiedenen Komponenten zu verwenden. Es bietet eine zentrale, konsistente
- * Datenstruktur für die Darstellung der Status-Optionen in UI-Komponenten.
- *
  * @package App\Traits\Employee
  */
 trait WithEmployeeStatusOptions
 {
     /**
      * Gibt alle verfügbaren Mitarbeiterstatus-Optionen mit ihren Labels, Farben und Icons zurück
-     * 
+     *
      * Diese Computed Property bereitet die Daten für die Anzeige in Select-Komponenten vor
      * und sorgt für eine einheitliche Darstellung in der gesamten Anwendung.
-     * 
+     *
      * @return array Array mit Optionen für Dropdown-Menüs und andere UI-Elemente
      */
     public function getEmployeeStatusOptionsProperty()

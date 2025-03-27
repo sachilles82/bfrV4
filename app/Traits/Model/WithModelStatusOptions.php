@@ -1,12 +1,11 @@
 <?php
 
 namespace App\Traits\Model;
+
 use App\Enums\Model\ModelStatus;
 
 /**
  * Trait für die Model Status Optionen
- *
- *
  */
 trait WithModelStatusOptions
 {

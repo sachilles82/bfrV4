@@ -90,8 +90,6 @@ trait WithStatus
         if (property_exists($this, 'selectedIds')) {
             $this->selectedIds = [];
         }
-
-        $this->dispatch('update-table');
     }
 
     /**
@@ -111,6 +109,5 @@ trait WithStatus
         }
 
         $this->dispatch('resetFilters');
-        $this->dispatch('update-table');
     }
 }
