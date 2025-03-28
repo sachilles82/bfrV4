@@ -128,11 +128,12 @@
                                 @endforelse
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
-                                <x-slot name="add">
-                                    <livewire:alem.department.create-department
-                                        lazy
-                                    />
-                                </x-slot>
+                                    <x-slot name="add">
+                                        <livewire:alem.department.create-department
+                                            displayMode="dropdown"
+                                            lazy
+                                        />
+                                    </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>

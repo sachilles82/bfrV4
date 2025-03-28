@@ -4,120 +4,113 @@ namespace App\Livewire\Alem\Department;
 
 use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Department\Helper\ValidateDepartment;
-use App\Livewire\Alem\Department\Helper\WithDepartmentModelStatus;
+use App\Livewire\Alem\Department\Helper\WithDepartmentSorting;
 use App\Models\Alem\Department;
+use App\Traits\Model\WithModelStatusOptions;
 use Flux\Flux;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class EditDepartment extends Component
 {
-    use ValidateDepartment, WithDepartmentModelStatus;
+    use ValidateDepartment, WithDepartmentSorting, AuthorizesRequests,
+        WithModelStatusOptions;
 
-    public $departmentId;
-    public $name = '';
-    public $description = '';
-    public $model_status = '';
+    public ?int $departmentId = null;
+    public $name;
+    public $description;
+    public $model_status;
 
-    /**
-     * Gibt die verfügbaren Status-Optionen zurück
-     */
-    public function getStatusesProperty()
-    {
-        return \App\Enums\Model\ModelStatus::cases();
-    }
 
     /**
-     * Event-Listener für das Laden der Abteilungsdaten
+     * Lade das Department zur Bearbeitung
      */
     #[On('edit-department')]
     public function loadDepartment($id): void
     {
-        $this->departmentId = $id;
-        $department = Department::findOrFail($id);
+        try {
+            $department = Department::findOrFail($id);
 
-        $this->name = $department->name;
-        $this->description = $department->description ?? '';
-        $this->model_status = $department->model_status;
+            // $this->authorize('update', $department);
 
-        $this->dispatch('modal-open', id: 'edit-department');
+            $this->departmentId = $department->id;
+            $this->name = $department->name;
+            $this->description = $department->description ?? '';
+            $this->model_status = $department->model_status;
+
+            $this->modal('edit-department')->show();
+
+        } catch (AuthorizationException $ae) {
+            Flux::toast(
+                text: __('You are not authorized to edit this department.'),
+                heading: __('Error'),
+                variant: 'danger'
+            );
+        } catch (\Exception $e) {
+            Flux::toast(
+                text: __('Error loading department: ') . $e->getMessage(),
+                heading: __('Error'),
+                variant: 'danger'
+            );
+        }
     }
 
     /**
      * Abteilung aktualisieren
      */
-    public function update(): void
+    public function updateDepartment(): void
     {
-        // Authorization
-        if (!auth()->user()->can('update', Department::class)) {
-            return;
-        }
-
         $this->validate();
 
-        $department = Department::find($this->departmentId);
+        try {
+            $department = Department::findOrFail($this->departmentId);
 
-        if (!$department) {
+            // $this->authorize('update', $department);
+
+            $department->update([
+                'name' => $this->name,
+                'description' => $this->description,
+                'model_status' => $this->model_status,
+            ]);
+
+            $this->closeModal();
+
             Flux::toast(
-                text: __('Department not found.'),
+                text: __('Department updated successfully.'),
+                heading: __('Success'),
+                variant: 'success'
+            );
+
+            $this->dispatch('department-updated');
+
+        } catch (AuthorizationException $ae) {
+            Flux::toast(
+                text: __('You are not authorized to update this department.'),
                 heading: __('Error'),
                 variant: 'danger'
             );
-            return;
+        } catch (\Exception $e) {
+            Flux::toast(
+                text: __('Error updating department: ') . $e->getMessage(),
+                heading: __('Error'),
+                variant: 'danger'
+            );
         }
-
-        $department->update([
-            'name' => $this->name,
-            'description' => $this->description,
-            'model_status' => $this->model_status,
-        ]);
-
-        // Event auslösen für die Aktualisierung der Tabelle
-        $this->dispatch('department-updated');
-        $this->dispatchModelEvent('updated');
-
-        // Modal schließen
-        $this->dispatch('modal-close', id: 'edit-department');
-        $this->reset(['departmentId', 'name', 'description', 'status']);
-
-        Flux::toast(
-            text: __('Department updated successfully.'),
-            heading: __('Success'),
-            variant: 'success'
-        );
     }
 
-    /**
-     * Gets all available model status options with their labels, colors, and icons
-     */
-    public function getModelStatusOptionsProperty()
-    {
-        $statuses = [];
-
-        foreach (ModelStatus::cases() as $status) {
-            $statuses[] = [
-                'value' => $status->value,
-                'label' => $status->label(),
-                'colors' => $status->colors(),
-                'icon' => $status->icon(),
-            ];
-        }
-
-        return $statuses;
-    }
-
-    /**
-     * Modal schließen
-     */
     public function closeModal(): void
     {
-        $this->dispatch('modal-close', id: 'edit-department');
         $this->reset(['departmentId', 'name', 'description', 'model_status']);
+        $this->modal('edit-department')->close();
     }
 
     public function render(): View
     {
-        return view('livewire.alem.department.edit');
+        return view('livewire.alem.department.edit', [
+            'modelStatusOptions' => $this->modelStatusOptions,
+        ]);
     }
 }

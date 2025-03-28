@@ -5,9 +5,8 @@
             <flux:subheading>{{ __('Update department information') }}</flux:subheading>
         </div>
 
-        <!-- Formular für Abteilungsdaten -->
-        <form wire:submit.prevent="update" class="space-y-4">
-            <!-- Department Information Section -->
+        <form wire:submit.prevent="updateDepartment" class="space-y-4">
+
             <div class="py-4">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                     <!-- Department Name -->
@@ -47,32 +46,33 @@
 
                     <!-- Status Selection -->
                     <div class="sm:col-span-6">
-{{--                        <x-pupi.input.group>--}}
-{{--                            label="{{ __('Status') }}"--}}
-{{--                            for="status"--}}
-{{--                            badge="{{ __('Required') }}"--}}
-{{--                            :error="$errors->first('model_status')"--}}
-{{--                            model="model_status"--}}
-{{--                            help-text="{{ __('Select the current status of this department') }}">--}}
-{{--                            <flux:select--}}
-{{--                                class="mt-2"--}}
-{{--                                wire:model="model_status"--}}
-{{--                                id="status"--}}
-{{--                                variant="listbox">--}}
-{{--                                @foreach($modelStatusOptions as $statusOption)--}}
-{{--                                    <flux:option value="{{ $statusOption['value'] }}">--}}
-{{--                                        <div class="flex items-center">--}}
-{{--                                            <span class="mr-2">--}}
-{{--                                                <x-dynamic-component--}}
-{{--                                                    :component="$statusOption['icon']"--}}
-{{--                                                    class="{{ $statusOption['colors'] ?? '' }}"/>--}}
-{{--                                            </span>--}}
-{{--                                            <span>{{ $statusOption['label'] }}</span>--}}
-{{--                                        </div>--}}
-{{--                                    </flux:option>--}}
-{{--                                @endforeach--}}
-{{--                            </flux:select>--}}
-{{--                        </x-pupi.input.group>--}}
+                        <x-pupi.input.group
+                            label="{{ __('Status') }}"
+                            for="model_status"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('model_status')"
+                            model="model_status"
+                            help-text="{{ __('Select the current status of this department') }}"
+                        >
+                            <flux:select
+                                class="mt-2"
+                                wire:model="model_status"
+                                id="model_status"
+                                variant="listbox">
+                                @foreach($modelStatusOptions as $statusOption)
+                                    <flux:option value="{{ $statusOption['value'] }}">
+                                        <div class="flex items-center">
+                                            <span class="mr-2">
+                                                <x-dynamic-component
+                                                    :component="$statusOption['icon']"
+                                                    class="{{ $statusOption['colors'] ?? '' }}"/>
+                                            </span>
+                                            <span>{{ $statusOption['label'] }}</span>
+                                        </div>
+                                    </flux:option>
+                                @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
                     </div>
                 </div>
             </div>

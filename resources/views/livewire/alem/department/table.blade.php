@@ -7,10 +7,10 @@
         <x-pupi.actions.status-filter
             :statusFilter="$statusFilter"
         />
-
+        <!-- Create Button für die Componente-->
         <flux:modal.trigger name="create-department">
             <div
-                class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
+                class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
 
                 <x-pupi.icon.create class="-ml-1.5 size-5"/>
                 {{ __('Create') }}
@@ -139,9 +139,10 @@
                                         <div class="flex shrink-0 -space-x-1">
                                             @foreach($userAvatars['visible_users'] as $user)
                                                 <flux:tooltip class="cursor-default"
-                                                    content="{{ $user['full_name'] }}"
-                                                    position="top">
-                                                    <img class="size-6 max-w-none rounded-full ring-2 ring-white dark:ring-gray-700"
+                                                              content="{{ $user['full_name'] }}"
+                                                              position="top">
+                                                    <img
+                                                        class="size-6 max-w-none rounded-full ring-2 ring-white dark:ring-gray-700"
                                                         src="{{ $user['avatar_url'] }}"
                                                         alt="{{ $user['full_name'] }}">
                                                 </flux:tooltip>
@@ -150,7 +151,8 @@
 
                                         @if($userAvatars['remaining_count'] > 0)
                                             <flux:tooltip class="cursor-default" position="top">
-                                                <span class="shrink-0 text-xs/5 font-medium text-gray-600 dark:text-gray-400">+{{ $userAvatars['remaining_count'] }}</span>
+                                                <span
+                                                    class="shrink-0 text-xs/5 font-medium text-gray-600 dark:text-gray-400">+{{ $userAvatars['remaining_count'] }}</span>
 
                                                 <flux:tooltip.content class="max-w-[20rem] space-y-2">
                                                     @foreach($userAvatars['remaining_user_groups'] as $userName)
@@ -165,7 +167,8 @@
                                 @endif
 
                                 @if($department->trashed())
-                                    <div class="flex items-center mt-1 {{ $department->deletion_urgency_class ?? 'text-amber-600' }}">
+                                    <div
+                                        class="flex items-center mt-1 {{ $department->deletion_urgency_class ?? 'text-amber-600' }}">
                                         <x-pupi.icon.clock class="h-4 w-4 mr-1"/>
                                         {{ $department->deletion_message ?? __('Pending deletion') }}
                                         <span class="text-gray-500 text-xs ml-1">({{ $department->permanent_deletion_date_for_humans ?? __('7 days') }})</span>
@@ -184,14 +187,16 @@
 
                                     <flux:menu class="min-w-32">
                                         <flux:modal.trigger name="department-edit">
-                                            <flux:menu.item wire:click="edit({{ $department->id }})" icon="pencil-square">
+                                            <flux:menu.item wire:click="edit({{ $department->id }})"
+                                                            icon="pencil-square">
                                                 {{ __('Edit') }}
                                             </flux:menu.item>
                                         </flux:modal.trigger>
 
                                         @if($department->trashed())
                                             <!-- Options for departments in trash -->
-                                            <flux:menu.item wire:click="restore({{ $department->id }})" icon="arrow-uturn-up">
+                                            <flux:menu.item wire:click="restore({{ $department->id }})"
+                                                            icon="arrow-uturn-up">
                                                 {{ __('Restore to Active') }}
                                             </flux:menu.item>
 
@@ -210,15 +215,17 @@
                                         @elseif($department->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
                                             <!-- Options for archived departments -->
 
-                                            <flux:modal.trigger name="department-edit">
-                                                <flux:menu.item wire:click="edit({{ $department->id }})" icon="pencil-square">
+                                            <flux:modal.trigger name="edit-department">
+                                                <flux:menu.item wire:click="edit({{ $department->id }})"
+                                                                icon="pencil-square">
                                                     {{ __('Edit') }}
                                                 </flux:menu.item>
                                             </flux:modal.trigger>
 
                                             <flux:separator class="my-1"/>
 
-                                            <flux:menu.item wire:click="activate({{ $department->id }})" icon="check-circle">
+                                            <flux:menu.item wire:click="activate({{ $department->id }})"
+                                                            icon="check-circle">
                                                 {{ __('Set Active') }}
                                             </flux:menu.item>
 
@@ -230,7 +237,8 @@
                                                 {{ __('Move to Trash') }}
                                             </flux:menu.item>
                                         @else
-                                            <flux:menu.item wire:click="archive({{ $department->id }})" icon="archive-box">
+                                            <flux:menu.item wire:click="archive({{ $department->id }})"
+                                                            icon="archive-box">
                                                 {{ __('Archive') }}
                                             </flux:menu.item>
 

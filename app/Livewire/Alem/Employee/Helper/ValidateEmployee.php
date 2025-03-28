@@ -6,6 +6,7 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 trait ValidateEmployee
 {
@@ -41,7 +42,12 @@ trait ValidateEmployee
             'employee_status' => ['required', Rule::in(array_column(EmployeeStatus::cases(), 'value'))],
             'joined_at' => 'required|date',
 
-            'model_status' => ['required', Rule::in(array_column(ModelStatus::cases(), 'value'))],
+            'model_status' => [
+                'required',
+                'string',
+                new Enum(ModelStatus::class), // Status muss ein gültiger Wert aus dem ModelStatus-Enum sein
+            ],
+
         ];
     }
 
@@ -89,7 +95,11 @@ trait ValidateEmployee
             'employee_status.required' => __('Employee status is required.'),
             'joined_at.required' => __('Joined date is required.'),
             'joined_at.date' => __('Joined date must be a valid date.'),
+            // Model status messages
             'model_status.required' => __('Account status is required.'),
+            'model_status.string' => __('Account status must be a string.'),
+            'model_status.enum' => __(  'Der Status need to be a valid value from the ModelStatus enum.'),
+
         ];
     }
 }

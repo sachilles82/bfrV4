@@ -5,6 +5,10 @@ namespace App\Livewire\Alem\Department\Helper;
 use App\Traits\Table\WithSorting;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Trait für die Sortierung von Abteilungen
+ * Füge alle Spalten hinzu, nach denen sortiert werden kann
+ */
 trait WithDepartmentSorting
 {
     use WithSorting;
@@ -17,8 +21,7 @@ trait WithDepartmentSorting
         if ($this->sortCol) {
             $column = match ($this->sortCol) {
                 'name' => 'name',
-                'joined_at' => 'joined_at',
-                'created_at' => 'created_at',
+                default => 'created_at',
             };
             $query->orderBy($column, $this->sortAsc ? 'asc' : 'desc');
         }

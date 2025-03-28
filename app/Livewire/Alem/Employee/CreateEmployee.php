@@ -51,6 +51,8 @@ class CreateEmployee extends Component
     public $department = null;
     public $selectedTeams = []; // Ausgewählte Teams für den Mitarbeiter
 
+    public $createButton = 'open-manager';
+
     /**
      * Mitarbeiter-spezifische Felder (Employee Fields)
      */
@@ -58,16 +60,21 @@ class CreateEmployee extends Component
     public $stage;                     // Karrierestufe
     public $supervisor = null;         // Supervisor/Manager
 
+//    // Anzeigeart: 'default' = Index-Seite, 'dropdown' = im Dropdown
+//    public string $displayMode = 'default';
+
+
     /**
      * Initialisiert die Komponente mit Standardwerten
      */
-    public function mount(): void
+    public function mount($displayMode = 'default'): void
     {
         // Default values
         $this->model_status = ModelStatus::ACTIVE->value; // 'active'
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->gender = Gender::Male->value;
         $this->invitations = true;
+        $this->displayMode = $displayMode;
     }
 
     //-------------------------------------------------------------------------

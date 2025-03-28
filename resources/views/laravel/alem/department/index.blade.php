@@ -26,11 +26,19 @@
 
             <!--Create Button, open the Create Component-->
             <x-slot:create>
-                <livewire:alem.department.create-department />
+                <livewire:alem.department.create-department
+                lazy
+                />
             </x-slot:create>
 
             <!-- Table -->
-            <livewire:alem.department.department-table />
+            <livewire:alem.department.department-table
+            />
+
+            <!-- Edit Component -->
+            <livewire:alem.department.edit-department
+                lazy
+            />
 
         </x-pupi.layout.form-index>
 

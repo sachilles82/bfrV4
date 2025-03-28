@@ -56,7 +56,7 @@ class EditEmployee extends Component
     public ?int $supervisor = null;
 
     /**
-     * Laden eines Benutzers zur Bearbeitung
+     * Lade den User Employee zur Bearbeitung
      */
     #[On('edit-employee')]
     public function loadUser($id): void
@@ -73,8 +73,7 @@ class EditEmployee extends Component
                 ])
                 ->findOrFail($id);
 
-            // Berechtigungsprüfung
-//            $this->authorize('update', $user);
+            // $this->authorize('update', $user);
 
             // User-Daten
             $this->userId = $user->id;
@@ -126,10 +125,8 @@ class EditEmployee extends Component
         try {
             $user = User::findOrFail($this->userId);
 
-            // Berechtigungsprüfung (uncomment if needed)
             // $this->authorize('update', $user);
 
-            // User-Daten aktualisieren
             $user->update([
                 'name' => $this->name,
                 'last_name' => $this->last_name,
@@ -181,9 +178,6 @@ class EditEmployee extends Component
         }
     }
 
-    /**
-     * Modal schließen und Formular zurücksetzen
-     */
     public function closeModal(): void
     {
         $this->reset([
