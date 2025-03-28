@@ -27,31 +27,31 @@ class EditEmployee extends Component
 {
     use ValidateEmployee, AuthorizesRequests;
 
-    public $userId;
-    public $employeeId;
+    public ?int $userId = null;
+    public int $employeeId;
 
-    public $selectedRoles = [];
-    public $model_status;
-    public $employee_status;
-    public $invitations = false;
+    public array $selectedRoles = [];
+    public ?string $model_status = null;
+    public ?string $employee_status = null;
+    public bool $invitations = false;
 
     /**
      * Benutzer-Felder (User Fields)
      */
-    public $gender;
-    public $name;
-    public $last_name;
-    public $email;
-    public $department = null;
+    public ?string $gender = null;
+    public string $name = '';
+    public string $last_name = '';
+    public string $email = '';
+    public ?int $department = null;
     public ?Carbon $joined_at = null;
-    public $selectedTeams = [];
+    public array $selectedTeams = [];
 
     /**
      * Mitarbeiter-spezifische Felder (Employee Fields)
      */
-    public $profession;
-    public $stage;
-    public $supervisor_id;
+    public ?int $profession = null;
+    public ?int $stage = null;
+    public ?int $supervisor = null;
 
     /**
      * Laden eines Benutzers zur Bearbeitung
@@ -96,7 +96,7 @@ class EditEmployee extends Component
                 $this->employee_status = $user->employee->employee_status;
                 $this->profession = $user->employee->profession_id;
                 $this->stage = $user->employee->stage_id;
-                $this->supervisor_id = $user->employee->supervisor_id;
+                $this->supervisor = $user->employee->supervisor_id;
             }
 
         } catch (AuthorizationException $ae) {
@@ -119,13 +119,13 @@ class EditEmployee extends Component
      */
     public function updateEmployee(): void
     {
-//        $this->validate();
+        $this->validate();
 
         try {
             $user = User::findOrFail($this->userId);
 
-            // Berechtigungsprüfung
-//            $this->authorize('update', $user);
+            // Berechtigungsprüfung (uncomment if needed)
+            // $this->authorize('update', $user);
 
             // User-Daten aktualisieren
             $user->update([
@@ -150,20 +150,9 @@ class EditEmployee extends Component
                     'employee_status' => $this->employee_status,
                     'profession_id' => $this->profession,
                     'stage_id' => $this->stage,
-                    'supervisor_id' => $this->supervisor_id,
-                ]);
-            } else if ($this->employee_status) {
-                // Falls noch kein Employee-Datensatz existiert
-                Employee::create([
-                    'user_id' => $user->id,
-                    'uuid' => \Illuminate\Support\Str::uuid()->toString(),
-                    'employee_status' => $this->employee_status,
-                    'profession_id' => $this->profession,
-                    'stage_id' => $this->stage,
-                    'supervisor_id' => $this->supervisor_id,
+                    'supervisor_id' => $this->supervisor,
                 ]);
             }
-
 
             $this->closeModal();
 
@@ -198,7 +187,7 @@ class EditEmployee extends Component
         $this->reset([
             'userId', 'employeeId', 'name', 'last_name', 'email', 'gender',
             'model_status', 'employee_status', 'joined_at', 'department',
-            'profession', 'stage', 'supervisor_id', 'selectedRoles', 'selectedTeams'
+            'profession', 'stage', 'supervisor', 'selectedRoles', 'selectedTeams'
         ]);
 
         $this->modal('edit-employee')->close();

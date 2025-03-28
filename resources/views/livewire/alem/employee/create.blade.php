@@ -164,15 +164,15 @@
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Supervisor') }}"
-                            for="supervisor_id"
+                            for="supervisor"
                             badge="{{ __('Required') }}"
                             :error="$errors->first('supervisor_id')"
-                            model="supervisor_id"
+                            model="supervisor"
                             help-text="{{ __('') }}">
                             <flux:select
                                 class="mt-2"
-                                wire:model="supervisor_id"
-                                id="supervisor_id"
+                                wire:model="supervisor"
+                                id="supervisor"
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Supervisor') }}">

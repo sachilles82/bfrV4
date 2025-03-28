@@ -21,6 +21,7 @@ class CreateRole extends Component
     public $name;
     public $description;
     public $access;
+    public $is_manager = false;
 
     public function save(): void
     {
@@ -35,6 +36,7 @@ class CreateRole extends Component
                 'description' => $this->description,
                 'access' => $this->access,
                 'visible' => RoleVisibility::Visible,
+                'is_manager'  => $this->is_manager,
             ]);
             $this->modal('role-add')->close();
             $this->dispatch('role-created');
@@ -45,7 +47,7 @@ class CreateRole extends Component
                 variant: 'success'
             );
 
-            $this->reset(['name', 'description', 'access']);
+            $this->reset(['name', 'description', 'access', 'is_manager']);
 
         } catch (ValidationException $ve) {
             Flux::toast(

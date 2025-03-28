@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('team_id')->nullable()->after('company_id')->constrained('teams')->cascadeOnDelete();
             $table->string('access')->index()->after('description');
             $table->string('visible')->index()->after('access');
+            $table->boolean('is_manager')->default(false)->after('visible');
             $table->index(['company_id', 'access', 'visible']);
         });
     }

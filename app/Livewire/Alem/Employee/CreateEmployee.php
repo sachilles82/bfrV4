@@ -3,8 +3,6 @@
 namespace App\Livewire\Alem\Employee;
 
 use App\Enums\Employee\EmployeeStatus;
-use App\Enums\Employee\NoticePeriod;
-use App\Enums\Employee\Probation;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
@@ -33,7 +31,7 @@ class CreateEmployee extends Component
 {
     use ValidateEmployee, AuthorizesRequests;
 
-    public $userId;                     //Wird für den Supervisor benötigt
+    public ?int $userId = null;                     //Wird für den Supervisor benötigt
 
     public $selectedRoles = [];         // Employee User kann mehrere Rollen haben
     public $model_status;               // Account Status des Benutzers
@@ -58,6 +56,7 @@ class CreateEmployee extends Component
      */
     public $profession;                // Beruf/Position
     public $stage;                     // Karrierestufe
+    public $supervisor = null;         // Supervisor/Manager
 
     /**
      * Initialisiert die Komponente mit Standardwerten
@@ -125,21 +124,12 @@ class CreateEmployee extends Component
 
     public function getSupervisorsProperty()
     {
-        $managerRole = Role::where('name', UserHasRole::Manager->value)->first();
-        $ownerRole = Role::where('name', UserHasRole::Owner->value)->first();
-
-        if (!$managerRole && !$ownerRole) {
-            return collect();
-        }
-
-        $roleIds = collect([$managerRole?->id, $ownerRole?->id])->filter()->toArray();
-
         return User::query()
             ->select(['id', 'name', 'last_name', 'profile_photo_path'])
             ->where('company_id', auth()->user()->company_id)
-            ->where('id', '!=', $this->userId)
-            ->whereHas('roles', function ($query) use ($roleIds) {
-                $query->whereIn('id', $roleIds);
+//            ->where('id', '!=', auth()->id()) // Aktuellen Benutzer ausschließen
+            ->whereHas('roles', function ($query) {
+                $query->where('is_manager', true); // Nur Benutzer mit Manager-Rolle
             })
             ->orderBy('name')
             ->get();
@@ -197,6 +187,7 @@ class CreateEmployee extends Component
                 'profession_id' => $this->profession,
                 'stage_id' => $this->stage,
                 'employee_status' => $this->employee_status,
+                'supervisor_id' => $this->supervisor,
             ]);
 
             // 4. Teams zuweisen
@@ -246,7 +237,7 @@ class CreateEmployee extends Component
     {
         $this->reset([
             'name', 'last_name', 'email', 'password', 'gender', 'selectedRoles',
-            'joined_at', 'profession', 'stage', 'selectedTeams',
+            'joined_at', 'profession', 'stage', 'selectedTeams', 'supervisor',
             'model_status', 'employee_status', 'invitations'
         ]);
 

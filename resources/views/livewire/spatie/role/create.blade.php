@@ -52,6 +52,20 @@
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
+
+                    <div class="col-span-full">
+                        <x-pupi.input.group label="{{ __('')}}"
+                                            for="is_manager"
+                                            :error="$errors->first('is_manager')"
+                                            help-text="{{ __('') }}">
+                            <flux:switch
+                                wire:model="is_manager"
+                                label="{{ __('Is Manager Role') }}"
+                                description="{{ __('Users with this role can be selected as supervisors.') }}"
+                            />
+                        </x-pupi.input.group>
+                    </div>
+
                     <div class="col-span-full">
                         <x-pupi.input.group
                             label="{{ __('Description') }}"

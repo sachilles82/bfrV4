@@ -11,6 +11,7 @@ trait ValidateRole
         'name' => ['required', 'string', 'min:2', 'max:20', 'regex:/^[\pL\pN\s]*$/u'],
         'description' => ['nullable', 'string', 'min:2', 'max:60', 'regex:/^[\pL\pN\s]*$/u'],
         'access' => ['required', 'string', 'in:employee_panel,partner_panel'],
+        'is_manager' => ['boolean'],
     ];
 
     /**

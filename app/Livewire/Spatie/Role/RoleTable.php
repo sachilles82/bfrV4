@@ -24,6 +24,7 @@ class RoleTable extends Component
     public $name;
     public $description;
     public $access;
+    public $is_manager;
 
 
     public function mount(): void
@@ -48,6 +49,7 @@ class RoleTable extends Component
             $this->name        = $role->name;
             $this->description = $role->description;
             $this->access      = $role->access->value;
+            $this->is_manager  = $role->is_manager;
         } catch (AuthorizationException $ae) {
             // Bei Berechtigungsproblemen
             Flux::toast(
@@ -87,6 +89,7 @@ class RoleTable extends Component
                 'name'        => $this->name,
                 'description' => $this->description,
                 'access'      => RoleHasAccessTo::from($this->access),
+                'is_manager'  => $this->is_manager,
             ]);
 
             Flux::toast(
@@ -152,7 +155,7 @@ class RoleTable extends Component
         $user = auth()->user();
 
         $query = Role::query()
-            ->select('id', 'name', 'description', 'access', 'created_by')
+            ->select('id', 'name', 'description', 'access', 'created_by', 'is_manager')
             ->with(['creator:id,name'])
             ->withCount('permissions')
             ->where(function ($q) use ($user) {

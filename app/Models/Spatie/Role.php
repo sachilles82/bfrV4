@@ -17,6 +17,7 @@ class Role extends SpatieRole
         'description',
         'access',
         'visible',
+        'is_manager',
         'company_id',
         'team_id',
         'created_by',
@@ -25,6 +26,7 @@ class Role extends SpatieRole
     protected $casts = [
         'access'  => RoleHasAccessTo::class,
         'visible' => RoleVisibility::class,
+        'is_manager' => 'boolean',
     ];
 
     protected $attributes = [

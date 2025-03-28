@@ -23,6 +23,9 @@
                     {{ __('Access Portal') }}
                 </x-pupi.table.th.notsort>
                 <x-pupi.table.th.notsort>
+                    {{ __('Manager') }}
+                </x-pupi.table.th.notsort>
+                <x-pupi.table.th.notsort>
                     {{ __('Total Permissions') }}
                 </x-pupi.table.th.notsort>
                 <x-pupi.table.th.notsort>
@@ -53,6 +56,20 @@
                             <div
                                 class="text-xs leading-5 text-gray-500 dark:text-gray-400">{{ $role->description }}</div>
                         </x-pupi.table.tr.cell>
+
+                        <x-pupi.table.tr.cell>
+                            @if($role->is_manager)
+                                <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20">
+            <x-pupi.icon.check class="w-4 h-4 mr-1" />
+            {{ __('Yes') }}
+        </span>
+                            @else
+                                <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20">
+            <x-pupi.icon.x-mark class="w-4 h-4 mr-1" />
+            {{ __('No') }}
+        </span>
+                            @endif
+                        </x-pupi.table.tr.cell>
                         <x-pupi.table.tr.cell>
                                <span
                                    class="cursor-default inline-flex items-center rounded-lg px-2 py-1 text-sm font-medium ring-1 ring-inset mr-2
@@ -74,26 +91,26 @@
                             </flux:tooltip>
                         </x-pupi.table.tr.cell>
                         <flux:cell>
-{{--                            @can('update', $role)--}}
-                                <flux:dropdown align="end" offset="-15">
-                                    <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal" size="sm"
-                                                 variant="ghost" inset="top bottom"/>
+                            {{--                            @can('update', $role)--}}
+                            <flux:dropdown align="end" offset="-15">
+                                <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal" size="sm"
+                                             variant="ghost" inset="top bottom"/>
 
-                                    <flux:menu class="min-w-32">
-                                        <flux:menu.item wire:click="showEditModal({{ $role->id }})"
-                                                        icon="pencil-square">
-                                            {{ __('Edit') }}
-                                        </flux:menu.item>
+                                <flux:menu class="min-w-32">
+                                    <flux:menu.item wire:click="showEditModal({{ $role->id }})"
+                                                    icon="pencil-square">
+                                        {{ __('Edit') }}
+                                    </flux:menu.item>
 
-                                        <flux:menu.item wire:click="delete({{ $role->id }})"
-                                                        wire:confirm="{{ __('Are you sure you want to remove this role?') }}"
-                                                        wire:confirm.prompt="Are you sure?\n\nType YES to confirm|YES"
-                                                        icon="trash" variant="danger">
-                                            {{ __('Delete') }}
-                                        </flux:menu.item>
-                                    </flux:menu>
-                                </flux:dropdown>
-{{--                            @endcan--}}
+                                    <flux:menu.item wire:click="delete({{ $role->id }})"
+                                                    wire:confirm="{{ __('Are you sure you want to remove this role?') }}"
+                                                    wire:confirm.prompt="Are you sure?\n\nType YES to confirm|YES"
+                                                    icon="trash" variant="danger">
+                                        {{ __('Delete') }}
+                                    </flux:menu.item>
+                                </flux:menu>
+                            </flux:dropdown>
+                            {{--                            @endcan--}}
                         </flux:cell>
                     </tr>
                 @empty
@@ -142,11 +159,25 @@
                             @endforeach
                         </flux:select>
                     </div>
+
+                    <div class="col-span-full">
+                        <x-pupi.input.group label="{{ __('')}}"
+                                            for="is_manager"
+                                            :error="$errors->first('is_manager')"
+                                            help-text="{{ __('') }}">
+                            <flux:switch
+                                wire:model="is_manager"
+                                label="{{ __('Is Manager Role') }}"
+                                description="{{ __('Users with this role can be selected as supervisors.') }}"
+                            />
+                        </x-pupi.input.group>
+                    </div>
+
                     <div class="col-span-full">
                         <x-pupi.input.group label="{{ __('Description')}}"
                                             for="description"
                                             :error="$errors->first('description')"
-                                            help-text="{{ __('*max 60 Letter! Describe the Role you will create') }}">
+                                            help-text="{{ __('') }}">
                             <x-pupi.input.textarea rows="2" autofocus wire:model="description"
                                                    name="description" id="description"
                                                    placeholder="{{ __('Role with Full Access')}}"/>

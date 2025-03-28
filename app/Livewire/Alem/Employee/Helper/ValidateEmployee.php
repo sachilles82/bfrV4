@@ -17,7 +17,7 @@ trait ValidateEmployee
             'name' => 'required|string|min:3',
             'last_name' => 'required|string|min:3',
             'email' => [
-                'required', 'email', Rule::unique('users', 'email')->ignore($this->employee->user->id ?? null),
+                'required', 'email', Rule::unique('users', 'email')->ignore($this->userId ?? null),
             ],
 
             // Role validation - at least one role must be selected
@@ -30,6 +30,7 @@ trait ValidateEmployee
 
             // Department
             'department' => ['required', 'exists:departments,id'],
+
             // Supervisor
             'supervisor' => ['required', 'exists:users,id'],
 
@@ -85,7 +86,6 @@ trait ValidateEmployee
             'profession.exists' => __('The selected profession is invalid.'),
             'stage.required' => __('Stage is required.'),
             'stage.exists' => __('The selected stage is invalid.'),
-
             'employee_status.required' => __('Employee status is required.'),
             'joined_at.required' => __('Joined date is required.'),
             'joined_at.date' => __('Joined date must be a valid date.'),
