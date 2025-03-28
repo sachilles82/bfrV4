@@ -53,8 +53,8 @@ class EditEmployee extends Component
     /**
      * Mitarbeiter-spezifische Felder (Employee Fields)
      */
-    public ?int $profession = null;
-    public ?int $stage = null;
+    public $profession = null;
+    public $stage = null;
     public ?int $supervisor = null;
 
     /**
