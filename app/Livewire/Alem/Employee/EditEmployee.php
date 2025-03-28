@@ -6,11 +6,8 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
-use App\Enums\Role\UserHasRole;
-use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
-use App\Models\Alem\Employee\Employee;
 use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
@@ -21,6 +18,7 @@ use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -29,10 +27,10 @@ class EditEmployee extends Component
     use ValidateEmployee, AuthorizesRequests,
         WithModelStatusOptions;
 
-    //locked in livewire
-    public int $employeeId;
-
+    #[Locked]
     public ?int $userId = null;
+
+    public int $employeeId;
 
     public $selectedRoles = [];
     public $model_status;
@@ -57,9 +55,6 @@ class EditEmployee extends Component
     public $stage = null;
     public ?int $supervisor = null;
 
-    /**
-     * Lade den User Employee zur Bearbeitung
-     */
     #[On('edit-employee')]
     public function loadUser($id): void
     {
@@ -87,13 +82,9 @@ class EditEmployee extends Component
             $this->joined_at = $user->joined_at;
             $this->department = $user->department_id;
 
-            // Teams
             $this->selectedTeams = $user->teams->pluck('id')->toArray();
-
-            // Rollen
             $this->selectedRoles = $user->roles->pluck('id')->toArray();
 
-            // Employee-Daten, falls vorhanden
             if ($user->employee) {
                 $this->employeeId = $user->employee->id;
                 $this->employee_status = $user->employee->employee_status;
@@ -117,9 +108,6 @@ class EditEmployee extends Component
         }
     }
 
-    /**
-     * Aktualisiert den Benutzer und die zugehörigen Employee-Daten
-     */
     public function updateEmployee(): void
     {
         $this->validate();
@@ -139,10 +127,8 @@ class EditEmployee extends Component
                 'department_id' => $this->department,
             ]);
 
-            // Rollen aktualisieren
+            // Rollen und Teams aktualisieren
             $user->roles()->sync($this->selectedRoles);
-
-            // Teams aktualisieren
             $user->teams()->sync($this->selectedTeams);
 
             // Employee-Daten aktualisieren
@@ -190,10 +176,6 @@ class EditEmployee extends Component
 
         $this->modal('edit-employee')->close();
     }
-
-    //-------------------------------------------------------------------------
-    // COMPUTED PROPERTIES (GETTER)
-    //-------------------------------------------------------------------------
 
     #[On('profession-updated')]
     public function getProfessionsProperty()
@@ -254,11 +236,6 @@ class EditEmployee extends Component
             ->get();
     }
 
-    /**
-     * Gets all available employee status options with their labels, colors, and icons
-     *
-     * @return array
-     */
     public function getEmployeeStatusOptionsProperty()
     {
         $statuses = [];

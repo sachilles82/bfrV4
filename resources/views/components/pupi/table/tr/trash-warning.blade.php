@@ -1,6 +1,6 @@
 @props(['colspan' => 5])
 
-<tr>
+<tr x-data="{ visible: true }" x-init="setTimeout(() => { visible = false }, 1000)" x-show="visible" x-transition.duration.500ms>
     <td colspan="{{ $colspan }}" class="bg-yellow-50 px-4 py-2 text-yellow-800">
         <div class="flex items-start">
             <x-pupi.icon.danger class="h-6 w-6"/>

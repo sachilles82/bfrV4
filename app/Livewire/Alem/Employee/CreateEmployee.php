@@ -88,8 +88,8 @@ class CreateEmployee extends Component
             $query->where('access', RoleHasAccessTo::EmployeePanel)
                 ->where('visible', RoleVisibility::Visible);
         })
-            ->where('created_by', 1)                 // System-erstellte Rollen
-            ->orWhere('created_by', auth()->id())    // Oder vom aktuellen Benutzer erstellte Rollen
+            ->where('created_by', 1)
+            ->orWhere('created_by', auth()->id())
             ->get();
     }
 
@@ -124,11 +124,7 @@ class CreateEmployee extends Component
             ->orderBy('name')
             ->get();
     }
-    /**
-     * Gets all available employee status options with their labels, colors, and icons
-     *
-     * @return array
-     */
+
     public function getEmployeeStatusOptionsProperty()
     {
         $statuses = [];

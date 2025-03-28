@@ -7,7 +7,7 @@ use Livewire\Attributes\Url;
 
 /**
  * Basis-Trait für modellspezifische Status-Filter in einzelnen Models. Wie Employee, Report, etc.
- * Wird von konkreten Status-Traits wie WithEmployeeStatus, WithReportStatus usw. verwendet
+ * Wird von konkreten Status-Traits wie EmployeeStatus, WithReportStatus usw. verwendet
  */
 
 trait WithStatus

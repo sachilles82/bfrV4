@@ -17,13 +17,13 @@ class CreateDepartment extends Component
     use ValidateDepartment, WithPlaceholder, AuthorizesRequests,
         WithModelStatusOptions;
 
-    public ?int $departmentId = null; //!Muss in jeder Komponente sein, die ein WithModelStatusOptions hat
+    public ?int $departmentId = null; //!Muss in jeder Komponente sein
 
     public $name;
     public $description;
     public $model_status;
 
-    public string $displayMode = 'default';
+    public string $displayMode = 'default'; // habe ich wegen dem Create Button "open-manager"gemacht
 
     public function mount(): void
     {

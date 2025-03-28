@@ -4,10 +4,10 @@ namespace App\Livewire\Alem\Department;
 
 use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Department\Helper\Searchable;
+use App\Livewire\Alem\Department\Helper\WithDepartmentModelStatus;
 use App\Livewire\Alem\Department\Helper\WithDepartmentSorting;
 use App\Models\Alem\Department;
 use App\Traits\Employee\WithUserAvatars;
-use App\Traits\Model\ModelStatusAction;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
@@ -16,49 +16,10 @@ use Livewire\Component;
 class DepartmentTable extends Component
 {
     use Searchable, WithPerPagePagination, WithDepartmentSorting,
-        ModelStatusAction,
+        WithDepartmentModelStatus,
         WithUserAvatars;
 
-    public $selectedIds = [];
-    public $idsOnPage = [];
-    public $statusFilter = 'active';
-
-    public $departmentId;
-    public $name = '';
-
-
-    /**
-     * Die Modellklasse für ModelStatusAction
-     */
-    protected function getModelClass(): string
-    {
-        return Department::class;
-    }
-
-    /**
-     * Der Anzeigename für das Modell
-     */
-    protected function getModelDisplayName(): string
-    {
-        return 'Department';
-    }
-
-    /**
-     * Der pluralisierte Anzeigename für das Modell
-     */
-    protected function getModelDisplayNamePlural(): string
-    {
-        return 'Departments';
-    }
-
-
-    /**
-     * Name des Events, das nach Status-Änderungen ausgelöst wird
-     */
-    protected function getStatusUpdateEventName(): string
-    {
-        return 'department-updated';
-    }
+    public $departmentId; // Wird benötigt damit ich die Daten in der EditDepartment Komponente laden kann
 
     /**
      * Hört auf das Event 'department-created', 'department-updated' und aktualisiert die Tabelle

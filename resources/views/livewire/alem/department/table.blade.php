@@ -72,40 +72,14 @@
                 </x-slot:head>
                 <x-slot:body>
                     @if($statusFilter === 'trashed')
-                        <tr>
-                            <td colspan="5"
-                                class="bg-yellow-50 px-4 py-2 text-yellow-800">
-                                <div class="flex items-start">
-                                    <x-pupi.icon.danger class="h-6 w-6"/>
-                                    <div class="ml-3 flex-1 pt-0.5">
-                                        <p class="text-sm font-medium">{{ __('Attention!') }}
-                                            <span
-                                                class="ml-2 font-normal text-sm text-gray-600">{{ __('Trash will delete automatically all') }}</span>
-                                            <span class="font-medium">{{ __('7 Days') }}</span>
-                                            <span
-                                                class="font-normal text-sm text-gray-600">{{ __('automatically permanently') }}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
+                        <x-pupi.table.tr.trash-warning :colspan="5" />
                     @endif
                     @forelse($departments as $department)
-                        <tr
-                            wire:key="{{ $department->id }}"
-                            x-on:check-all.window="checked = $event.detail"
-                            x-on:update-table.window="checked = false"
-                            x-data="{ checked: false }"
-                            x-init="checked = $wire.selectedIds.includes('{{ $department->id }}')"
-                            x-bind:class="{
-                             'bg-gray-100 dark:bg-gray-800/50': checked,
-                'hover:bg-gray-100 dark:hover:bg-gray-800/50': !checked
-                        }"
-                        >
+                            <x-pupi.table.tr.selectable-row :id="$department->id">
                             <td class="relative px-7 sm:w-12 sm:px-6">
                                 <div x-show="checked" x-cloak
                                      class="absolute inset-y-0 left-0 w-0.5 bg-indigo-600"></div>
-                                <x-pupi.table.tr.checkbox x-model="checked" wire:model.live="selectedIds"
+                                <x-pupi.table.tr.checkbox x-model="checked" wire:model="selectedIds"
                                                           value="{{ $department->id }}"/>
                             </td>
                             <x-pupi.table.tr.cell>
@@ -170,7 +144,7 @@
                                                  variant="ghost" inset="top bottom"/>
 
                                     <flux:menu class="min-w-32">
-                                        <flux:modal.trigger name="department-edit">
+                                        <flux:modal.trigger name="edit-department">
                                             <flux:menu.item wire:click="edit({{ $department->id }})"
                                                             icon="pencil-square">
                                                 {{ __('Edit') }}
@@ -237,7 +211,7 @@
                                     </flux:menu>
                                 </flux:dropdown>
                             </td>
-                        </tr>
+                        </x-pupi.table.tr.selectable-row>
                     @empty
                         <x-pupi.table.tr.empty>
                             <x-pupi.table.tr.empty-cell colspan="5"/>

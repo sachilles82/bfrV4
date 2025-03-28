@@ -10,6 +10,7 @@ use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -18,7 +19,8 @@ class EditDepartment extends Component
     use ValidateDepartment, WithDepartmentSorting, AuthorizesRequests,
         WithModelStatusOptions;
 
-    public ?int $departmentId = null; //!Muss in jeder Komponente sein, die ein WithModelStatusOptions hat
+    #[Locked]
+    public ?int $departmentId = null; //!Muss in jeder Komponente sein
 
     public $name;
     public $description;
@@ -32,7 +34,8 @@ class EditDepartment extends Component
     public function loadDepartment($id): void
     {
         try {
-            $department = Department::findOrFail($id);
+            $department = Department::select(['id', 'name', 'description', 'model_status'])
+                ->findOrFail($id);
 
             // $this->authorize('update', $department);
 

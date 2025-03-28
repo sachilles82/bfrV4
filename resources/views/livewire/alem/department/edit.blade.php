@@ -33,7 +33,6 @@
                             for="description"
                             badge="{{ __('Optional') }}"
                             :error="$errors->first('description')"
-                            help-text="{{ __('Provide a brief description of this department') }}"
                             model="description">
                             <x-pupi.input.textarea
                                 wire:model="description"
@@ -52,7 +51,6 @@
                             badge="{{ __('Required') }}"
                             :error="$errors->first('model_status')"
                             model="model_status"
-                            help-text="{{ __('Select the current status of this department') }}"
                         >
                             <flux:select
                                 class="mt-2"

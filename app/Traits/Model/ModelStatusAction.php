@@ -5,6 +5,7 @@ use App\Enums\Model\ModelStatus;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Livewire\Attributes\Url;
 
 /**
  * Trait für die Handhabung von Model-Status-Aktionen in Livewire-Komponenten
@@ -16,11 +17,16 @@ use Illuminate\Database\Eloquent\Model;
 trait ModelStatusAction
 {
     /**
-     * Erforderliche Eigenschaften in der Komponente:
+     * Diese Eigenschaften werden in jeder Komponente gebraucht. CheckAll Box:
      * public $selectedIds = [];
      * public $idsOnPage = [];
      * public $statusFilter = 'active';
      */
+
+    #[Url]
+    public $statusFilter = 'active';
+    public $selectedIds = [];
+    public $idsOnPage = [];
 
     /**
      * Gibt die Modellklasse zurück, die in der Komponente verwendet wird.
