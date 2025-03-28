@@ -6,6 +6,7 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
+use App\Enums\Role\UserHasRole;
 use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
@@ -257,16 +258,22 @@ class EditEmployee extends Component
 
     public function getSupervisorsProperty()
     {
-        // Manager-Rolle finden
-        $managerRole = Role::where('name', 'Manager')->first();
+        $managerRole = Role::where('name', UserHasRole::Manager->value)->first();
+        $ownerRole = Role::where('name', UserHasRole::Owner->value)->first();
 
-        if (!$managerRole) {
+        if (!$managerRole && !$ownerRole) {
             return collect();
         }
 
-        // Benutzer mit Manager-Rolle abrufen, aktuellen Benutzer ausschließen
-        return User::role($managerRole)
+        $roleIds = collect([$managerRole?->id, $ownerRole?->id])->filter()->toArray();
+
+        return User::query()
+            ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+            ->where('company_id', auth()->user()->company_id)
             ->where('id', '!=', $this->userId)
+            ->whereHas('roles', function ($query) use ($roleIds) {
+                $query->whereIn('id', $roleIds);
+            })
             ->orderBy('name')
             ->get();
     }

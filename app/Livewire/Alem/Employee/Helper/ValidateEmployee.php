@@ -19,7 +19,6 @@ trait ValidateEmployee
             'email' => [
                 'required', 'email', Rule::unique('users', 'email')->ignore($this->employee->user->id ?? null),
             ],
-            'password' => 'required|string|min:8',
 
             // Role validation - at least one role must be selected
             'selectedRoles' => 'required|array|min:1',
@@ -30,11 +29,13 @@ trait ValidateEmployee
             'selectedTeams.*' => ['exists:teams,id'],
 
             // Department
-            'department' => ['nullable', 'exists:departments,id'],
+            'department' => ['required', 'exists:departments,id'],
+            // Supervisor
+            'supervisor' => ['required', 'exists:users,id'],
 
             // Employee fields
-            'profession' => 'nullable|exists:professions,id',
-            'stage' => 'nullable|exists:stages,id',
+            'profession' => 'required|exists:professions,id',
+            'stage' => 'required|exists:stages,id',
 
             'employee_status' => ['required', Rule::in(array_column(EmployeeStatus::cases(), 'value'))],
             'joined_at' => 'required|date',
@@ -59,9 +60,6 @@ trait ValidateEmployee
             'email.email' => __('Email must be valid.'),
             'email.unique' => __('Email already exists.'),
 
-            'password.required' => __('Password is required.'),
-            'password.min' => __('Password must be at least 8 characters.'),
-
             // Role validation messages
             'selectedRoles.required' => __('At least one role must be selected.'),
             'selectedRoles.array' => __('Roles must be provided as a list.'),
@@ -75,10 +73,17 @@ trait ValidateEmployee
             'selectedTeams.*.exists' => __('The selected team is invalid.'),
 
             // Department messages
+            'department.required' => __('Department is required.'),
             'department.exists' => __('The selected department is invalid.'),
 
+            // Supervisor messages
+            'supervisor.required' => __('Supervisor is required.'),
+            'supervisor.exists' => __('The selected supervisor is invalid.'),
+
             // Employee field messages
+            'profession.required' => __('Profession is required.'),
             'profession.exists' => __('The selected profession is invalid.'),
+            'stage.required' => __('Stage is required.'),
             'stage.exists' => __('The selected stage is invalid.'),
 
             'employee_status.required' => __('Employee status is required.'),

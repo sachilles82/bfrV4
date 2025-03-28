@@ -95,10 +95,18 @@
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Supervisor') }}">
-                                <flux:option value="">{{ __('No Supervisor') }}</flux:option>
                                 @foreach($this->supervisors as $supervisor)
                                     <flux:option value="{{ $supervisor->id }}">
-                                        <span class="truncate">{{ $supervisor->name }} {{ $supervisor->last_name }}</span>
+                                        <div class="flex items-center gap-2 whitespace-nowrap">
+                                            <flux:avatar
+                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
+                                                circle
+                                                size="xs"
+                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
+                                                alt="{{ $supervisor->name }}"
+                                            />
+                                            {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                        </div>
                                     </flux:option>
                                 @endforeach
                             </flux:select>
@@ -353,8 +361,6 @@
         </form>
     </flux:modal>
 </div>
-
-
 
 
 <!-- komponente mit blur -->

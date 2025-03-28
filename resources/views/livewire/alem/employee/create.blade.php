@@ -7,7 +7,7 @@
 
         <!-- Formular: User- & Employee-Daten -->
         <form wire:submit.prevent="saveEmployee" class="space-y-4">
-            <div wire:loading class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xs rounded-lg"></div>
+
             <!-- Personal Information Section -->
             <div class="py-4">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -77,22 +77,6 @@
                                 name="email"
                                 id="email"
                                 placeholder="{{ __('meine@email.ch') }}"/>
-                        </x-pupi.input.group>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Password') }}"
-                            for="password"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('password')"
-                            model="password">
-                            <x-pupi.input.text
-                                wire:model="password"
-                                id="password"
-                                type="password"
-                                placeholder="{{ __('Enter password') }}"/>
                         </x-pupi.input.group>
                     </div>
 
@@ -176,12 +160,46 @@
                         </x-pupi.input.group>
                     </div>
 
+                    <!-- Supervisor -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Supervisor') }}"
+                            for="supervisor_id"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('supervisor_id')"
+                            model="supervisor_id"
+                            help-text="{{ __('') }}">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="supervisor_id"
+                                id="supervisor_id"
+                                variant="listbox"
+                                searchable
+                                placeholder="{{ __('Select Supervisor') }}">
+                                @foreach($this->supervisors as $supervisor)
+                                    <flux:option value="{{ $supervisor->id }}">
+                                        <div class="flex items-center gap-2 whitespace-nowrap">
+                                            <flux:avatar
+                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
+                                                circle
+                                                size="xs"
+                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
+                                                alt="{{ $supervisor->name }}"
+                                            />
+                                            {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                        </div>
+                                    </flux:option>
+                                @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
                     <!-- Profession -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Profession') }}"
                             for="profession"
-                            badge="{{ __('Optional') }}"
+                            badge="{{ __('Required') }}"
                             :error="$errors->first('profession')"
                             model="profession"
                             help-text="{{ __('') }}">
@@ -213,7 +231,7 @@
                         <x-pupi.input.group
                             label="{{ __('Stage') }}"
                             for="stage"
-                            badge="{{ __('Optional') }}"
+                            badge="{{ __('Required') }}"
                             :error="$errors->first('stage')"
                             model="stage"
                             help-text="{{ __('') }}">

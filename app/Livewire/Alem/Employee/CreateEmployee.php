@@ -8,6 +8,7 @@ use App\Enums\Employee\Probation;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
+use App\Enums\Role\UserHasRole;
 use App\Enums\User\Gender;
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
@@ -31,6 +32,8 @@ use Livewire\Component;
 class CreateEmployee extends Component
 {
     use ValidateEmployee, AuthorizesRequests;
+
+    public $userId;                     //Wird für den Supervisor benötigt
 
     public $selectedRoles = [];         // Employee User kann mehrere Rollen haben
     public $model_status;               // Account Status des Benutzers
@@ -118,6 +121,28 @@ class CreateEmployee extends Component
         }
 
         return $query->get();
+    }
+
+    public function getSupervisorsProperty()
+    {
+        $managerRole = Role::where('name', UserHasRole::Manager->value)->first();
+        $ownerRole = Role::where('name', UserHasRole::Owner->value)->first();
+
+        if (!$managerRole && !$ownerRole) {
+            return collect();
+        }
+
+        $roleIds = collect([$managerRole?->id, $ownerRole?->id])->filter()->toArray();
+
+        return User::query()
+            ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+            ->where('company_id', auth()->user()->company_id)
+            ->where('id', '!=', $this->userId)
+            ->whereHas('roles', function ($query) use ($roleIds) {
+                $query->whereIn('id', $roleIds);
+            })
+            ->orderBy('name')
+            ->get();
     }
 
     /**

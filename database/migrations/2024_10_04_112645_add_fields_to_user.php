@@ -27,8 +27,12 @@ return new class extends Migration
             $table->timestamp('joined_at')->after('phone_2')->nullable();
             $table->foreignId('department_id')->nullable()->after('joined_at')->constrained('departments')->nullOnDelete();
 
+            $table->index('created_by');
+            $table->index('user_type');
+            $table->index('model_status');
 
-            $table->index(['name', 'company_id', 'team_id', 'created_by','user_type', 'model_status','department_id']);
+            $table->index(['company_id', 'user_type']);
+            $table->index(['company_id', 'department_id']);
         });
     }
 
