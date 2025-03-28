@@ -1,14 +1,7 @@
 <div wire:ignore.self>
     <flux:modal.trigger name="create-department">
         @if($displayMode === 'dropdown')
-            {{-- Open Manager Button für Dropdown-Ansicht --}}
             <x-pupi.button.open-manager/>
-        @else
-            {{-- Standard-Button für die Index-Seite --}}
-            {{--            <div class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">--}}
-            {{--                <x-pupi.icon.create class="-ml-1.5 size-5"/>--}}
-            {{--                {{ __('Create') }}--}}
-            {{--            </div>--}}
         @endif
     </flux:modal.trigger>
     <flux:modal name="create-department"

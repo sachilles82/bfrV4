@@ -23,11 +23,9 @@
             <x-slot:description>
                 {{__('A list of all departments in this table') }}
             </x-slot:description>
-
             <!--Create Button, open the Create Component-->
             <x-slot:create>
                 <livewire:alem.department.create-department
-                lazy
                 />
             </x-slot:create>
 

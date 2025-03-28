@@ -8,15 +8,16 @@ use App\Models\Alem\Department;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Model\WithModelStatusOptions;
 use Flux\Flux;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Livewire\Component;
 
 class CreateDepartment extends Component
 {
-    use ValidateDepartment, WithPlaceholder,
+    use ValidateDepartment, WithPlaceholder, AuthorizesRequests,
         WithModelStatusOptions;
 
-    public ?int $departmentId = null;
+    public ?int $departmentId = null; //!Muss in jeder Komponente sein, die ein WithModelStatusOptions hat
 
     public $name;
     public $description;
@@ -24,14 +25,10 @@ class CreateDepartment extends Component
 
     public string $displayMode = 'default';
 
-    /**
-     * Initialisiert die Komponente mit Standardwerten
-     */
     public function mount(): void
     {
-        $this->model_status = ModelStatus::ACTIVE->value; // 'active'
+        $this->model_status = ModelStatus::ACTIVE->value;
     }
-
 
     public function saveDepartment(): void
     {
@@ -65,9 +62,6 @@ class CreateDepartment extends Component
         }
     }
 
-    /**
-     * Setzt das Formular zurück
-     */
     public function resetForm(): void
     {
         $this->reset(['name', 'description', 'model_status']);

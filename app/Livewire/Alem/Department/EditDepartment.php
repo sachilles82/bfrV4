@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Alem\Department;
 
-use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Department\Helper\ValidateDepartment;
 use App\Livewire\Alem\Department\Helper\WithDepartmentSorting;
 use App\Models\Alem\Department;
@@ -19,7 +18,8 @@ class EditDepartment extends Component
     use ValidateDepartment, WithDepartmentSorting, AuthorizesRequests,
         WithModelStatusOptions;
 
-    public ?int $departmentId = null;
+    public ?int $departmentId = null; //!Muss in jeder Komponente sein, die ein WithModelStatusOptions hat
+
     public $name;
     public $description;
     public $model_status;
@@ -58,9 +58,6 @@ class EditDepartment extends Component
         }
     }
 
-    /**
-     * Abteilung aktualisieren
-     */
     public function updateDepartment(): void
     {
         $this->validate();

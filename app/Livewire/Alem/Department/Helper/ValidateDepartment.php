@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Enum;
 
 trait ValidateDepartment
 {
-    /** Definiert die Validierungsregeln.*/
+
     public function rules(): array
     {
         $teamId = Auth::user()->currentTeam->id;
@@ -18,30 +18,29 @@ trait ValidateDepartment
             'name' => [
                 'required',
                 'string',
-                'regex:/^[a-zA-Z0-9äöüÄÖÜß\s]+$/', // Buchstaben, Zahlen, Umlaute und Leerzeichen
-                'not_regex:/<|>/', // Keine spitzen Klammern
+                'regex:/^[a-zA-Z0-9äöüÄÖÜß\s]+$/',
+                'not_regex:/<|>/',
                 'max:25',
                 'min:2',
                 Rule::unique('departments', 'name')
-                    ->where('team_id', $teamId) // Sicherstellen, dass es nur innerhalb des gleichen Teams einzigartig ist
+                    ->where('team_id', $teamId)
                     ->ignore($this->departmentId),
             ],
             'description' => [
                 'nullable',
                 'string',
                 'max:1000',
-                'regex:/^[a-zA-Z0-9äöüÄÖÜß\s\.,;:!?\-_()\/\'\"]+$/', // Erlaubte Zeichen: Buchstaben, Zahlen, Umlaute, Leerzeichen und gängige Satzzeichen
-                'not_regex:/<|>/', // Keine spitzen Klammern
+                'regex:/^[a-zA-Z0-9äöüÄÖÜß\s\.,;:!?\-_()\/\'\"]+$/',
+                'not_regex:/<|>/',
             ],
             'model_status' => [
                 'required',
                 'string',
-                new Enum(ModelStatus::class), // Status muss ein gültiger Wert aus dem ModelStatus-Enum sein
+                new Enum(ModelStatus::class),
             ],
         ];
     }
 
-    /** Definiert benutzerdefinierte Fehlermeldungen für die Validierungsregeln.*/
     public function messages(): array
     {
         return [

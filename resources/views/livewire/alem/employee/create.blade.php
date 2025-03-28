@@ -130,7 +130,7 @@
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
                                     <x-slot name="add">
                                         <livewire:alem.department.create-department
-                                            displayMode="dropdown"
+                                            :display-mode="'dropdown'"
                                             lazy
                                         />
                                     </x-slot>

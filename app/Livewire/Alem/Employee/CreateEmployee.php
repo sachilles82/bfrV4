@@ -6,7 +6,6 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
-use App\Enums\Role\UserHasRole;
 use App\Enums\User\Gender;
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
@@ -16,7 +15,6 @@ use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
-
 use Illuminate\Support\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -49,9 +47,7 @@ class CreateEmployee extends Component
     public $password;
     public ?Carbon $joined_at = null;
     public $department = null;
-    public $selectedTeams = []; // Ausgewählte Teams für den Mitarbeiter
-
-    public $createButton = 'open-manager';
+    public $selectedTeams = [];
 
     /**
      * Mitarbeiter-spezifische Felder (Employee Fields)
@@ -60,21 +56,16 @@ class CreateEmployee extends Component
     public $stage;                     // Karrierestufe
     public $supervisor = null;         // Supervisor/Manager
 
-//    // Anzeigeart: 'default' = Index-Seite, 'dropdown' = im Dropdown
-//    public string $displayMode = 'default';
-
-
     /**
      * Initialisiert die Komponente mit Standardwerten
      */
-    public function mount($displayMode = 'default'): void
+    public function mount(): void
     {
         // Default values
         $this->model_status = ModelStatus::ACTIVE->value; // 'active'
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->gender = Gender::Male->value;
         $this->invitations = true;
-        $this->displayMode = $displayMode;
     }
 
     //-------------------------------------------------------------------------
