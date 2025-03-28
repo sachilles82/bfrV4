@@ -139,7 +139,7 @@
                                             for="name"
                                             :error="$errors->first('name')"
                                             help-text="{{ __('') }}">
-                            <x-pupi.input.text autofocus wire:model.live="name"
+                            <x-pupi.input.text autofocus wire:model="name"
                                                name="name" id="name"
                                                placeholder="{{ __('Role')}}"/>
                         </x-pupi.input.group>

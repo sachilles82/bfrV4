@@ -219,9 +219,9 @@
                             <x-pupi.table.tr.cell>
                                 <div class="flex flex-wrap gap-1">
                                     @foreach($user->roles as $role)
-                                        <div class="inline-flex items-center rounded-lg px-2 py-1 text-sm font-medium ring-1 ring-inset mr-2
-                                bg-indigo-50 text-indigo-800 ring-indigo-700/10
-                                dark:bg-indigo-400/10 dark:text-indigo-400 dark:ring-indigo-400/30">
+                                        <div class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1 mr-2
+                                        bg-indigo-50 text-indigo-800 ring-indigo-700/10
+                                        dark:bg-indigo-400/10 dark:text-indigo-400 dark:ring-indigo-400/30">
                                             <x-pupi.icon.shield-check class="w-5 h-5 mr-1"/>
                                             {{$role->name}}
                                         </div>
@@ -231,9 +231,8 @@
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <flux:tooltip class="cursor-default"
-                                              content="
-                  {{ __('Hired on: ') }}
-                  {{ $user->joined_at ? $user->joined_at->format('d.m.Y') : __('Not set') }}"
+                                              content="{{ __('Hired on: ') }}
+                                                          {{ $user->joined_at ? $user->joined_at->format('d.m.Y') : __('Not set') }}"
                                               position="top">
                                     <div class="text-gray-500 dark:text-gray-400">
                                         {{ $user->joined_at ? $user->joined_at->diffForHumans() : __('Not available') }}
