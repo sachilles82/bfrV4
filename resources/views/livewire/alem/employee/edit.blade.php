@@ -79,6 +79,62 @@
                         </x-pupi.input.group>
                     </div>
 
+                    <!-- Teams -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Teams') }}"
+                            for="selectedTeams"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('selectedTeams')"
+                            model="selectedTeams"
+                            help-text="{{ __('') }}">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="selectedTeams"
+                                id="selectedTeams"
+                                variant="listbox"
+                                multiple
+                                placeholder="{{ __('Teams auswählen') }}">
+                                @foreach($this->teams as $team)
+                                    <flux:option value="{{ $team->id }}">{{ $team->name }}</flux:option>
+                                @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Department -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Department') }}"
+                            for="department"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('department')"
+                            model="department"
+                            help-text="{{ __('') }}">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="department"
+                                id="department"
+                                variant="listbox"
+                                searchable
+                                placeholder="{{ __('Select Department') }}">
+                                @forelse($this->departments as $department)
+                                    <flux:option value="{{ $department->id }}">
+                                        <span class="truncate">{{ $department->name }}</span>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No Departments found') }}</flux:option>
+                                @endforelse
+
+                                <x-slot name="add">
+                                    <livewire:alem.department.create-department
+                                        lazy
+                                    />
+                                </x-slot>
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
                     <!-- Supervisor -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
@@ -129,66 +185,18 @@
                                 multiple
                                 placeholder="{{ __('Select roles') }}">
                                 @foreach($this->roles as $roleOption)
-                                    <flux:option
-                                        value="{{ $roleOption->id }}">{{ __($roleOption->name) }}</flux:option>
+
+                                    <div class="flex items-center gap-2">
+                                        <flux:option value="{{ $roleOption->id }}">
+                                            {{ __($roleOption->name) }}
+                                            @if($roleOption->is_manager)
+                                                <span class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+                                                {{ __('Manager') }}
+                                            </span>
+                                            @endif
+                                        </flux:option>
+                                    </div>
                                 @endforeach
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
-
-                    <!-- Teams -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Teams') }}"
-                            for="selectedTeams"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('selectedTeams')"
-                            model="selectedTeams"
-                            help-text="{{ __('') }}">
-                            <flux:select
-                                class="mt-2"
-                                wire:model="selectedTeams"
-                                id="selectedTeams"
-                                variant="listbox"
-                                multiple
-                                placeholder="{{ __('Teams auswählen') }}">
-                                @foreach($this->teams as $team)
-                                    <flux:option value="{{ $team->id }}">{{ $team->name }}</flux:option>
-                                @endforeach
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
-
-                    <!-- Department -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Department') }}"
-                            for="department"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('department')"
-                            model="department"
-                            help-text="{{ __('') }}">
-                            <flux:select
-                                class="mt-2"
-                                wire:model="department"
-                                id="department"
-                                variant="listbox"
-                                searchable
-                                placeholder="{{ __('Department auswählen') }}">
-                                @forelse($this->departments as $department)
-                                    <flux:option value="{{ $department->id }}">
-                                        <span class="truncate">{{ $department->name }}</span>
-                                    </flux:option>
-                                @empty
-                                    <flux:option value="">{{ __('No Departments found') }}</flux:option>
-                                @endforelse
-
-                                <!-- Trigger zum Öffnen des Department-Modals -->
-                                <x-slot name="add">
-                                    <livewire:alem.department.create-department
-                                        lazy
-                                    />
-                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>

@@ -27,24 +27,26 @@ class EditEmployee extends Component
 {
     use ValidateEmployee, AuthorizesRequests;
 
-    public ?int $userId = null;
+    //locked in livewire
     public int $employeeId;
 
-    public array $selectedRoles = [];
-    public ?string $model_status = null;
-    public ?string $employee_status = null;
+    public ?int $userId = null;
+
+    public $selectedRoles = [];
+    public $model_status;
+    public $employee_status;
     public bool $invitations = false;
 
     /**
      * Benutzer-Felder (User Fields)
      */
-    public ?string $gender = null;
-    public string $name = '';
-    public string $last_name = '';
-    public string $email = '';
+    public $gender;
+    public $name;
+    public $last_name;
+    public $email;
     public ?int $department = null;
     public ?Carbon $joined_at = null;
-    public array $selectedTeams = [];
+    public $selectedTeams = [];
 
     /**
      * Mitarbeiter-spezifische Felder (Employee Fields)

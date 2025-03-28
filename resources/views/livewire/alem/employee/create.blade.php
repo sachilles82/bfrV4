@@ -80,38 +80,6 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Roles -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Roles') }}"
-                            for="selectedRoles"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('selectedRoles')"
-                            model="selectedRoles">
-                            <flux:select
-                                class="mt-2"
-                                wire:model="selectedRoles"
-                                id="selectedRoles"
-                                variant="listbox"
-                                multiple
-                                placeholder="{{ __('Select roles') }}">
-                                @foreach($this->roles as $roleOption)
-
-                                    <div class="flex items-center gap-2">
-                                    <flux:option value="{{ $roleOption->id }}">
-                                        {{ __($roleOption->name) }}
-                                        @if($roleOption->is_manager)
-                                            <span class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
-                                                {{ __('Manager') }}
-                                            </span>
-                                        @endif
-                                    </flux:option>
-                                    </div>
-                                @endforeach
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
-
                     <!-- Teams -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
@@ -198,6 +166,38 @@
                                             {{ $supervisor->name }} {{ $supervisor->last_name }}
                                         </div>
                                     </flux:option>
+                                @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Roles -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Roles') }}"
+                            for="selectedRoles"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('selectedRoles')"
+                            model="selectedRoles">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="selectedRoles"
+                                id="selectedRoles"
+                                variant="listbox"
+                                multiple
+                                placeholder="{{ __('Select roles') }}">
+                                @foreach($this->roles as $roleOption)
+
+                                    <div class="flex items-center gap-2">
+                                    <flux:option value="{{ $roleOption->id }}">
+                                        {{ __($roleOption->name) }}
+                                        @if($roleOption->is_manager)
+                                            <span class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+                                                {{ __('Manager') }}
+                                            </span>
+                                        @endif
+                                    </flux:option>
+                                    </div>
                                 @endforeach
                             </flux:select>
                         </x-pupi.input.group>
