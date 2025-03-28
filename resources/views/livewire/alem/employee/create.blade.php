@@ -328,15 +328,15 @@
                                 wire:model="employee_status"
                                 id="employee_status"
                                 variant="listbox">
-                                @foreach(\App\Enums\Employee\EmployeeStatus::cases() as $empStatus)
-                                    <flux:option value="{{ $empStatus->value }}">
+                                @foreach($employeeStatusOptions as $statusOption)
+                                    <flux:option value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
                                             <span class="mr-2">
                                                 <x-dynamic-component
-                                                    :component="$empStatus->icon()"
-                                                    class="h-4 w-4 {{ $empStatus->colors() ?? '' }}"/>
+                                                    :component="$statusOption['icon']"
+                                                    class="h-5 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
                                             </span>
-                                            <span>{{ $empStatus->label() }}</span>
+                                            <span>{{ $statusOption['label'] }}</span>
                                         </div>
                                     </flux:option>
                                 @endforeach
@@ -347,28 +347,26 @@
                     <!-- Model Status -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
-                            label="{{ __('Account Status') }}"
+                            label="{{ __('Status') }}"
                             for="model_status"
                             badge="{{ __('Required') }}"
+                            :error="$errors->first('model_status')"
                             model="model_status"
-                            help-text="{{ __('') }}"
-                            :error="$errors->first('model_status')">
+                        >
                             <flux:select
-                                x-model="modelStatus"
-                                wire:model.defer="model_status"
+                                class="mt-2"
+                                wire:model="model_status"
                                 id="model_status"
-                                name="model_status"
-                                variant="listbox"
-                                placeholder="{{ __('Account Status') }}">
-                                @foreach($this->modelStatusOptions as $status)
-                                    <flux:option value="{{ $status['value'] }}">
+                                variant="listbox">
+                                @foreach($modelStatusOptions as $statusOption)
+                                    <flux:option value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
-                                            <span class="mr-2">
-                                                <x-dynamic-component
-                                                    :component="$status['icon'] ?? 'heroicon-o-question-mark-circle'"
-                                                    class="h-4 w-4 {{ $status['colors'] ?? '' }}"/>
-                                            </span>
-                                            <span>{{ $status['label'] }}</span>
+                                    <span class="mr-2">
+                                        <x-dynamic-component
+                                            :component="$statusOption['icon']"
+                                            class="{{ $statusOption['colors'] ?? '' }}"/>
+                                    </span>
+                                            <span>{{ $statusOption['label'] }}</span>
                                         </div>
                                     </flux:option>
                                 @endforeach

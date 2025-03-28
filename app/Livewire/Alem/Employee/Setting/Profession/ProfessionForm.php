@@ -58,8 +58,7 @@ class ProfessionForm extends Component
                 );
             }
 
-            // Event dispatchen, damit andere Komponenten reagieren können
-            $this->dispatch('professionUpdated');
+            $this->dispatch('profession-updated');
 
         } catch (\Throwable $e) {
             // Validierungsfehler direkt weiterwerfen
@@ -110,7 +109,7 @@ class ProfessionForm extends Component
 
             $profession->delete();
             $this->finish();
-            $this->dispatch('professionUpdated');
+            $this->dispatch('profession-updated');
 
             Flux::toast(
                 text: __('Profession deleted successfully.'),

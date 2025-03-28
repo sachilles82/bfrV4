@@ -58,11 +58,9 @@ class StageForm extends Component
                 );
             }
 
-            // Event dispatchen, damit andere Komponenten reagieren können
-            $this->dispatch('stageUpdated');
+            $this->dispatch('stage-updated');
 
         } catch (\Throwable $e) {
-            // Validierungsfehler direkt weiterwerfen
             if ($e instanceof ValidationException) {
                 throw $e;
             }
@@ -109,7 +107,7 @@ class StageForm extends Component
                 ->findOrFail($id);
 
             $stage->delete();
-            $this->dispatch('stageUpdated');
+            $this->dispatch('stage-updated');
 
             Flux::toast(
                 text: __('Stage deleted successfully.'),

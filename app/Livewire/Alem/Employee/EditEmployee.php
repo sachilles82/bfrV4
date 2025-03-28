@@ -15,6 +15,7 @@ use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
+use App\Traits\Model\WithModelStatusOptions;
 use Illuminate\Support\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -25,7 +26,8 @@ use Livewire\Component;
 
 class EditEmployee extends Component
 {
-    use ValidateEmployee, AuthorizesRequests;
+    use ValidateEmployee, AuthorizesRequests,
+        WithModelStatusOptions;
 
     //locked in livewire
     public int $employeeId;
@@ -193,7 +195,7 @@ class EditEmployee extends Component
     // COMPUTED PROPERTIES (GETTER)
     //-------------------------------------------------------------------------
 
-    #[On('professionUpdated')]
+    #[On('profession-updated')]
     public function getProfessionsProperty()
     {
         return Profession::where('company_id', auth()->user()->company_id)
@@ -201,7 +203,7 @@ class EditEmployee extends Component
             ->get();
     }
 
-    #[On('stageUpdated')]
+    #[On('stage-updated')]
     public function getStagesProperty()
     {
         return Stage::where('company_id', auth()->user()->company_id)
@@ -209,7 +211,6 @@ class EditEmployee extends Component
             ->get();
     }
 
-    #[On('roleUpdated')]
     public function getRolesProperty()
     {
         return Role::where(function ($query) {
@@ -226,7 +227,7 @@ class EditEmployee extends Component
         return auth()->user()->allTeams();
     }
 
-    #[On('departmentUpdated')]
+    #[On('department-created')]
     public function getDepartmentsProperty()
     {
         $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
@@ -243,34 +244,26 @@ class EditEmployee extends Component
 
     public function getSupervisorsProperty()
     {
-        $managerRole = Role::where('name', UserHasRole::Manager->value)->first();
-        $ownerRole = Role::where('name', UserHasRole::Owner->value)->first();
-
-        if (!$managerRole && !$ownerRole) {
-            return collect();
-        }
-
-        $roleIds = collect([$managerRole?->id, $ownerRole?->id])->filter()->toArray();
-
         return User::query()
             ->select(['id', 'name', 'last_name', 'profile_photo_path'])
             ->where('company_id', auth()->user()->company_id)
-            ->where('id', '!=', $this->userId)
-            ->whereHas('roles', function ($query) use ($roleIds) {
-                $query->whereIn('id', $roleIds);
+            ->whereHas('roles', function ($query) {
+                $query->where('is_manager', true);
             })
             ->orderBy('name')
             ->get();
     }
 
     /**
-     * Gets all available model status options with their labels, colors, and icons
+     * Gets all available employee status options with their labels, colors, and icons
+     *
+     * @return array
      */
-    public function getModelStatusOptionsProperty()
+    public function getEmployeeStatusOptionsProperty()
     {
         $statuses = [];
 
-        foreach (ModelStatus::cases() as $status) {
+        foreach (EmployeeStatus::cases() as $status) {
             $statuses[] = [
                 'value' => $status->value,
                 'label' => $status->label(),
@@ -284,6 +277,9 @@ class EditEmployee extends Component
 
     public function render(): View
     {
-        return view('livewire.alem.employee.edit');
+        return view('livewire.alem.employee.edit', [
+            'employeeStatusOptions' => $this->employeeStatusOptions,
+            'modelStatusOptions' => $this->modelStatusOptions,
+        ]);
     }
 }

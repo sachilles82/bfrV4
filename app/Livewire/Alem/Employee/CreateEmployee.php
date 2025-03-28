@@ -15,6 +15,7 @@ use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
+use App\Traits\Model\WithModelStatusOptions;
 use Illuminate\Support\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -27,14 +28,15 @@ use Livewire\Component;
 
 class CreateEmployee extends Component
 {
-    use ValidateEmployee, AuthorizesRequests;
+    use ValidateEmployee, AuthorizesRequests,
+        WithModelStatusOptions;
 
     public ?int $userId = null;                     //Wird für den Supervisor benötigt
 
-    public $selectedRoles = [];         // Employee User kann mehrere Rollen haben
-    public $model_status;               // Account Status des Benutzers
-    public $employee_status;            // Beschäftigungs Status des Mitarbeiters
-    public $invitations = true;       // Flag for sending email invitations
+    public $selectedRoles = [];
+    public $model_status;
+    public $employee_status;
+    public $invitations = true;
 
     /**
      * Benutzer-Felder (User Fields)
@@ -52,27 +54,19 @@ class CreateEmployee extends Component
     /**
      * Mitarbeiter-spezifische Felder (Employee Fields)
      */
-    public $profession;                // Beruf/Position
-    public $stage;                     // Karrierestufe
-    public $supervisor = null;         // Supervisor/Manager
+    public $profession;
+    public $stage;
+    public $supervisor = null;
 
-    /**
-     * Initialisiert die Komponente mit Standardwerten
-     */
     public function mount(): void
     {
-        // Default values
-        $this->model_status = ModelStatus::ACTIVE->value; // 'active'
-        $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->gender = Gender::Male->value;
+        $this->model_status = ModelStatus::ACTIVE->value;
+        $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->invitations = true;
     }
 
-    //-------------------------------------------------------------------------
-    // COMPUTED PROPERTIES (GETTER)
-    //-------------------------------------------------------------------------
-
-    #[On('professionUpdated')]
+    #[On('profession-updated')]
     public function getProfessionsProperty()
     {
         return Profession::where('company_id', auth()->user()->company_id)
@@ -80,7 +74,7 @@ class CreateEmployee extends Component
             ->get();
     }
 
-    #[On('stageUpdated')]
+    #[On('stage-updated')]
     public function getStagesProperty()
     {
         return Stage::where('company_id', auth()->user()->company_id)
@@ -88,7 +82,6 @@ class CreateEmployee extends Component
             ->get();
     }
 
-    #[On('roleUpdated')]
     public function getRolesProperty()
     {
         return Role::where(function ($query) {
@@ -105,7 +98,7 @@ class CreateEmployee extends Component
         return auth()->user()->allTeams();
     }
 
-    #[On('departmentUpdated')]
+    #[On('department-created')]
     public function getDepartmentsProperty()
     {
         $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
@@ -125,22 +118,22 @@ class CreateEmployee extends Component
         return User::query()
             ->select(['id', 'name', 'last_name', 'profile_photo_path'])
             ->where('company_id', auth()->user()->company_id)
-//            ->where('id', '!=', auth()->id()) // Aktuellen Benutzer ausschließen
             ->whereHas('roles', function ($query) {
-                $query->where('is_manager', true); // Nur Benutzer mit Manager-Rolle
+                $query->where('is_manager', true);
             })
             ->orderBy('name')
             ->get();
     }
-
     /**
-     * Gets all available model status options with their labels, colors, and icons
+     * Gets all available employee status options with their labels, colors, and icons
+     *
+     * @return array
      */
-    public function getModelStatusOptionsProperty()
+    public function getEmployeeStatusOptionsProperty()
     {
         $statuses = [];
 
-        foreach (ModelStatus::cases() as $status) {
+        foreach (EmployeeStatus::cases() as $status) {
             $statuses[] = [
                 'value' => $status->value,
                 'label' => $status->label(),
@@ -241,16 +234,17 @@ class CreateEmployee extends Component
 
         $this->modal('create-employee')->close();
 
-        // Standardwerte neu initialisieren
         $this->model_status = ModelStatus::ACTIVE->value;
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->gender = Gender::Male->value;
         $this->invitations = true;
-        $this->selectedRoles = [];
     }
 
     public function render(): View
     {
-        return view('livewire.alem.employee.create');
+        return view('livewire.alem.employee.create', [
+            'employeeStatusOptions' => $this->employeeStatusOptions,
+            'modelStatusOptions' => $this->modelStatusOptions,
+        ]);
     }
 }

@@ -49,22 +49,6 @@
                 </div>
 
                 <x-pupi.actions.per-page/>
-                <div>
-                    <flux:select variant="listbox" wire:model.live="statusFilter" id="statusFilter">
-                        @foreach($statuses as $status)
-                            <flux:option value="{{ $status->value }}">
-                                <div class="inline-flex items-center">
-                                    <span class="mr-2">
-                                        <x-dynamic-component
-                                            :component="$status->icon()"
-                                            class="h-4 w-4 rounded-md {{ $status->colors() ?? '' }}"/>
-                                    </span>
-                                    {{ $status->label() }}
-                                </div>
-                            </flux:option>
-                        @endforeach
-                    </flux::select>
-                </div>
             </div>
         </div>
     </div>

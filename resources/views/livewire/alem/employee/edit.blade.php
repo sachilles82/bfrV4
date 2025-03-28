@@ -308,15 +308,15 @@
                                 wire:model="employee_status"
                                 id="employee_status"
                                 variant="listbox">
-                                @foreach(\App\Enums\Employee\EmployeeStatus::cases() as $empStatus)
-                                    <flux:option value="{{ $empStatus->value }}">
+                                @foreach($employeeStatusOptions as $statusOption)
+                                    <flux:option value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
                                             <span class="mr-2">
                                                 <x-dynamic-component
-                                                    :component="$empStatus->icon()"
-                                                    class="h-4 w-4 {{ $empStatus->colors() ?? '' }}"/>
+                                                    :component="$statusOption['icon']"
+                                                    class="h-5 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
                                             </span>
-                                            <span>{{ $empStatus->label() }}</span>
+                                            <span>{{ $statusOption['label'] }}</span>
                                         </div>
                                     </flux:option>
                                 @endforeach
@@ -339,15 +339,15 @@
                                 name="model_status"
                                 variant="listbox"
                                 placeholder="{{ __('Account Status') }}">
-                                @foreach($this->modelStatusOptions as $status)
-                                    <flux:option value="{{ $status['value'] }}">
+                                @foreach($modelStatusOptions as $statusOption)
+                                    <flux:option value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
                                             <span class="mr-2">
                                                 <x-dynamic-component
-                                                    :component="$status['icon'] ?? 'heroicon-o-question-mark-circle'"
-                                                    class="h-4 w-4 {{ $status['colors'] ?? '' }}"/>
+                                                    :component="$statusOption['icon']"
+                                                    class="{{ $statusOption['colors'] ?? '' }}"/>
                                             </span>
-                                            <span>{{ $status['label'] }}</span>
+                                            <span>{{ $statusOption['label'] }}</span>
                                         </div>
                                     </flux:option>
                                 @endforeach
