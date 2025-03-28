@@ -138,79 +138,77 @@
                                     {{ $department->created_at ? $department->created_at->diffForHumans() : __('Not available') }}
                                 </div>
                             </x-pupi.table.tr.cell>
-                            <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                <flux:dropdown align="end" offset="-15">
-                                    <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal" size="sm"
-                                                 variant="ghost" inset="top bottom"/>
+                                <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                    <flux:dropdown align="end" offset="-15">
+                                        <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal" size="sm"
+                                                     variant="ghost" inset="top bottom"/>
 
-                                    <flux:menu class="min-w-32">
-                                        <flux:modal.trigger name="edit-department">
-                                            <flux:menu.item wire:click="edit({{ $department->id }})"
-                                                            icon="pencil-square">
-                                                {{ __('Edit') }}
-                                            </flux:menu.item>
-                                        </flux:modal.trigger>
-
-                                        @if($department->trashed())
-                                            <!-- Options for departments in trash -->
-                                            <flux:menu.item wire:click="restore({{ $department->id }})"
-                                                            icon="arrow-uturn-up">
-                                                {{ __('Restore to Active') }}
-                                            </flux:menu.item>
-
-                                            <flux:menu.item wire:click="restoreToArchive({{ $department->id }})"
-                                                            icon="archive-box">
-                                                {{ __('Restore to Archive') }}
-                                            </flux:menu.item>
-
-                                            <flux:separator class="my-1"/>
-
-                                            <flux:menu.item wire:click="forceDelete({{ $department->id }})"
-                                                            wire:confirm="{{ __('Are you sure you want to permanently delete this department?') }}"
-                                                            icon="trash" variant="danger">
-                                                {{ __('Delete Permanently') }}
-                                            </flux:menu.item>
-                                        @elseif($department->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
-                                            <!-- Options for archived departments -->
-
-                                            <flux:modal.trigger name="edit-department">
-                                                <flux:menu.item wire:click="edit({{ $department->id }})"
-                                                                icon="pencil-square">
-                                                    {{ __('Edit') }}
+                                        <flux:menu class="min-w-32">
+                                            @if($department->trashed())
+                                                <!-- Options for departments in trash -->
+                                                <flux:menu.item wire:click="restore({{ $department->id }})"
+                                                                icon="arrow-uturn-up">
+                                                    {{ __('Restore to Active') }}
                                                 </flux:menu.item>
-                                            </flux:modal.trigger>
 
-                                            <flux:separator class="my-1"/>
+                                                <flux:menu.item wire:click="restoreToArchive({{ $department->id }})"
+                                                                icon="archive-box">
+                                                    {{ __('Restore to Archive') }}
+                                                </flux:menu.item>
 
-                                            <flux:menu.item wire:click="activate({{ $department->id }})"
-                                                            icon="check-circle">
-                                                {{ __('Set Active') }}
-                                            </flux:menu.item>
+                                                <flux:separator class="my-1"/>
 
-                                            <flux:separator class="my-1"/>
+                                                <flux:menu.item wire:click="forceDelete({{ $department->id }})"
+                                                                wire:confirm="{{ __('Are you sure you want to permanently delete this department?') }}"
+                                                                icon="trash" variant="danger">
+                                                    {{ __('Delete Permanently') }}
+                                                </flux:menu.item>
+                                            @elseif($department->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
+                                                <!-- Options for archived departments -->
+                                                <flux:modal.trigger name="edit-department">
+                                                    <flux:menu.item wire:click="edit({{ $department->id }})"
+                                                                    icon="pencil-square">
+                                                        {{ __('Edit') }}
+                                                    </flux:menu.item>
+                                                </flux:modal.trigger>
 
-                                            <flux:menu.item wire:click="delete({{ $department->id }})"
-                                                            wire:confirm="{{ __('Are you sure you want to move this department to trash?') }}"
-                                                            icon="trash" variant="danger">
-                                                {{ __('Move to Trash') }}
-                                            </flux:menu.item>
-                                        @else
-                                            <flux:menu.item wire:click="archive({{ $department->id }})"
-                                                            icon="archive-box">
-                                                {{ __('Archive') }}
-                                            </flux:menu.item>
+                                                <flux:menu.item wire:click="activate({{ $department->id }})"
+                                                                icon="check-circle">
+                                                    {{ __('Set Active') }}
+                                                </flux:menu.item>
 
-                                            <flux:separator class="my-1"/>
+                                                <flux:separator class="my-1"/>
 
-                                            <flux:menu.item wire:click="delete({{ $department->id }})"
-                                                            wire:confirm="{{ __('Are you sure you want to delete this department?') }}"
-                                                            icon="trash" variant="danger">
-                                                {{ __('Delete') }}
-                                            </flux:menu.item>
-                                        @endif
-                                    </flux:menu>
-                                </flux:dropdown>
-                            </td>
+                                                <flux:menu.item wire:click="delete({{ $department->id }})"
+                                                                wire:confirm="{{ __('Are you sure you want to move this department to trash?') }}"
+                                                                icon="trash" variant="danger">
+                                                    {{ __('Move to Trash') }}
+                                                </flux:menu.item>
+                                            @else
+                                                <!-- Options for active departments -->
+                                                <flux:modal.trigger name="edit-department">
+                                                    <flux:menu.item wire:click="edit({{ $department->id }})"
+                                                                    icon="pencil-square">
+                                                        {{ __('Edit') }}
+                                                    </flux:menu.item>
+                                                </flux:modal.trigger>
+
+                                                <flux:menu.item wire:click="archive({{ $department->id }})"
+                                                                icon="archive-box">
+                                                    {{ __('Archive') }}
+                                                </flux:menu.item>
+
+                                                <flux:separator class="my-1"/>
+
+                                                <flux:menu.item wire:click="delete({{ $department->id }})"
+                                                                wire:confirm="{{ __('Are you sure you want to delete this department?') }}"
+                                                                icon="trash" variant="danger">
+                                                    {{ __('Move to Trash') }}
+                                                </flux:menu.item>
+                                            @endif
+                                        </flux:menu>
+                                    </flux:dropdown>
+                                </td>
                         </x-pupi.table.tr.selectable-row>
                     @empty
                         <x-pupi.table.tr.empty>
