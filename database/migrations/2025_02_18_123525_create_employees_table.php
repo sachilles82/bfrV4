@@ -8,6 +8,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
+    /**
+     * Run the migrations.
+     * Erstellt die employees-Tabelle mit optimierten Fremdschlüsselbeziehungen
+     */
     public function up(): void
     {
         Schema::create('employees', function (Blueprint $table) {
@@ -16,13 +20,11 @@ return new class extends Migration {
             $table->uuid('uuid')->nullable()->unique();
 
             $table->string('personal_number')->nullable();
-            $table->foreignId('profession_id')->references('id')->on('professions');
-            $table->foreignId('stage_id')->references('id')->on('stages');
+            $table->foreignId('profession_id')->constrained('professions')->cascadeOnDelete();
+            $table->foreignId('stage_id')->constrained('stages')->cascadeOnDelete();
             $table->string('employment_type')->nullable();
-            // Zuerst die Spalte erstellen
-            $table->unsignedBigInteger('supervisor_id')->nullable();
-            // Dann den Foreign Key definieren
-            $table->foreign('supervisor_id')->references('id')->on('users')->cascadeOnDelete(); // Wenn User gelöscht wird, werden zugehörige Employees ebenfalls gelöscht
+            // Verwende die moderne foreignId-Methode mit constrained und cascadeOnDelete
+            $table->foreignId('supervisor_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->string('probation_enum')->default(Probation::THREE_MONTHS->value);
             $table->date('probation_at')->nullable();
             $table->string('notice_at')->nullable();
@@ -50,10 +52,13 @@ return new class extends Migration {
             $table->index('ahv_number', 'idx_ahv_number');
             $table->index('nationality', 'idx_nationality');
             $table->index('religion', 'idx_religion');
-
         });
     }
 
+    /**
+     * Reverse the migrations.
+     * Entfernt die employees-Tabelle
+     */
     public function down(): void
     {
         Schema::dropIfExists('employees');

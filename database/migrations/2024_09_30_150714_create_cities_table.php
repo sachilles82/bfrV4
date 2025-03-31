@@ -6,21 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     * Erstellt die cities-Tabelle mit optimierten Fremdschlüsselbeziehungen
+     */
     public function up(): void
     {
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->foreignId('state_id')->constrained()->cascadeOnDelete();
-//            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
-//            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
-            $table->unsignedBigInteger('team_id')->nullable();
-            $table->unsignedBigInteger('created_by')->nullable();
+            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
             $table->index(['name', 'state_id', 'team_id', 'created_by']);
         });
     }
 
+    /**
+     * Reverse the migrations.
+     * Entfernt die cities-Tabelle
+     */
     public function down(): void
     {
         Schema::dropIfExists('cities');

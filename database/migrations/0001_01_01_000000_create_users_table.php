@@ -22,7 +22,9 @@ return new class extends Migration
             
             // Persönliche Informationen
             $table->string('name');
-            $table->string('name_normalized')->nullable()->index();
+            $table->string('name_normalized')
+                ->virtualAs("regexp_replace(lower(name), '[^a-z0-9]', '')")
+                ->nullable()->index();
             $table->string('last_name')->nullable();
             $table->string('gender')->default(\App\Enums\User\Gender::Male)->nullable();
             $table->string('phone_1')->nullable();
@@ -40,12 +42,12 @@ return new class extends Migration
             }
             
             // Organisations- und Rollenzuordnung
-            $table->unsignedBigInteger('company_id')->nullable()->index(); // Nur als Spalte ohne Constraint, da companies-Tabelle noch nicht existiert
-            $table->unsignedBigInteger('department_id')->nullable();
+            $table->foreignId('company_id')->nullable()->index(); // Wird später durch Constraint ergänzt
+            $table->foreignId('department_id')->nullable(); // Wird später durch Constraint ergänzt
             $table->string('user_type')->default(UserType::Employee);
             $table->string('model_status')->default(ModelStatus::ACTIVE);
             $table->timestamp('joined_at')->nullable();
-            $table->unsignedBigInteger('created_by')->nullable();
+            $table->foreignId('created_by')->nullable(); // Selbstreferenz wird später durch Constraint ergänzt
             
             // Authentifizierung und Sicherheit
             $table->string('email')->unique();
