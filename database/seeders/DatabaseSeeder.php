@@ -10,6 +10,7 @@ use Database\Seeders\Spatie\PermissionSeeder;
 use Database\Seeders\Spatie\RoleSeeder;
 use Database\Seeders\User\AdminSeeder;
 use Database\Seeders\User\DummyUserSeeder;
+use Database\Seeders\User\TestDataSeeder;
 use Illuminate\Database\Seeder;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -33,6 +34,8 @@ class DatabaseSeeder extends Seeder
             CountrySeeder::class,
             StateSeeder::class,
             CitySeeder::class,
+
+            TestDataSeeder::class,
         ]);
     }
 }

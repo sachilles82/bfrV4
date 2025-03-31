@@ -16,8 +16,10 @@ return new class extends Migration
             $table->string('name')->index();
             $table->char('code',6);
             $table->foreignId('country_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+//            $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
+//            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('team_id')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
             $table->index(['name', 'code','country_id', 'team_id', 'created_by']);

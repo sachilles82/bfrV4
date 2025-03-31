@@ -22,7 +22,7 @@ return new class extends Migration {
             // Zuerst die Spalte erstellen
             $table->unsignedBigInteger('supervisor_id')->nullable();
             // Dann den Foreign Key definieren
-            $table->foreign('supervisor_id')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('supervisor_id')->references('id')->on('users')->cascadeOnDelete(); // Wenn User gelöscht wird, werden zugehörige Employees ebenfalls gelöscht
             $table->string('probation_enum')->default(Probation::THREE_MONTHS->value);
             $table->date('probation_at')->nullable();
             $table->string('notice_at')->nullable();

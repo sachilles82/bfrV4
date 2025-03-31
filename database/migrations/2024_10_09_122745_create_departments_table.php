@@ -18,8 +18,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->foreignId('team_id')->index()->constrained()->cascadeOnDelete();
-            $table->foreignId('created_by')->constrained('users')->nullOnDelete();
-            $table->string('model_status')->default(ModelStatus::ACTIVE)->after('created_by'); // Changed from timestamp to string
+            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete(); // Wenn User gelöscht wird, werden zugehörige Departments ebenfalls gelöscht
+            $table->string('model_status')->default(ModelStatus::ACTIVE);
             $table->softDeletes();
             $table->timestamps();
         });
