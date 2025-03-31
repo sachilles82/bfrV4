@@ -55,6 +55,12 @@ class Department extends Model
      */
     public function users(): HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class)
+            ->select(['id', 'name', 'last_name', 'department_id', 'email', 'profile_photo_path']);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('model_status', ModelStatus::ACTIVE);
     }
 }

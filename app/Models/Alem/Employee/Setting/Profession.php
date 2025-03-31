@@ -24,6 +24,6 @@ class Profession extends Model
      */
     public function employees(): HasMany
     {
-        return $this->hasMany(Employee::class, 'profession');
+        return $this->hasMany(Employee::class, 'profession_id');
     }
 }

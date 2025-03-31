@@ -98,8 +98,8 @@ class TestDataSeeder extends Seeder
 
         try {
             // Parameter für das Seeden
-            $employeeCount = 10000; // Anzahl der zu erstellenden Mitarbeiter
-            $chunkSize = 2500;      // Größere Chunks für bessere Performance
+            $employeeCount = 70000; // Anzahl der zu erstellenden Mitarbeiter
+            $chunkSize = 5000;      // Größere Chunks für bessere Performance
 
             $this->command->info('Starte Erstellung der Testdaten...');
 

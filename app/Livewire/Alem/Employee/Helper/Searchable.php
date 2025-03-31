@@ -20,7 +20,11 @@ trait Searchable
     }
 
     /**
-     * Optimierte Suchfunktion mit datenbankspezifischen Anpassungen
+     * Optimierte Suchfunktion mit datenbankspezifischen Anpassungen für MySQL und PostgreSQL
+     *
+     * Die Implementierung nutzt:
+     * - Für MySQL: Virtuelle normalisierte Spalten für Performance
+     * - Für PostgreSQL: Spezielle regexp_replace und ilike für optimale Suche
      *
      * @param Builder $query Die aktuelle Query
      * @return Builder Die modifizierte Query
@@ -36,7 +40,7 @@ trait Searchable
         // MySQL-spezifische Optimierung mit normalisierten Spalten
         if ($databaseDriver === 'mysql') {
             collect(str_getcsv($this->search, ' ', '"'))->filter()->each(function ($term) use ($query) {
-                $term = preg_replace('/[^A-Za-z0-9]/', '', $term).'%';
+                $term = preg_replace('/[^A-Za-z0-9]/', '', $term) . '%';
                 $query->whereIn('id', function ($query) use ($term) {
                     $query->select('id')
                         ->from(function ($query) use ($term) {
@@ -61,7 +65,7 @@ trait Searchable
         // PostgreSQL-spezifische Optimierung mit regexp_replace und ilike
         if ($databaseDriver === 'pgsql') {
             collect(str_getcsv($this->search, ' ', '"'))->filter()->each(function ($term) use ($query) {
-                $term = preg_replace('/[^A-Za-z0-9]/', '', $term).'%';
+                $term = preg_replace('/[^A-Za-z0-9]/', '', $term) . '%';
                 $query->whereIn('id', function ($query) use ($term) {
                     $query->select('id')
                         ->from(function ($query) use ($term) {
@@ -83,38 +87,16 @@ trait Searchable
             return $query;
         }
 
-        // SQLite-Fallback (einfachere Implementierung für die Entwicklung)
-        if ($databaseDriver === 'sqlite') {
-            // Parse search terms, allowing for quoted phrases
+        // Für alle anderen Datenbanken: Einfache Suche mit Präfix-Wildcard
+        // Dieser Code sollte in einer MySQL/PostgreSQL-Umgebung nicht ausgeführt werden
+        return $query->whereIn('id', function ($query) {
             $terms = collect(str_getcsv($this->search, ' ', '"'))->filter();
-
-            return $query->where(function($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $likeTerm = '%' . $term . '%';  // Für SQLite verwenden wir beide Wildcards für bessere Resultate
-
-                    $query->where(function($subQuery) use ($likeTerm) {
-                        $subQuery->where('users.name', 'like', $likeTerm)
-                            ->orWhere('users.last_name', 'like', $likeTerm)
-                            ->orWhere('users.email', 'like', $likeTerm)
-                            ->orWhere('users.phone_1', 'like', $likeTerm);
-                    });
-                }
-            });
-        }
-
-        // Generischer Fallback für andere Datenbanken
-        $terms = collect(str_getcsv($this->search, ' ', '"'))->filter();
-
-        return $query->where(function($query) use ($terms) {
             foreach ($terms as $term) {
-                $likeTerm = $term . '%';  // Trailing wildcard für bessere Index-Nutzung
-
-                $query->where(function($subQuery) use ($likeTerm) {
-                    $subQuery->where('users.name', 'like', $likeTerm)
-                        ->orWhere('users.last_name', 'like', $likeTerm)
-                        ->orWhere('users.email', 'like', $likeTerm)
-                        ->orWhere('users.phone_1', 'like', $likeTerm);
-                });
+                $likeTerm = $term . '%';
+                $query->orWhere('users.name', 'like', $likeTerm)
+                    ->orWhere('users.last_name', 'like', $likeTerm)
+                    ->orWhere('users.email', 'like', $likeTerm)
+                    ->orWhere('users.phone_1', 'like', $likeTerm);
             }
         });
     }

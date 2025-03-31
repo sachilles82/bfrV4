@@ -4,9 +4,12 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Model\ModelStatus;
+use App\Enums\User\UserType;
 use App\Models\Address\State;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
+use App\Scopes\TeamScope;
+use App\Traits\BelongsToCompany;
 use App\Traits\HasAddress;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
@@ -18,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
@@ -33,7 +37,8 @@ class User extends Authenticatable
     use HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    use TraitForUserModel;
+//    use BelongsToCompany
+//    use TraitForUserModel;
     use HasAddress;
     use SoftDeletes;
     use HasRoles;
@@ -148,7 +153,13 @@ class User extends Authenticatable
 
     protected static function booted(): void
     {
+//        static::addGlobalScope(new TeamScope);
+
         static::creating(function ($user) {
+//            $user->team_id = Auth::user()->currentTeam->id ?? null;
+//            $user->company_id = Auth::user()->company->id ?? null;
+//            $user->created_by = Auth::id();
+
             if (empty($user->slug)) {
                 $user->slug = Str::slug($user->name);
             }
@@ -158,5 +169,12 @@ class User extends Authenticatable
             // Optional: Den slug auch aktualisieren, wenn sich der Name ändert.
             $user->slug = Str::slug($user->name);
         });
+    }
+
+    public function scopeActiveEmployees($query)
+    {
+        return $query->where('user_type', UserType::Employee)
+            ->where('model_status', ModelStatus::ACTIVE)
+            ->whereHas('employee');
     }
 }

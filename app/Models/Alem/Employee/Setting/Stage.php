@@ -24,6 +24,6 @@ class Stage extends Model
      */
     public function employees(): HasMany
     {
-        return $this->hasMany(Employee::class, 'stage');
+        return $this->hasMany(Employee::class, 'stage_id');
     }
 }
