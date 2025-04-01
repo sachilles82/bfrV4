@@ -16,8 +16,6 @@
 {{--                />--}}
 {{--            </x-slot:create>--}}
 
-
-            <!-- Table -->
             <livewire:alem.employee.employee-table
 {{--                lazy--}}
             />
