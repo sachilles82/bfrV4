@@ -334,10 +334,14 @@ class TestDataSeeder extends Seeder
                     // Zufälliges Eintrittsdatum in den letzten 3 Jahren
                     $joinedDate = Carbon::now()->subDays(rand(0, 365 * 3));
 
+                    // Namen für den Benutzer
+                    $firstName = $faker->firstName;
+                    $lastName = $faker->lastName;
+
                     // Erstelle Benutzer-Daten direkt mit DB
                     $userId = DB::table('users')->insertGetId([
-                        'name' => $faker->firstName,
-                        'last_name' => $faker->lastName,
+                        'name' => $firstName,
+                        'last_name' => $lastName,
                         'email' => $email,
                         'email_verified_at' => $currentTime,
                         'password' => $passwordHash,
@@ -347,8 +351,8 @@ class TestDataSeeder extends Seeder
                         'department_id' => $departmentIds[array_rand($departmentIds)],
                         'model_status' => ModelStatus::ACTIVE->value,
                         'phone_1' => '+41' . rand(700000000, 799999999),
-                        // Einfacherer, aber immer noch eindeutiger Slug
-                        'slug' => Str::slug($faker->firstName . $index),
+                        // Slug aus Vorname und Nachname mit Index für Eindeutigkeit
+                        'slug' => Str::slug($firstName . '-' . $lastName . '-' . $index),
                         'created_by' => $owner->id,
                         'joined_at' => $joinedDate,
                         'created_at' => $currentTime,
@@ -359,7 +363,6 @@ class TestDataSeeder extends Seeder
                     $randomStatus = $this->getRandomEmployeeStatus();
                     $employees[] = [
                         'user_id' => $userId,
-                        'uuid' => (string) Str::uuid(),
                         'profession_id' => $professionIds[array_rand($professionIds)],
                         'stage_id' => $stageIds[array_rand($stageIds)],
                         'personal_number' => 'PN' . str_pad($index, 8, '0', STR_PAD_LEFT),

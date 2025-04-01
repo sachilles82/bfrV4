@@ -117,52 +117,6 @@ return new class extends Migration
             });
         }
 
-        /* 
-        // Hier ist die auskommentierte PostgreSQL-spezifische Version für zukünftige Referenz
-        // Diese Version nutzt PostgreSQL-eigene Funktionen für bessere Suchperformance
-        
-        if (config('database.default') === 'pgsql') {
-            // Index-Erstellung für normalisierte Suche in PostgreSQL
-            DB::statement('CREATE INDEX users_name_normalized_idx ON users USING btree (regexp_replace(lower(name), \'[^a-z0-9]\', \'\'))');
-            DB::statement('CREATE INDEX users_last_name_normalized_idx ON users USING btree (regexp_replace(lower(last_name), \'[^a-z0-9]\', \'\'))');
-            
-            // Alternativ: Materialized View für optimierte Suche erstellen
-            DB::statement('
-                CREATE MATERIALIZED VIEW IF NOT EXISTS user_search_index AS
-                SELECT 
-                    id, 
-                    regexp_replace(lower(name), \'[^a-z0-9]\', \'\') as name_normalized,
-                    regexp_replace(lower(last_name), \'[^a-z0-9]\', \'\') as last_name_normalized,
-                    lower(email) as email_lower,
-                    phone_1
-                FROM users
-            ');
-            
-            // Indizes auf dem Materialized View
-            DB::statement('CREATE INDEX user_search_name_idx ON user_search_index USING btree (name_normalized)');
-            DB::statement('CREATE INDEX user_search_last_name_idx ON user_search_index USING btree (last_name_normalized)');
-            DB::statement('CREATE INDEX user_search_email_idx ON user_search_index USING btree (email_lower)');
-            
-            // Trigger für automatische Aktualisierung des Views bei Änderungen
-            DB::unprepared('
-                CREATE OR REPLACE FUNCTION refresh_user_search_index()
-                RETURNS TRIGGER AS $$
-                BEGIN
-                    REFRESH MATERIALIZED VIEW CONCURRENTLY user_search_index;
-                    RETURN NULL;
-                END;
-                $$ LANGUAGE plpgsql;
-                
-                DROP TRIGGER IF EXISTS refresh_user_search_trigger ON users;
-                
-                CREATE TRIGGER refresh_user_search_trigger
-                AFTER INSERT OR UPDATE OR DELETE ON users
-                FOR EACH STATEMENT
-                EXECUTE FUNCTION refresh_user_search_index();
-            ');
-        }
-        */
-
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');

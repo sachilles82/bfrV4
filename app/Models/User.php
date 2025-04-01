@@ -58,17 +58,16 @@ class User extends Authenticatable
         'name',
         'last_name',
         'email',
-        'email_verified_at',
         'password',
-        'company_id',
-        'user_type',
-        'gender',
-        'created_by',
-        'model_status',
         'phone_1',
         'phone_2',
-        'joined_at',
+        'slug',
+        'company_id',
+        'team_id',
         'department_id',
+        'joined_at',
+        'user_type',
+        'model_status',
     ];
 
     /**
@@ -84,29 +83,15 @@ class User extends Authenticatable
     ];
 
     /**
-     * The accessors to append to the model's array form.
+     * The attributes that should be cast.
      *
-     * @var array<int, string>
+     * @var array<string, string>
      */
-    protected $appends = [
-        'profile_photo_url',
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'joined_at' => 'date',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'model_status' => ModelStatus::class,
-            'joined_at' => 'datetime',
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Definiere zusätzliche Datumfelder.
@@ -145,7 +130,18 @@ class User extends Authenticatable
         return $this->belongsTo(Department::class);
     }
 
-    /* Verwende den "username" als Schlüssel für das Route Model Binding.*/
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKey(): mixed
+    {
+        // Hier kombinieren wir den Slug für URLs
+        return $this->slug;
+    }
+
+    /**
+     * Get the route key name for the model.
+     */
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -161,13 +157,17 @@ class User extends Authenticatable
 //            $user->created_by = Auth::id();
 
             if (empty($user->slug)) {
-                $user->slug = Str::slug($user->name);
+                // Erstelle Slug aus Vor- und Nachname
+                $user->slug = Str::slug($user->name . '-' . $user->last_name);
             }
         });
 
         static::updating(function ($user) {
-            // Optional: Den slug auch aktualisieren, wenn sich der Name ändert.
-            $user->slug = Str::slug($user->name);
+            // Den Slug nur aktualisieren, wenn sich der Name oder Nachname geändert hat
+            if ($user->isDirty('name') || $user->isDirty('last_name')) {
+                // Erstelle Slug aus Vor- und Nachname
+                $user->slug = Str::slug($user->name . '-' . $user->last_name);
+            }
         });
     }
 
