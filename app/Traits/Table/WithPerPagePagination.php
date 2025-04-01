@@ -8,16 +8,15 @@ use Psr\Container\NotFoundExceptionInterface;
 
 trait WithPerPagePagination
 {
-
     use WithPagination;
 
     public int $perPage = 7;
+    protected string $paginationTheme = 'simple-custom'; // Auf unser neues benutzerdefiniertes Template umstellen
 
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-
     public function initializeWithPerPagePagination(): void
     {
         $this->perPage = session()->get('perPage', $this->perPage);
@@ -38,6 +37,3 @@ trait WithPerPagePagination
         return $query->simplePaginate($this->perPage);
     }
 }
-
-
-

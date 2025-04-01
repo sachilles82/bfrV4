@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Alem\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class EmployeeController extends Controller
@@ -16,7 +15,7 @@ class EmployeeController extends Controller
      * @param string $activeTab Der aktive Tab in der Ansicht (Standard ist 'employee-update')
      * @return View
      */
-    public function show($slug, $activeTab = 'employee-update'): View
+    public function show(string $slug, string $activeTab = 'employee-update'): View
     {
         // Finde den User basierend auf Slug
         $user = User::where('slug', $slug)->first();

@@ -23,10 +23,6 @@ class EmployeeTable extends Component
         WithEmployeeModelStatus,
         WithEmployeeStatus;
 
-    public $name = '';
-
-    public $teamFilter = null;
-
     /** Tabelle zeigt nur User mit user_typ employee */
     protected string $userType = 'employee';
 
@@ -37,13 +33,12 @@ class EmployeeTable extends Component
     public function refreshTable(): void
     {
         $this->resetPage();
-        Cache::forget($this->getCacheKey('teams'));
     }
 
     /** Lifecycle-Hook: Wird aufgerufen, wenn sich ein Filter ändert, die Auswahl zurücksetzen */
     public function updated($property): void
     {
-        if (in_array($property, ['statusFilter', 'employeeStatusFilter', 'teamFilter'])) {
+        if (in_array($property, ['statusFilter', 'employeeStatusFilter'])) {
             $this->selectedIds = [];
             $this->reset('search', 'sortCol', 'sortAsc');
 
@@ -62,7 +57,7 @@ class EmployeeTable extends Component
     {
         $this->resetPage();
         $this->reset('search');
-        $this->reset('sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter', 'teamFilter');
+        $this->reset('sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter');
         $this->selectedIds = [];
         $this->dispatch('resetFilters');
         $this->dispatch('update-table');
@@ -93,35 +88,11 @@ class EmployeeTable extends Component
         $this->dispatch('edit-employee', $id);
     }
 
-    /**
-     * Wendet den Team-Filter auf die Abfrage an
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function applyTeamFilter($query)
-    {
-        if (!empty($this->teamFilter)) {
-            return $query->whereHas('teams', function ($teamQuery) {
-                $teamQuery->where('teams.id', $this->teamFilter);
-            });
-        }
-
-        return $query;
-    }
-
     protected function activeEmployees($query)
     {
         return $query->where('model_status', ModelStatus::ACTIVE)
             ->where('user_type', UserType::Employee);
     }
-    /**
-     * Rendert die Mitarbeitertabelle mit allen notwendigen Daten
-     * Optimiert für exakte Feldauswahl und Performance
-     *
-     * @return \Illuminate\Contracts\View\View
-     */
-    // In app/Livewire/Alem/Employee/EmployeeTable.php
 
     public function render(): View
     {
@@ -151,7 +122,6 @@ class EmployeeTable extends Component
             }
         ]);
 
-        // Anwenden der Filter
         $this->applySearch($query);
         $this->applySorting($query);
         $this->applyStatusFilter($query);
@@ -162,13 +132,6 @@ class EmployeeTable extends Component
             });
         }
 
-        if ($this->teamFilter) {
-            $query->whereHas('teams', function($q) {
-                $q->where('teams.id', $this->teamFilter);
-            });
-        }
-
-        // Paginierung anwenden
         $users = $query->paginate($this->perPage);
         $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();
 

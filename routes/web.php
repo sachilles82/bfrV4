@@ -4,6 +4,7 @@ use App\Enums\Role\Permission;
 use App\Http\Controllers\Alem\Company\CompanyController;
 use App\Http\Controllers\Alem\Company\DepartmentController;
 use App\Http\Controllers\Alem\Employee\EmployeeController;
+use App\Http\Controllers\Alem\Employee\EmployeeIndexController;
 use App\Http\Controllers\Alem\Employee\ProfileController;
 use App\Http\Controllers\Setting\Role\RoleController;
 use Illuminate\Support\Facades\Route;
@@ -59,9 +60,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
     Route::prefix('accounts')->group(function () {
 
-        Route::get('/employees',  function () {
-            return view('laravel/alem/employee/index');
-        })->name('alem.employees');
+        Route::get('/employees' , [EmployeeIndexController::class, 'index'])
+            ->name('alem.employees');
 
         // Route für das Mitarbeiter-Profil mit Slug aus Vor- und Nachname
         Route::get('/employees/{slug}/{activeTab?}', [EmployeeController::class, 'show'])
