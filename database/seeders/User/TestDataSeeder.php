@@ -27,66 +27,13 @@ use Faker\Factory as Faker;
 class TestDataSeeder extends Seeder
 {
     /**
-     * Liste deutscher Vornamen
-     */
-    protected $firstNames = [
-        'Alexander', 'Andreas', 'Angelika', 'Anna', 'Birgit', 'Bernd', 'Brigitte', 'Christian', 'Claudia',
-        'Daniel', 'Dieter', 'Elisabeth', 'Eva', 'Felix', 'Frank', 'Gabriele', 'Gisela', 'Hans', 'Heike',
-        'Heinz', 'Helga', 'Inge', 'Jan', 'Jens', 'Joachim', 'Johannes', 'Julia', 'Jürgen', 'Karl', 'Karin',
-        'Klaus', 'Lena', 'Lisa', 'Lukas', 'Manfred', 'Marcel', 'Maria', 'Marion', 'Markus', 'Martin',
-        'Martina', 'Max', 'Maximilian', 'Michael', 'Monica', 'Monika', 'Nicole', 'Nina', 'Norbert', 'Oliver',
-        'Petra', 'Peter', 'Rainer', 'Ralf', 'Renate', 'Sabine', 'Sandra', 'Sarah', 'Sebastian', 'Silke',
-        'Simon', 'Sophie', 'Stefan', 'Stephanie', 'Susanne', 'Sven', 'Thomas', 'Thorsten', 'Tim', 'Timo',
-        'Tobias', 'Ulrich', 'Ursula', 'Ute', 'Uwe', 'Volker', 'Werner', 'Wilhelm', 'Wolfgang', 'Yvonne'
-    ];
-
-    /**
-     * Liste deutscher Nachnamen
-     */
-    protected $lastNames = [
-        'Müller', 'Schmidt', 'Schneider', 'Fischer', 'Weber', 'Meyer', 'Wagner', 'Becker', 'Schulz', 'Hoffmann',
-        'Schäfer', 'Koch', 'Bauer', 'Richter', 'Klein', 'Wolf', 'Schröder', 'Neumann', 'Schwarz', 'Zimmermann',
-        'Braun', 'Krüger', 'Hofmann', 'Hartmann', 'Lange', 'Schmitt', 'Werner', 'Schmitz', 'Krause', 'Meier',
-        'Lehmann', 'Schmid', 'Schulze', 'Maier', 'Köhler', 'Herrmann', 'König', 'Walter', 'Mayer', 'Huber',
-        'Kaiser', 'Fuchs', 'Peters', 'Lang', 'Scholz', 'Möller', 'Weiß', 'Jung', 'Hahn', 'Schubert',
-        'Vogel', 'Friedrich', 'Keller', 'Günther', 'Frank', 'Berger', 'Winkler', 'Roth', 'Beck', 'Lorenz',
-        'Baumann', 'Franke', 'Albrecht', 'Schuster', 'Simon', 'Ludwig', 'Böhm', 'Winter', 'Kraus', 'Martin',
-        'Schumacher', 'Krämer', 'Vogt', 'Stein', 'Jäger', 'Otto', 'Sommer', 'Groß', 'Seidel', 'Heinrich'
-    ];
-
-    protected function getRandomEmployeeStatus()
-    {
-        // Alle verfügbaren Status
-        $statuses = [
-            EmployeeStatus::ONBOARDING,
-            EmployeeStatus::PROBATION,
-            EmployeeStatus::EMPLOYED,
-            EmployeeStatus::ONLEAVE,
-            EmployeeStatus::LEAVE
-        ];
-
-        // Gewichtete Auswahl: EMPLOYED und PROBATION häufiger
-        $weights = [0.10, 0.25, 0.55, 0.05, 0.05]; // 10%, 25%, 55%, 5%, 5%
-
-        $randomNumber = mt_rand(1, 100) / 100;
-        $cumulativeWeight = 0;
-
-        foreach ($weights as $key => $weight) {
-            $cumulativeWeight += $weight;
-            if ($randomNumber <= $cumulativeWeight) {
-                return $statuses[$key];
-            }
-        }
-
-        // Fallback
-        return EmployeeStatus::EMPLOYED;
-    }
-
-    /**
      * Seed the application's database.
      */
     public function run(): void
     {
+        // Initialisiere Faker für deutsche Namen
+        $faker = Faker::create('de_DE');
+
         // Erhöhe das PHP Memory Limit für große Datensätze
         ini_set('memory_limit', '2G');
 
@@ -98,8 +45,8 @@ class TestDataSeeder extends Seeder
 
         try {
             // Parameter für das Seeden
-            $employeeCount = 70000; // Anzahl der zu erstellenden Mitarbeiter
-            $chunkSize = 5000;      // Größere Chunks für bessere Performance
+            $employeeCount = 1000; // Anzahl der zu erstellenden Mitarbeiter
+            $chunkSize = 100;      // Größere Chunks für bessere Performance
 
             $this->command->info('Starte Erstellung der Testdaten...');
 
@@ -172,9 +119,9 @@ class TestDataSeeder extends Seeder
             // 3. Erstelle ein Unternehmen
             $this->command->info('Erstelle Unternehmen...');
             $company = Company::create([
-                'company_name' => 'Firma AG',
+                'company_name' => 'Dani AG',
                 'email' => 'info@firma.ch',
-                'phone_1' => '+41 123 456 789',
+                'phone_1' => '+41 44 401 11 42',
                 'is_active' => true,
                 'owner_id' => $owner->id,
                 'created_by' => $owner->id,
@@ -191,7 +138,7 @@ class TestDataSeeder extends Seeder
             // 4. Erstelle ein Team
             $this->command->info('Erstelle Team...');
             $team = Team::create([
-                'name' => 'Firma Team',
+                'name' => 'Betrieb 48',
                 'user_id' => $owner->id,
                 'company_id' => $company->id,
                 'personal_team' => true,
@@ -199,32 +146,12 @@ class TestDataSeeder extends Seeder
 
             // Enum für Role Visibility importieren
             $visibleValue = \App\Enums\Role\RoleVisibility::Visible->value;
-            $hiddenValue = \App\Enums\Role\RoleVisibility::Hidden->value;
 
             // Enum für Role Access importieren
-            $publicValue = \App\Enums\Role\RoleHasAccessTo::OwnerPanel->value;
             $employeePanelValue = \App\Enums\Role\RoleHasAccessTo::EmployeePanel->value;
 
             // Rollen-Daten vorbereiten
             $roleData = [
-                'owner' => [
-                    'name' => 'owner',
-                    'guard_name' => 'web',
-                    'created_by' => $owner->id,
-                    'company_id' => $company->id,
-                    'access' => $publicValue,
-                    'visible' => $visibleValue,
-                    'is_manager' => true
-                ],
-                'employee' => [
-                    'name' => 'employee',
-                    'guard_name' => 'web',
-                    'created_by' => $owner->id,
-                    'company_id' => $company->id,
-                    'access' => $employeePanelValue,
-                    'visible' => $visibleValue,
-                    'is_manager' => false
-                ],
                 'Worker' => [
                     'name' => 'Worker',
                     'guard_name' => 'web',
@@ -311,19 +238,18 @@ class TestDataSeeder extends Seeder
             $this->command->getOutput()->progressFinish();
             $this->command->newLine();
 
-            // 7. Erstelle Berufe mit Faker
-            $this->command->info('Erstelle 100 Berufe mit Faker...');
-            $faker = Faker::create('de_CH'); // Faker initialisieren (für realistische Berufe)
-            $professionChunks = array_chunk(range(1, 100), min(100, $chunkSize));
-            $this->command->getOutput()->progressStart(100);
+            // 7. Erstelle Berufe
+            $this->command->info('Erstelle 50 Berufe...');
+            $professionChunks = array_chunk(range(1, 50), min(50, $chunkSize));
+            $this->command->getOutput()->progressStart(50);
 
             foreach ($professionChunks as $chunk) {
                 DB::beginTransaction();
                 $professions = [];
 
-                foreach ($chunk as $i) {
+                foreach ($chunk as $index) {
                     $professions[] = [
-                        'name' => $faker->unique()->jobTitle, // Faker für Berufsbezeichnung
+                        'name' => 'Beruf' . $index,
                         'company_id' => $company->id,
                         'team_id' => $team->id, // Korrigierte Team ID
                         'created_by' => $owner->id,
@@ -342,7 +268,7 @@ class TestDataSeeder extends Seeder
             $this->command->newLine();
 
             // 8. Erstelle definierte Stufen
-            $stageNames = ['Lehrling', 'Praktikant', 'Angelernt', 'Geselle', 'Facharbeiter', 'Meister', 'Experte'];
+            $stageNames = ['Lehrling', 'Praktikant', 'Angelernt', 'Geselle', 'Facharbeiter', 'Meister', 'Experte', 'Leiter', 'Direktor', 'CEO', 'CTO', 'CFO', 'COO', 'CIO', 'CSO', 'CMO'];
             $this->command->info('Erstelle ' . count($stageNames) . ' definierte Stufen...');
             $this->command->getOutput()->progressStart(count($stageNames));
 
@@ -352,7 +278,7 @@ class TestDataSeeder extends Seeder
                 $stages[] = [
                     'name' => $stageName,
                     'company_id' => $company->id,
-                    'team_id' => $team->id, // Korrigierte Team ID
+                    'team_id' => $team->id,
                     'created_by' => $owner->id,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -372,12 +298,13 @@ class TestDataSeeder extends Seeder
             $stageIds = Stage::where('company_id', $company->id)->pluck('id')->toArray();
 
             // Hole die Hauptrolle für Mitarbeiter zur Massenverknüpfung
-            $employeeRoleId = $roles['employee'];
             $workerRoleId = $roles['Worker'];
             $managerRoleId = $roles['Manager'];
+            $editorRoleId = $roles['Editor'];
+            $temporaryRoleId = $roles['Temporary'];
 
-            // Rolle-IDs für die zufällige Zuweisung vorbereiten
-            $roleIds = [$employeeRoleId, $workerRoleId, $managerRoleId];
+            // Rolle-IDs für die zufällige Zuweisung vorbereiten (nur Worker, Manager, Editor, Temporary)
+            $roleIds = [$workerRoleId, $managerRoleId, $editorRoleId, $temporaryRoleId];
 
             // 9. Erstelle Mitarbeiter
             $this->command->info('Erstelle ' . $employeeCount . ' Mitarbeiter in Chunks von ' . $chunkSize . '...');
@@ -400,19 +327,17 @@ class TestDataSeeder extends Seeder
 
                 for ($j = 0; $j < $chunkSize && ($i + $j) < $employeeCount; $j++) {
                     $index = $i + $j + 1;
-                    $firstName = $this->firstNames[array_rand($this->firstNames)];
-                    $lastName = $this->lastNames[array_rand($this->lastNames)];
 
                     // Ensure unique email
-                    $email = strtolower(Str::slug($firstName)) . '.' . strtolower(Str::slug($lastName)) . '.' . $index . '@firma.ch';
+                    $email = strtolower(Str::slug($faker->firstName)) . '.' . strtolower(Str::slug($faker->lastName)) . '.' . $index . '@firma.ch';
 
                     // Zufälliges Eintrittsdatum in den letzten 3 Jahren
                     $joinedDate = Carbon::now()->subDays(rand(0, 365 * 3));
 
                     // Erstelle Benutzer-Daten direkt mit DB
                     $userId = DB::table('users')->insertGetId([
-                        'name' => $firstName,
-                        'last_name' => $lastName,
+                        'name' => $faker->firstName,
+                        'last_name' => $faker->lastName,
                         'email' => $email,
                         'email_verified_at' => $currentTime,
                         'password' => $passwordHash,
@@ -423,7 +348,7 @@ class TestDataSeeder extends Seeder
                         'model_status' => ModelStatus::ACTIVE->value,
                         'phone_1' => '+41' . rand(700000000, 799999999),
                         // Einfacherer, aber immer noch eindeutiger Slug
-                        'slug' => Str::slug($firstName . '-' . $lastName . '-' . $index),
+                        'slug' => Str::slug($faker->firstName . $index),
                         'created_by' => $owner->id,
                         'joined_at' => $joinedDate,
                         'created_at' => $currentTime,
@@ -504,5 +429,33 @@ class TestDataSeeder extends Seeder
             // Model Events wieder aktivieren
             Model::reguard();
         }
+    }
+
+    protected function getRandomEmployeeStatus()
+    {
+        // Alle verfügbaren Status
+        $statuses = [
+            EmployeeStatus::ONBOARDING,
+            EmployeeStatus::PROBATION,
+            EmployeeStatus::EMPLOYED,
+            EmployeeStatus::ONLEAVE,
+            EmployeeStatus::LEAVE
+        ];
+
+        // Gewichtete Auswahl: EMPLOYED und PROBATION häufiger
+        $weights = [0.10, 0.25, 0.55, 0.05, 0.05]; // 10%, 25%, 55%, 5%, 5%
+
+        $randomNumber = mt_rand(1, 100) / 100;
+        $cumulativeWeight = 0;
+
+        foreach ($weights as $key => $weight) {
+            $cumulativeWeight += $weight;
+            if ($randomNumber <= $cumulativeWeight) {
+                return $statuses[$key];
+            }
+        }
+
+        // Fallback
+        return EmployeeStatus::EMPLOYED;
     }
 }
