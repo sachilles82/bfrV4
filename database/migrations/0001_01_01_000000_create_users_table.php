@@ -62,14 +62,16 @@ return new class extends Migration
 
                 // System-Zeitstempel
                 $table->softDeletes();
+                $table->index('deleted_at');
                 $table->timestamps();
 
                 // Optimierte Indizes für häufig abgefragte Felder
-                $table->index(['user_type', 'model_status'], 'idx_user_type_status');
+                $table->index(['id','name', 'last_name']);
+                $table->index(['user_type', 'model_status', 'deleted_at'], 'idx_user_type_status_deleted');
                 $table->index(['company_id', 'department_id'], 'idx_company_department');
             });
         }
-        
+
         // PostgreSQL-spezifische Implementation mit rawIndex für normalisierte Felder
         if (config('database.default') === 'pgsql') {
             Schema::create('users', function (Blueprint $table) {
@@ -144,7 +146,7 @@ return new class extends Migration
             // Auskommentiert, da der oben stehende Code ebenfalls auskommentiert ist
             // DB::statement('DROP MATERIALIZED VIEW IF EXISTS user_search_index');
         }
-        
+
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');

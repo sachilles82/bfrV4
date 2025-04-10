@@ -88,26 +88,17 @@ class EmployeeTable extends Component
         $this->dispatch('edit-employee', $id);
     }
 
-    protected function activeEmployees($query)
-    {
-        return $query->where('model_status', ModelStatus::ACTIVE)
-            ->where('user_type', UserType::Employee);
-    }
-
     public function render(): View
     {
-        // Verbesserte Query mit gezielter Feldauswahl und optimierten Joins
         $query = User::query()
             ->select([
-                'id', 'user_type', 'name', 'last_name', 'phone_1',
+                'id', 'name', 'last_name', 'phone_1',
                 'email', 'joined_at', 'created_at', 'model_status',
                 'company_id', 'department_id', 'profile_photo_path', 'slug'
             ])
             ->where('user_type', $this->userType)
-            ->where('model_status', ModelStatus::ACTIVE)
             ->whereHas('employee');
 
-        // Effizientes Laden der Beziehungen mit expliziten Feldangaben
         $query->with([
             'employee' => function($query) {
                 $query->select(['id', 'user_id', 'employee_status', 'profession_id', 'stage_id']);
@@ -118,7 +109,7 @@ class EmployeeTable extends Component
             'teams:id,name',
             'roles' => function($query) {
                 $query->where('visible', RoleVisibility::Visible->value)
-                    ->select('id', 'name', 'is_manager');
+                    ->select('id', 'name');
             }
         ]);
 
@@ -132,7 +123,8 @@ class EmployeeTable extends Component
             });
         }
 
-        $users = $query->paginate($this->perPage);
+        // SimplePaginate statt paginate verwenden, um die COUNT-Abfrage zu vermeiden
+        $users = $query->simplePaginate($this->perPage);
         $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();
 
         return view('livewire.alem.employee.table', [

@@ -31,17 +31,17 @@
                 @endif
             </div>
 
-            {{-- Results Information --}}
-            <div class="text-center mx-auto">
-                <p class="text-sm text-gray-700 dark:text-gray-400 leading-5">
-                    <span class="font-medium">{{ $paginator->firstItem() }}</span>
-                    <span>{!! __('to') !!}</span>
-                    <span class="font-medium">{{ $paginator->lastItem() }}</span>
-                    <span>{!! __('of') !!}</span>
-                    <span class="font-medium">{{ $paginator->total() }}</span>
-                    <span>{!! __('results') !!}</span>
-                </p>
-            </div>
+{{--            --}}{{-- Results Information --}}
+{{--            <div class="text-center mx-auto">--}}
+{{--                <p class="text-sm text-gray-700 dark:text-gray-400 leading-5">--}}
+{{--                    <span class="font-medium">{{ $paginator->firstItem() }}</span>--}}
+{{--                    <span>{!! __('to') !!}</span>--}}
+{{--                    <span class="font-medium">{{ $paginator->lastItem() }}</span>--}}
+{{--                    <span>{!! __('of') !!}</span>--}}
+{{--                    <span class="font-medium">{{ $paginator->total() }}</span>--}}
+{{--                    <span>{!! __('results') !!}</span>--}}
+{{--                </p>--}}
+{{--            </div>--}}
 
             {{-- Next Page Link --}}
             <div>

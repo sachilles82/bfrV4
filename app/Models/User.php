@@ -171,10 +171,9 @@ class User extends Authenticatable
         });
     }
 
-    public function scopeActiveEmployees($query)
-    {
-        return $query->where('user_type', UserType::Employee)
-            ->where('model_status', ModelStatus::ACTIVE)
-            ->whereHas('employee');
-    }
+//    public function scopeActiveEmployees($query)
+//    {
+//        return $query->where('user_type', UserType::Employee)
+//            ->where('model_status', ModelStatus::ACTIVE);
+//    }
 }

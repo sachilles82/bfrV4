@@ -11,14 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('team_user', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('team_id');
-            $table->foreignId('user_id');
-            $table->string('role')->nullable();
-            $table->timestamps();
-
-            $table->unique(['team_id', 'user_id']);
+        Schema::table('team_user', function (Blueprint $table) {
             $table->index('user_id', 'team_user_user_id_index');
         });
     }
@@ -28,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('team_user');
+        Schema::table('team_user', function (Blueprint $table) {
+            //
+        });
     }
 };

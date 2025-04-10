@@ -70,16 +70,15 @@ trait ModelStatusAction
     {
         switch ($this->statusFilter) {
             case 'archived':
-                $query->whereNull('deleted_at')
-                    ->where('model_status', ModelStatus::ARCHIVED);
+                $query->where('model_status', ModelStatus::ARCHIVED);
                 break;
             case 'trashed':
-                $query->onlyTrashed();
+                $query->where('model_status', ModelStatus::TRASHED)
+                    ->onlyTrashed();
                 break;
             case 'active':
             default:
-                $query->whereNull('deleted_at')
-                    ->where('model_status', ModelStatus::ACTIVE);
+                $query->where('model_status', ModelStatus::ACTIVE);
         }
         return $query;
     }

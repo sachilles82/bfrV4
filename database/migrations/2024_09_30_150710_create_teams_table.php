@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->boolean('personal_team');
             $table->timestamps();
+
+            $table->index('user_id', 'teams_user_id_index');
         });
     }
 
