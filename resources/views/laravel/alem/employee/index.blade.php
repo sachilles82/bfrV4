@@ -17,7 +17,11 @@
 {{--            </x-slot:create>--}}
 
             <livewire:alem.employee.employee-table
-{{--                lazy--}}
+                :departments="$departments"
+                :teams="$teams"
+                :professions="$professions"
+                :stages="$stages"
+                {{-- lazy --}} {{-- Lazy Loading kann hier sinnvoll sein --}}
             />
 
 {{--            <!-- Edit Component -->--}}
