@@ -96,42 +96,62 @@ class EmployeeTable extends Component
      */
     public function render(): View
     {
-        // Hole die Company ID des eingeloggten Users (wird für Query benötigt)
+        // In der render() Methode
+
+// Hole die Company ID UND die aktuelle Team ID des eingeloggten Users
         $authCompanyId = auth()->user()?->company_id;
+        $authCurrentTeamId = auth()->user()?->currentTeam?->id; // ID des aktuellen Teams holen
 
-        // Beginne die Query (unverändert)
+// Beginne die Query
         $query = User::query()
-            ->select([
-                'id', 'department_id', 'name', 'last_name', 'phone_1',
-                'email', 'joined_at', 'created_at', 'model_status', 'profile_photo_path', 'slug','company_id'
+            ->select([ // Wähle benötigte Spalten aus der users-Tabelle
+                'users.id', 'users.department_id', 'users.name', 'users.last_name', 'users.phone_1',
+                'users.email', 'users.joined_at', 'users.created_at', 'users.model_status',
+                'users.profile_photo_path', 'users.slug','users.company_id'
+                // 'users.team_id' nicht auswählen, es sei denn, du brauchst es explizit hier
             ])
-            ->where('user_type', $this->userType)
-            ->whereHas('employee');
+            ->where('users.user_type', $this->userType) // Filtere nach Mitarbeitertyp
+            ->whereHas('employee'); // Stelle sicher, dass es ein Mitarbeiter-Profil gibt
 
-        // Filter nach Company ID (unverändert)
+// Filter nach Company ID (unverändert)
         if ($authCompanyId) {
-            $query->where('company_id', $authCompanyId);
+            $query->where('users.company_id', $authCompanyId); // Nutze Tabellenpräfix für Klarheit
         } else {
             Log::warning('User ohne company_id versucht auf EmployeeTable zuzugreifen.', ['user_id' => auth()->id()]);
             $query->whereRaw('1 = 0');
         }
 
-        // Eager Loading (unverändert)
+// *** NEU: Filter nach aktueller Team ID über Jetstream-Mitgliedschaft ***
+        if ($authCurrentTeamId) {
+            $query->whereHas('teams', function ($q) use ($authCurrentTeamId) {
+                // Filtere Benutzer, die Mitglied im aktuellen Team des Admins sind
+                $q->where('teams.id', $authCurrentTeamId); // Filtert über die Pivot-Tabelle team_user
+            });
+        } else {
+            // Wenn der Admin kein currentTeam hat (sollte nicht vorkommen, aber sicher ist sicher)
+            Log::warning('Admin ohne currentTeam versucht auf EmployeeTable zuzugreifen.', ['user_id' => auth()->id()]);
+            $query->whereRaw('1 = 0'); // Keine Mitarbeiter anzeigen
+        }
+
+// Eager Loading (wie zuvor, ohne spezielle Scope-Behandlung für Department)
         $query->with([
-            'employee' => function($query) {
-                $query->select(['id', 'user_id', 'employee_status', 'profession_id', 'stage_id']);
+            'employee' => function($q_employee) {
+                $q_employee->select(['id', 'user_id', 'employee_status', 'profession_id', 'stage_id'])
+                    ->with([
+                        'profession:id,name',
+                        'stage:id,name',
+                    ]);
             },
-            'employee.profession:id,name',
-            'employee.stage:id,name',
-            'department:id,name',
+            'department:id,name', // Department normal laden
+            // Lade die Teams des *Mitarbeiters*, falls benötigt für die Anzeige in der Tabelle
             'teams:id,name',
-            'roles' => function($query) {
-                $query->where('visible', RoleVisibility::Visible->value)
+            'roles' => function($q_roles) {
+                $q_roles->where('visible', RoleVisibility::Visible->value)
                     ->select('id', 'name');
             }
         ]);
 
-        // Filter und Sortierung anwenden (unverändert)
+// Filter und Sortierung anwenden (unverändert)
         $this->applySearch($query);
         $this->applySorting($query);
         $this->applyStatusFilter($query);
@@ -142,19 +162,15 @@ class EmployeeTable extends Component
             });
         }
 
-        // Paginierung (unverändert)
+// Paginierung (unverändert)
         $users = $query->simplePaginate($this->perPage);
         $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();
 
-        // --- View zurückgeben (angepasst) ---
-        // 'availableTeams' wird nicht mehr übergeben. Die View kann bei Bedarf
-        // auf die public property $this->teams zugreifen (oder $teams direkt).
+// --- View zurückgeben (unverändert) ---
         return view('livewire.alem.employee.table', [
             'users' => $users,
             'statuses' => ModelStatus::cases(),
             'employeeStatuses' => EmployeeStatus::cases(),
-            // 'availableTeams' => $this->availableTeams, // Entfernt
         ]);
-        // -----------------------------------
     }
 }

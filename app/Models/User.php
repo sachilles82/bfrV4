@@ -27,6 +27,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -149,6 +150,18 @@ class User extends Authenticatable
 
     protected static function booted(): void
     {
+        static::created(function ($user) {
+            // Nach dem Erstellen/Ändern eines Benutzers den Permission-Cache zurücksetzen
+            app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+        });
+
+        static::updated(function ($user) {
+            // Wenn Berechtigungsrelevante Felder geändert wurden, Cache zurücksetzen
+            if ($user->isDirty('model_status') || $user->isDirty('user_type')) {
+                app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
+            }
+        });
+
 //        static::addGlobalScope(new TeamScope);
 
         static::creating(function ($user) {
