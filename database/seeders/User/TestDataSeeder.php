@@ -13,6 +13,7 @@ use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Alem\Industry;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
@@ -45,8 +46,8 @@ class TestDataSeeder extends Seeder
 
         try {
             // Parameter für das Seeden
-            $employeeCount = 1000; // Anzahl der zu erstellenden Mitarbeiter
-            $chunkSize = 100;      // Größere Chunks für bessere Performance
+            $employeeCount = 100000; // Anzahl der zu erstellenden Mitarbeiter
+            $chunkSize = 7500;      // Größere Chunks für bessere Performance
 
             $this->command->info('Starte Erstellung der Testdaten...');
 
@@ -111,7 +112,7 @@ class TestDataSeeder extends Seeder
 
             // Erstelle eine Industrie (falls noch keine existiert)
             $this->command->info('Erstelle Industrie...');
-            $industry = \App\Models\Alem\Industry::firstOrCreate(
+            $industry = Industry::firstOrCreate(
                 ['name' => 'IT'],
                 ['name' => 'IT']
             );

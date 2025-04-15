@@ -4,6 +4,7 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Enums\Company\CompanySize;
 use App\Enums\Company\CompanyType;
 use App\Models\User;
+
 test('create new user', function () {
     // Erstelle einen Test-Benutzer mit allen notwendigen Daten
     $userData = [

@@ -40,23 +40,35 @@ class EmployeeIndexController extends Controller
 
     /**
      * Holt eine Ressource aus dem Cache oder erzeugt sie neu und speichert sie permanent.
-     * Verwendet die Laravel Cache-Facade.
+     * Verwendet die Laravel Cache-Facade und fügt Debugbar-Infos hinzu.
      *
      * @param  string  $cacheKey  Der zu verwendende Cache-Schlüssel.
      * @param  callable  $callback  Die Funktion, die die Daten generiert, wenn sie nicht im Cache sind.
+     * @param  string  $resourceTypeForDebug  Ein beschreibender Name für Debugbar-Nachrichten (z.B. 'Departments').
      * @return mixed Die Daten aus dem Cache oder neu generiert.
      */
-    private function rememberResourceForever(string $cacheKey, callable $callback)
+    private function rememberResourceForever(string $cacheKey, callable $callback, string $resourceTypeForDebug)
     {
-        // Cache::rememberForever nutzt den konfigurierten Cache-Treiber (Redis)
-        // und die korrekte Cache-Datenbank (standardmäßig 1).
-        // Der Eintrag bleibt bestehen, bis er explizit via Cache::forget() gelöscht wird.
-        return Cache::rememberForever($cacheKey, function () use ($cacheKey, $callback) {
-            Debugbar::info("Cache Miss für Key: {$cacheKey}, wird neu erstellt via Cache::rememberForever");
+        // Prüfen ob im Cache, *bevor* rememberForever aufgerufen wird, für klareres Debugging
+        if (Cache::has($cacheKey)) {
+            Debugbar::info("Cache Hit für {$resourceTypeForDebug} (Key: {$cacheKey}) - Daten aus Cache geladen.");
 
-            // Führe den Callback aus, um die Daten zu erhalten
-            return $callback();
-        });
+            // Hole die Daten direkt, da wir wissen, dass sie da sind
+            return Cache::get($cacheKey);
+        } else {
+            // Wenn nicht im Cache, nutze rememberForever zum Holen, Speichern und Zurückgeben
+            Debugbar::info("Cache Miss für {$resourceTypeForDebug} (Key: {$cacheKey}) - Daten werden aus DB geladen und permanent gecached.");
+
+            // Der Callback wird nur ausgeführt, wenn der Key *jetzt gerade* nicht existiert.
+            // Die Debug-Nachricht im Callback ist weiterhin nützlich, falls es zu Race Conditions käme
+            // oder zur Bestätigung, dass der Callback tatsächlich lief.
+            return Cache::rememberForever($cacheKey, function () use ($callback, $resourceTypeForDebug, $cacheKey) {
+                Debugbar::info("-> Callback für Cache::rememberForever ausgeführt ({$resourceTypeForDebug}, Key: {$cacheKey}).");
+
+                // Führe den Callback aus, um die Daten zu erhalten
+                return $callback();
+            });
+        }
     }
 
     /**
@@ -97,22 +109,28 @@ class EmployeeIndexController extends Controller
             return collect();
         }
 
-        // Cache-Key enthält die Firmen-ID
         $cacheKey = "roles_company_{$authCompanyId}_creator_1";
+        $resourceTypeForDebug = 'Rollen (Visible, Creator 1)';
 
-        return Cache::rememberForever($cacheKey, function () use ($authCompanyId) {
-            Debugbar::info('Cache Miss: Lade Rollen aus der Datenbank und speichere sie dauerhaft im Cache', [
-                'company_id' => $authCompanyId,
-                'created_by' => 1,
-            ]);
+        // Prüfen ob im Cache, *bevor* rememberForever aufgerufen wird
+        if (Cache::has($cacheKey)) {
+            Debugbar::info("Cache Hit für {$resourceTypeForDebug} (Key: {$cacheKey}) - Daten aus Cache geladen.");
 
-            // Nur relevante Rollen mit spezifischen Bedingungen und nur ID+Namen
-            return Role::where('company_id', $authCompanyId)
-                ->where('created_by', 1)
-                ->where('visible', RoleVisibility::Visible->value)
-                ->select(['id', 'name'])
-                ->get();
-        });
+            return Cache::get($cacheKey);
+        } else {
+            Debugbar::info("Cache Miss für {$resourceTypeForDebug} (Key: {$cacheKey}) - Daten werden aus DB geladen und permanent gecached.");
+
+            return Cache::rememberForever($cacheKey, function () use ($authCompanyId, $resourceTypeForDebug, $cacheKey) {
+                Debugbar::info("-> Callback für Cache::rememberForever ausgeführt ({$resourceTypeForDebug}, Key: {$cacheKey}).");
+
+                // Nur relevante Rollen mit spezifischen Bedingungen und nur ID+Namen
+                return Role::where('company_id', $authCompanyId)
+                    ->where('created_by', 1)
+                    ->where('visible', RoleVisibility::Visible->value)
+                    ->select(['id', 'name'])
+                    ->get();
+            });
+        }
     }
 
     /**
@@ -131,20 +149,27 @@ class EmployeeIndexController extends Controller
             return collect();
         }
 
-        // Cache-Key enthält die Firmen-ID
         $cacheKey = "professions_company_{$authCompanyId}";
+        $resourceTypeForDebug = 'Professionen';
 
-        return Cache::rememberForever($cacheKey, function () use ($authCompanyId) {
-            Debugbar::info('Cache Miss: Lade Professionen aus der Datenbank und speichere sie dauerhaft im Cache', [
-                'company_id' => $authCompanyId,
-            ]);
+        // Prüfen ob im Cache, *bevor* rememberForever aufgerufen wird
+        if (Cache::has($cacheKey)) {
+            Debugbar::info("Cache Hit für {$resourceTypeForDebug} (Key: {$cacheKey}) - Daten aus Cache geladen.");
 
-            // Professionen nach Firmen-ID filtern
-            return Profession::where('company_id', $authCompanyId)
-                ->select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-        });
+            return Cache::get($cacheKey);
+        } else {
+            Debugbar::info("Cache Miss für {$resourceTypeForDebug} (Key: {$cacheKey}) - Daten werden aus DB geladen und permanent gecached.");
+
+            return Cache::rememberForever($cacheKey, function () use ($authCompanyId, $resourceTypeForDebug, $cacheKey) {
+                Debugbar::info("-> Callback für Cache::rememberForever ausgeführt ({$resourceTypeForDebug}, Key: {$cacheKey}).");
+
+                // Professionen nach Firmen-ID filtern
+                return Profession::where('company_id', $authCompanyId)
+                    ->select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            });
+        }
     }
 
     /**
@@ -163,24 +188,32 @@ class EmployeeIndexController extends Controller
             return collect();
         }
 
-        // Cache-Key enthält die Firmen-ID
         $cacheKey = "stages_company_{$authCompanyId}";
+        $resourceTypeForDebug = 'Stages';
 
-        return Cache::rememberForever($cacheKey, function () use ($authCompanyId) {
-            Debugbar::info('Cache Miss: Lade Stages aus der Datenbank und speichere sie dauerhaft im Cache', [
-                'company_id' => $authCompanyId,
-            ]);
+        // Prüfen ob im Cache, *bevor* rememberForever aufgerufen wird
+        if (Cache::has($cacheKey)) {
+            Debugbar::info("Cache Hit für {$resourceTypeForDebug} (Key: {$cacheKey}) - Daten aus Cache geladen.");
 
-            // Stages nach Firmen-ID filtern
-            return Stage::where('company_id', $authCompanyId)
-                ->select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-        });
+            return Cache::get($cacheKey);
+        } else {
+            Debugbar::info("Cache Miss für {$resourceTypeForDebug} (Key: {$cacheKey}) - Daten werden aus DB geladen und permanent gecached.");
+
+            return Cache::rememberForever($cacheKey, function () use ($authCompanyId, $resourceTypeForDebug, $cacheKey) {
+                Debugbar::info("-> Callback für Cache::rememberForever ausgeführt ({$resourceTypeForDebug}, Key: {$cacheKey}).");
+
+                // Stages nach Firmen-ID filtern
+                return Stage::where('company_id', $authCompanyId)
+                    ->select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            });
+        }
     }
 
     /**
-     * Zeigt die Index-Seite für Mitarbeiter an und lädt benötigte Daten aus dem Cache.
+     * Zeigt die Index-Seite für Mitarbeiter an und lädt benötigte Lookup-Daten aus dem Cache.
+     * Die eigentliche Mitarbeiterliste wird von der Livewire Komponente geladen und gefiltert.
      */
     public function index(): View
     {
@@ -190,74 +223,87 @@ class EmployeeIndexController extends Controller
             abort(403, 'Keine Firma zugeordnet.');
         }
 
-        // Departments laden (bisherige Methode nutzen)
+        // Departments laden (Lookup-Daten für Filter etc.)
         $departmentsKey = $this->getCompanyCacheKey('departments', $authCompanyId);
         $departments = [];
         if ($departmentsKey) {
+            // Verwende die verbesserte Caching-Methode mit Debug-Ausgabe
             $departments = $this->rememberResourceForever($departmentsKey, function () use ($authCompanyId) {
                 return Department::where('company_id', $authCompanyId)
                     ->orderBy('name')
-                    ->pluck('name', 'id')
+                    ->pluck('name', 'id') // pluck direkt hier ist effizienter für key-value
                     ->all();
-            });
-            Debugbar::info('Departments geladen.', ['key' => $departmentsKey, 'count' => count($departments)]);
+            }, 'Departments (Lookup)'); // Eindeutiger Name für Debugging
+            // Debugbar::info wird jetzt in rememberResourceForever gehandhabt
         } else {
             Log::error("Konnte Department Cache Key nicht generieren für Company ID: {$authCompanyId}");
         }
 
-        // Teams laden (bisherige Methode nutzen)
+        // Teams laden (Lookup-Daten für Filter etc.)
         $teamsKey = $this->getCompanyCacheKey('teams', $authCompanyId);
         $teams = [];
         if ($teamsKey) {
+            // Verwende die verbesserte Caching-Methode mit Debug-Ausgabe
             $teams = $this->rememberResourceForever($teamsKey, function () use ($authCompanyId) {
                 return Team::where('company_id', $authCompanyId)
                     ->orderBy('name')
-                    ->pluck('name', 'id')
+                    ->pluck('name', 'id') // pluck direkt hier ist effizienter für key-value
                     ->all();
-            });
-            Debugbar::info('Teams geladen.', ['key' => $teamsKey, 'count' => count($teams)]);
+            }, 'Teams (Lookup)'); // Eindeutiger Name für Debugging
+            // Debugbar::info wird jetzt in rememberResourceForever gehandhabt
         } else {
             Log::error("Konnte Team Cache Key nicht generieren für Company ID: {$authCompanyId}");
         }
 
-        // Professions und Stages laden (ursprüngliche Methoden beibehalten)
-        $professions = $this->getCachedProfessions()->pluck('name', 'id')->toArray();
-        Debugbar::info('Professions geladen.', ['count' => count($professions)]);
+        // Professions laden (Lookup-Daten, nutzt eigene Methode mit Debugging)
+        $professionsCollection = $this->getCachedProfessions();
+        $professions = $professionsCollection->pluck('name', 'id')->toArray();
+        Debugbar::info('Professions (Lookup) an View übergeben.', ['count' => count($professions)]);
 
-        $stages = $this->getCachedStages()->pluck('name', 'id')->toArray();
-        Debugbar::info('Stages geladen.', ['count' => count($stages)]);
+        // Stages laden (Lookup-Daten, nutzt eigene Methode mit Debugging)
+        $stagesCollection = $this->getCachedStages();
+        $stages = $stagesCollection->pluck('name', 'id')->toArray();
+        Debugbar::info('Stages (Lookup) an View übergeben.', ['count' => count($stages)]);
 
-        // Nur die Rollen aus der speziellen Cache-Methode laden
-        $roles = $this->getCachedRoles()->pluck('name', 'id')->toArray();
-        Debugbar::info('Rollen aus Cache geladen', ['count' => count($roles)]);
+        // Rollen laden (Lookup-Daten, nutzt eigene Methode mit Debugging)
+        $rolesCollection = $this->getCachedRoles();
+        $roles = $rolesCollection->pluck('name', 'id')->toArray();
+        Debugbar::info('Rollen (Lookup) an View übergeben.', ['count' => count($roles)]);
 
+        // Die View rendern und die Lookup-Daten übergeben
+        // Die Livewire-Komponente ('alem.employee.employee-table') holt sich dann die eigentlichen Benutzerdaten
         return view('laravel.alem.employee.index', [
             'departments' => $departments,
             'teams' => $teams,
-            'roles' => $roles,
+            'roles' => $roles, // Rollen werden oft auch als Filter gebraucht
             'professions' => $professions,
             'stages' => $stages,
         ]);
     }
 
     /**
-     * Cache für Rollen löschen
-     * Nützlich nach Rollenänderungen oder bei Debugging
+     * Cache für Rollen, Professionen und Stages löschen
+     * Nützlich nach Änderungen oder bei Debugging
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function invalidateRolesCache()
+    public function invalidateLookupsCache() // Umbenannt für Klarheit
     {
         $authCompanyId = Auth::user()?->company_id;
 
         if ($authCompanyId) {
+            // Lösche alle relevanten Lookup-Caches für die Firma
             Cache::forget("roles_company_{$authCompanyId}_creator_1");
             Cache::forget("professions_company_{$authCompanyId}");
             Cache::forget("stages_company_{$authCompanyId}");
-            Debugbar::info('Rollen- und zugehörige Caches wurden gelöscht', ['company_id' => $authCompanyId]);
+            // Potenzielle weitere Caches für Departments und Teams löschen, falls diese Funktion allgemeiner sein soll
+            $this->invalidateCache('departments', $authCompanyId);
+            $this->invalidateCache('teams', $authCompanyId);
+
+            Debugbar::info('Alle Lookup-Caches (Rollen, Professionen, Stages, Departments, Teams) wurden gelöscht', ['company_id' => $authCompanyId]);
         }
 
         // Zurück zur vorherigen Seite mit Erfolgsmeldung
-        return back()->with('message', 'Caches wurden erfolgreich zurückgesetzt.');
+        return back()->with('message', 'Lookup-Caches wurden erfolgreich zurückgesetzt.');
     }
 }

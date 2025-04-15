@@ -28,6 +28,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Scout\Searchable;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -41,7 +42,6 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use HasRoles;
     use HasTeams;
-
     use ModelPermanentDeletion;
     use ModelStatusManagement{
         ModelStatusManagement::restore insteadof SoftDeletes;
@@ -51,6 +51,7 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
+    use Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -197,4 +198,29 @@ class User extends Authenticatable
     //        return $query->where('user_type', UserType::Employee)
     //            ->where('model_status', ModelStatus::ACTIVE);
     //    }
+
+    /**
+     * Definiert, welche Daten des Models an den Suchindex gesendet werden sollen.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id'          => $this->getKey(), // ID ist oft nützlich
+            'name'        => $this->name,
+            'last_name'   => $this->last_name,
+            'email'       => $this->email,
+            'phone_1'     => $this->phone_1,
+
+            'joined_at_timestamp' => $this->joined_at?->timestamp,
+            'created_at_timestamp' => $this->created_at?->timestamp,
+
+            // Status direkt vom User-Model
+            'model_status' => $this->model_status,
+            'user_type'    => $this->user_type,
+
+            // Füge weitere relevante Felder hinzu...
+        ];
+    }
 }

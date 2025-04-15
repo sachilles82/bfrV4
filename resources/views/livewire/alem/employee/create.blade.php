@@ -1,4 +1,5 @@
 <div wire:ignore.self>
+
     <flux:modal name="create-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl" wire:model="showModal">
         <div>
             <flux:heading size="lg">{{ __('Create Employee') }}</flux:heading>
@@ -129,10 +130,10 @@
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
                                     <x-slot name="add">
-                                        <livewire:alem.department.create-department
-                                            :display-mode="'dropdown'"
-                                            lazy
-                                        />
+{{--                                        <livewire:alem.department.create-department--}}
+{{--                                            :display-mode="'dropdown'"--}}
+{{--                                            lazy--}}
+{{--                                        />--}}
                                     </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
@@ -230,7 +231,7 @@
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
                                 <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.profession-form lazy/>
+{{--                                    <livewire:alem.employee.setting.profession.profession-form lazy/>--}}
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
@@ -262,9 +263,9 @@
 
                                 <!-- Trigger zum Öffnen des Stage-Modals -->
                                 <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.stage-form
-                                        lazy
-                                    />
+{{--                                    <livewire:alem.employee.setting.profession.stage-form--}}
+{{--                                        lazy--}}
+{{--                                    />--}}
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
