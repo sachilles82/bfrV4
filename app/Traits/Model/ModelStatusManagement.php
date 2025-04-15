@@ -12,7 +12,6 @@ use App\Enums\Model\ModelStatus;
  */
 trait ModelStatusManagement
 {
-    // --- Status-Checks und Scopes (unverändert) ---
 
     public function isActive(): bool
     {

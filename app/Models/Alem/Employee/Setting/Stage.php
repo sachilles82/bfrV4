@@ -3,14 +3,14 @@
 namespace App\Models\Alem\Employee\Setting;
 
 use App\Models\Alem\Employee\Employee;
-use App\Traits\BelongsToCompany;
+use App\Traits\BelongsToTeam;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Stage extends Model
 {
-    use BelongsToCompany, HasFactory;
+    use BelongsToTeam, HasFactory;
 
     protected $fillable = [
         'name',
