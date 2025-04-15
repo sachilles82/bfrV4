@@ -96,7 +96,7 @@
                         {{ __('Name') }}
                     </x-pupi.table.th.sort>
                     <x-pupi.table.th.notsort>{{ __('Contact') }}</x-pupi.table.th.notsort>
-                    <x-pupi.table.th.notsort>{{ __('Team') }}</x-pupi.table.th.notsort>
+                    <x-pupi.table.th.notsort>{{ __('Department') }}</x-pupi.table.th.notsort>
                     <!-- Spalte Account Status -->
                     <x-pupi.table.th.notsort>{{ __('Role') }}</x-pupi.table.th.notsort>
                     <x-pupi.table.th.sort column="joined_at" :$sortCol :$sortAsc class="pl-2">
@@ -174,13 +174,6 @@
 
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
-                                <div class="text-gray-900 dark:text-gray-300">
-                                    @if($user->teams->count() > 0)
-                                        {{ $user->teams->pluck('name')->join(', ') }}
-                                    @else
-                                        <span class="text-gray-400">No teams</span>
-                                    @endif
-                                </div>
                                 <div class="text-gray-500 dark:text-gray-400">
                                     @if($user->department)
                                         {{ $user->department->name }}

@@ -50,7 +50,6 @@ class EmployeeTable extends Component
      */
     public function updated($property): void
     {
-        // Unverändert
         if (in_array($property, ['statusFilter', 'employeeStatusFilter'])) {
             $this->selectedIds = [];
             $this->reset('search', 'sortCol', 'sortAsc');
@@ -124,7 +123,7 @@ class EmployeeTable extends Component
             },
             'department:id,name', // Department normal laden
             // Lade die Teams des *Mitarbeiters*, falls benötigt für die Anzeige in der Tabelle
-            'teams:id,name',
+//            'teams:id,name',
             'roles' => function ($q_roles) {
                 $q_roles->where('visible', RoleVisibility::Visible->value)
                     ->select('id', 'name');
