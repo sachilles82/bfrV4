@@ -6,8 +6,8 @@ namespace Database\Seeders\Spatie;
 
 use App\Enums\Role\Permission;
 use App\Enums\Role\RoleHasAccessTo;
-use App\Enums\Role\UserHasRole;
 use App\Enums\Role\RoleVisibility;
+use App\Enums\Role\UserHasRole;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -24,7 +24,7 @@ class RoleSeeder extends Seeder
             'description' => __('Super Admin mit allen Berechtigungen'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => true
+            'is_manager' => true,
         ]);
 
         // Der Super Admin erhält alle Permissions (aus dem Model, hier nicht aus dem Enum)
@@ -40,7 +40,7 @@ class RoleSeeder extends Seeder
             'description' => __('Admin Role als Standart für Admins damit sie sich in Nova anmelden können'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -51,7 +51,7 @@ class RoleSeeder extends Seeder
             'description' => __('Support Team Role für Nova Admin User'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -62,7 +62,7 @@ class RoleSeeder extends Seeder
             'description' => __('Marketing Team Role für Nova Admin User'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -73,7 +73,7 @@ class RoleSeeder extends Seeder
             'description' => __('Sales Team Role für Nova Admin User'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         // Erstelle die Owner-Rolle und weise ihr Permissions zu
@@ -85,14 +85,14 @@ class RoleSeeder extends Seeder
             'description' => __('Default Owner Role with full Permissions for Owner Panel/Customer App user'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => true
+            'is_manager' => true,
         ]);
 
         // Hole alle Permissions, die der "settingApp" zugeordnet sind (aus dem Enum)
         $permissionsForSettingApp = Permission::casesForApp('settingApp');
 
         // Transformiere die Enum-Cases in ein Array von String-Werten
-        $permissionValues = array_map(fn($perm) => $perm->value, $permissionsForSettingApp);
+        $permissionValues = array_map(fn ($perm) => $perm->value, $permissionsForSettingApp);
 
         // Weise der Owner-Rolle diese Permissions zu
         $ownerRole->syncPermissions($permissionValues);
@@ -106,7 +106,7 @@ class RoleSeeder extends Seeder
             'description' => __('Owner Role1 with limited Access to Owner Panel'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => true
+            'is_manager' => true,
         ]);
 
         Role::create([
@@ -117,7 +117,7 @@ class RoleSeeder extends Seeder
             'description' => __('Owner Role2 with limited Access to Owner Panel'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => true
+            'is_manager' => true,
         ]);
 
         Role::create([
@@ -128,7 +128,7 @@ class RoleSeeder extends Seeder
             'description' => __('Owner Role3 with limited Access to Owner Panel'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => true
+            'is_manager' => true,
         ]);
 
         // Employee Rollen erstellen
@@ -140,7 +140,7 @@ class RoleSeeder extends Seeder
             'created_by' => 1,
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -151,7 +151,7 @@ class RoleSeeder extends Seeder
             'created_by' => 1,
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -162,7 +162,7 @@ class RoleSeeder extends Seeder
             'created_by' => 1,
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => true
+            'is_manager' => true,
         ]);
 
         Role::create([
@@ -173,7 +173,7 @@ class RoleSeeder extends Seeder
             'created_by' => 1,
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -184,7 +184,7 @@ class RoleSeeder extends Seeder
             'created_by' => 1,
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         // Partner Rollen erstellen
@@ -196,7 +196,7 @@ class RoleSeeder extends Seeder
             'description' => __('Partner_desc'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -207,7 +207,7 @@ class RoleSeeder extends Seeder
             'description' => __('Pieceworker Role for Partner Panel Access'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -218,7 +218,7 @@ class RoleSeeder extends Seeder
             'description' => __('Subcontractor Role for Partner Panel Access'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -229,7 +229,7 @@ class RoleSeeder extends Seeder
             'description' => __('Supplier Role for Partner Panel Access'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -240,7 +240,7 @@ class RoleSeeder extends Seeder
             'description' => __('Client Role for Partner Panel Access'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
 
         Role::create([
@@ -251,7 +251,7 @@ class RoleSeeder extends Seeder
             'description' => __('Builder Role for Partner Panel Access'),
             'company_id' => null,
             'team_id' => null,
-            'is_manager' => false
+            'is_manager' => false,
         ]);
     }
 }

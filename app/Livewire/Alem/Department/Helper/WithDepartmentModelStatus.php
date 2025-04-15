@@ -33,7 +33,6 @@ trait WithDepartmentModelStatus
         return 'Departments';
     }
 
-
     /**
      * Name des Events, das nach Status-Änderungen ausgelöst wird
      */

@@ -17,20 +17,25 @@ class AddressForm extends Component
     public Model $addressable;
 
     public Collection $countries;
+
     public Collection $states;
+
     public Collection $cities;
 
     public ?int $country_id = null;
-    public ?int $state_id   = null;
-    public ?int $city_id    = null;
+
+    public ?int $state_id = null;
+
+    public ?int $city_id = null;
+
     public string $street_number = '';
 
     public function mount(Model $addressable, $countries, $states, $cities): void
     {
         $this->addressable = $addressable;
         $this->countries = $countries;
-        $this->states    = $states;
-        $this->cities    = $cities;
+        $this->states = $states;
+        $this->cities = $cities;
 
         if ($address = $this->addressable->address) {
             $this->country_id = $address->country_id ?? null;

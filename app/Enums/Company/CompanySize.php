@@ -24,5 +24,4 @@ enum CompanySize: string
             self::MoreThanTwoHundred->value => '>200',
         ];
     }
-
 }

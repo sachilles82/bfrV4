@@ -50,12 +50,12 @@ class UserFactory extends Factory
         ]);
     }
 
-//    public function configure():static
-//    {
-//        return $this->afterCreating(function (User $user) {
-//            $user->assignRole(UserRole::Admin);
-//        });
-//    }
+    //    public function configure():static
+    //    {
+    //        return $this->afterCreating(function (User $user) {
+    //            $user->assignRole(UserRole::Admin);
+    //        });
+    //    }
 
     /**
      * Indicate that the user should have a personal team.

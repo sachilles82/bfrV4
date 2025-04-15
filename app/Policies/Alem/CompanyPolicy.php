@@ -35,5 +35,4 @@ class CompanyPolicy
     {
         return $user->id === $company->owner_id;
     }
-
 }

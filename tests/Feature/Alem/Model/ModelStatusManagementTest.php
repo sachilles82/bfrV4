@@ -5,8 +5,8 @@ namespace Tests\Feature\Alem\Model;
 use App\Enums\Model\ModelStatus;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ModelStatusManagementTest extends TestCase
 {
@@ -16,7 +16,7 @@ class ModelStatusManagementTest extends TestCase
     public function user_can_be_active()
     {
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $this->assertTrue($user->isActive());
@@ -29,7 +29,7 @@ class ModelStatusManagementTest extends TestCase
     public function user_can_be_archived()
     {
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED,
         ]);
 
         $this->assertFalse($user->isActive());
@@ -53,7 +53,7 @@ class ModelStatusManagementTest extends TestCase
     public function can_change_user_status()
     {
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $user->setStatus(ModelStatus::ARCHIVED);
@@ -67,11 +67,11 @@ class ModelStatusManagementTest extends TestCase
     public function scope_active_returns_only_active_users()
     {
         $activeUser = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $archivedUser = User::factory()->create([
-            'model_status' => ModelStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED,
         ]);
 
         $users = User::active()->get();
@@ -84,11 +84,11 @@ class ModelStatusManagementTest extends TestCase
     public function scope_archived_returns_only_archived_users()
     {
         $activeUser = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $archivedUser = User::factory()->create([
-            'model_status' => ModelStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED,
         ]);
 
         $users = User::archived()->get();
@@ -114,7 +114,7 @@ class ModelStatusManagementTest extends TestCase
     public function delete_updates_model_status_and_soft_deletes()
     {
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $user->delete();
@@ -122,7 +122,7 @@ class ModelStatusManagementTest extends TestCase
         $this->assertTrue($user->isTrashed());
         $this->assertDatabaseMissing('users', [
             'id' => $user->id,
-            'deleted_at' => null
+            'deleted_at' => null,
         ]);
 
         // Reload the model to check the status
@@ -134,7 +134,7 @@ class ModelStatusManagementTest extends TestCase
     public function restore_updates_model_status_to_active()
     {
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $user->delete();
@@ -156,7 +156,7 @@ class ModelStatusManagementTest extends TestCase
     public function restore_updates_model_status_from_trashed()
     {
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $user->delete();
@@ -181,7 +181,7 @@ class ModelStatusManagementTest extends TestCase
         // Hier ändern wir die Erwartung, statt die Implementierung
 
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED,
         ]);
 
         // Check initial state
@@ -203,7 +203,7 @@ class ModelStatusManagementTest extends TestCase
     {
         // Benutzer erstellen und in den Papierkorb legen
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
         $user->delete();
 
@@ -228,7 +228,7 @@ class ModelStatusManagementTest extends TestCase
     {
         // Benutzer ohne Löschung erstellen
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         // Status ändern, aber nicht löschen
@@ -246,7 +246,7 @@ class ModelStatusManagementTest extends TestCase
     {
         // Benutzer erstellen und in den Papierkorb legen
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED,
         ]);
         $user->delete();
 
@@ -270,7 +270,7 @@ class ModelStatusManagementTest extends TestCase
     {
         // Benutzer erstellen und in den Papierkorb legen
         $user = User::factory()->create([
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
         $user->delete();
 

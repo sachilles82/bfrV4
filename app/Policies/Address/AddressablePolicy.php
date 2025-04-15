@@ -3,7 +3,6 @@
 namespace App\Policies\Address;
 
 use App\Enums\Role\Permission;
-use App\Models\Address\Address;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Database\Eloquent\Model;

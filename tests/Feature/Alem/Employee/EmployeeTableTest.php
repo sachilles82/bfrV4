@@ -30,7 +30,7 @@ class EmployeeTableTest extends TestCase
         // Create an authenticated user with a valid company record
         $this->user = User::factory()->create([
             'user_type' => 'admin',
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         // Create test employees with different statuses
@@ -38,19 +38,19 @@ class EmployeeTableTest extends TestCase
             'active' => User::factory()->create([
                 'user_type' => 'employee',
                 'model_status' => ModelStatus::ACTIVE,
-                'company_id' => $this->user->company_id
+                'company_id' => $this->user->company_id,
             ]),
             'archived' => User::factory()->create([
                 'user_type' => 'employee',
                 'model_status' => ModelStatus::ARCHIVED,
-                'company_id' => $this->user->company_id
-            ])
+                'company_id' => $this->user->company_id,
+            ]),
         ];
 
         // Add a trashed employee
         $trashedUser = User::factory()->create([
             'user_type' => 'employee',
-            'company_id' => $this->user->company_id
+            'company_id' => $this->user->company_id,
         ]);
         $trashedUser->delete();
         $this->employees['trashed'] = $trashedUser;
@@ -110,7 +110,7 @@ class EmployeeTableTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->employees['archived']->id,
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
     }
 
@@ -124,7 +124,7 @@ class EmployeeTableTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $this->employees['active']->id,
-            'model_status' => ModelStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED,
         ]);
     }
 
@@ -139,7 +139,7 @@ class EmployeeTableTest extends TestCase
             ->assertDispatched('update-table');
 
         $this->assertSoftDeleted('users', [
-            'id' => $id
+            'id' => $id,
         ]);
     }
 
@@ -162,9 +162,9 @@ class EmployeeTableTest extends TestCase
 
         // Get a fresh instance and check
         $restoredUser = User::find($id);
-        $this->assertNotNull($restoredUser, "User should exist after restore");
-        $this->assertFalse($restoredUser->trashed(), "User should not be trashed after restore");
-        $this->assertEquals(ModelStatus::ACTIVE, $restoredUser->model_status, "User should be ACTIVE after restore");
+        $this->assertNotNull($restoredUser, 'User should exist after restore');
+        $this->assertFalse($restoredUser->trashed(), 'User should not be trashed after restore');
+        $this->assertEquals(ModelStatus::ACTIVE, $restoredUser->model_status, 'User should be ACTIVE after restore');
     }
 
     #[Test]
@@ -180,7 +180,7 @@ class EmployeeTableTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'id' => $id,
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
     }
 
@@ -198,7 +198,7 @@ class EmployeeTableTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $id,
             'deleted_at' => null,
-            'model_status' => ModelStatus::ARCHIVED
+            'model_status' => ModelStatus::ARCHIVED,
         ]);
     }
 
@@ -214,7 +214,7 @@ class EmployeeTableTest extends TestCase
             ->assertDispatched('update-table');
 
         $this->assertDatabaseMissing('users', [
-            'id' => $id
+            'id' => $id,
         ]);
     }
 
@@ -222,7 +222,7 @@ class EmployeeTableTest extends TestCase
     public function can_bulk_activate_users()
     {
         $selectedIds = [
-            $this->employees['archived']->id
+            $this->employees['archived']->id,
         ];
 
         Livewire::test(EmployeeTable::class)
@@ -234,7 +234,7 @@ class EmployeeTableTest extends TestCase
         foreach ($selectedIds as $id) {
             $this->assertDatabaseHas('users', [
                 'id' => $id,
-                'model_status' => ModelStatus::ACTIVE
+                'model_status' => ModelStatus::ACTIVE,
             ]);
         }
     }
@@ -243,7 +243,7 @@ class EmployeeTableTest extends TestCase
     public function can_bulk_archive_users()
     {
         $selectedIds = [
-            $this->employees['active']->id
+            $this->employees['active']->id,
         ];
 
         Livewire::test(EmployeeTable::class)
@@ -255,7 +255,7 @@ class EmployeeTableTest extends TestCase
         foreach ($selectedIds as $id) {
             $this->assertDatabaseHas('users', [
                 'id' => $id,
-                'model_status' => ModelStatus::ARCHIVED
+                'model_status' => ModelStatus::ARCHIVED,
             ]);
         }
     }
@@ -264,7 +264,7 @@ class EmployeeTableTest extends TestCase
     public function can_bulk_trash_users()
     {
         $selectedIds = [
-            $this->employees['active']->id
+            $this->employees['active']->id,
         ];
 
         Livewire::test(EmployeeTable::class)
@@ -275,7 +275,7 @@ class EmployeeTableTest extends TestCase
 
         foreach ($selectedIds as $id) {
             $this->assertSoftDeleted('users', [
-                'id' => $id
+                'id' => $id,
             ]);
         }
     }
@@ -286,13 +286,13 @@ class EmployeeTableTest extends TestCase
         // Create another trashed user
         $anotherTrashed = User::factory()->create([
             'user_type' => 'employee',
-            'company_id' => $this->user->company_id
+            'company_id' => $this->user->company_id,
         ]);
         $anotherTrashed->delete();
 
         $selectedIds = [
             $this->employees['trashed']->id,
-            $anotherTrashed->id
+            $anotherTrashed->id,
         ];
 
         Livewire::test(EmployeeTable::class)
@@ -306,7 +306,7 @@ class EmployeeTableTest extends TestCase
             $this->assertDatabaseHas('users', [
                 'id' => $id,
                 'deleted_at' => null,
-                'model_status' => ModelStatus::ARCHIVED
+                'model_status' => ModelStatus::ARCHIVED,
             ]);
         }
     }
@@ -317,13 +317,13 @@ class EmployeeTableTest extends TestCase
         // Create another trashed user
         $anotherTrashed = User::factory()->create([
             'user_type' => 'employee',
-            'company_id' => $this->user->company_id
+            'company_id' => $this->user->company_id,
         ]);
         $anotherTrashed->delete();
 
         $selectedIds = [
             $this->employees['trashed']->id,
-            $anotherTrashed->id
+            $anotherTrashed->id,
         ];
 
         Livewire::test(EmployeeTable::class)
@@ -337,7 +337,7 @@ class EmployeeTableTest extends TestCase
             $this->assertDatabaseHas('users', [
                 'id' => $id,
                 'deleted_at' => null,
-                'model_status' => ModelStatus::ACTIVE
+                'model_status' => ModelStatus::ACTIVE,
             ]);
         }
     }
@@ -348,13 +348,13 @@ class EmployeeTableTest extends TestCase
         // Create another trashed user
         $anotherTrashed = User::factory()->create([
             'user_type' => 'employee',
-            'company_id' => $this->user->company_id
+            'company_id' => $this->user->company_id,
         ]);
         $anotherTrashed->delete();
 
         $selectedIds = [
             $this->employees['trashed']->id,
-            $anotherTrashed->id
+            $anotherTrashed->id,
         ];
 
         Livewire::test(EmployeeTable::class)
@@ -366,7 +366,7 @@ class EmployeeTableTest extends TestCase
 
         foreach ($selectedIds as $id) {
             $this->assertDatabaseMissing('users', [
-                'id' => $id
+                'id' => $id,
             ]);
         }
     }
@@ -411,7 +411,7 @@ class EmployeeTableTest extends TestCase
         for ($i = 0; $i < 3; $i++) {
             $user = User::factory()->create([
                 'user_type' => 'employee',
-                'company_id' => $this->user->company_id
+                'company_id' => $this->user->company_id,
             ]);
             $user->delete();
             $trashedUsers[] = $user->id;
@@ -429,7 +429,7 @@ class EmployeeTableTest extends TestCase
         // Verify all trashed users are permanently deleted
         foreach ($trashedUsers as $id) {
             $this->assertDatabaseMissing('users', [
-                'id' => $id
+                'id' => $id,
             ]);
         }
         $this->assertFalse(User::onlyTrashed()->exists());
@@ -443,14 +443,14 @@ class EmployeeTableTest extends TestCase
             'name' => 'AAA User',
             'user_type' => 'employee',
             'model_status' => ModelStatus::ACTIVE,
-            'company_id' => $this->user->company_id
+            'company_id' => $this->user->company_id,
         ]);
 
         $userZ = User::factory()->create([
             'name' => 'ZZZ User',
             'user_type' => 'employee',
             'model_status' => ModelStatus::ACTIVE,
-            'company_id' => $this->user->company_id
+            'company_id' => $this->user->company_id,
         ]);
 
         // Test ascending sort - we just check if sorting works by checking the rendered output
@@ -480,7 +480,7 @@ class EmployeeTableTest extends TestCase
             'name' => 'UniqueSearchTerm',
             'user_type' => 'employee',
             'model_status' => ModelStatus::ACTIVE,
-            'company_id' => $this->user->company_id
+            'company_id' => $this->user->company_id,
         ]);
 
         // Test with the search term
@@ -499,30 +499,30 @@ class EmployeeTableTest extends TestCase
         // Erstelle Benutzer, die als Owner und created_by dienen werden
         $creator = User::factory()->create([
             'user_type' => 'admin',
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $owner1 = User::factory()->create([
             'user_type' => 'owner',
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         $owner2 = User::factory()->create([
             'user_type' => 'owner',
-            'model_status' => ModelStatus::ACTIVE
+            'model_status' => ModelStatus::ACTIVE,
         ]);
 
         // Erstelle Firmen mit explizit gesetzten owner_id und created_by
         $company1 = \App\Models\Alem\Company::factory()->create([
             'industry_id' => $industry->id,
             'owner_id' => $owner1->id,
-            'created_by' => $creator->id
+            'created_by' => $creator->id,
         ]);
 
         $company2 = \App\Models\Alem\Company::factory()->create([
             'industry_id' => $industry->id,
             'owner_id' => $owner2->id,
-            'created_by' => $creator->id
+            'created_by' => $creator->id,
         ]);
 
         // Aktualisiere die Owner mit ihren jeweiligen Firmen
@@ -533,13 +533,13 @@ class EmployeeTableTest extends TestCase
         $employee1 = User::factory()->create([
             'user_type' => 'employee',
             'model_status' => ModelStatus::ACTIVE,
-            'company_id' => $company1->id
+            'company_id' => $company1->id,
         ]);
 
         $employee2 = User::factory()->create([
             'user_type' => 'employee',
             'model_status' => ModelStatus::ACTIVE,
-            'company_id' => $company2->id
+            'company_id' => $company2->id,
         ]);
 
         // Test: Owner der Firma 1 sieht nur Mitarbeiter der Firma 1
@@ -556,7 +556,7 @@ class EmployeeTableTest extends TestCase
 
         // Test: Admin (ohne Firma) sieht keine Mitarbeiter
         Livewire::actingAs($this->user) // $this->user ist der Admin aus der setUp-Methode
-        ->test(EmployeeTable::class)
+            ->test(EmployeeTable::class)
             ->assertDontSee($employee1->name)
             ->assertDontSee($employee2->name);
     }

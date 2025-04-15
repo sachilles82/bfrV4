@@ -43,16 +43,9 @@ class AddressPolicy
         return false;
     }
 
+    public function delete(User $user, Address $address): bool {}
 
-    public function delete(User $user, Address $address): bool
-    {
-    }
+    public function restore(User $user, Address $address): bool {}
 
-    public function restore(User $user, Address $address): bool
-    {
-    }
-
-    public function forceDelete(User $user, Address $address): bool
-    {
-    }
+    public function forceDelete(User $user, Address $address): bool {}
 }

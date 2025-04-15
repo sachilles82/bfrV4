@@ -16,7 +16,6 @@ trait BelongsToTeam
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-
     public static function bootBelongsToTeam(): void
     {
         static::addGlobalScope(new TeamScope);
@@ -42,5 +41,4 @@ trait BelongsToTeam
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
 }

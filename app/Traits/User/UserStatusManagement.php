@@ -3,7 +3,6 @@
 namespace App\Traits\User;
 
 use App\Enums\User\AccountStatus;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Trait für die Verwaltung von Benutzer-Status.
@@ -17,17 +16,17 @@ trait UserStatusManagement
 
     public function isActive(): bool
     {
-        return $this->account_status === AccountStatus::ACTIVE && !$this->trashed();
+        return $this->account_status === AccountStatus::ACTIVE && ! $this->trashed();
     }
 
     public function isNotActivated(): bool
     {
-        return $this->account_status === AccountStatus::INACTIVE && !$this->trashed();
+        return $this->account_status === AccountStatus::INACTIVE && ! $this->trashed();
     }
 
     public function isArchived(): bool
     {
-        return $this->account_status === AccountStatus::ARCHIVED && !$this->trashed();
+        return $this->account_status === AccountStatus::ARCHIVED && ! $this->trashed();
     }
 
     public function isTrashed(): bool
@@ -43,6 +42,7 @@ trait UserStatusManagement
     public function setStatus(AccountStatus $status): self
     {
         $this->update(['account_status' => $status]);
+
         return $this;
     }
 
@@ -80,6 +80,7 @@ trait UserStatusManagement
     public function delete()
     {
         $this->update(['account_status' => AccountStatus::TRASHED]);
+
         return parent::delete();
     }
 
@@ -105,7 +106,7 @@ trait UserStatusManagement
     /**
      * Stellt einen soft-deleted Benutzer wieder her und setzt den Account-Status auf den angegebenen Status.
      *
-     * @param AccountStatus $status Der gewünschte Account-Status (z. B. INACTIVE oder ARCHIVED).
+     * @param  AccountStatus  $status  Der gewünschte Account-Status (z. B. INACTIVE oder ARCHIVED).
      * @return bool True, wenn der Benutzer wiederhergestellt wurde.
      */
     public function restoreToStatus(AccountStatus $status): bool
@@ -116,13 +117,12 @@ trait UserStatusManagement
             $restored = true;
         }
         $this->update(['account_status' => $status]);
+
         return $restored;
     }
 
     /**
      * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf ACTIVE.
-     *
-     * @return bool
      */
     public function restoreToActive(): bool
     {
@@ -131,8 +131,6 @@ trait UserStatusManagement
 
     /**
      * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf INACTIVE.
-     *
-     * @return bool
      */
     public function restoreToInactive(): bool
     {
@@ -141,8 +139,6 @@ trait UserStatusManagement
 
     /**
      * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf ARCHIVED.
-     *
-     * @return bool
      */
     public function restoreToArchive(): bool
     {

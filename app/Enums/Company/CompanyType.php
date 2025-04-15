@@ -8,7 +8,6 @@ enum CompanyType: string
     case GmbH = 'gmbh';
     case AG = 'ag';
 
-
     public static function options(): array
     {
         return [
@@ -21,9 +20,9 @@ enum CompanyType: string
     public function label(): string
     {
         return match ($this) {
-            static::Einzelfirma => __('Einzelfirma'),
-            static::GmbH => __('GmbH'),
-            static::AG => __('AG'),
+            self::Einzelfirma => __('Einzelfirma'),
+            self::GmbH => __('GmbH'),
+            self::AG => __('AG'),
         };
     }
 }

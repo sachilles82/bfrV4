@@ -18,9 +18,9 @@ trait ValidateEmploymentData
             'birthdate' => 'required|date',
             'nationality' => 'required|string|max:100',
             'hometown' => 'required|string|max:100',
-            'religion' => 'required|string|in:' . implode(',', array_map(fn($item) => $item->value, Religion::cases())),
-            'civil_status' => 'required|string|in:' . implode(',', array_map(fn($item) => $item->value, CivilStatus::cases())),
-            'residence_permit' => 'required|string|in:' . implode(',', array_map(fn($item) => $item->value, Residence::cases())),
+            'religion' => 'required|string|in:'.implode(',', array_map(fn ($item) => $item->value, Religion::cases())),
+            'civil_status' => 'required|string|in:'.implode(',', array_map(fn ($item) => $item->value, CivilStatus::cases())),
+            'residence_permit' => 'required|string|in:'.implode(',', array_map(fn ($item) => $item->value, Residence::cases())),
         ];
     }
 

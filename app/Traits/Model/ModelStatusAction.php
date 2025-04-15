@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Traits\Model;
+
 use App\Enums\Model\ModelStatus;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,10 +23,11 @@ trait ModelStatusAction
      * public $idsOnPage = [];
      * public $statusFilter = 'active';
      */
-
     #[Url]
     public $statusFilter = 'active';
+
     public $selectedIds = [];
+
     public $idsOnPage = [];
 
     /**
@@ -50,7 +52,7 @@ trait ModelStatusAction
     /**
      * Status-Filter setzen
      *
-     * @param string $status Der neue Status ('active', 'archived', 'trashed')
+     * @param  string  $status  Der neue Status ('active', 'archived', 'trashed')
      */
     public function setStatusFilter(string $status): void
     {
@@ -63,7 +65,7 @@ trait ModelStatusAction
     /**
      * Status-Filter auf die Abfrage anwenden
      *
-     * @param Builder $query Die zu filternde Query
+     * @param  Builder  $query  Die zu filternde Query
      * @return Builder Die gefilterte Query
      */
     protected function applyStatusFilter(Builder $query): Builder
@@ -80,6 +82,7 @@ trait ModelStatusAction
             default:
                 $query->where('model_status', ModelStatus::ACTIVE);
         }
+
         return $query;
     }
 
@@ -91,18 +94,20 @@ trait ModelStatusAction
     protected function getModelInstance(): Model
     {
         $class = $this->getModelClass();
+
         return new $class;
     }
 
     /**
      * Hilfsmethode für den Modell-Query-Builder
      *
-     * @param bool $withTrashed Ob gelöschte Einträge einbezogen werden sollen
+     * @param  bool  $withTrashed  Ob gelöschte Einträge einbezogen werden sollen
      * @return Builder Der Query-Builder für das Modell
      */
     protected function getModelQuery(bool $withTrashed = false): Builder
     {
         $class = $this->getModelClass();
+
         return $withTrashed ? $class::withTrashed() : $class::query();
     }
 
@@ -111,7 +116,7 @@ trait ModelStatusAction
     /**
      * Model aktivieren
      *
-     * @param int|string $modelId Die Modell-ID
+     * @param  int|string  $modelId  Die Modell-ID
      */
     public function activate($modelId): void
     {
@@ -126,7 +131,7 @@ trait ModelStatusAction
     /**
      * Model archivieren
      *
-     * @param int|string $modelId Die Modell-ID
+     * @param  int|string  $modelId  Die Modell-ID
      */
     public function archive($modelId): void
     {
@@ -141,7 +146,7 @@ trait ModelStatusAction
     /**
      * Model in den Papierkorb verschieben
      *
-     * @param int|string $modelId Die Modell-ID
+     * @param  int|string  $modelId  Die Modell-ID
      */
     public function delete($modelId): void
     {
@@ -158,12 +163,14 @@ trait ModelStatusAction
      * Wenn das Model im Papierkorb ist, wird es mit restoreToActive() wiederhergestellt.
      * Falls der Status archived ist, wird setModelActive() aufgerufen.
      *
-     * @param int|string $modelId Die Modell-ID
+     * @param  int|string  $modelId  Die Modell-ID
      */
     public function restore($modelId): void
     {
         $model = $this->getModelQuery(true)->find($modelId);
-        if (!$model) return;
+        if (! $model) {
+            return;
+        }
 
         if ($model->trashed()) {
             $model->restoreToActive();
@@ -180,12 +187,14 @@ trait ModelStatusAction
     /**
      * Model im archivierten Zustand wiederherstellen
      *
-     * @param int|string $modelId Die Modell-ID
+     * @param  int|string  $modelId  Die Modell-ID
      */
     public function restoreToArchive($modelId): void
     {
         $model = $this->getModelQuery(true)->find($modelId);
-        if (!$model) return;
+        if (! $model) {
+            return;
+        }
 
         if ($model->trashed()) {
             $model->restoreToArchive();
@@ -200,7 +209,7 @@ trait ModelStatusAction
     /**
      * Model dauerhaft löschen
      *
-     * @param int|string $modelId Die Modell-ID
+     * @param  int|string  $modelId  Die Modell-ID
      */
     public function forceDelete($modelId): void
     {
@@ -230,7 +239,7 @@ trait ModelStatusAction
                     'count' => $count,
                     'name' => $count === 1
                         ? $this->getModelDisplayName()
-                        : $this->getModelDisplayNamePlural()
+                        : $this->getModelDisplayNamePlural(),
                 ]),
                 'Success',
                 'danger'
@@ -249,7 +258,7 @@ trait ModelStatusAction
      */
     protected function getModelDisplayNamePlural(): string
     {
-        return $this->getModelDisplayName() . 's';
+        return $this->getModelDisplayName().'s';
     }
 
     // Bulk-Aktionen
@@ -257,12 +266,13 @@ trait ModelStatusAction
     /**
      * Bulk-Status-Update für mehrere Modelle
      *
-     * @param string $action Die durchzuführende Aktion ('active', 'archived', 'trashed', 'restore_to_archive')
+     * @param  string  $action  Die durchzuführende Aktion ('active', 'archived', 'trashed', 'restore_to_archive')
      */
     public function bulkUpdateStatus(string $action): void
     {
         if (empty($this->selectedIds)) {
             $this->showToast(__('No :name selected.', ['name' => $this->getModelDisplayNamePlural()]), 'Info', 'info');
+
             return;
         }
 
@@ -271,7 +281,7 @@ trait ModelStatusAction
 
         foreach ($models as $model) {
             $count++;
-            match($action) {
+            match ($action) {
                 'active' => $this->setModelActive($model),
                 'archived' => $this->setModelArchived($model),
                 'trashed' => $this->trashModel($model),
@@ -287,7 +297,7 @@ trait ModelStatusAction
                     'count' => $count,
                     'name' => $count === 1
                         ? $this->getModelDisplayName()
-                        : $this->getModelDisplayNamePlural()
+                        : $this->getModelDisplayNamePlural(),
                 ]),
                 'Success',
                 'success'
@@ -305,6 +315,7 @@ trait ModelStatusAction
     {
         if (empty($this->selectedIds)) {
             $this->showToast(__('No :name selected.', ['name' => $this->getModelDisplayNamePlural()]), 'Info', 'info');
+
             return;
         }
 
@@ -324,7 +335,7 @@ trait ModelStatusAction
                     'count' => $count,
                     'name' => $count === 1
                         ? $this->getModelDisplayName()
-                        : $this->getModelDisplayNamePlural()
+                        : $this->getModelDisplayNamePlural(),
                 ]),
                 'Success',
                 'danger'
@@ -340,7 +351,7 @@ trait ModelStatusAction
     /**
      * Setzt ein Model auf aktiv
      *
-     * @param Model $model Das zu ändernde Model
+     * @param  Model  $model  Das zu ändernde Model
      */
     private function setModelActive(Model $model): void
     {
@@ -355,7 +366,7 @@ trait ModelStatusAction
     /**
      * Archiviert ein Model
      *
-     * @param Model $model Das zu ändernde Model
+     * @param  Model  $model  Das zu ändernde Model
      */
     private function setModelArchived(Model $model): void
     {
@@ -370,11 +381,11 @@ trait ModelStatusAction
     /**
      * Verschiebt ein Model in den Papierkorb
      *
-     * @param Model $model Das zu ändernde Model
+     * @param  Model  $model  Das zu ändernde Model
      */
     private function trashModel(Model $model): void
     {
-        if (!$model->trashed()) {
+        if (! $model->trashed()) {
             $model->delete();
         }
     }
@@ -382,10 +393,10 @@ trait ModelStatusAction
     /**
      * Zeigt eine Toast-Nachricht an
      *
-     * @param string $message Die anzuzeigende Nachricht
-     * @param string $heading Die Überschrift (Standard: 'Success')
-     * @param string $variant Der Typ der Nachricht (Standard: 'success')
-     * @param array $params Parameter für die Übersetzung
+     * @param  string  $message  Die anzuzeigende Nachricht
+     * @param  string  $heading  Die Überschrift (Standard: 'Success')
+     * @param  string  $variant  Der Typ der Nachricht (Standard: 'success')
+     * @param  array  $params  Parameter für die Übersetzung
      */
     private function showToast(string $message, string $heading = 'Success', string $variant = 'success', array $params = []): void
     {

@@ -4,7 +4,6 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Enums\Company\CompanySize;
 use App\Enums\Company\CompanyType;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CreateUserTest extends TestCase
@@ -31,7 +30,7 @@ class CreateUserTest extends TestCase
         ];
 
         // Rufe die CreateNewUser-Klasse auf
-        $createNewUser = new CreateNewUser();
+        $createNewUser = new CreateNewUser;
         $user = $createNewUser->create($userData);
 
         // Überprüfe, ob der Benutzer erstellt wurde
@@ -48,7 +47,7 @@ class CreateUserTest extends TestCase
         // Überprüfe, ob ein Team erstellt wurde
         $this->assertTrue($user->ownedTeams()->exists());
         $this->assertEquals($user->company_id, $user->ownedTeams()->first()->company_id);
-        
-        echo "Der Test wurde erfolgreich durchgeführt! Ein neuer Benutzer mit zugehörigem Unternehmen und Team wurde erstellt.";
+
+        echo 'Der Test wurde erfolgreich durchgeführt! Ein neuer Benutzer mit zugehörigem Unternehmen und Team wurde erstellt.';
     }
 }

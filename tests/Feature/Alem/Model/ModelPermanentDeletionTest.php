@@ -36,7 +36,7 @@ class ModelPermanentDeletionTest extends TestCase
         Carbon::setTestNow('2023-01-15 12:00:00');
 
         // Erstelle eine Instanz des Testmodells
-        $this->testModel = new TestPermanentDeletionModel();
+        $this->testModel = new TestPermanentDeletionModel;
     }
 
     protected function tearDown(): void
@@ -286,9 +286,10 @@ class ModelPermanentDeletionTest extends TestCase
  */
 class TestPermanentDeletionModel extends Model
 {
-    use SoftDeletes, ModelPermanentDeletion;
+    use ModelPermanentDeletion, SoftDeletes;
 
     protected $table = 'test_permanent_deletion_models';
+
     protected $fillable = ['name'];
 
     // Stelle sicher, dass deleted_at als Datum behandelt wird

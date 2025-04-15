@@ -1,0 +1,24 @@
+# phpstan.neon
+parameters:
+    level: 5  # Starte vielleicht mit einem niedrigeren Level (z.B. 1 oder 2) und erhöhe es schrittweise
+    paths:
+        - app
+        - routes
+        - database/factories
+        - database/seeders
+        - tests
+
+
+    # Optional: Schliesse bestimmte Pfade oder Dateien aus
+    excludePaths:
+        - vendor/*
+        - storage/*
+        - bootstrap/cache/*
+        - public/*
+        - resources/*
+        - database/migrations/* # Migrationen haben oft keinen strikten Typ
+        - tests/bootstrap.php
+
+    # Sehr empfohlen für Laravel: larastan/larastan
+    includes:
+        - ./vendor/larastan/larastan/extension.neon

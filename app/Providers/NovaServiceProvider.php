@@ -30,14 +30,11 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
         $this->footer();
 
-
         Nova::userMenu(function (Request $request, Menu $menu) {
             return $menu
 //                ->append(MenuItem::externalLink('API Docs', 'http://example.com'))
                 ->prepend(MenuItem::link('Mein Profil', '/resources/admins/'.$request->user()->getKey()));
         });
-
-
 
         Nova::mainMenu(function (Request $request) {
 
@@ -46,38 +43,36 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     ->icon('presentation-chart-line'),
 
                 MenuSection::make('Organisation', [
-//                    MenuItem::make('Alle Firmen', '/resources/companies'),
-//                    MenuItem::make('Alle Inhaber', '/resources/owners'),
-//                    MenuItem::make('Alle Mitarbeiter', '/resources/employees'),
-//                    MenuItem::make('Neue Firma', '/resources/companies/new'),
-//                    MenuItem::make('Adressen', '/resources/addresses'),
-//                    MenuItem::make('Alle Teams', '/resources/teams'),
+                    //                    MenuItem::make('Alle Firmen', '/resources/companies'),
+                    //                    MenuItem::make('Alle Inhaber', '/resources/owners'),
+                    //                    MenuItem::make('Alle Mitarbeiter', '/resources/employees'),
+                    //                    MenuItem::make('Neue Firma', '/resources/companies/new'),
+                    //                    MenuItem::make('Adressen', '/resources/addresses'),
+                    //                    MenuItem::make('Alle Teams', '/resources/teams'),
 
                 ])->icon('office-building')->collapsable(),
 
                 MenuSection::make('User', [
-//                    MenuItem::make('Alle Inhaber', '/resources/owners'),
+                    //                    MenuItem::make('Alle Inhaber', '/resources/owners'),
                 ])->icon('document-text')->collapsable(),
 
-
                 MenuSection::make('Nova Settings', [
-//                    MenuItem::resource(Admin::class),
-//                    MenuItem::resource(Team::class),
-//                    MenuItem::make('Alle Accounts', '/resources/users'),
-//                    MenuItem::resource(Team::class),
+                    //                    MenuItem::resource(Admin::class),
+                    //                    MenuItem::resource(Team::class),
+                    //                    MenuItem::make('Alle Accounts', '/resources/users'),
+                    //                    MenuItem::resource(Team::class),
                 ])->icon('user')->collapsable(),
 
-
                 MenuSection::make('Authorization', [
-//                    MenuItem::resource(Role::class),
-//                    MenuItem::resource(Permission::class),
+                    //                    MenuItem::resource(Role::class),
+                    //                    MenuItem::resource(Permission::class),
                 ])->icon('shield-check')->collapsable(),
 
                 MenuSection::make('Einstellungen', [
                     MenuItem::make('Branchen', '/resources/industries'),
-//                    MenuItem::resource(Country::class),
-//                    MenuItem::resource(State::class),
-//                    MenuItem::resource(City::class),
+                    //                    MenuItem::resource(Country::class),
+                    //                    MenuItem::resource(State::class),
+                    //                    MenuItem::resource(City::class),
                 ])->icon('cog')->collapsable(),
             ];
         });
@@ -91,9 +86,9 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     protected function routes()
     {
         Nova::routes()
-                ->withAuthenticationRoutes()
-                ->withPasswordResetRoutes()
-                ->register();
+            ->withAuthenticationRoutes()
+            ->withPasswordResetRoutes()
+            ->register();
     }
 
     /**
@@ -144,9 +139,9 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
         //
     }
 
-    public function footer():void
+    public function footer(): void
     {
-        Nova::footer(function ($request){
+        Nova::footer(function ($request) {
             return \Blade::render(string: 'nova/footer');
         });
     }

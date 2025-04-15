@@ -8,13 +8,13 @@ use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\Team;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache; // Wichtig: Cache-Facade verwenden
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth; // Wichtig: Cache-Facade verwenden
+use Illuminate\Support\Facades\Cache;
 // use Illuminate\Support\Facades\Redis; // Nicht mehr direkt für Caching benötigt
-use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 class EmployeeIndexController extends Controller
@@ -23,16 +23,17 @@ class EmployeeIndexController extends Controller
      * Generiert einen Cache-Schlüssel für firmenweite Listen-Daten.
      * Verwendet das konfigurierte Cache-Prefix automatisch.
      *
-     * @param string $resourceName Name der Ressource (z.B. 'departments', 'teams')
-     * @param int $companyId
+     * @param  string  $resourceName  Name der Ressource (z.B. 'departments', 'teams')
      * @return string|null Cache-Schlüssel oder null, wenn Company fehlt
      */
     private function getCompanyCacheKey(string $resourceName, ?int $companyId): ?string
     {
-        if (!$companyId) {
-            Log::warning("Versuch, Cache-Schlüssel ohne Company-ID zu generieren.", ['resource' => $resourceName]);
+        if (! $companyId) {
+            Log::warning('Versuch, Cache-Schlüssel ohne Company-ID zu generieren.', ['resource' => $resourceName]);
+
             return null;
         }
+
         // Das Cache-Prefix wird von Laravel automatisch hinzugefügt
         return "list_company_{$companyId}_resource_{$resourceName}";
     }
@@ -41,8 +42,8 @@ class EmployeeIndexController extends Controller
      * Holt eine Ressource aus dem Cache oder erzeugt sie neu und speichert sie permanent.
      * Verwendet die Laravel Cache-Facade.
      *
-     * @param string $cacheKey Der zu verwendende Cache-Schlüssel.
-     * @param callable $callback Die Funktion, die die Daten generiert, wenn sie nicht im Cache sind.
+     * @param  string  $cacheKey  Der zu verwendende Cache-Schlüssel.
+     * @param  callable  $callback  Die Funktion, die die Daten generiert, wenn sie nicht im Cache sind.
      * @return mixed Die Daten aus dem Cache oder neu generiert.
      */
     private function rememberResourceForever(string $cacheKey, callable $callback)
@@ -50,8 +51,9 @@ class EmployeeIndexController extends Controller
         // Cache::rememberForever nutzt den konfigurierten Cache-Treiber (Redis)
         // und die korrekte Cache-Datenbank (standardmäßig 1).
         // Der Eintrag bleibt bestehen, bis er explizit via Cache::forget() gelöscht wird.
-        return Cache::rememberForever($cacheKey, function() use ($cacheKey, $callback) {
+        return Cache::rememberForever($cacheKey, function () use ($cacheKey, $callback) {
             Debugbar::info("Cache Miss für Key: {$cacheKey}, wird neu erstellt via Cache::rememberForever");
+
             // Führe den Callback aus, um die Daten zu erhalten
             return $callback();
         });
@@ -60,8 +62,8 @@ class EmployeeIndexController extends Controller
     /**
      * Invalidiert den Cache für eine bestimmte Ressource unter Verwendung der Cache-Facade.
      *
-     * @param string $resourceName Name der Ressource.
-     * @param int $companyId Die ID der Firma.
+     * @param  string  $resourceName  Name der Ressource.
+     * @param  int  $companyId  Die ID der Firma.
      */
     public function invalidateCache(string $resourceName, int $companyId): void
     {
@@ -89,8 +91,9 @@ class EmployeeIndexController extends Controller
     {
         $authCompanyId = Auth::user()?->company_id;
 
-        if (!$authCompanyId) {
-            Debugbar::warning("Keine Firmen-ID für angemeldeten Benutzer gefunden, kann Rollen nicht cachen");
+        if (! $authCompanyId) {
+            Debugbar::warning('Keine Firmen-ID für angemeldeten Benutzer gefunden, kann Rollen nicht cachen');
+
             return collect();
         }
 
@@ -98,17 +101,17 @@ class EmployeeIndexController extends Controller
         $cacheKey = "roles_company_{$authCompanyId}_creator_1";
 
         return Cache::rememberForever($cacheKey, function () use ($authCompanyId) {
-            Debugbar::info("Cache Miss: Lade Rollen aus der Datenbank und speichere sie dauerhaft im Cache", [
+            Debugbar::info('Cache Miss: Lade Rollen aus der Datenbank und speichere sie dauerhaft im Cache', [
                 'company_id' => $authCompanyId,
-                'created_by' => 1
+                'created_by' => 1,
             ]);
 
             // Nur relevante Rollen mit spezifischen Bedingungen und nur ID+Namen
             return Role::where('company_id', $authCompanyId)
-                      ->where('created_by', 1)
-                      ->where('visible', RoleVisibility::Visible->value)
-                      ->select(['id', 'name'])
-                      ->get();
+                ->where('created_by', 1)
+                ->where('visible', RoleVisibility::Visible->value)
+                ->select(['id', 'name'])
+                ->get();
         });
     }
 
@@ -122,17 +125,18 @@ class EmployeeIndexController extends Controller
     {
         $authCompanyId = Auth::user()?->company_id;
 
-        if (!$authCompanyId) {
-            Debugbar::warning("Keine Firmen-ID für angemeldeten Benutzer gefunden, kann Professionen nicht cachen");
+        if (! $authCompanyId) {
+            Debugbar::warning('Keine Firmen-ID für angemeldeten Benutzer gefunden, kann Professionen nicht cachen');
+
             return collect();
         }
-        
+
         // Cache-Key enthält die Firmen-ID
         $cacheKey = "professions_company_{$authCompanyId}";
 
         return Cache::rememberForever($cacheKey, function () use ($authCompanyId) {
-            Debugbar::info("Cache Miss: Lade Professionen aus der Datenbank und speichere sie dauerhaft im Cache", [
-                'company_id' => $authCompanyId
+            Debugbar::info('Cache Miss: Lade Professionen aus der Datenbank und speichere sie dauerhaft im Cache', [
+                'company_id' => $authCompanyId,
             ]);
 
             // Professionen nach Firmen-ID filtern
@@ -153,17 +157,18 @@ class EmployeeIndexController extends Controller
     {
         $authCompanyId = Auth::user()?->company_id;
 
-        if (!$authCompanyId) {
-            Debugbar::warning("Keine Firmen-ID für angemeldeten Benutzer gefunden, kann Stages nicht cachen");
+        if (! $authCompanyId) {
+            Debugbar::warning('Keine Firmen-ID für angemeldeten Benutzer gefunden, kann Stages nicht cachen');
+
             return collect();
         }
-        
+
         // Cache-Key enthält die Firmen-ID
         $cacheKey = "stages_company_{$authCompanyId}";
 
         return Cache::rememberForever($cacheKey, function () use ($authCompanyId) {
-            Debugbar::info("Cache Miss: Lade Stages aus der Datenbank und speichere sie dauerhaft im Cache", [
-                'company_id' => $authCompanyId
+            Debugbar::info('Cache Miss: Lade Stages aus der Datenbank und speichere sie dauerhaft im Cache', [
+                'company_id' => $authCompanyId,
             ]);
 
             // Stages nach Firmen-ID filtern
@@ -176,14 +181,12 @@ class EmployeeIndexController extends Controller
 
     /**
      * Zeigt die Index-Seite für Mitarbeiter an und lädt benötigte Daten aus dem Cache.
-     *
-     * @return View
      */
     public function index(): View
     {
         $authCompanyId = Auth::user()?->company_id;
 
-        if (!$authCompanyId) {
+        if (! $authCompanyId) {
             abort(403, 'Keine Firma zugeordnet.');
         }
 
@@ -197,7 +200,7 @@ class EmployeeIndexController extends Controller
                     ->pluck('name', 'id')
                     ->all();
             });
-            Debugbar::info("Departments geladen.", ['key' => $departmentsKey, 'count' => count($departments)]);
+            Debugbar::info('Departments geladen.', ['key' => $departmentsKey, 'count' => count($departments)]);
         } else {
             Log::error("Konnte Department Cache Key nicht generieren für Company ID: {$authCompanyId}");
         }
@@ -212,21 +215,21 @@ class EmployeeIndexController extends Controller
                     ->pluck('name', 'id')
                     ->all();
             });
-            Debugbar::info("Teams geladen.", ['key' => $teamsKey, 'count' => count($teams)]);
+            Debugbar::info('Teams geladen.', ['key' => $teamsKey, 'count' => count($teams)]);
         } else {
             Log::error("Konnte Team Cache Key nicht generieren für Company ID: {$authCompanyId}");
         }
 
         // Professions und Stages laden (ursprüngliche Methoden beibehalten)
         $professions = $this->getCachedProfessions()->pluck('name', 'id')->toArray();
-        Debugbar::info("Professions geladen.", ['count' => count($professions)]);
+        Debugbar::info('Professions geladen.', ['count' => count($professions)]);
 
         $stages = $this->getCachedStages()->pluck('name', 'id')->toArray();
-        Debugbar::info("Stages geladen.", ['count' => count($stages)]);
+        Debugbar::info('Stages geladen.', ['count' => count($stages)]);
 
         // Nur die Rollen aus der speziellen Cache-Methode laden
         $roles = $this->getCachedRoles()->pluck('name', 'id')->toArray();
-        Debugbar::info("Rollen aus Cache geladen", ['count' => count($roles)]);
+        Debugbar::info('Rollen aus Cache geladen', ['count' => count($roles)]);
 
         return view('laravel.alem.employee.index', [
             'departments' => $departments,
@@ -251,7 +254,7 @@ class EmployeeIndexController extends Controller
             Cache::forget("roles_company_{$authCompanyId}_creator_1");
             Cache::forget("professions_company_{$authCompanyId}");
             Cache::forget("stages_company_{$authCompanyId}");
-            Debugbar::info("Rollen- und zugehörige Caches wurden gelöscht", ['company_id' => $authCompanyId]);
+            Debugbar::info('Rollen- und zugehörige Caches wurden gelöscht', ['company_id' => $authCompanyId]);
         }
 
         // Zurück zur vorherigen Seite mit Erfolgsmeldung

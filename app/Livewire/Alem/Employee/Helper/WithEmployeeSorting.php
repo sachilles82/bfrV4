@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
  * Trait für die Sortierung von Mitarbeitern
  * Füge alle Spalten hinzu, nach denen sortiert werden kann
  */
-
 trait WithEmployeeSorting
 {
     use WithSorting;
@@ -27,7 +26,7 @@ trait WithEmployeeSorting
             };
             $query->orderBy($column, $this->sortAsc ? 'asc' : 'desc');
         }
+
         return $query;
     }
-
 }

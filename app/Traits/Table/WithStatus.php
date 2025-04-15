@@ -9,7 +9,6 @@ use Livewire\Attributes\Url;
  * Basis-Trait für modellspezifische Status-Filter in einzelnen Models. Wie Employee, Report, etc.
  * Wird von konkreten Status-Traits wie EmployeeStatus, WithReportStatus usw. verwendet
  */
-
 trait WithStatus
 {
     #[Url]
@@ -39,7 +38,7 @@ trait WithStatus
      */
     protected function getResetMethodName(): string
     {
-        return 'reset' . ucfirst($this->getStatusFilterName()) . 'Filter';
+        return 'reset'.ucfirst($this->getStatusFilterName()).'Filter';
     }
 
     /**
@@ -48,7 +47,7 @@ trait WithStatus
      */
     protected function getApplyMethodName(): string
     {
-        return 'apply' . ucfirst($this->getStatusFilterName()) . 'Filter';
+        return 'apply'.ucfirst($this->getStatusFilterName()).'Filter';
     }
 
     /**
@@ -58,7 +57,7 @@ trait WithStatus
     public function bootModelSpecificStatus(): void
     {
         // Dynamisch die Property für den Filter erstellen
-        $filterName = $this->getStatusFilterName() . 'Filter';
+        $filterName = $this->getStatusFilterName().'Filter';
         $this->$filterName = $this->modelStatusFilter;
     }
 
@@ -68,9 +67,9 @@ trait WithStatus
      */
     protected function applyModelSpecificStatusFilter(Builder $query): Builder
     {
-        $filterName = $this->getStatusFilterName() . 'Filter';
+        $filterName = $this->getStatusFilterName().'Filter';
 
-        if (!empty($this->$filterName)) {
+        if (! empty($this->$filterName)) {
             $query->whereHas($this->getRelationName(), function ($query) use ($filterName) {
                 $query->where($this->getStatusFieldName(), $this->$filterName);
             });
@@ -84,7 +83,7 @@ trait WithStatus
      */
     protected function resetModelSpecificStatusFilter(): void
     {
-        $filterName = $this->getStatusFilterName() . 'Filter';
+        $filterName = $this->getStatusFilterName().'Filter';
         $this->$filterName = '';
 
         if (property_exists($this, 'selectedIds')) {
@@ -99,7 +98,7 @@ trait WithStatus
      */
     public function setAllModelSpecificStatus(): void
     {
-        $filterName = $this->getStatusFilterName() . 'Filter';
+        $filterName = $this->getStatusFilterName().'Filter';
         $this->$filterName = '';
 
         if (method_exists($this, 'reset')) {

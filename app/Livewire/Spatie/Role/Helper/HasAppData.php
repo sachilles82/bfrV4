@@ -9,7 +9,7 @@ trait HasAppData
      */
     private function getAppData(): array
     {
-        return match($this->app) {
+        return match ($this->app) {
             'baseApp' => [
                 'logo' => 'https://tailwindui.com/plus/img/logos/48x48/savvycal.svg',
                 'title' => 'BaseApp, Inc',

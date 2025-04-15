@@ -6,7 +6,6 @@ use App\Enums\Employee\EmployeeStatus;
 
 /**
  * Trait für die Bereitstellung von Employee-Status-Optionen
- * @package App\Traits\Employee
  */
 trait WithEmployeeStatusOptions
 {

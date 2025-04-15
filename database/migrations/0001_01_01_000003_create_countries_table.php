@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->index();
             $table->char('code', 2)->unique();
-            $table->string('phonecode',10)->nullable();
+            $table->string('phonecode', 10)->nullable();
             $table->string('currency', 3)->nullable();
             $table->timestamps();
 

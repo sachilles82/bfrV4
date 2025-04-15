@@ -23,7 +23,9 @@ class StateForm extends Component
 
     #[Locked]
     public ?int $stateId = null;
+
     public ?string $name = null;
+
     public ?string $code = null;
 
     public bool $editing = false;
@@ -90,7 +92,7 @@ class StateForm extends Component
     public function deleteState(int $id): void
     {
         // Autorisierung
-//        $this->authorize('delete');
+        //        $this->authorize('delete');
         $state = State::where('created_by', auth()->id())->findOrFail($id);
 
         $state->delete();
@@ -111,7 +113,7 @@ class StateForm extends Component
 
         $this->dispatch('update-address');
         $this->reset([
-            'stateId', 'name', 'country_id', 'editing'
+            'stateId', 'name', 'country_id', 'editing',
         ]);
     }
 

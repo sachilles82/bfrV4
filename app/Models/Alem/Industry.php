@@ -12,13 +12,13 @@ class Industry extends Model
     use HasFactory;
 
     /**
-         * The attributes that are mass assignable.
-         *
-         * @var array<int, string>
-         */
-        protected $fillable = [
-            'name',
-        ];
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+    ];
 
     public function companies(): HasMany
     {

@@ -6,7 +6,6 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Auth;
 
 class City extends Model
 {
@@ -49,5 +48,4 @@ class City extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
 }

@@ -14,8 +14,6 @@ trait EmployeeStatusManagement
 {
     /**
      * Überprüft, ob der Mitarbeiter im Probezeitstatus ist.
-     *
-     * @return bool
      */
     public function isOnProbation(): bool
     {
@@ -24,8 +22,6 @@ trait EmployeeStatusManagement
 
     /**
      * Überprüft, ob der Mitarbeiter im Onboarding-Status ist.
-     *
-     * @return bool
      */
     public function isOnboarding(): bool
     {
@@ -34,8 +30,6 @@ trait EmployeeStatusManagement
 
     /**
      * Überprüft, ob der Mitarbeiter voll angestellt ist.
-     *
-     * @return bool
      */
     public function isEmployed(): bool
     {
@@ -44,8 +38,6 @@ trait EmployeeStatusManagement
 
     /**
      * Überprüft, ob der Mitarbeiter im Urlaub ist.
-     *
-     * @return bool
      */
     public function isOnLeave(): bool
     {
@@ -54,8 +46,6 @@ trait EmployeeStatusManagement
 
     /**
      * Überprüft, ob der Mitarbeiter die Firma verlassen hat.
-     *
-     * @return bool
      */
     public function hasLeft(): bool
     {
@@ -65,19 +55,17 @@ trait EmployeeStatusManagement
     /**
      * Setzt den Status des Mitarbeiters.
      *
-     * @param EmployeeStatus $status Der neue Status
-     * @return self
+     * @param  EmployeeStatus  $status  Der neue Status
      */
     public function setEmployeeStatus(EmployeeStatus $status): self
     {
         $this->update(['employee_status' => $status]);
+
         return $this;
     }
 
     /**
      * Setzt den Mitarbeiter auf Probezeit.
-     *
-     * @return self
      */
     public function setProbation(): self
     {
@@ -86,8 +74,6 @@ trait EmployeeStatusManagement
 
     /**
      * Setzt den Mitarbeiter auf Onboarding.
-     *
-     * @return self
      */
     public function setOnboarding(): self
     {
@@ -96,8 +82,6 @@ trait EmployeeStatusManagement
 
     /**
      * Setzt den Mitarbeiter auf vollzeit angestellt.
-     *
-     * @return self
      */
     public function setEmployed(): self
     {
@@ -106,8 +90,6 @@ trait EmployeeStatusManagement
 
     /**
      * Setzt den Mitarbeiter auf Urlaub.
-     *
-     * @return self
      */
     public function setOnLeave(): self
     {
@@ -116,8 +98,6 @@ trait EmployeeStatusManagement
 
     /**
      * Setzt den Mitarbeiter auf verlassen.
-     *
-     * @return self
      */
     public function setLeft(): self
     {
@@ -127,8 +107,7 @@ trait EmployeeStatusManagement
     /**
      * Scope für Mitarbeiter auf Probezeit.
      *
-     * @param Builder $query
-     * @return Builder
+     * @param  Builder  $query
      */
     public function scopeOnProbation($query): Builder
     {
@@ -138,8 +117,7 @@ trait EmployeeStatusManagement
     /**
      * Scope für Mitarbeiter im Onboarding.
      *
-     * @param Builder $query
-     * @return Builder
+     * @param  Builder  $query
      */
     public function scopeOnboarding($query): Builder
     {
@@ -149,8 +127,7 @@ trait EmployeeStatusManagement
     /**
      * Scope für vollzeit angestellte Mitarbeiter.
      *
-     * @param Builder $query
-     * @return Builder
+     * @param  Builder  $query
      */
     public function scopeEmployed($query): Builder
     {
@@ -160,8 +137,7 @@ trait EmployeeStatusManagement
     /**
      * Scope für Mitarbeiter im Urlaub.
      *
-     * @param Builder $query
-     * @return Builder
+     * @param  Builder  $query
      */
     public function scopeOnLeave($query): Builder
     {
@@ -171,8 +147,7 @@ trait EmployeeStatusManagement
     /**
      * Scope für Mitarbeiter, die die Firma verlassen haben.
      *
-     * @param Builder $query
-     * @return Builder
+     * @param  Builder  $query
      */
     public function scopeLeft($query): Builder
     {

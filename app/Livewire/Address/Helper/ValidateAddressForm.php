@@ -4,7 +4,6 @@ namespace App\Livewire\Address\Helper;
 
 trait ValidateAddressForm
 {
-
     public function rules(): array
     {
         return [
@@ -29,5 +28,4 @@ trait ValidateAddressForm
             'city_id.exists' => __('The selected city is invalid.'),
         ];
     }
-
 }

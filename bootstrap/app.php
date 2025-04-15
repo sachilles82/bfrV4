@@ -16,11 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->web(append: [
-//            \Spatie\ResponseCache\Middlewares\CacheResponse::class,
+            //            \Spatie\ResponseCache\Middlewares\CacheResponse::class,
         ]);
 
         $middleware->alias([
-//            'cacheResponse' => \Spatie\ResponseCache\Middlewares\CacheResponse::class,
+            //            'cacheResponse' => \Spatie\ResponseCache\Middlewares\CacheResponse::class,
             'doNotCacheResponse' => DoNotCacheResponse::class,
         ]);
     })

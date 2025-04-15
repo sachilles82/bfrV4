@@ -11,7 +11,7 @@ trait HasAddress
      * Das ist eine MorphOne Realation.
      * Jedes Model hat nur eine Adresse.
      */
-    public function address():MorphOne
+    public function address(): MorphOne
     {
         return $this->morphOne(Address::class, 'addressable');
     }

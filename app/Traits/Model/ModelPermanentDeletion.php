@@ -31,7 +31,7 @@ trait ModelPermanentDeletion
      */
     public function getDaysUntilPermanentDeleteAttribute(): ?int
     {
-        if (!$this->trashed()) {
+        if (! $this->trashed()) {
             return null;
         }
 
@@ -50,7 +50,7 @@ trait ModelPermanentDeletion
      */
     public function getPermanentDeletionDateAttribute(): ?Carbon
     {
-        if (!$this->trashed()) {
+        if (! $this->trashed()) {
             return null;
         }
 
@@ -63,7 +63,7 @@ trait ModelPermanentDeletion
      */
     public function getDeletionMessageAttribute(): ?string
     {
-        if (!$this->trashed()) {
+        if (! $this->trashed()) {
             return null;
         }
 
@@ -83,7 +83,7 @@ trait ModelPermanentDeletion
      */
     public function getPermanentDeletionDateForHumansAttribute(): ?string
     {
-        if (!$this->permanent_deletion_date) {
+        if (! $this->permanent_deletion_date) {
             return null;
         }
 
@@ -99,7 +99,7 @@ trait ModelPermanentDeletion
      */
     public function getDeletionUrgencyClassAttribute(): ?string
     {
-        if (!$this->trashed()) {
+        if (! $this->trashed()) {
             return null;
         }
 

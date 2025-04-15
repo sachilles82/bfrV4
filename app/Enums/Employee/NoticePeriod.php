@@ -46,22 +46,22 @@ enum NoticePeriod: string
     public function label(): string
     {
         return match ($this) {
-            static::NO_NOTICE => __('No notice period'),
-            static::ONE_WEEK => __('1 week'),
-            static::TWO_WEEKS => __('2 weeks'),
-            static::THREE_WEEKS => __('3 weeks'),
-            static::ONE_MONTH => __('1 month'),
-            static::TWO_MONTHS => __('2 months'),
-            static::THREE_MONTHS => __('3 months'),
-            static::FOUR_MONTHS => __('4 months'),
-            static::FIVE_MONTHS => __('5 months'),
-            static::SIX_MONTHS => __('6 months'),
-            static::SEVEN_MONTHS => __('7 months'),
-            static::EIGHT_MONTHS => __('8 months'),
-            static::NINE_MONTHS => __('9 months'),
-            static::TEN_MONTHS => __('10 months'),
-            static::ELEVEN_MONTHS => __('11 months'),
-            static::TWELVE_MONTHS => __('12 months'),
+            self::NO_NOTICE => __('No notice period'),
+            self::ONE_WEEK => __('1 week'),
+            self::TWO_WEEKS => __('2 weeks'),
+            self::THREE_WEEKS => __('3 weeks'),
+            self::ONE_MONTH => __('1 month'),
+            self::TWO_MONTHS => __('2 months'),
+            self::THREE_MONTHS => __('3 months'),
+            self::FOUR_MONTHS => __('4 months'),
+            self::FIVE_MONTHS => __('5 months'),
+            self::SIX_MONTHS => __('6 months'),
+            self::SEVEN_MONTHS => __('7 months'),
+            self::EIGHT_MONTHS => __('8 months'),
+            self::NINE_MONTHS => __('9 months'),
+            self::TEN_MONTHS => __('10 months'),
+            self::ELEVEN_MONTHS => __('11 months'),
+            self::TWELVE_MONTHS => __('12 months'),
         };
     }
 }

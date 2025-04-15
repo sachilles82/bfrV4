@@ -16,7 +16,7 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $adminUser = User::find(1);// Dummy User wird erstellt damit die Role beim seeden die User ID 1 hat
+        $adminUser = User::find(1); // Dummy User wird erstellt damit die Role beim seeden die User ID 1 hat
 
         // Super Admin überschreibt Dummy User
         $adminUser->update([

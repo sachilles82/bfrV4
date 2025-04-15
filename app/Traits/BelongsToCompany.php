@@ -16,7 +16,6 @@ trait BelongsToCompany
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-
     public static function bootBelongsToCompany(): void
     {
         static::addGlobalScope(new CompanyScope);
@@ -42,5 +41,4 @@ trait BelongsToCompany
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
 }

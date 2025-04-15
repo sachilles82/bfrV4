@@ -7,17 +7,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Country extends Model
 {
-         /**
-         * The attributes that are mass assignable.
-         *
-         * @var array<int, string>
-         */
-        protected $fillable = [
-            'name',
-            'code',
-            'currency',
-            'phonecode',
-        ];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'code',
+        'currency',
+        'phonecode',
+    ];
 
     public function states(): HasMany
     {

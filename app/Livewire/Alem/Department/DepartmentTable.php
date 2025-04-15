@@ -15,8 +15,8 @@ use Livewire\Component;
 
 class DepartmentTable extends Component
 {
-    use Searchable, WithPerPagePagination, WithDepartmentSorting,
-        WithDepartmentModelStatus,
+    use Searchable, WithDepartmentModelStatus, WithDepartmentSorting,
+        WithPerPagePagination,
         WithUserAvatars;
 
     public $departmentId; // Wird benötigt damit ich die Daten in der EditDepartment Komponente laden kann
@@ -63,13 +63,13 @@ class DepartmentTable extends Component
         $this->dispatch('edit-department', $id);
     }
 
-//    #[On('created')]
-//    public function handleCreated(): void
-//    {
-//        $this->resetPage();
-//        $this->reset('search');
-//        $this->dispatch('update-table');
-//    }
+    //    #[On('created')]
+    //    public function handleCreated(): void
+    //    {
+    //        $this->resetPage();
+    //        $this->reset('search');
+    //        $this->dispatch('update-table');
+    //    }
 
     public function render(): View
     {
@@ -79,10 +79,8 @@ class DepartmentTable extends Component
         $this->applySorting($query);
         $this->applyStatusFilter($query);
 
-
         $departments = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
-        $this->idsOnPage =$departments->pluck('id')->map(fn($id) => (string)$id)->toArray();
-
+        $this->idsOnPage = $departments->pluck('id')->map(fn ($id) => (string) $id)->toArray();
 
         return view('livewire.alem.department.table', [
             'departments' => $departments,

@@ -2,8 +2,6 @@
 
 namespace App\Policies\Address;
 
-use App\Models\User;
-
 class AddressManager
 {
     /**

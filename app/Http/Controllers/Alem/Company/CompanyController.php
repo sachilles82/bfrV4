@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Alem\Company;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
@@ -21,10 +20,10 @@ class CompanyController extends Controller
                 ->select([
                     'id', 'owner_id', 'company_name', 'industry_id',
                     'company_size', 'company_type', 'email', 'phone_1',
-                    'phone_2', 'register_number', 'company_url'
+                    'phone_2', 'register_number', 'company_url',
                 ])
                 ->with([
-                    'address' => function($query) {
+                    'address' => function ($query) {
                         $query->select('id', 'addressable_id', 'addressable_type', 'country_id', 'state_id', 'city_id', 'street_number');
                     },
                     'address.country:id,name',

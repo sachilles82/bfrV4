@@ -5,7 +5,6 @@ namespace App\Livewire\Alem\Employee\Profile\Helper;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
-use Illuminate\Validation\Rule;
 
 trait ValidatePersonalData
 {
@@ -15,27 +14,27 @@ trait ValidatePersonalData
     protected function rules(): array
     {
         return [
-            'employee_status' => 'required|string|in:' . implode(',', array_column(EmployeeStatus::cases(), 'value')),
+            'employee_status' => 'required|string|in:'.implode(',', array_column(EmployeeStatus::cases(), 'value')),
             'personal_number' => [
                 'nullable',
                 'string',
                 'max:20',
                 'regex:/^[a-zA-Z0-9äöüÄÖÜß\.\-_\/\s]*$/',
             ],
-//            'employment_type' => [
-//                'required',
-//                'string',
-//                'max:50',
-//                'regex:/^[a-zA-Z0-9äöüÄÖÜß\.\-\/\s%\(\)]*$/',
-//            ],
+            //            'employment_type' => [
+            //                'required',
+            //                'string',
+            //                'max:50',
+            //                'regex:/^[a-zA-Z0-9äöüÄÖÜß\.\-\/\s%\(\)]*$/',
+            //            ],
 
             'supervisor' => 'nullable|exists:users,id',
             'joined_at' => 'required|date|before_or_equal:today',
             'leave_at' => 'nullable|date|after_or_equal:joined_at',
-            'probation_enum' => 'required|string|in:' . implode(',', array_column(Probation::cases(), 'value')),
+            'probation_enum' => 'required|string|in:'.implode(',', array_column(Probation::cases(), 'value')),
             'probation_at' => 'nullable|date|after_or_equal:joined_at',
             'notice_at' => 'nullable|date|after_or_equal:joined_at',
-            'notice_enum' => 'nullable|string|in:' . implode(',', array_column(NoticePeriod::cases(), 'value')),
+            'notice_enum' => 'nullable|string|in:'.implode(',', array_column(NoticePeriod::cases(), 'value')),
             'profession' => 'required|exists:professions,id',
             'stage' => 'required|exists:stages,id',
         ];

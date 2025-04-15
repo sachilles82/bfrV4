@@ -31,7 +31,7 @@ trait ValidateInformation
             'selectedTeams' => 'required|array|min:1',
             'selectedTeams.*' => 'exists:teams,id',
             'role' => 'nullable|exists:roles,id',
-            'model_status' => 'required|string|in:' . implode(',', array_column(ModelStatus::cases(), 'value')),
+            'model_status' => 'required|string|in:'.implode(',', array_column(ModelStatus::cases(), 'value')),
         ];
     }
 

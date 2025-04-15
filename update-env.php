@@ -1,7 +1,7 @@
 <?php
 
 // Einfaches Skript zum Ändern des REDIS_CLIENT-Werts in der .env-Datei
-$envFile = __DIR__ . '/.env';
+$envFile = __DIR__.'/.env';
 $envContent = file_get_contents($envFile);
 
 // Überprüfen, ob REDIS_CLIENT existiert und enthält phpredis

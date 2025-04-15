@@ -2,9 +2,9 @@
 
 namespace Database\Seeders\Spatie;
 
+use App\Enums\Role\Permission;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission as PermissionModel;
-use App\Enums\Role\Permission;
 
 class PermissionSeeder extends Seeder
 {

@@ -16,16 +16,17 @@ use Livewire\Component;
 
 class EditDepartment extends Component
 {
-    use ValidateDepartment, WithDepartmentSorting, AuthorizesRequests,
+    use AuthorizesRequests, ValidateDepartment, WithDepartmentSorting,
         WithModelStatusOptions;
 
     #[Locked]
-    public ?int $departmentId = null; //!Muss in jeder Komponente sein
+    public ?int $departmentId = null; // !Muss in jeder Komponente sein
 
     public $name;
-    public $description;
-    public $model_status;
 
+    public $description;
+
+    public $model_status;
 
     /**
      * Lade das Department zur Bearbeitung
@@ -54,7 +55,7 @@ class EditDepartment extends Component
             );
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error loading department: ') . $e->getMessage(),
+                text: __('Error loading department: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -94,7 +95,7 @@ class EditDepartment extends Component
             );
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error updating department: ') . $e->getMessage(),
+                text: __('Error updating department: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );

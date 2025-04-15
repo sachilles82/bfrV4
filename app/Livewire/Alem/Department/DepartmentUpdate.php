@@ -12,9 +12,10 @@ class DepartmentUpdate extends Component
     use ValidateDepartment;
 
     public $departmentId;
-    public $department;
-    public $name;
 
+    public $department;
+
+    public $name;
 
     public function mount(Department $department): void
     {
@@ -22,11 +23,10 @@ class DepartmentUpdate extends Component
         $this->name = $department->name;
     }
 
-
     public function updateDepartment(): void
     {
         // this authorize
-//        $this->authorize('update', $department);
+        //        $this->authorize('update', $department);
         $this->validate();
 
         $this->department->update([
@@ -35,7 +35,7 @@ class DepartmentUpdate extends Component
 
     }
 
-    public function render():View
+    public function render(): View
     {
         return view('livewire.alem.department.update');
     }

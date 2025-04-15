@@ -15,14 +15,10 @@ trait WithSorting
     public function sortBy($column): void
     {
         if ($this->sortCol === $column) {
-            $this->sortAsc = !$this->sortAsc;
+            $this->sortAsc = ! $this->sortAsc;
         } else {
             $this->sortCol = $column;
             $this->sortAsc = false;
         }
     }
-
 }
-
-
-

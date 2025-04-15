@@ -12,13 +12,13 @@ class Dropdown extends Component
 
     public function mount(): void
     {
-        $this->industries = Industry::select('id','name')->orderBy('id')->get();
+        $this->industries = Industry::select('id', 'name')->orderBy('id')->get();
     }
 
     public function render(): View
     {
         return view('livewire.hr.industry.dropdown', [
-            'industries' => $this->industries
+            'industries' => $this->industries,
         ]);
     }
 }

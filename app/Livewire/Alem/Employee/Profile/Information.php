@@ -17,18 +17,24 @@ use Spatie\Permission\Models\Role;
 
 class Information extends Component
 {
-    use ValidateInformation, AuthorizesRequests;
+    use AuthorizesRequests, ValidateInformation;
 
     // Der User-Datensatz
     public User $user;
 
     // Lokale Properties für User-Daten
     public ?string $gender = '';
+
     public string $name;
+
     public string $last_name;
+
     public string $email;
+
     public ?string $phone_1 = '';
+
     public $model_status = '';
+
     public $department = '';
 
     // Team-Verwaltung - als Array für multiple Teams
@@ -79,7 +85,7 @@ class Information extends Component
     {
         // Alle aktiven Departments laden, die zum aktuellen Team gehören
         // Filtere nach aktuellem Team, falls ein Team ausgewählt ist
-        $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
+        $teamId = ! empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
 
         $query = Department::where('model_status', ModelStatus::ACTIVE->value);
 
@@ -123,7 +129,7 @@ class Information extends Component
      */
     public function updateEmployee(): void
     {
-//        $this->authorize('update', $this->user);
+        //        $this->authorize('update', $this->user);
 
         $this->validate();
 
@@ -146,7 +152,7 @@ class Information extends Component
             $this->syncUserRole();
 
             // Falls das aktuelle Team entfernt wurde, muss der User ein neues aktuelles Team haben
-            if (!in_array($this->user->currentTeam?->id, $this->selectedTeams) && !empty($this->selectedTeams)) {
+            if (! in_array($this->user->currentTeam?->id, $this->selectedTeams) && ! empty($this->selectedTeams)) {
                 $teamToSwitch = $this->user->teams()->find($this->selectedTeams[0]);
                 if ($teamToSwitch) {
                     $this->user->switchTeam($teamToSwitch);
@@ -163,7 +169,7 @@ class Information extends Component
 
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error updating user: ') . $e->getMessage(),
+                text: __('Error updating user: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );

@@ -22,5 +22,4 @@ return new class extends Migration
             $table->index(['company_id', 'access', 'visible']);
         });
     }
-
 };

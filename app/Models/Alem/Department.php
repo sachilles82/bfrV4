@@ -14,29 +14,29 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Department extends Model
 {
-//    use HasFactory;
+    //    use HasFactory;
     use BelongsToTeam;
-    use SoftDeletes;
     use ModelPermanentDeletion;
     use ModelStatusManagement{
         ModelStatusManagement::restore insteadof SoftDeletes;
         // Alias für die originale SoftDeletes::restore()-Methode.
         SoftDeletes::restore as softRestore;
     }
+    use SoftDeletes;
 
     /**
-         * The attributes that are mass assignable.
-         *
-         * @var array<int, string>
-         */
-        protected $fillable = [
-            'name',
-            'description',
-            'company_id',
-            'team_id',
-            'created_by',
-            'model_status',
-        ];
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'description',
+        'company_id',
+        'team_id',
+        'created_by',
+        'model_status',
+    ];
 
     /**
      * Get the attributes that should be cast.

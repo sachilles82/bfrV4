@@ -19,12 +19,17 @@ class AddressForm extends Component
     public Model $addressable;
 
     public array $countries = [];
+
     public array $states = [];
+
     public array $cities = [];
 
     public ?int $selectedCountry = null;
+
     public ?int $selectedState = null;
+
     public ?int $selectedCity = null;
+
     public string $street_number = '';
 
     public function mount(Model $addressable, array $countries): void
@@ -92,7 +97,7 @@ class AddressForm extends Component
 
     public function updateAddress(): void
     {
-//        $this->authorize('update', $this->addressable);
+        //        $this->authorize('update', $this->addressable);
 
         $this->validate();
 
@@ -159,8 +164,8 @@ class AddressForm extends Component
     {
         return view('livewire.address.address-form', [
             'countries' => $this->countries,
-            'states'    => $this->states,
-            'cities'    => $this->cities,
+            'states' => $this->states,
+            'cities' => $this->cities,
         ]);
     }
 }

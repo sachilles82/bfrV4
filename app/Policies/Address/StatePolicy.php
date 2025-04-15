@@ -8,13 +8,12 @@ use App\Models\User;
 
 class StatePolicy
 {
-
     /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-//        return $user->can(Permission::CREATE_STATE);
+        //        return $user->can(Permission::CREATE_STATE);
         return true;
     }
 
@@ -23,17 +22,17 @@ class StatePolicy
      */
     public function update(User $user, State $state): bool
     {
-//        if ($user->can(Permission::EDIT_ALL_STATE)) {
-//            return true;
-//        }
-//
-//        if ($user->can(Permission::EDIT_OWN_STATE)) {
-//            return $user->id == $state->created_by;
-//        }
-//
-//        return false;
-        //nur zu Testzwecken
-                return true;
+        //        if ($user->can(Permission::EDIT_ALL_STATE)) {
+        //            return true;
+        //        }
+        //
+        //        if ($user->can(Permission::EDIT_OWN_STATE)) {
+        //            return $user->id == $state->created_by;
+        //        }
+        //
+        //        return false;
+        // nur zu Testzwecken
+        return true;
     }
 
     /**
@@ -41,15 +40,15 @@ class StatePolicy
      */
     public function delete(User $user, State $state): bool
     {
-//        if ($user->can(Permission::DELETE_ALL_STATE)) {
-//            return true;
-//        }
-//
-//        if ($user->can(Permission::DELETE_OWN_STATE)) {
-//            return $user->id == $state->created_by;
-//        }
-//
-//        return false;
+        //        if ($user->can(Permission::DELETE_ALL_STATE)) {
+        //            return true;
+        //        }
+        //
+        //        if ($user->can(Permission::DELETE_OWN_STATE)) {
+        //            return $user->id == $state->created_by;
+        //        }
+        //
+        //        return false;
 
         return true;
     }

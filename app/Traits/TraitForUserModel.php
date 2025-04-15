@@ -9,8 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 trait TraitForUserModel
 {
-
-    public function team():BelongsTo
+    public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
     }
@@ -24,5 +23,4 @@ trait TraitForUserModel
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
 }

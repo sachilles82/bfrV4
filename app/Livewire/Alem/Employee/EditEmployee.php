@@ -8,15 +8,15 @@ use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
-use App\Models\Spatie\Role;
-use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Spatie\Role;
+use App\Models\User;
 use App\Traits\Model\WithModelStatusOptions;
-use Illuminate\Support\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -24,7 +24,7 @@ use Livewire\Component;
 
 class EditEmployee extends Component
 {
-    use ValidateEmployee, AuthorizesRequests,
+    use AuthorizesRequests, ValidateEmployee,
         WithModelStatusOptions;
 
     #[Locked]
@@ -33,26 +33,37 @@ class EditEmployee extends Component
     public int $employeeId;
 
     public $selectedRoles = [];
+
     public $model_status;
+
     public $employee_status;
+
     public bool $invitations = false;
 
     /**
      * Benutzer-Felder (User Fields)
      */
     public $gender;
+
     public $name;
+
     public $last_name;
+
     public $email;
+
     public ?int $department = null;
+
     public ?Carbon $joined_at = null;
+
     public $selectedTeams = [];
 
     /**
      * Mitarbeiter-spezifische Felder (Employee Fields)
      */
     public $profession = null;
+
     public $stage = null;
+
     public ?int $supervisor = null;
 
     #[On('edit-employee')]
@@ -66,7 +77,7 @@ class EditEmployee extends Component
                     'employee.stage:id,name',
                     'department:id,name',
                     'roles:id,name',
-                    'teams:id,name'
+                    'teams:id,name',
                 ])
                 ->findOrFail($id);
 
@@ -101,7 +112,7 @@ class EditEmployee extends Component
             );
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error loading employee: ') . $e->getMessage(),
+                text: __('Error loading employee: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -159,7 +170,7 @@ class EditEmployee extends Component
             );
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error updating employee: ') . $e->getMessage(),
+                text: __('Error updating employee: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -171,7 +182,7 @@ class EditEmployee extends Component
         $this->reset([
             'userId', 'employeeId', 'name', 'last_name', 'email', 'gender',
             'model_status', 'employee_status', 'joined_at', 'department',
-            'profession', 'stage', 'supervisor', 'selectedRoles', 'selectedTeams'
+            'profession', 'stage', 'supervisor', 'selectedRoles', 'selectedTeams',
         ]);
 
         $this->modal('edit-employee')->close();
@@ -212,7 +223,7 @@ class EditEmployee extends Component
     #[On('department-created')]
     public function getDepartmentsProperty()
     {
-        $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
+        $teamId = ! empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
 
         $query = Department::where('model_status', ModelStatus::ACTIVE->value)
             ->where('company_id', auth()->user()->company_id);

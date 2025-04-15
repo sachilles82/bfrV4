@@ -18,11 +18,15 @@ class Update extends Component
     use AuthorizesRequests, HasAppData;
 
     public int $roleId;
+
     public Role $role;
+
     public string $app;
 
     public string $name;
+
     public array $selectedIds = [];
+
     public array $idsOnPage = [];
 
     public array $allPermissions = [];
@@ -108,7 +112,7 @@ class Update extends Component
     public function render(): View
     {
         $permissionsByGroup = collect($this->allPermissions)
-            ->groupBy(fn($perm) => $perm->group());
+            ->groupBy(fn ($perm) => $perm->group());
 
         $appData = $this->getAppData();
 

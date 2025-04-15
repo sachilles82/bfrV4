@@ -25,6 +25,7 @@ trait WithDepartmentSorting
             };
             $query->orderBy($column, $this->sortAsc ? 'asc' : 'desc');
         }
+
         return $query;
     }
 }

@@ -9,8 +9,6 @@ use App\Enums\Model\ModelStatus;
  */
 trait WithModelStatusOptions
 {
-
-
     /**
      * Erforderliche Eigenschaften in der Komponente um den Model Status zu haben:
      * 1. public $model_status;
@@ -19,7 +17,9 @@ trait WithModelStatusOptions
      * 2. in der render Methode der Komponente:
      *   'modelStatusOptions' => $this->modelStatusOptions,
      * 3. in der blade Datei:
+     *
      * @foreach($modelStatusOptions as $statusOption)
+     *
      * @endforeach
      */
 

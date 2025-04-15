@@ -14,13 +14,15 @@ use Livewire\Component;
 
 class CreateDepartment extends Component
 {
-    use ValidateDepartment, WithPlaceholder, AuthorizesRequests,
-        WithModelStatusOptions;
+    use AuthorizesRequests, ValidateDepartment, WithModelStatusOptions,
+        WithPlaceholder;
 
-    public ?int $departmentId = null; //!Muss in jeder Komponente sein
+    public ?int $departmentId = null; // !Muss in jeder Komponente sein
 
     public $name;
+
     public $description;
+
     public $model_status;
 
     public string $displayMode = 'default'; // habe ich wegen dem Create Button "open-manager"gemacht
@@ -55,7 +57,7 @@ class CreateDepartment extends Component
 
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error: ') . $e->getMessage(),
+                text: __('Error: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );

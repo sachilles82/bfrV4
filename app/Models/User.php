@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\UserType;
 use App\Models\Address\State;
+use App\Models\Alem\Company;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
 use App\Scopes\TeamScope;
@@ -32,23 +33,24 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    //    use BelongsToCompany
+    //    use TraitForUserModel;
+    use HasAddress;
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
-    use HasTeams;
-    use Notifiable;
-    use TwoFactorAuthenticatable;
-//    use BelongsToCompany
-//    use TraitForUserModel;
-    use HasAddress;
-    use SoftDeletes;
     use HasRoles;
+    use HasTeams;
+
     use ModelPermanentDeletion;
     use ModelStatusManagement{
         ModelStatusManagement::restore insteadof SoftDeletes;
         // Alias für die originale SoftDeletes::restore()-Methode.
         SoftDeletes::restore as softRestore;
     }
+    use Notifiable;
+    use SoftDeletes;
+    use TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -107,9 +109,10 @@ class User extends Authenticatable
      */
     public function getYearsOfServiceAttribute()
     {
-        if (!$this->joined_at) {
+        if (! $this->joined_at) {
             return 0;
         }
+
         return $this->joined_at->diffInYears(now());
     }
 
@@ -162,16 +165,16 @@ class User extends Authenticatable
             }
         });
 
-//        static::addGlobalScope(new TeamScope);
+        //        static::addGlobalScope(new TeamScope);
 
         static::creating(function ($user) {
-//            $user->team_id = Auth::user()->currentTeam->id ?? null;
-//            $user->company_id = Auth::user()->company->id ?? null;
-//            $user->created_by = Auth::id();
+            //            $user->team_id = Auth::user()->currentTeam->id ?? null;
+            //            $user->company_id = Auth::user()->company->id ?? null;
+            //            $user->created_by = Auth::id();
 
             if (empty($user->slug)) {
                 // Erstelle Slug aus Vor- und Nachname
-                $user->slug = Str::slug($user->name . '-' . $user->last_name);
+                $user->slug = Str::slug($user->name.'-'.$user->last_name);
             }
         });
 
@@ -179,14 +182,19 @@ class User extends Authenticatable
             // Den Slug nur aktualisieren, wenn sich der Name oder Nachname geändert hat
             if ($user->isDirty('name') || $user->isDirty('last_name')) {
                 // Erstelle Slug aus Vor- und Nachname
-                $user->slug = Str::slug($user->name . '-' . $user->last_name);
+                $user->slug = Str::slug($user->name.'-'.$user->last_name);
             }
         });
     }
 
-//    public function scopeActiveEmployees($query)
-//    {
-//        return $query->where('user_type', UserType::Employee)
-//            ->where('model_status', ModelStatus::ACTIVE);
-//    }
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    //    public function scopeActiveEmployees($query)
+    //    {
+    //        return $query->where('user_type', UserType::Employee)
+    //            ->where('model_status', ModelStatus::ACTIVE);
+    //    }
 }

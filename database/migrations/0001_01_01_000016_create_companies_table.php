@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('created_by');
             $table->foreignId('industry_id')->constrained('industries');
             $table->string('company_url')->nullable()->unique();
-            $table->enum('company_size', ['1-5', '6-10', '11-20', '21-50','51-100','101-200','>200',])->default('1-5');
+            $table->enum('company_size', ['1-5', '6-10', '11-20', '21-50', '51-100', '101-200', '>200'])->default('1-5');
             $table->enum('company_type', ['ag', 'einzelfirma', 'gmbh'])->default('gmbh');
             $table->string('register_number')->nullable();
             $table->string('email')->nullable()->unique();
@@ -41,5 +41,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('companies');
     }
-
 };

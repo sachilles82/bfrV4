@@ -10,6 +10,7 @@ use Livewire\Component;
 class AddressManager extends Component
 {
     public $addressable;
+
     public array $countries = [];
 
     public function mount($addressable): void
@@ -19,7 +20,7 @@ class AddressManager extends Component
         // Länder dauerhaft cachen (rememberForever)
         $this->countries = Cache::rememberForever('countries-all', function () {
             return Country::select([
-                'id', 'name', 'code'
+                'id', 'name', 'code',
             ])
                 ->orderBy('id')
                 ->get()

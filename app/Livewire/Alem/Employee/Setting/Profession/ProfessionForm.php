@@ -8,8 +8,8 @@ use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
@@ -21,6 +21,7 @@ class ProfessionForm extends Component
     public ?int $professionId = null;
 
     public ?string $name = null;
+
     public bool $editing = false;
 
     /**
@@ -147,7 +148,7 @@ class ProfessionForm extends Component
     public function render(): View
     {
         $query = Profession::where('created_by',
-                 Auth::id())->orderBy('id');
+            Auth::id())->orderBy('id');
         $professions = $this->applySimplePagination($query);
 
         return view('livewire.alem.employee.setting.profession.profession-form', [

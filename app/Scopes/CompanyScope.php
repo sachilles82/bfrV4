@@ -2,9 +2,9 @@
 
 namespace App\Scopes;
 
-use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\Auth;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -12,9 +12,6 @@ use Psr\Container\NotFoundExceptionInterface;
 class CompanyScope implements Scope
 {
     /**
-     * @param Builder $builder
-     * @param Model $model
-     * @return void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
@@ -24,5 +21,4 @@ class CompanyScope implements Scope
             $builder->where('company_id', Auth::user()->company->id);
         }
     }
-
 }

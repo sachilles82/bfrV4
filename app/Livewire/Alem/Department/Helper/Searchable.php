@@ -8,7 +8,7 @@ trait Searchable
 
     public function updatedSearchable($property): void
     {
-        if ($property === 'search'){
+        if ($property === 'search') {
             $this->resetPage();
         }
     }

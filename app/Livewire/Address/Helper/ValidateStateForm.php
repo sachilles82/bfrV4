@@ -4,7 +4,6 @@ namespace App\Livewire\Address\Helper;
 
 trait ValidateStateForm
 {
-
     public function rules(): array
     {
         return [
@@ -24,5 +23,4 @@ trait ValidateStateForm
             'selectedCountry.exists' => __('The selected country is invalid.'),
         ];
     }
-
 }

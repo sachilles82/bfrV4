@@ -12,15 +12,17 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Component;
-use Spatie\ResponseCache\ResponseCache;
 
 class CreateRole extends Component
 {
-    use ValidateRole, AuthorizesRequests;
+    use AuthorizesRequests, ValidateRole;
 
     public $name;
+
     public $description;
+
     public $access;
+
     public $is_manager = false;
 
     public function save(): void
@@ -32,11 +34,11 @@ class CreateRole extends Component
             $this->validate();
 
             Role::create([
-                'name'        => $this->name,
+                'name' => $this->name,
                 'description' => $this->description,
                 'access' => $this->access,
                 'visible' => RoleVisibility::Visible,
-                'is_manager'  => $this->is_manager,
+                'is_manager' => $this->is_manager,
             ]);
             $this->modal('role-add')->close();
             $this->dispatch('role-created');
@@ -63,7 +65,7 @@ class CreateRole extends Component
             );
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error creating role: ') . $e->getMessage(),
+                text: __('Error creating role: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -73,8 +75,8 @@ class CreateRole extends Component
     public function render(): View
     {
         $accessOptions = collect(RoleHasAccessTo::cases())
-            ->filter(fn($case) => in_array($case, [
-                RoleHasAccessTo::EmployeePanel, RoleHasAccessTo::PartnerPanel
+            ->filter(fn ($case) => in_array($case, [
+                RoleHasAccessTo::EmployeePanel, RoleHasAccessTo::PartnerPanel,
             ]))
             ->values();
 

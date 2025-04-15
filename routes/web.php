@@ -30,7 +30,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         return view('quiz');
     })->name('quiz');
 
-
     Route::prefix('settings')->group(function () {
 
         // Hier werden nur diese Routen gecached:
@@ -39,15 +38,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             ->name('settings.company');
 
         Route::get('/profile', [
-            ProfileController::class, 'show'
+            ProfileController::class, 'show',
         ])->name('settings.profile');
-//
-//        Route::get('/compliance', [
-//            ComplianceController::class, 'show'
-//        ])->name('settings.compliance');
+        //
+        //        Route::get('/compliance', [
+        //            ComplianceController::class, 'show'
+        //        ])->name('settings.compliance');
 
-
-        Route::middleware(['can:' . Permission::LIST_ROLE->value])->group(function () {
+        Route::middleware(['can:'.Permission::LIST_ROLE->value])->group(function () {
             Route::get('/roles', function () {
                 return view('laravel/spatie/role/index');
             })->name('settings.roles');
@@ -60,7 +58,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
     Route::prefix('accounts')->group(function () {
 
-        Route::get('/employees' , [EmployeeIndexController::class, 'index'])
+        Route::get('/employees', [EmployeeIndexController::class, 'index'])
             ->name('alem.employees');
 
         // Route für das Mitarbeiter-Profil mit Slug aus Vor- und Nachname
@@ -73,17 +71,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         })->name('settings.departments');
 
         Route::get('/departments/{department}', [
-            DepartmentController::class, 'show'
+            DepartmentController::class, 'show',
         ])->name('settings.departments.show');
 
-//        Route::middleware(['can:' . Permission::LIST_ROLE->value])->group(function () {
-//            Route::get('/roles', function () {
-//                return view('laravel/spatie/role/index');
-//            })->name('settings.roles');
-//
-//            Route::get('/roles/{roleId}/{app}', [RoleController::class, 'show'])
-//                ->name('settings.roles.show');
-//        });
+        //        Route::middleware(['can:' . Permission::LIST_ROLE->value])->group(function () {
+        //            Route::get('/roles', function () {
+        //                return view('laravel/spatie/role/index');
+        //            })->name('settings.roles');
+        //
+        //            Route::get('/roles/{roleId}/{app}', [RoleController::class, 'show'])
+        //                ->name('settings.roles.show');
+        //        });
 
     });
 });

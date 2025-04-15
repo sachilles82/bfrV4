@@ -18,7 +18,7 @@ class StateFactory extends Factory
     public function definition(): array
     {
         return [
-        'current_team_id' => Team::factory(),
+            'current_team_id' => Team::factory(),
         ];
     }
 }

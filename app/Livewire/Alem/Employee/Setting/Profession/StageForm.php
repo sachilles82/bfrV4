@@ -21,6 +21,7 @@ class StageForm extends Component
     public ?int $stageId = null;
 
     public ?string $name = null;
+
     public bool $editing = false;
 
     /**

@@ -8,21 +8,21 @@ use App\Enums\Company\CompanyType;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\UserType;
+use App\Models\Alem\Company;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\Team;
 use App\Models\User;
-use App\Models\Alem\Company;
 use Carbon\Carbon;
+use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
-use Faker\Factory as Faker;
 
 class TestDataSeeder extends Seeder
 {
@@ -45,8 +45,8 @@ class TestDataSeeder extends Seeder
 
         try {
             // Parameter für das Seeden
-            $employeeCount = 2500000; // Anzahl der zu erstellenden Mitarbeiter
-            $chunkSize = 7500;      // Größere Chunks für bessere Performance
+            $employeeCount = 1000; // Anzahl der zu erstellenden Mitarbeiter
+            $chunkSize = 100;      // Größere Chunks für bessere Performance
 
             $this->command->info('Starte Erstellung der Testdaten...');
 
@@ -63,7 +63,7 @@ class TestDataSeeder extends Seeder
 
                 // Lösche alle abhängigen Datensätze
                 $this->command->info('Lösche vorhandene Mitarbeiter-Datensätze...');
-                Employee::whereHas('user', function($query) use ($companyId) {
+                Employee::whereHas('user', function ($query) use ($companyId) {
                     $query->where('company_id', $companyId);
                 })->delete();
 
@@ -105,7 +105,7 @@ class TestDataSeeder extends Seeder
                     'remember_token' => Str::random(10),
                     'user_type' => UserType::Owner,
                     'model_status' => ModelStatus::ACTIVE,
-                    'slug' => 'daniel-' . Str::random(5), // Eindeutiger Slug mit Zufallszeichen
+                    'slug' => 'daniel-'.Str::random(5), // Eindeutiger Slug mit Zufallszeichen
                 ]
             );
 
@@ -159,7 +159,7 @@ class TestDataSeeder extends Seeder
                     'company_id' => $company->id,
                     'access' => $employeePanelValue,
                     'visible' => $visibleValue,
-                    'is_manager' => false
+                    'is_manager' => false,
                 ],
                 'Manager' => [
                     'name' => 'Manager',
@@ -168,7 +168,7 @@ class TestDataSeeder extends Seeder
                     'company_id' => $company->id,
                     'access' => $employeePanelValue,
                     'visible' => $visibleValue,
-                    'is_manager' => true
+                    'is_manager' => true,
                 ],
                 'Editor' => [
                     'name' => 'Editor',
@@ -177,7 +177,7 @@ class TestDataSeeder extends Seeder
                     'company_id' => $company->id,
                     'access' => $employeePanelValue,
                     'visible' => $visibleValue,
-                    'is_manager' => false
+                    'is_manager' => false,
                 ],
                 'Temporary' => [
                     'name' => 'Temporary',
@@ -186,7 +186,7 @@ class TestDataSeeder extends Seeder
                     'company_id' => $company->id,
                     'access' => $employeePanelValue,
                     'visible' => $visibleValue,
-                    'is_manager' => false
+                    'is_manager' => false,
                 ],
             ];
 
@@ -219,8 +219,8 @@ class TestDataSeeder extends Seeder
 
                 foreach ($chunk as $i) {
                     $departments[] = [
-                        'name' => 'Abteilung ' . $i,
-                        'description' => 'Beschreibung für Abteilung ' . $i,
+                        'name' => 'Abteilung '.$i,
+                        'description' => 'Beschreibung für Abteilung '.$i,
                         'company_id' => $company->id,
                         'team_id' => $owner->current_team_id,
                         'created_by' => $owner->id,
@@ -249,7 +249,7 @@ class TestDataSeeder extends Seeder
 
                 foreach ($chunk as $index) {
                     $professions[] = [
-                        'name' => 'Beruf' . $index,
+                        'name' => 'Beruf'.$index,
                         'company_id' => $company->id,
                         'team_id' => $team->id, // Korrigierte Team ID
                         'created_by' => $owner->id,
@@ -269,7 +269,7 @@ class TestDataSeeder extends Seeder
 
             // 8. Erstelle definierte Stufen
             $stageNames = ['Lehrling', 'Praktikant', 'Angelernt', 'Geselle', 'Facharbeiter', 'Meister', 'Experte', 'Leiter', 'Direktor', 'CEO', 'CTO', 'CFO', 'COO', 'CIO', 'CSO', 'CMO'];
-            $this->command->info('Erstelle ' . count($stageNames) . ' definierte Stufen...');
+            $this->command->info('Erstelle '.count($stageNames).' definierte Stufen...');
             $this->command->getOutput()->progressStart(count($stageNames));
 
             DB::beginTransaction();
@@ -307,7 +307,7 @@ class TestDataSeeder extends Seeder
             $roleIds = [$workerRoleId, $managerRoleId, $editorRoleId, $temporaryRoleId];
 
             // 9. Erstelle Mitarbeiter
-            $this->command->info('Erstelle ' . $employeeCount . ' Mitarbeiter in Chunks von ' . $chunkSize . '...');
+            $this->command->info('Erstelle '.$employeeCount.' Mitarbeiter in Chunks von '.$chunkSize.'...');
             $this->command->getOutput()->progressStart($employeeCount);
 
             // Vorgenerierter Passwort-Hash für bessere Performance
@@ -329,7 +329,7 @@ class TestDataSeeder extends Seeder
                     $index = $i + $j + 1;
 
                     // Ensure unique email
-                    $email = strtolower(Str::slug($faker->firstName)) . '.' . strtolower(Str::slug($faker->lastName)) . '.' . $index . '@firma.ch';
+                    $email = strtolower(Str::slug($faker->firstName)).'.'.strtolower(Str::slug($faker->lastName)).'.'.$index.'@firma.ch';
 
                     // Zufälliges Eintrittsdatum in den letzten 3 Jahren
                     $joinedDate = Carbon::now()->subDays(rand(0, 365 * 3));
@@ -350,9 +350,9 @@ class TestDataSeeder extends Seeder
                         'user_type' => UserType::Employee->value,
                         'department_id' => $departmentIds[array_rand($departmentIds)],
                         'model_status' => ModelStatus::ACTIVE->value,
-                        'phone_1' => '+41' . rand(700000000, 799999999),
+                        'phone_1' => '+41'.rand(700000000, 799999999),
                         // Slug aus Vorname und Nachname mit Index für Eindeutigkeit
-                        'slug' => Str::slug($firstName . '-' . $lastName . '-' . $index),
+                        'slug' => Str::slug($firstName.'-'.$lastName.'-'.$index),
                         'created_by' => $owner->id,
                         'joined_at' => $joinedDate,
                         'created_at' => $currentTime,
@@ -365,7 +365,7 @@ class TestDataSeeder extends Seeder
                         'user_id' => $userId,
                         'profession_id' => $professionIds[array_rand($professionIds)],
                         'stage_id' => $stageIds[array_rand($stageIds)],
-                        'personal_number' => 'PN' . str_pad($index, 8, '0', STR_PAD_LEFT),
+                        'personal_number' => 'PN'.str_pad($index, 8, '0', STR_PAD_LEFT),
                         'supervisor_id' => $owner->id,
                         'employee_status' => $randomStatus->value,
                         'created_at' => $currentTime,
@@ -393,17 +393,17 @@ class TestDataSeeder extends Seeder
                 }
 
                 // Bulk-Insert für Mitarbeiter
-                if (!empty($employees)) {
+                if (! empty($employees)) {
                     DB::table('employees')->insert($employees);
                 }
 
                 // Bulk-Insert für Rollen-Zuweisungen
-                if (!empty($roleAssignments)) {
+                if (! empty($roleAssignments)) {
                     DB::table('model_has_roles')->insert($roleAssignments);
                 }
 
                 // Bulk-Insert für Team-Zuweisungen
-                if (!empty($teamAssignments)) {
+                if (! empty($teamAssignments)) {
                     DB::table('team_user')->insert($teamAssignments);
                 }
 
@@ -425,7 +425,7 @@ class TestDataSeeder extends Seeder
             // Transaktion rückgängig machen, wenn ein Fehler auftritt
             DB::rollBack();
 
-            $this->command->error('Fehler beim Erstellen der Testdaten: ' . $e->getMessage());
+            $this->command->error('Fehler beim Erstellen der Testdaten: '.$e->getMessage());
             $this->command->error($e->getTraceAsString());
             throw $e;
         } finally {
@@ -442,7 +442,7 @@ class TestDataSeeder extends Seeder
             EmployeeStatus::PROBATION,
             EmployeeStatus::EMPLOYED,
             EmployeeStatus::ONLEAVE,
-            EmployeeStatus::LEAVE
+            EmployeeStatus::LEAVE,
         ];
 
         // Gewichtete Auswahl: EMPLOYED und PROBATION häufiger

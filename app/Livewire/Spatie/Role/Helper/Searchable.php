@@ -18,6 +18,6 @@ trait Searchable
         return $this->search === ''
             ? $query
             : $query->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('access', 'like', "%{$this->search}%");
+                ->orWhere('access', 'like', "%{$this->search}%");
     }
 }

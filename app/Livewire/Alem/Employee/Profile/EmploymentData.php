@@ -6,8 +6,8 @@ use App\Enums\Employee\CivilStatus;
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
 use App\Livewire\Alem\Employee\Profile\Helper\ValidateEmploymentData;
-use App\Models\Alem\Employee\Employee;
 use App\Models\Address\Country;
+use App\Models\Alem\Employee\Employee;
 use App\Models\User;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -17,16 +17,22 @@ use Livewire\Component;
 
 class EmploymentData extends Component
 {
-    use ValidateEmploymentData, AuthorizesRequests;
+    use AuthorizesRequests, ValidateEmploymentData;
 
     public User $user;
 
     public ?string $ahv_number = '';
+
     public ?string $birthdate = '';
+
     public ?string $nationality = '';
+
     public ?string $hometown = '';
+
     public ?string $religion = '';
+
     public ?string $civil_status = '';
+
     public ?string $residence_permit = '';
 
     // Länder für das Dropdown
@@ -45,7 +51,7 @@ class EmploymentData extends Component
         // Länder dauerhaft cachen (rememberForever)
         $this->countries = Cache::rememberForever('countries-all', function () {
             return Country::select([
-                'id', 'name', 'code'
+                'id', 'name', 'code',
             ])
                 ->orderBy('id')
                 ->get()
@@ -122,7 +128,7 @@ class EmploymentData extends Component
         } catch (\Exception $e) {
             // Fehlermeldung anzeigen
             Flux::toast(
-                text: __('Error updating employment data: ') . $e->getMessage(),
+                text: __('Error updating employment data: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );

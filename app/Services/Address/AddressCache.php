@@ -2,10 +2,10 @@
 
 namespace App\Services\Address;
 
-use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
-use App\Models\Address\State;
 use App\Models\Address\City;
+use App\Models\Address\State;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class AddressCache
 {
@@ -17,10 +17,6 @@ class AddressCache
 
     /**
      * Liefert alle States für ein bestimmtes Land und Team.
-     *
-     * @param int $countryId
-     * @param int $teamId
-     * @return array
      */
     public static function getStates(int $countryId, int $teamId): array
     {
@@ -44,15 +40,12 @@ class AddressCache
         });
 
         self::$localCache[$cacheKey] = $states;
+
         return $states;
     }
 
     /**
      * Liefert alle Cities für einen bestimmten State und Team.
-     *
-     * @param int $stateId
-     * @param int $teamId
-     * @return array
      */
     public static function getCities(int $stateId, int $teamId): array
     {
@@ -75,14 +68,12 @@ class AddressCache
         });
 
         self::$localCache[$cacheKey] = $cities;
+
         return $cities;
     }
 
     /**
      * Entfernt den Cache-Eintrag für States.
-     *
-     * @param int $countryId
-     * @param int $teamId
      */
     public static function forgetStates(int $countryId, int $teamId): void
     {
@@ -93,9 +84,6 @@ class AddressCache
 
     /**
      * Entfernt den Cache-Eintrag für Cities.
-     *
-     * @param int $stateId
-     * @param int $teamId
      */
     public static function forgetCities(int $stateId, int $teamId): void
     {

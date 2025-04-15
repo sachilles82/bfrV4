@@ -10,32 +10,17 @@ class ProfessionPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(User $user): bool
-    {
+    public function viewAny(User $user): bool {}
 
-    }
+    public function view(User $user, Profession $profession): bool {}
 
-    public function view(User $user, Profession $profession): bool
-    {
-    }
+    public function create(User $user): bool {}
 
-    public function create(User $user): bool
-    {
-    }
+    public function update(User $user, Profession $profession): bool {}
 
-    public function update(User $user, Profession $profession): bool
-    {
-    }
+    public function delete(User $user, Profession $profession): bool {}
 
-    public function delete(User $user, Profession $profession): bool
-    {
-    }
+    public function restore(User $user, Profession $profession): bool {}
 
-    public function restore(User $user, Profession $profession): bool
-    {
-    }
-
-    public function forceDelete(User $user, Profession $profession): bool
-    {
-    }
+    public function forceDelete(User $user, Profession $profession): bool {}
 }

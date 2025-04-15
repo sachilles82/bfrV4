@@ -413,6 +413,11 @@
                                 Dashboard
                             </a>
                         @else
+                            @env('local')
+                                <div class="space-y-2">
+                                    <x-login-link email="daniel@firma.ch" label="Login as admin"/>
+                                </div>
+                            @endenv
                             <a wire:navigate.hover
                                href="{{ route('login') }}"
                                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-hidden focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"

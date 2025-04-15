@@ -10,7 +10,7 @@ enum Gender: string
     public static function options(): array
     {
         return [
-            self::Male->value   => 'Male',
+            self::Male->value => 'Male',
             self::Female->value => 'Female',
         ];
     }
@@ -18,7 +18,7 @@ enum Gender: string
     public function label(): string
     {
         return match ($this) {
-            self::Male   => __('Male'),
+            self::Male => __('Male'),
             self::Female => __('Female'),
         };
     }

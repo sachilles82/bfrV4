@@ -98,7 +98,7 @@ trait ValidateEmployee
             // Model status messages
             'model_status.required' => __('Account status is required.'),
             'model_status.string' => __('Account status must be a string.'),
-            'model_status.enum' => __(  'Der Status need to be a valid value from the ModelStatus enum.'),
+            'model_status.enum' => __('Der Status need to be a valid value from the ModelStatus enum.'),
 
         ];
     }

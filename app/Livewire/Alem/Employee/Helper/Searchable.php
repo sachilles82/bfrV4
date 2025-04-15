@@ -38,13 +38,13 @@ trait Searchable
             // *: Erlaubt Präfix-Suche (wie LIKE 'wort%')
             // Beispiel: "Max Müller" -> "+Max* +Müller*"
             $booleanSearchTerm = collect(explode(' ', $searchString)) // Einfach nach Leerzeichen trennen
-            ->filter()
-                ->map(fn($term) => '+' . preg_replace('/[^A-Za-z0-9]/', '', $term) . '*') // Normalisieren und für Boolean Mode formatieren
+                ->filter()
+                ->map(fn ($term) => '+'.preg_replace('/[^A-Za-z0-9]/', '', $term).'*') // Normalisieren und für Boolean Mode formatieren
                 ->implode(' ');
 
-            if (!empty($booleanSearchTerm)) {
+            if (! empty($booleanSearchTerm)) {
                 $query->whereRaw(
-                // ÄNDERUNG: Auf Originalspalten matchen
+                    // ÄNDERUNG: Auf Originalspalten matchen
                     'MATCH(name, last_name, email, phone_1) AGAINST (? IN BOOLEAN MODE)',
                     [$booleanSearchTerm]
                 );
@@ -56,6 +56,7 @@ trait Searchable
             // Die Abfrage verwendet dann z.B. to_tsquery und den @@ Operator.
             // Beispiel (sehr vereinfacht):
             $searchTerm = str_replace(' ', ' & ', $searchString); // Einfache AND-Logik
+
             // Annahme: Du hast eine 'tsv_search_column' vom Typ tsvector
             // $query->whereRaw("tsv_search_column @@ to_tsquery('german', ?)", [$searchTerm]);
             // --> Hier müsstest du die PostgreSQL-spezifische Implementierung recherchieren!
@@ -78,7 +79,7 @@ trait Searchable
         $terms = collect(str_getcsv($searchString, ' ', '"'))->filter();
         $query->where(function ($q) use ($terms) {
             foreach ($terms as $term) {
-                $likeTerm = $term . '%'; // Einfaches Präfix für Fallback
+                $likeTerm = $term.'%'; // Einfaches Präfix für Fallback
                 $q->where(function ($innerQ) use ($likeTerm) {
                     $innerQ->orWhere('users.name', 'like', $likeTerm)
                         ->orWhere('users.last_name', 'like', $likeTerm)
@@ -87,6 +88,7 @@ trait Searchable
                 });
             }
         });
+
         return $query;
     }
 }

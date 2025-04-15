@@ -3,7 +3,6 @@
 namespace App\Traits\Model;
 
 use App\Enums\Model\ModelStatus;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Trait für die Verwaltung von Model-Status.
@@ -11,19 +10,18 @@ use Illuminate\Database\Eloquent\Builder;
  * Stellt Methoden bereit, um den Status eines Models zu prüfen und zu ändern.
  * Interagiert mit SoftDeletes für eine korrekte Papierkorb-Funktionalität.
  */
-
 trait ModelStatusManagement
 {
-// --- Status-Checks und Scopes (unverändert) ---
+    // --- Status-Checks und Scopes (unverändert) ---
 
     public function isActive(): bool
     {
-        return $this->model_status === ModelStatus::ACTIVE && !$this->trashed();
+        return $this->model_status === ModelStatus::ACTIVE && ! $this->trashed();
     }
 
     public function isArchived(): bool
     {
-        return $this->model_status === ModelStatus::ARCHIVED && !$this->trashed();
+        return $this->model_status === ModelStatus::ARCHIVED && ! $this->trashed();
     }
 
     public function isTrashed(): bool
@@ -39,6 +37,7 @@ trait ModelStatusManagement
     public function setStatus(ModelStatus $status): self
     {
         $this->update(['model_status' => $status]);
+
         return $this;
     }
 
@@ -70,6 +69,7 @@ trait ModelStatusManagement
     public function delete()
     {
         $this->update(['model_status' => ModelStatus::TRASHED]);
+
         return parent::delete();
     }
 
@@ -95,7 +95,7 @@ trait ModelStatusManagement
     /**
      * Stellt einen soft-deleted Benutzer wieder her und setzt den Account-Status auf den angegebenen Status.
      *
-     * @param ModelStatus $status Der gewünschte Account-Status (z. B. ACTIVE oder ARCHIVED).
+     * @param  ModelStatus  $status  Der gewünschte Account-Status (z. B. ACTIVE oder ARCHIVED).
      * @return bool True, wenn der Benutzer wiederhergestellt wurde.
      */
     public function restoreToStatus(ModelStatus $status): bool
@@ -106,13 +106,12 @@ trait ModelStatusManagement
             $restored = true;
         }
         $this->update(['model_status' => $status]);
+
         return $restored;
     }
 
     /**
      * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf ACTIVE.
-     *
-     * @return bool
      */
     public function restoreToActive(): bool
     {
@@ -121,8 +120,6 @@ trait ModelStatusManagement
 
     /**
      * Convenience-Methode: Stellt den Benutzer wieder her und setzt den Status auf ARCHIVED.
-     *
-     * @return bool
      */
     public function restoreToArchive(): bool
     {

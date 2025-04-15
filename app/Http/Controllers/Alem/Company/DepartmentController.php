@@ -12,7 +12,7 @@ class DepartmentController extends Controller
 
     public function show(Department $department)
     {
-//        $this->authorize('show', $department);
+        //        $this->authorize('show', $department);
         return view('laravel.alem.department.show',
             compact('department')
         );

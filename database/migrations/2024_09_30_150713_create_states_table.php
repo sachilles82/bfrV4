@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('states', function (Blueprint $table) {
             $table->id();
             $table->string('name')->index();
-            $table->char('code',6);
+            $table->char('code', 6);
             $table->foreignId('country_id')->constrained()->cascadeOnDelete();
             $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
 
-            $table->index(['name', 'code','country_id', 'team_id', 'created_by']);
+            $table->index(['name', 'code', 'country_id', 'team_id', 'created_by']);
         });
     }
 

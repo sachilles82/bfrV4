@@ -10,7 +10,6 @@ use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
 {
-
     protected $fillable = [
         'name',
         'guard_name',
@@ -24,7 +23,7 @@ class Role extends SpatieRole
     ];
 
     protected $casts = [
-        'access'  => RoleHasAccessTo::class,
+        'access' => RoleHasAccessTo::class,
         'visible' => RoleVisibility::class,
         'is_manager' => 'boolean',
     ];

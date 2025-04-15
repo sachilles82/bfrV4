@@ -12,11 +12,10 @@ enum UserType: string
     public function label(): string
     {
         return match ($this) {
-            static::Admin => __('Admin'), // User ist Nova Admin, mein Mitarbeiter
-            static::Owner => __('Owner'), // User ist der Besitzer der Company, mein Kunde
-            static::Employee => __('Employee'), // User ist ein Mitarbeiter der Company,
-            static::Partner => __('Partner'),// User ist ein Partner der Company
+            self::Admin => __('Admin'), // User ist Nova Admin, mein Mitarbeiter
+            self::Owner => __('Owner'), // User ist der Besitzer der Company, mein Kunde
+            self::Employee => __('Employee'), // User ist ein Mitarbeiter der Company,
+            self::Partner => __('Partner'),// User ist ein Partner der Company
         };
     }
 }
-

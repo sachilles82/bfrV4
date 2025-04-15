@@ -16,7 +16,6 @@ class RolePolicy
         return true;
     }
 
-
     public function view(User $user, Role $role): bool
     {
         return true;
@@ -27,12 +26,11 @@ class RolePolicy
         return $user->can(Permission::CREATE_ROLE);
     }
 
-
     public function update(User $user, Role $role): bool
     {
-//        if ($user->can(Permission::UPDATE_ROLE_PERMISSIONS)) {
-//            return true;
-//        }
+        //        if ($user->can(Permission::UPDATE_ROLE_PERMISSIONS)) {
+        //            return true;
+        //        }
 
         if ($user->can(Permission::UPDATE_OWN_ROLE_PERMISSIONS)) {
             return $user->id == $role->created_by;
@@ -45,9 +43,9 @@ class RolePolicy
      */
     public function delete(User $user, Role $role): bool
     {
-//        if ($user->can(Permission::DELETE_ROLE)) {
-//            return true;
-//        }
+        //        if ($user->can(Permission::DELETE_ROLE)) {
+        //            return true;
+        //        }
 
         if ($user->can(Permission::DELETE_OWN_ROLE)) {
             return $user->id == $role->created_by;

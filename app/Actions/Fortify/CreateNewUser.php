@@ -23,14 +23,11 @@ class CreateNewUser implements CreatesNewUsers
 
     /**
      * Create a newly registered user.
-     *
-     * @param array $input
-     * @return User
      */
     public function create(array $input): User
     {
 
-//        dd($input);
+        //        dd($input);
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -40,7 +37,6 @@ class CreateNewUser implements CreatesNewUsers
             'company_type' => ['required', Rule::enum(CompanyType::class)],
             'company_size' => ['required', Rule::enum(CompanySize::class)],
             'industry_id' => ['required', 'exists:industries,id'],
-
 
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ], [
@@ -100,16 +96,12 @@ class CreateNewUser implements CreatesNewUsers
 
     /**
      * Create a personal team for the user.
-     *
-     * @param User $user
-     * @param int $companyId
-     * @return void
      */
     protected function createTeam(User $user, int $companyId): void
     {
         $user->ownedTeams()->save(Team::forceCreate([
             'user_id' => $user->id,
-            'name' => explode(' ', $user->name, 2)[0] . "'s Team",
+            'name' => explode(' ', $user->name, 2)[0]."'s Team",
             'personal_team' => true,
             'company_id' => $companyId,
         ]));

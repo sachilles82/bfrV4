@@ -19,14 +19,17 @@ class CityForm extends Component
 
     /** Vom AddressManager übergebene Länder und States (als Collections oder Arrays) */
     public $countries;
+
     public $states;
 
     // Formulareingaben
     public ?int $country_id = null;
+
     public ?int $state_id = null;
 
     #[Locked]
     public ?int $cityId = null;
+
     public ?string $name = null;
 
     public bool $editing = false;
@@ -73,7 +76,7 @@ class CityForm extends Component
         if ($this->editing && $this->cityId) {
             $city = City::where('created_by', Auth::id())->findOrFail($this->cityId);
             $city->update([
-                'name'     => $this->name,
+                'name' => $this->name,
                 'state_id' => $this->state_id,
             ]);
             Flux::toast(
@@ -83,8 +86,8 @@ class CityForm extends Component
             );
         } else {
             City::create([
-                'name'       => $this->name,
-                'state_id'   => $this->state_id,
+                'name' => $this->name,
+                'state_id' => $this->state_id,
                 'created_by' => Auth::id(),
             ]);
             Flux::toast(
@@ -129,7 +132,7 @@ class CityForm extends Component
         app(ResponseCache::class)->clear();
         $this->dispatch('update-address');
         $this->reset([
-            'cityId', 'name', 'country_id', 'state_id', 'editing'
+            'cityId', 'name', 'country_id', 'state_id', 'editing',
         ]);
     }
 
@@ -139,7 +142,7 @@ class CityForm extends Component
             ->with([
                 'state.country' => function ($q) {
                     $q->select(['id', 'name', 'code']);
-                }
+                },
             ])
             ->orderBy('id');
 

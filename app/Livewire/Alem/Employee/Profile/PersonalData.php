@@ -19,33 +19,38 @@ use Spatie\Permission\Models\Role;
 
 class PersonalData extends Component
 {
-    use ValidatePersonalData, AuthorizesRequests;
+    use AuthorizesRequests, ValidatePersonalData;
 
     // User mit den Daten
     public User $user;
+
     public $joined_at = '';
 
     // Employee mit den Daten
     public ?Employee $employee = null;
+
     public $personal_number = '';
 
     public $profession = '';
+
     public $stage = '';
 
     public $employment_type = '';
+
     public $supervisor = '';
 
-//    $joined_at; wird im User Model gespeichert
+    //    $joined_at; wird im User Model gespeichert
     public $probation_enum = '';
+
     public $probation_at = '';
 
     public $notice_at = '';
+
     public $notice_enum = '';
+
     public $leave_at = '';
 
     public $employee_status = '';
-
-
 
     /**
      * Der Mount-Hook erhält einen User und lädt zusätzlich die Employee-Daten,
@@ -85,7 +90,7 @@ class PersonalData extends Component
                 'value' => $status->value,
                 'label' => $status->label(),
                 'icon' => $status->icon(),
-                'colors' => $status->colors()
+                'colors' => $status->colors(),
             ];
         });
     }
@@ -98,7 +103,7 @@ class PersonalData extends Component
         // Get manager role
         $managerRole = Role::where('name', 'Manager')->first();
 
-        if (!$managerRole) {
+        if (! $managerRole) {
             // If the role doesn't exist, return an empty collection
             return collect();
         }
@@ -159,7 +164,7 @@ class PersonalData extends Component
      */
     public function updateEmployee(): void
     {
-        //$this->authorize('update', $this->user);
+        // $this->authorize('update', $this->user);
 
         $this->validate();
 
@@ -181,7 +186,7 @@ class PersonalData extends Component
                 'notice_at' => $this->notice_at ?: null,
                 'notice_enum' => $this->notice_enum,
                 'profession_id' => $this->profession ?: null,
-                'stage_id' => $this->stage ?: null
+                'stage_id' => $this->stage ?: null,
             ];
 
             // Update oder Create Employee
@@ -192,7 +197,7 @@ class PersonalData extends Component
                 $employeeData['user_id'] = $this->user->id;
 
                 // UUID generieren falls benötigt
-                if (!isset($employeeData['uuid'])) {
+                if (! isset($employeeData['uuid'])) {
                     $employeeData['uuid'] = \Illuminate\Support\Str::uuid()->toString();
                 }
 
@@ -212,7 +217,7 @@ class PersonalData extends Component
 
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error updating employee data: ') . $e->getMessage(),
+                text: __('Error updating employee data: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -233,7 +238,7 @@ class PersonalData extends Component
             'employeeStatusOptions' => $employeeStatusOptions,
             'probationOptions' => $probationOptions,
             'noticePeriodOptions' => $noticePeriodOptions,
-            'supervisors' => $supervisors
+            'supervisors' => $supervisors,
         ]);
     }
 }

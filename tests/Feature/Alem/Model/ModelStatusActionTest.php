@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Component;
 use Livewire\Livewire;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ModelStatusActionTest extends TestCase
 {
@@ -23,11 +23,14 @@ class ModelStatusActionTest extends TestCase
      */
     protected function getTestComponent()
     {
-        return new class extends Component {
+        return new class extends Component
+        {
             use ModelStatusAction;
 
             public $selectedIds = [];
+
             public $idsOnPage = [];
+
             public $statusFilter = 'active';
 
             protected function getModelClass(): string
@@ -470,17 +473,20 @@ class ModelStatusActionTest extends TestCase
  */
 class TestModel extends Model
 {
-    use SoftDeletes;
     use ModelPermanentDeletion;
     use ModelStatusManagement{
         ModelStatusManagement::restore insteadof SoftDeletes;
         // Alias für die originale SoftDeletes::restore()-Methode.
         SoftDeletes::restore as softRestore;
     }
+    use SoftDeletes;
 
     protected $table = 'test_models';
+
     protected $fillable = ['name', 'model_status'];
+
     protected $dates = ['deleted_at'];
+
     protected $casts = [
         'model_status' => ModelStatus::class,
     ];
@@ -489,12 +495,12 @@ class TestModel extends Model
 
     public function isActive(): bool
     {
-        return $this->model_status === ModelStatus::ACTIVE && !$this->trashed();
+        return $this->model_status === ModelStatus::ACTIVE && ! $this->trashed();
     }
 
     public function isArchived(): bool
     {
-        return $this->model_status === ModelStatus::ARCHIVED && !$this->trashed();
+        return $this->model_status === ModelStatus::ARCHIVED && ! $this->trashed();
     }
 
     public function hasStatus(ModelStatus $status): bool
@@ -511,6 +517,7 @@ class TestModel extends Model
         }
         $this->model_status = ModelStatus::ACTIVE;
         $this->save();
+
         return $restored;
     }
 
@@ -523,6 +530,7 @@ class TestModel extends Model
         }
         $this->model_status = ModelStatus::ARCHIVED;
         $this->save();
+
         return $restored;
     }
 }

@@ -11,16 +11,15 @@ class EmployeeController extends Controller
     /**
      * Zeigt das Profil eines Mitarbeiters an
      *
-     * @param string $slug Der Slug des Mitarbeiters (z.B. 'vorname-nachname-index')
-     * @param string $activeTab Der aktive Tab in der Ansicht (Standard ist 'employee-update')
-     * @return View
+     * @param  string  $slug  Der Slug des Mitarbeiters (z.B. 'vorname-nachname-index')
+     * @param  string  $activeTab  Der aktive Tab in der Ansicht (Standard ist 'employee-update')
      */
     public function show(string $slug, string $activeTab = 'employee-update'): View
     {
         // Finde den User basierend auf Slug
         $user = User::where('slug', $slug)->first();
 
-        if (!$user || $user->user_type !== 'employee' || !$user->employee) {
+        if (! $user || $user->user_type !== 'employee' || ! $user->employee) {
             abort(404, 'Mitarbeiter nicht gefunden.');
         }
 

@@ -9,7 +9,6 @@ use Illuminate\Validation\Rules\Enum;
 
 trait ValidateDepartment
 {
-
     public function rules(): array
     {
         $teamId = Auth::user()->currentTeam->id;

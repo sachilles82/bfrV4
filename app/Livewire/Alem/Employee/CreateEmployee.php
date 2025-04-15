@@ -11,15 +11,15 @@ use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
-use App\Models\Spatie\Role;
-use App\Models\User;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Spatie\Role;
+use App\Models\User;
 use App\Traits\Model\WithModelStatusOptions;
-use Illuminate\Support\Carbon;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -28,34 +28,47 @@ use Livewire\Component;
 
 class CreateEmployee extends Component
 {
-    use ValidateEmployee, AuthorizesRequests,
+    use AuthorizesRequests, ValidateEmployee,
         WithModelStatusOptions;
 
-    public ?int $userId = null;                     //Wird für den Supervisor benötigt
+    public ?int $userId = null;                     // Wird für den Supervisor benötigt
 
     public $selectedRoles = [];
+
     public $model_status;
+
     public $employee_status;
+
     public $invitations = true;
 
     /**
      * Benutzer-Felder (User Fields)
      */
     public $gender;
+
     public $name;
+
     public $last_name;
+
     public $email;
+
     public $email_verified_at;
+
     public $password;
+
     public ?Carbon $joined_at = null;
+
     public $department = null;
+
     public $selectedTeams = [];
 
     /**
      * Mitarbeiter-spezifische Felder (Employee Fields)
      */
     public $profession;
+
     public $stage;
+
     public $supervisor = null;
 
     public function mount(): void
@@ -101,7 +114,7 @@ class CreateEmployee extends Component
     #[On('department-created')]
     public function getDepartmentsProperty()
     {
-        $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
+        $teamId = ! empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
 
         $query = Department::where('model_status', ModelStatus::ACTIVE->value)
             ->where('company_id', auth()->user()->company_id);
@@ -163,14 +176,14 @@ class CreateEmployee extends Component
             ]);
 
             // 2. Rollen zuweisen
-            if (!empty($this->selectedRoles)) {
+            if (! empty($this->selectedRoles)) {
                 $user->roles()->sync($this->selectedRoles);
             }
 
             // 3. Mitarbeiter-Datensatz erstellen
             Employee::create([
                 'user_id' => $user->id,
-                'uuid' => (string)Str::uuid(),
+                'uuid' => (string) Str::uuid(),
                 'profession_id' => $this->profession,
                 'stage_id' => $this->stage,
                 'employee_status' => $this->employee_status,
@@ -178,7 +191,7 @@ class CreateEmployee extends Component
             ]);
 
             // 4. Teams zuweisen
-            if (!empty($this->selectedTeams)) {
+            if (! empty($this->selectedTeams)) {
                 foreach ($this->selectedTeams as $teamId) {
                     $team = auth()->user()->allTeams()->find($teamId);
                     if ($team) {
@@ -213,7 +226,7 @@ class CreateEmployee extends Component
             );
         } catch (\Exception $e) {
             Flux::toast(
-                text: __('Error: ') . $e->getMessage(),
+                text: __('Error: ').$e->getMessage(),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -225,7 +238,7 @@ class CreateEmployee extends Component
         $this->reset([
             'name', 'last_name', 'email', 'password', 'gender', 'selectedRoles',
             'joined_at', 'profession', 'stage', 'selectedTeams', 'supervisor',
-            'model_status', 'employee_status', 'invitations'
+            'model_status', 'employee_status', 'invitations',
         ]);
 
         $this->modal('create-employee')->close();

@@ -8,7 +8,6 @@ use Livewire\Component;
 
 class DynamicNavigation extends Component
 {
-
     public User $user;
 
     public string $activeTab;

@@ -12,8 +12,7 @@ trait WithUserAvatars
     /**
      * Bereitet die Benutzerdaten für die Anzeige der Avatare vor
      *
-     * @param \App\Models\Alem\Department $department
-     * @return array
+     * @param  \App\Models\Alem\Department  $department
      */
     public function prepareUserAvatars($department): array
     {
@@ -35,9 +34,9 @@ trait WithUserAvatars
                 $result['visible_users'][] = [
                     'name' => $user->name,
                     'last_name' => $user->last_name ?? '',
-                    'full_name' => trim($user->name . ' ' . ($user->last_name ?? '')),
-                    'avatar_url' => "https://ui-avatars.com/api/?name=" . urlencode($user->name) . "&color=7F9CF5&background=EBF4FF",
-                    'z_index' => 30 - ($index + 1) * 10
+                    'full_name' => trim($user->name.' '.($user->last_name ?? '')),
+                    'avatar_url' => 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF',
+                    'z_index' => 30 - ($index + 1) * 10,
                 ];
             }
 
@@ -49,7 +48,7 @@ trait WithUserAvatars
                 $remainingUsers = $department->users->skip(3);
 
                 foreach ($remainingUsers as $user) {
-                    $result['remaining_user_groups'][] = trim($user->name . ' ' . ($user->last_name ?? ''));
+                    $result['remaining_user_groups'][] = trim($user->name.' '.($user->last_name ?? ''));
                 }
             }
         }

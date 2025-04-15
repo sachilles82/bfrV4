@@ -10,22 +10,23 @@ use App\Models\Spatie\Role;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Spatie\ResponseCache\ResponseCache;
 
 class RoleTable extends Component
 {
-    use Searchable, WithPerPagePagination, ValidateRole;
+    use Searchable, ValidateRole, WithPerPagePagination;
 
     public $roleId;
-    public $name;
-    public $description;
-    public $access;
-    public $is_manager;
 
+    public $name;
+
+    public $description;
+
+    public $access;
+
+    public $is_manager;
 
     public function mount(): void
     {
@@ -37,7 +38,6 @@ class RoleTable extends Component
         $this->resetPage();
     }
 
-
     public function loadRole($id): void
     {
         try {
@@ -45,11 +45,11 @@ class RoleTable extends Component
 
             $this->authorize('update', $role);
 
-            $this->roleId      = $role->id;
-            $this->name        = $role->name;
+            $this->roleId = $role->id;
+            $this->name = $role->name;
             $this->description = $role->description;
-            $this->access      = $role->access->value;
-            $this->is_manager  = $role->is_manager;
+            $this->access = $role->access->value;
+            $this->is_manager = $role->is_manager;
         } catch (AuthorizationException $ae) {
             // Bei Berechtigungsproblemen
             Flux::toast(
@@ -86,10 +86,10 @@ class RoleTable extends Component
             $this->authorize('update', $role);
 
             $role->update([
-                'name'        => $this->name,
+                'name' => $this->name,
                 'description' => $this->description,
-                'access'      => RoleHasAccessTo::from($this->access),
-                'is_manager'  => $this->is_manager,
+                'access' => RoleHasAccessTo::from($this->access),
+                'is_manager' => $this->is_manager,
             ]);
 
             Flux::toast(
@@ -172,9 +172,9 @@ class RoleTable extends Component
         $roles = $this->applyPagination($query);
 
         $accessOptions = collect(RoleHasAccessTo::cases())
-            ->filter(fn($case) => in_array($case, [
+            ->filter(fn ($case) => in_array($case, [
                 RoleHasAccessTo::EmployeePanel,
-                RoleHasAccessTo::PartnerPanel
+                RoleHasAccessTo::PartnerPanel,
             ]))
             ->values();
 

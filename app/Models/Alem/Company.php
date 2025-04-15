@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Company extends Model
 {
-    use HasFactory;
     use HasAddress;
+    use HasFactory;
     use SoftDeletes;
 
     /**
@@ -52,7 +52,6 @@ class Company extends Model
 
     ];
 
-
     /** Zeigt zu welcher Branche die Company gehört */
     public function industry(): BelongsTo
     {
@@ -73,10 +72,9 @@ class Company extends Model
             if (app()->environment('testing')) {
                 return;
             }
-            if (!Industry::where('id', $company->industry_id)->exists()) {
+            if (! Industry::where('id', $company->industry_id)->exists()) {
                 throw new \InvalidArgumentException('Invalid inadustry_id provided.');
             }
         });
     }
-
 }

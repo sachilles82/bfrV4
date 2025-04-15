@@ -18,11 +18,15 @@ class CityForm extends Component
     use ValidateCityForm, WithPerPagePagination;
 
     public array $countries = [];
+
     public array $states = [];
 
     public ?int $selectedCountry = null;
+
     public ?int $selectedState = null;
+
     public ?int $cityId = null;
+
     public string $name = '';
 
     public bool $editing = false;
@@ -155,7 +159,6 @@ class CityForm extends Component
             $city->delete();
             $this->dispatch('refresh-states-cities', ['modifiedState' => $modifiedState]);
 
-
             Flux::toast(
                 text: __('City deleted successfully.'),
                 heading: __('Success.'),
@@ -181,7 +184,7 @@ class CityForm extends Component
             ->close();
 
         $this->reset([
-            'cityId', 'name', 'selectedCountry', 'selectedState', 'editing'
+            'cityId', 'name', 'selectedCountry', 'selectedState', 'editing',
         ]);
 
         $this->resetValidation();

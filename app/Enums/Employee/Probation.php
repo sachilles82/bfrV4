@@ -30,13 +30,13 @@ enum Probation: string
     public function label(): string
     {
         return match ($this) {
-            static::NO_PROBATION => __('No probation'),
-            static::ONE_WEEK => __('1 week'),
-            static::TWO_WEEKS => __('2 weeks'),
-            static::THREE_WEEKS => __('3 weeks'),
-            static::ONE_MONTH => __('1 month'),
-            static::TWO_MONTHS => __('2 months'),
-            static::THREE_MONTHS => __('3 months'),
+            self::NO_PROBATION => __('No probation'),
+            self::ONE_WEEK => __('1 week'),
+            self::TWO_WEEKS => __('2 weeks'),
+            self::THREE_WEEKS => __('3 weeks'),
+            self::ONE_MONTH => __('1 month'),
+            self::TWO_MONTHS => __('2 months'),
+            self::THREE_MONTHS => __('3 months'),
         };
     }
 }

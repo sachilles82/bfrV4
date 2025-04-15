@@ -14,7 +14,6 @@ enum RoleHasAccessTo: string
      * Die Role die OwnerPanel hat, hat Zugriff auf das Owner Panel
      * Die Role die EmployeePanel hat, hat Zugriff auf das Employee Panel
      */
-
     case AdminPanel = 'admin_panel';
     case OwnerPanel = 'owner_panel';
     case EmployeePanel = 'employee_panel';
@@ -22,11 +21,11 @@ enum RoleHasAccessTo: string
 
     public function label(): string
     {
-        return match($this) {
-            self::AdminPanel    => __('Admin Panel'),
-            self::OwnerPanel    => __('Owner Panel'),
+        return match ($this) {
+            self::AdminPanel => __('Admin Panel'),
+            self::OwnerPanel => __('Owner Panel'),
             self::EmployeePanel => __('Employee Panel'),
-            self::PartnerPanel  => __('Partner Panel'),
+            self::PartnerPanel => __('Partner Panel'),
         };
     }
 }

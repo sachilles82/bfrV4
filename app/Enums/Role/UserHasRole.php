@@ -19,9 +19,7 @@ enum UserHasRole: string
      * Owner: Der Owner hat Zugriff auf das Owner Panel
      * Employee: Der Employee hat Zugriff auf das Employee Panel
      * Partner: Der Partner hat Zugriff auf das Partner Panel
-     *
      */
-
     case SuperAdmin = 'Super Admin';
     case Admin = 'admin';
     case Support = 'Support Team';
@@ -36,19 +34,19 @@ enum UserHasRole: string
     case Temporary = 'Temporary';
 
     /** Partner Roles */
-//    case Partner = 'partner'; // Standart Role, der User erhält diese Rolle automatisch bei der Registrierung um sich im Partner Panel anmelden zu können
-//    case Akkordant = 'akkordant';
-//    case Subunternehmer = 'subunternehmer';
-//    case Lieferant = 'lieferant';
-//    case Auftraggeber = 'auftraggeber';
-//    case Bauherr = 'bauherr';
+    //    case Partner = 'partner'; // Standart Role, der User erhält diese Rolle automatisch bei der Registrierung um sich im Partner Panel anmelden zu können
+    //    case Akkordant = 'akkordant';
+    //    case Subunternehmer = 'subunternehmer';
+    //    case Lieferant = 'lieferant';
+    //    case Auftraggeber = 'auftraggeber';
+    //    case Bauherr = 'bauherr';
 
     case Partner = 'partner'; // Standart Role, der User erhält diese Rolle automatisch bei der Registrierung um sich im Partner Panel anmelden zu können
     case Partner1 = 'Pieceworker'; // Akkordant
     case Partner2 = 'Subcontractor'; // Subunternehmer
     case Partner3 = 'Supplier'; // Lieferant
     case Partner4 = 'Client'; // Auftraggeber
-    case Partner5  = 'Building Owner'; // Bauherr
+    case Partner5 = 'Building Owner'; // Bauherr
 
     /** Owner Roles */
     case Owner = 'owner'; // Standart Role, erhält jeder erstellte Owner User damit er sich im Owner Panel anmelden kann
@@ -60,5 +58,4 @@ enum UserHasRole: string
     {
         return __("role.user_role.{$this->value}");
     }
-
 }

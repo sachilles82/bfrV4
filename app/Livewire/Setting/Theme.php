@@ -20,7 +20,7 @@ class Theme extends Component
         // Validate theme to prevent invalid values
         $allowedThemes = ['default', 'orange', 'green', 'blue', 'red', 'lime', 'pink'];
 
-        if (!in_array($value, $allowedThemes)) {
+        if (! in_array($value, $allowedThemes)) {
             $value = 'default';
         }
 

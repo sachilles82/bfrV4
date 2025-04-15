@@ -140,10 +140,8 @@ class IndustrySeeder extends Seeder
             // Sonstige Branchen
             'Reinigungsdienste und Facility Management',
             'Sicherheitsdienste und Detekteien',
-            'Öffentliche Verwaltung und Behörden'
+            'Öffentliche Verwaltung und Behörden',
         ];
-
-
 
         foreach ($industries as $industry) {
             DB::table('industries')->insert([

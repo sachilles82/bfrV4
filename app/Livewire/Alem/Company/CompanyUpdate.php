@@ -14,20 +14,29 @@ use Livewire\Component;
 
 class CompanyUpdate extends Component
 {
-    use ValidateCompany, AuthorizesRequests;
+    use AuthorizesRequests, ValidateCompany;
 
     public Company $company;
 
     // Lokale Properties für das Formular
     public string $ownerName;
+
     public string $company_name;
+
     public int $industry_id;
+
     public string $company_size;
+
     public string $company_type;
+
     public ?string $email;
+
     public ?string $phone_1;
+
     public ?string $phone_2;
+
     public ?string $register_number;
+
     public ?string $company_url;
 
     public function mount(Company $company): void
@@ -37,16 +46,16 @@ class CompanyUpdate extends Component
         $this->company = $company;
 
         // Initialisiere die Formularfelder
-        $this->ownerName       = $company->owner->name ?? 'Unknown';
-        $this->company_name    = $company->company_name;
-        $this->industry_id     = $company->industry_id;
-        $this->company_size    = $company->company_size->value ?? '';
-        $this->company_type    = $company->company_type->value ?? '';
-        $this->email           = $company->email;
-        $this->phone_1         = $company->phone_1;
-        $this->phone_2         = $company->phone_2;
+        $this->ownerName = $company->owner->name ?? 'Unknown';
+        $this->company_name = $company->company_name;
+        $this->industry_id = $company->industry_id;
+        $this->company_size = $company->company_size->value ?? '';
+        $this->company_type = $company->company_type->value ?? '';
+        $this->email = $company->email;
+        $this->phone_1 = $company->phone_1;
+        $this->phone_2 = $company->phone_2;
         $this->register_number = $company->register_number;
-        $this->company_url     = $company->company_url;
+        $this->company_url = $company->company_url;
     }
 
     #[Computed(persist: true)]
@@ -57,21 +66,20 @@ class CompanyUpdate extends Component
         });
     }
 
-
     public function updateCompany(): void
     {
         $this->authorize('update', $this->company);
         $this->validate();
 
         $this->company->update([
-            'company_name'    => $this->company_name,
-            'industry_id'     => $this->industry_id,
-            'company_size'    => $this->company_size,
-            'company_type'    => $this->company_type,
-            'company_url'     => $this->company_url,
-            'email'           => $this->email,
-            'phone_1'         => $this->phone_1,
-            'phone_2'         => $this->phone_2,
+            'company_name' => $this->company_name,
+            'industry_id' => $this->industry_id,
+            'company_size' => $this->company_size,
+            'company_type' => $this->company_type,
+            'company_url' => $this->company_url,
+            'email' => $this->email,
+            'phone_1' => $this->phone_1,
+            'phone_2' => $this->phone_2,
             'register_number' => $this->register_number,
         ]);
 
