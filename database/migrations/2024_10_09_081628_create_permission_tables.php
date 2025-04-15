@@ -60,6 +60,8 @@ return new class extends Migration
             $table->string('model_type');
             $table->unsignedBigInteger($columnNames['model_morph_key']);
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
+            // Optimierung für HasPermissions::getPermissionsViaRoles Abfragen
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'idx_model_perms_type_id');
 
             $table->foreign($pivotPermission)
                 ->references('id') // permission id
@@ -84,6 +86,8 @@ return new class extends Migration
             $table->string('model_type');
             $table->unsignedBigInteger($columnNames['model_morph_key']);
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
+            // Optimierung für HasRoles::getPermissionsViaRoles Abfragen
+            $table->index([$columnNames['model_morph_key'], 'model_type'], 'idx_model_roles_type_id');
 
             $table->foreign($pivotRole)
                 ->references('id') // role id

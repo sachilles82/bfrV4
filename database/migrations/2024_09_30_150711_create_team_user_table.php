@@ -20,6 +20,9 @@ return new class extends Migration
 
             $table->unique(['team_id', 'user_id']);
             $table->index('user_id', 'team_user_user_id_index');
+            // Optimierte Indizes für bessere Performance der Employee-Abfragen
+            $table->index('team_id', 'team_user_team_id_index');
+            $table->index(['user_id', 'team_id'], 'team_user_user_team_index');
         });
     }
 
