@@ -47,6 +47,7 @@ class TestDataSeeder extends Seeder
         try {
             // Parameter für das Seeden
             $employeeCount = 100000; // Anzahl der zu erstellenden Mitarbeiter
+            $managerCount = 100;    // Anzahl der Manager
             $chunkSize = 7500;      // Größere Chunks für bessere Performance
 
             $this->command->info('Starte Erstellung der Testdaten...');
@@ -298,14 +299,14 @@ class TestDataSeeder extends Seeder
             $professionIds = Profession::where('company_id', $company->id)->pluck('id')->toArray();
             $stageIds = Stage::where('company_id', $company->id)->pluck('id')->toArray();
 
-            // Hole die Hauptrolle für Mitarbeiter zur Massenverknüpfung
+            // Hole die Rollen-IDs
             $workerRoleId = $roles['Worker'];
             $managerRoleId = $roles['Manager'];
             $editorRoleId = $roles['Editor'];
             $temporaryRoleId = $roles['Temporary'];
 
-            // Rolle-IDs für die zufällige Zuweisung vorbereiten (nur Worker, Manager, Editor, Temporary)
-            $roleIds = [$workerRoleId, $managerRoleId, $editorRoleId, $temporaryRoleId];
+            // Rolle-IDs für Nicht-Manager
+            $nonManagerRoleIds = [$workerRoleId, $editorRoleId, $temporaryRoleId];
 
             // 9. Erstelle Mitarbeiter
             $this->command->info('Erstelle '.$employeeCount.' Mitarbeiter in Chunks von '.$chunkSize.'...');
@@ -314,6 +315,9 @@ class TestDataSeeder extends Seeder
             // Vorgenerierter Passwort-Hash für bessere Performance
             $passwordHash = Hash::make('password');
             $teamId = $team->id;
+
+            // Zähle die erstellten Manager
+            $managersCreated = 0;
 
             // Mitarbeiter in Chunks erstellen
             for ($i = 0; $i < $employeeCount; $i += $chunkSize) {
@@ -373,10 +377,17 @@ class TestDataSeeder extends Seeder
                         'updated_at' => $currentTime,
                     ];
 
-                    // Zufällige Rolle für Massen-Zuweisung
-                    $randomRoleId = $roleIds[array_rand($roleIds)];
+                    // Rollenauswahl: Manager-Rolle nur für die ersten 100 Benutzer
+                    if ($managersCreated < $managerCount) {
+                        $roleId = $managerRoleId;
+                        $managersCreated++;
+                    } else {
+                        // Für alle anderen: zufällige Nicht-Manager-Rolle
+                        $roleId = $nonManagerRoleIds[array_rand($nonManagerRoleIds)];
+                    }
+
                     $roleAssignments[] = [
-                        'role_id' => $randomRoleId,
+                        'role_id' => $roleId,
                         'model_type' => 'App\\Models\\User',
                         'model_id' => $userId,
                     ];
@@ -421,6 +432,7 @@ class TestDataSeeder extends Seeder
 
             $this->command->getOutput()->progressFinish();
             $this->command->info('Testdaten wurden erfolgreich erstellt!');
+            $this->command->info("Erstellt: $managersCreated Manager und " . ($employeeCount - $managersCreated) . " andere Mitarbeiter");
 
         } catch (\Exception $e) {
             // Transaktion rückgängig machen, wenn ein Fehler auftritt

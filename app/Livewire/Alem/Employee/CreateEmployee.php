@@ -99,37 +99,21 @@ class CreateEmployee extends Component
     private function loadEssentialData(): void
     {
         try {
-            Debugbar::startMeasure('load_teams', 'Loading teams');
-            // Alle Teams laden, die zur Firma des angemeldeten Benutzers gehören
-            $this->teams = Team::where('company_id', auth()->user()->company_id)
+            $currentTeamId = auth()->user()->current_team_id;
+            $currentCompanyId = auth()->user()->company_id;
+
+            $this->teams = Team::where('company_id', $currentCompanyId)
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
-            Debugbar::stopMeasure('load_teams');
-            
-            Debugbar::info('Teams loaded', [
-                'count' => $this->teams ? $this->teams->count() : 0,
-                'first_few' => $this->teams ? $this->teams->take(3)->pluck('name') : []
-            ]);
 
-            Debugbar::startMeasure('load_departments', 'Loading departments');
-            // Load departments (filtered by current team)
-            $currentTeamId = auth()->user()->current_team_id;
             $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
-                ->where('company_id', auth()->user()->company_id)
+                ->where('company_id', $currentCompanyId)
                 ->where('team_id', $currentTeamId)
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
-            Debugbar::stopMeasure('load_departments');
 
-            Debugbar::info('Departments loaded', [
-                'count' => $this->departments ? $this->departments->count() : 0,
-                'first_few' => $this->departments ? $this->departments->take(3)->pluck('name') : [],
-                'team_id' => $currentTeamId
-            ]);
-
-            // Load roles for employee permissions
             $this->roles = Role::where(function ($query) {
                 $query->where('access', RoleHasAccessTo::EmployeePanel)
                     ->where('visible', RoleVisibility::Visible);
@@ -141,34 +125,32 @@ class CreateEmployee extends Component
                 ->select(['id', 'name', 'is_manager'])
                 ->get();
 
-            // Load professions (filtered by company)
-            Debugbar::startMeasure('load_professions', 'Loading professions');
-            $this->professions = Profession::where('company_id', auth()->user()->company_id)
+            $this->professions = Profession::where('company_id', $currentCompanyId)
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
-            Debugbar::stopMeasure('load_professions');
 
-            Debugbar::info('Professions loaded', [
-                'count' => $this->professions ? $this->professions->count() : 0,
-                'first_few' => $this->professions ? $this->professions->take(3)->pluck('name') : []
-            ]);
-
-            // Load stages (filtered by company)
-            Debugbar::startMeasure('load_stages', 'Loading stages');
-            $this->stages = Stage::where('company_id', auth()->user()->company_id)
+            $this->stages = Stage::where('company_id', $currentCompanyId)
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
-            Debugbar::stopMeasure('load_stages');
 
-            Debugbar::info('Essential data loaded', [
-                'teams' => $this->teams ? $this->teams->count() : 0,
-                'roles' => $this->roles ? $this->roles->count() : 0,
-                'departments' => $this->departments ? $this->departments->count() : 0,
-                'professions' => $this->professions ? $this->professions->count() : 0,
-                'stages' => $this->stages ? $this->stages->count() : 0
-            ]);
+            $this->supervisors = User::query()
+                ->select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
+                ->join('model_has_roles', function($join) {
+                    $join->on('users.id', '=', 'model_has_roles.model_id')
+                        ->where('model_has_roles.model_type', User::class);
+                })
+                ->join('roles', function($join) {
+                    $join->on('model_has_roles.role_id', '=', 'roles.id')
+                        ->where('roles.is_manager', true);
+                })
+                ->where('users.company_id', $currentCompanyId)
+                ->whereNull('users.deleted_at')
+                ->orderBy('users.name')
+                ->distinct()
+                ->get();
+
         } catch (\Exception $e) {
             Debugbar::error('Error loading essential data: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()

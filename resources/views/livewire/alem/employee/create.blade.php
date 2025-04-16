@@ -141,38 +141,38 @@
                     </div>
 
                     <!-- Supervisor -->
-                    {{--                    <div class="sm:col-span-3">--}}
-                    {{--                        <x-pupi.input.group--}}
-                    {{--                            label="{{ __('Supervisor') }}"--}}
-                    {{--                            for="supervisor"--}}
-                    {{--                            badge="{{ __('Required') }}"--}}
-                    {{--                            :error="$errors->first('supervisor_id')"--}}
-                    {{--                            model="supervisor"--}}
-                    {{--                            help-text="{{ __('') }}">--}}
-                    {{--                            <flux:select--}}
-                    {{--                                class="mt-2"--}}
-                    {{--                                wire:model="supervisor"--}}
-                    {{--                                id="supervisor"--}}
-                    {{--                                variant="listbox"--}}
-                    {{--                                searchable--}}
-                    {{--                                placeholder="{{ __('Select Supervisor') }}">--}}
-                    {{--                                @foreach($this->supervisors as $supervisor)--}}
-                    {{--                                    <flux:option value="{{ $supervisor->id }}">--}}
-                    {{--                                        <div class="flex items-center gap-2 whitespace-nowrap">--}}
-                    {{--                                            <flux:avatar--}}
-                    {{--                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"--}}
-                    {{--                                                circle--}}
-                    {{--                                                size="xs"--}}
-                    {{--                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"--}}
-                    {{--                                                alt="{{ $supervisor->name }}"--}}
-                    {{--                                            />--}}
-                    {{--                                            {{ $supervisor->name }} {{ $supervisor->last_name }}--}}
-                    {{--                                        </div>--}}
-                    {{--                                    </flux:option>--}}
-                    {{--                                @endforeach--}}
-                    {{--                            </flux:select>--}}
-                    {{--                        </x-pupi.input.group>--}}
-                    {{--                    </div>--}}
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Supervisor') }}"
+                            for="supervisor"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('supervisor_id')"
+                            model="supervisor"
+                            help-text="{{ __('') }}">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="supervisor"
+                                id="supervisor"
+                                variant="listbox"
+                                searchable
+                                placeholder="{{ __('Select Supervisor') }}">
+                                @forelse($this->supervisors ?? [] as $supervisor)
+                                    <flux:option value="{{ $supervisor->id }}">
+                                        <div class="flex items-center gap-2 whitespace-nowrap">
+                                            <flux:avatar
+                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
+                                                circle
+                                                size="xs"
+                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
+                                                alt="{{ $supervisor->name }}"
+                                            />
+                                            {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                        </div>
+                                    </flux:option>
+                                    @endforeach
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
 
                     <!-- Roles -->
                     <div class="sm:col-span-3">
