@@ -309,138 +309,25 @@
 //}
 
 
-//namespace App\Http\Controllers\Alem\Employee;
-//
-//use App\Enums\Role\RoleVisibility;
-//use App\Http\Controllers\Controller;
-//use App\Models\Alem\Department;
-//use App\Models\Alem\Employee\Setting\Profession;
-//use App\Models\Alem\Employee\Setting\Stage;
-//use App\Models\Team;
-//use Barryvdh\Debugbar\Facades\Debugbar;
-//use Illuminate\Contracts\View\View;
-//use Illuminate\Support\Facades\Auth;
-//use Illuminate\Support\Facades\Log;
-//use Spatie\Permission\Models\Role;
-//
-//class EmployeeIndexController extends Controller
-//{
-//    /**
-//     * Zeigt die Index-Seite für Mitarbeiter an und lädt benötigte Lookup-Daten direkt aus der Datenbank.
-//     * Die eigentliche Mitarbeiterliste wird von der Livewire Komponente geladen und gefiltert.
-//     */
-//    public function index(): View
-//    {
-//        $authCompanyId = Auth::user()?->company_id;
-//
-//        if (!$authCompanyId) {
-//            abort(403, 'Keine Firma zugeordnet.');
-//        }
-//
-//        // Departments laden (Lookup-Daten für Filter etc.) - direkt aus der Datenbank
-//        $departments = [];
-//        try {
-//            Debugbar::info("Loading Departments directly from database");
-//            $departments = Department::where('company_id', $authCompanyId)
-//                ->orderBy('name')
-//                ->pluck('name', 'id')
-//                ->all();
-//            Debugbar::info('Departments (Lookup) an View übergeben.', ['count' => count($departments)]);
-//        } catch (\Exception $e) {
-//            Log::error("Fehler beim Laden der Departments: " . $e->getMessage());
-//        }
-//
-//        // Teams laden (Lookup-Daten für Filter etc.) - direkt aus der Datenbank
-//        $teams = [];
-//        try {
-//            Debugbar::info("Loading Teams directly from database");
-//            $teams = Team::where('company_id', $authCompanyId)
-//                ->orderBy('name')
-//                ->pluck('name', 'id')
-//                ->all();
-//            Debugbar::info('Teams (Lookup) an View übergeben.', ['count' => count($teams)]);
-//        } catch (\Exception $e) {
-//            Log::error("Fehler beim Laden der Teams: " . $e->getMessage());
-//        }
-//
-//        // Professionen laden (Lookup-Daten) - direkt aus der Datenbank
-//        $professions = [];
-//        try {
-//            Debugbar::info("Loading Professions directly from database");
-//            $professionsCollection = Profession::where('company_id', $authCompanyId)
-//                ->select(['id', 'name'])
-//                ->orderBy('name')
-//                ->get();
-//            $professions = $professionsCollection->pluck('name', 'id')->toArray();
-//            Debugbar::info('Professions (Lookup) an View übergeben.', ['count' => count($professions)]);
-//        } catch (\Exception $e) {
-//            Log::error("Fehler beim Laden der Professionen: " . $e->getMessage());
-//        }
-//
-//        // Stages laden (Lookup-Daten) - direkt aus der Datenbank
-//        $stages = [];
-//        try {
-//            Debugbar::info("Loading Stages directly from database");
-//            $stagesCollection = Stage::where('company_id', $authCompanyId)
-//                ->select(['id', 'name'])
-//                ->orderBy('name')
-//                ->get();
-//            $stages = $stagesCollection->pluck('name', 'id')->toArray();
-//            Debugbar::info('Stages (Lookup) an View übergeben.', ['count' => count($stages)]);
-//        } catch (\Exception $e) {
-//            Log::error("Fehler beim Laden der Stages: " . $e->getMessage());
-//        }
-//
-//        // Rollen laden (Lookup-Daten) - direkt aus der Datenbank
-//        $roles = [];
-//        try {
-//            Debugbar::info("Loading Roles directly from database");
-//            $rolesCollection = Role::where('company_id', $authCompanyId)
-//                ->where('created_by', 1)
-//                ->where('visible', RoleVisibility::Visible->value)
-//                ->select(['id', 'name'])
-//                ->get();
-//            $roles = $rolesCollection->pluck('name', 'id')->toArray();
-//            Debugbar::info('Rollen (Lookup) an View übergeben.', ['count' => count($roles)]);
-//        } catch (\Exception $e) {
-//            Log::error("Fehler beim Laden der Rollen: " . $e->getMessage());
-//        }
-//
-//        // Die View rendern und die Lookup-Daten übergeben
-//        // Die Livewire-Komponente ('alem.employee.employee-table') holt sich dann die eigentlichen Benutzerdaten
-//        return view('laravel.alem.employee.index', [
-//            'departments' => $departments,
-//            'teams' => $teams,
-//            'roles' => $roles, // Rollen werden oft auch als Filter gebraucht
-//            'professions' => $professions,
-//            'stages' => $stages,
-//        ]);
-//    }
-//
-//    /**
-//     * Hilfsmethode zum Invalidieren von Caches (obwohl wir sie hier nicht verwenden)
-//     * Behalten wir für Kompatibilität bei
-//     */
-//    public function invalidateLookupsCache()
-//    {
-//        Debugbar::info('Cache ist deaktiviert, keine Invalidierung nötig');
-//        return back()->with('message', 'Cache ist deaktiviert. Alle Daten werden direkt aus der Datenbank geladen.');
-//    }
-//}
-
-
 namespace App\Http\Controllers\Alem\Employee;
 
+use App\Enums\Role\RoleVisibility;
 use App\Http\Controllers\Controller;
+use App\Models\Alem\Department;
+use App\Models\Alem\Employee\Setting\Profession;
+use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Team;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 class EmployeeIndexController extends Controller
 {
     /**
-     * Zeigt nur die Index-Seite für Mitarbeiter an ohne Daten zu laden.
-     * Reine Test-Implementation für Ladezeiten-Tests der View.
+     * Zeigt die Index-Seite für Mitarbeiter an und lädt benötigte Lookup-Daten direkt aus der Datenbank.
+     * Die eigentliche Mitarbeiterliste wird von der Livewire Komponente geladen und gefiltert.
      */
     public function index(): View
     {
@@ -450,11 +337,93 @@ class EmployeeIndexController extends Controller
             abort(403, 'Keine Firma zugeordnet.');
         }
 
-        Debugbar::info("Test-Modus: Gebe nur die View zurück ohne Daten zu laden");
+        // Departments laden (Lookup-Daten für Filter etc.) - direkt aus der Datenbank
+        $departments = [];
+        try {
+            Debugbar::info("Loading Departments directly from database");
+            $departments = Department::where('company_id', $authCompanyId)
+                ->orderBy('name')
+                ->pluck('name', 'id')
+                ->all();
+            Debugbar::info('Departments (Lookup) an View übergeben.', ['count' => count($departments)]);
+        } catch (\Exception $e) {
+            Log::error("Fehler beim Laden der Departments: " . $e->getMessage());
+        }
 
+        // Teams laden (Lookup-Daten für Filter etc.) - direkt aus der Datenbank
+        $teams = [];
+        try {
+            Debugbar::info("Loading Teams directly from database");
+            $teams = Team::where('company_id', $authCompanyId)
+                ->orderBy('name')
+                ->pluck('name', 'id')
+                ->all();
+            Debugbar::info('Teams (Lookup) an View übergeben.', ['count' => count($teams)]);
+        } catch (\Exception $e) {
+            Log::error("Fehler beim Laden der Teams: " . $e->getMessage());
+        }
 
-        // Die View rendern ohne Lookup-Daten
-        return view('laravel.alem.employee.index');
+        // Professionen laden (Lookup-Daten) - direkt aus der Datenbank
+        $professions = [];
+        try {
+            Debugbar::info("Loading Professions directly from database");
+            $professionsCollection = Profession::where('company_id', $authCompanyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+            $professions = $professionsCollection->pluck('name', 'id')->toArray();
+            Debugbar::info('Professions (Lookup) an View übergeben.', ['count' => count($professions)]);
+        } catch (\Exception $e) {
+            Log::error("Fehler beim Laden der Professionen: " . $e->getMessage());
+        }
+
+        // Stages laden (Lookup-Daten) - direkt aus der Datenbank
+        $stages = [];
+        try {
+            Debugbar::info("Loading Stages directly from database");
+            $stagesCollection = Stage::where('company_id', $authCompanyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+            $stages = $stagesCollection->pluck('name', 'id')->toArray();
+            Debugbar::info('Stages (Lookup) an View übergeben.', ['count' => count($stages)]);
+        } catch (\Exception $e) {
+            Log::error("Fehler beim Laden der Stages: " . $e->getMessage());
+        }
+
+        // Rollen laden (Lookup-Daten) - direkt aus der Datenbank
+        $roles = [];
+        try {
+            Debugbar::info("Loading Roles directly from database");
+            $rolesCollection = Role::where('company_id', $authCompanyId)
+                ->where('created_by', 1)
+                ->where('visible', RoleVisibility::Visible->value)
+                ->select(['id', 'name'])
+                ->get();
+            $roles = $rolesCollection->pluck('name', 'id')->toArray();
+            Debugbar::info('Rollen (Lookup) an View übergeben.', ['count' => count($roles)]);
+        } catch (\Exception $e) {
+            Log::error("Fehler beim Laden der Rollen: " . $e->getMessage());
+        }
+
+        // Die View rendern und die Lookup-Daten übergeben
+        // Die Livewire-Komponente ('alem.employee.employee-table') holt sich dann die eigentlichen Benutzerdaten
+        return view('laravel.alem.employee.index', [
+            'departments' => $departments,
+            'teams' => $teams,
+            'roles' => $roles, // Rollen werden oft auch als Filter gebraucht
+            'professions' => $professions,
+            'stages' => $stages,
+        ]);
     }
 
+    /**
+     * Hilfsmethode zum Invalidieren von Caches (obwohl wir sie hier nicht verwenden)
+     * Behalten wir für Kompatibilität bei
+     */
+    public function invalidateLookupsCache()
+    {
+        Debugbar::info('Cache ist deaktiviert, keine Invalidierung nötig');
+        return back()->with('message', 'Cache ist deaktiviert. Alle Daten werden direkt aus der Datenbank geladen.');
+    }
 }

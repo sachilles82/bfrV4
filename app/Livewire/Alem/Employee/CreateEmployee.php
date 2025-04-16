@@ -438,6 +438,8 @@ class CreateEmployee extends Component
 
         $this->validate();
 
+        $this->showModal = false;
+
         try {
             DB::beginTransaction();
 
@@ -533,9 +535,6 @@ class CreateEmployee extends Component
 
         $this->generatedPassword = null;
 
-        // Close modal properly using Flux's modal API
-        $this->dispatch('modal-close', ['name' => 'create-employee']);
-        $this->showModal = false;
         $this->dataLoaded = false;
 
         // Reset to default values
