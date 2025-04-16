@@ -5,6 +5,7 @@ namespace App\Livewire\Alem\Employee\Helper;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
+use App\Models\Alem\Department;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
@@ -30,22 +31,37 @@ trait ValidateEmployee
             'selectedTeams.*' => ['exists:teams,id'],
 
             // Department
-            'department' => ['required', 'exists:departments,id'],
+//            'department' => ['required', 'exists:departments,id'],
+
+            'department' => [
+                'required',
+                'exists:departments,id',
+                function ($attribute, $value, $fail) {
+                    if (!empty($this->selectedTeams)) {
+                        // Prüfen, ob die Abteilung zu einem der ausgewählten Teams gehört
+                        $departmentTeamId = Department::find($value)->team_id ?? null;
+
+                        if (!in_array($departmentTeamId, $this->selectedTeams)) {
+                            $fail(__('The selected department must belong to one of the selected teams.'));
+                        }
+                    }
+                },
+            ],
 
             // Supervisor
-            'supervisor' => ['required', 'exists:users,id'],
+            'supervisor' => ['required', 'exists:users,id', 'different:userId'],
 
             // Employee fields
             'profession' => 'required|exists:professions,id',
             'stage' => 'required|exists:stages,id',
 
             'employee_status' => ['required', Rule::in(array_column(EmployeeStatus::cases(), 'value'))],
-            'joined_at' => 'required|date',
+            'joined_at' => 'required|date|before_or_equal:today',
 
             'model_status' => [
                 'required',
                 'string',
-                new Enum(ModelStatus::class), // Status muss ein gültiger Wert aus dem ModelStatus-Enum sein
+                new Enum(ModelStatus::class),
             ],
 
         ];
@@ -99,7 +115,6 @@ trait ValidateEmployee
             'model_status.required' => __('Account status is required.'),
             'model_status.string' => __('Account status must be a string.'),
             'model_status.enum' => __('Der Status need to be a valid value from the ModelStatus enum.'),
-
         ];
     }
 }

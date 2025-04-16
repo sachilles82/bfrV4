@@ -270,7 +270,6 @@ class CreateEmployee extends Component
         $this->professions = null;
     }
 
-
     /**
      * Event-Handler für stage-updated
      */
@@ -434,6 +433,9 @@ class CreateEmployee extends Component
             $this->loadEssentialData();
         }
 
+        // Sichere Passwortgenerierung
+        $this->generatedPassword = $this->generateSecurePassword();
+
         $this->validate();
 
         try {
@@ -445,7 +447,7 @@ class CreateEmployee extends Component
                 'name' => $this->name,
                 'last_name' => $this->last_name,
                 'email' => $this->email,
-                'password' => Hash::make($this->password),
+                'password' => Hash::make($this->generatedPassword),
                 'email_verified_at' => now(),
                 'department_id' => $this->department,
                 'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
@@ -529,6 +531,8 @@ class CreateEmployee extends Component
             'model_status', 'employee_status', 'invitations',
         ]);
 
+        $this->generatedPassword = null;
+
         // Close modal properly using Flux's modal API
         $this->dispatch('modal-close', ['name' => 'create-employee']);
         $this->showModal = false;
@@ -536,6 +540,39 @@ class CreateEmployee extends Component
 
         // Reset to default values
         $this->setDefaultValues();
+    }
+
+    /**
+     * Generiert ein sicheres, zufälliges Passwort mit Buchstaben, Zahlen und Sonderzeichen
+     * Länge: 10 Zeichen, mindestens je ein Zeichen aus jeder Kategorie
+     */
+    private function generateSecurePassword(): string
+    {
+        $lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        $uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $numbers = '0123456789';
+        $special = '!@#$%^&*()_-+=<>?';
+
+        // Mindestens ein Zeichen aus jeder Kategorie
+        $password = [
+            $lowercase[random_int(0, strlen($lowercase) - 1)],
+            $uppercase[random_int(0, strlen($uppercase) - 1)],
+            $numbers[random_int(0, strlen($numbers) - 1)],
+            $special[random_int(0, strlen($special) - 1)],
+        ];
+
+        // Restliche Zeichen bis zur gewünschten Länge auffüllen
+        $allChars = $lowercase . $uppercase . $numbers . $special;
+        $passwordLength = random_int(8, 10); // Zufällige Länge zwischen 8 und 10
+
+        for ($i = count($password); $i < $passwordLength; $i++) {
+            $password[] = $allChars[random_int(0, strlen($allChars) - 1)];
+        }
+
+        // Reihenfolge durchmischen
+        shuffle($password);
+
+        return implode('', $password);
     }
 
     /**
