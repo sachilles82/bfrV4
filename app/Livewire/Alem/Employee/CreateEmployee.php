@@ -270,6 +270,7 @@ class CreateEmployee extends Component
         $this->professions = null;
     }
 
+
     /**
      * Event-Handler für stage-updated
      */
