@@ -196,8 +196,8 @@ class EmployeeTable extends Component
         ]);
     }
 
-//    public function placeholder(): array
-//    {
-//
-//    }
+    public function placeholder():View
+    {
+        return view('livewire.placeholders.employee.index');
+    }
 }
