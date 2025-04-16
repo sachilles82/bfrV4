@@ -54,4 +54,15 @@ class Team extends JetstreamTeam
         return $this->belongsTo(Company::class);
 
     }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Team $team) {
+            // Wenn keine company_id explizit gesetzt wurde und ein Benutzer eingeloggt ist
+            if (!$team->company_id && auth()->check()) {
+                // Setze die company_id des authentifizierten Benutzers
+                $team->company_id = auth()->user()->company_id;
+            }
+        });
+    }
 }
