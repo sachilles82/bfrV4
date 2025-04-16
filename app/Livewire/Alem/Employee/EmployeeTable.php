@@ -195,4 +195,9 @@ class EmployeeTable extends Component
             'employeeStatuses' => EmployeeStatus::cases(), // Für den Mitarbeiterstatus-Filter
         ]);
     }
+
+//    public function placeholder(): array
+//    {
+//
+//    }
 }

@@ -30,7 +30,7 @@
                 :teams="$teams"
                 :professions="$professions"
                 :stages="$stages"
-{{--                 lazy--}}
+                 lazy
             />
 
 {{--            <!-- Edit Component -->--}}

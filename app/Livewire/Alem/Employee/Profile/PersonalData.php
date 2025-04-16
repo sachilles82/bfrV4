@@ -13,6 +13,7 @@ use App\Models\User;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
@@ -58,9 +59,18 @@ class PersonalData extends Component
      */
     public function mount(User $user): void
     {
+        $this->user = $user; // Fehlende Zuweisung hinzugefügt
 
-        // Eager load relations, Employee mit seinen Beziehungen
-        $user->load(['employee.profession', 'employee.stage', 'employee.supervisorUser']);
+        // Optimierung: Nur die benötigten Relationen und Felder laden
+        if (!$user->relationLoaded('employee')) {
+            $user->load(['employee' => function ($query) {
+                $query->select([
+                    'id', 'user_id', 'employee_status', 'profession_id', 'stage_id',
+                    'supervisor_id', 'probation_enum', 'probation_at', 'notice_at',
+                    'notice_enum', 'leave_at', 'personal_number', 'employment_type'
+                ]);
+            }, 'employee.profession:id,name', 'employee.stage:id,name']);
+        }
 
         $this->employee = $this->user->employee;
         $this->joined_at = $this->user->joined_at?->format('Y-m-d') ?? '';
@@ -85,13 +95,16 @@ class PersonalData extends Component
      */
     public function getEmployeeStatusOptionsProperty()
     {
-        return collect(EmployeeStatus::cases())->map(function ($status) {
-            return [
-                'value' => $status->value,
-                'label' => $status->label(),
-                'icon' => $status->icon(),
-                'colors' => $status->colors(),
-            ];
+        // Cache der Statusoptionen für bessere Performance
+        return Cache::remember('employee_status_options', now()->addHours(24), function () {
+            return collect(EmployeeStatus::cases())->map(function ($status) {
+                return [
+                    'value' => $status->value,
+                    'label' => $status->label(),
+                    'icon' => $status->icon(),
+                    'colors' => $status->colors(),
+                ];
+            });
         });
     }
 
@@ -100,19 +113,42 @@ class PersonalData extends Component
      */
     public function getSupervisorsProperty()
     {
-        // Get manager role
-        $managerRole = Role::where('name', 'Manager')->first();
-
-        if (! $managerRole) {
-            // If the role doesn't exist, return an empty collection
-            return collect();
-        }
-
-        // Get users with manager role, excluding current user
-        return User::role($managerRole)
-            ->where('id', '!=', $this->user->id) // Exclude current user
-            ->orderBy('name')
-            ->get();
+        // Cache-Schlüssel basierend auf Teams des aktuellen Benutzers
+        $userTeamIds = $this->user->teams->pluck('id')->implode('-');
+        $cacheKey = "supervisors_user_teams_{$userTeamIds}_exclude_{$this->user->id}";
+        
+        return Cache::remember($cacheKey, now()->addMinutes(30), function () {
+            // Manager-Rolle identifizieren
+            $managerRole = Role::select('id')->where('name', 'Manager')->first();
+            
+            if (!$managerRole) {
+                return collect();
+            }
+            
+            // Team-IDs des aktuellen Benutzers abrufen
+            $userTeamIds = $this->user->teams->pluck('id')->toArray();
+            
+            if (empty($userTeamIds)) {
+                return collect();
+            }
+            
+            // Benutzer mit Manager-Rolle finden, die in mindestens einem der Teams des aktuellen Benutzers sind
+            return User::join('model_has_roles', function ($join) use ($managerRole) {
+                    $join->on('users.id', '=', 'model_has_roles.model_id')
+                         ->where('model_has_roles.model_type', User::class)
+                         ->where('model_has_roles.role_id', $managerRole->id);
+                })
+                ->join('team_user', function ($join) use ($userTeamIds) {
+                    $join->on('users.id', '=', 'team_user.user_id')
+                         ->whereIn('team_user.team_id', $userTeamIds);
+                })
+                ->where('users.id', '!=', $this->user->id)
+                ->whereNull('users.deleted_at')
+                ->select(['users.id', 'users.name', 'users.last_name', 'users.email'])
+                ->groupBy('users.id', 'users.name', 'users.last_name', 'users.email') // Verhindert Duplikate bei mehreren gemeinsamen Teams
+                ->orderBy('users.name')
+                ->get();
+        });
     }
 
     /**
@@ -120,7 +156,9 @@ class PersonalData extends Component
      */
     public function getProbationOptionsProperty()
     {
-        return Probation::options();
+        return Cache::remember('employee_probation_options', now()->addDays(7), function () {
+            return Probation::options();
+        });
     }
 
     /**
@@ -128,7 +166,9 @@ class PersonalData extends Component
      */
     public function getNoticePeriodOptionsProperty()
     {
-        return NoticePeriod::options();
+        return Cache::remember('employee_notice_period_options', now()->addDays(7), function () {
+            return NoticePeriod::options();
+        });
     }
 
     /**
@@ -137,12 +177,17 @@ class PersonalData extends Component
     #[On('professionUpdated')]
     public function getProfessionsProperty()
     {
-        // Alle verfügbaren Professions laden, gefiltered nach Team
-        $teamId = $this->user->currentTeam?->id;
-
-        return Profession::when($teamId, function ($query) use ($teamId) {
-            return $query->where('team_id', $teamId);
-        })->get();
+        // Cache-Schlüssel mit Team-ID
+        $teamId = $this->user->currentTeam?->id ?? 0;
+        $cacheKey = "professions_team_{$teamId}";
+        
+        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($teamId) {
+            return Profession::select(['id', 'name', 'team_id'])
+                ->when($teamId, function ($query) use ($teamId) {
+                    return $query->where('team_id', $teamId);
+                })
+                ->get();
+        });
     }
 
     /**
@@ -151,12 +196,17 @@ class PersonalData extends Component
     #[On('stageUpdated')]
     public function getStagesProperty()
     {
-        // Alle verfügbaren Stages laden, gefiltered nach Team
-        $teamId = $this->user->currentTeam?->id;
-
-        return Stage::when($teamId, function ($query) use ($teamId) {
-            return $query->where('team_id', $teamId);
-        })->get();
+        // Cache-Schlüssel mit Team-ID
+        $teamId = $this->user->currentTeam?->id ?? 0;
+        $cacheKey = "stages_team_{$teamId}";
+        
+        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($teamId) {
+            return Stage::select(['id', 'name', 'team_id'])
+                ->when($teamId, function ($query) use ($teamId) {
+                    return $query->where('team_id', $teamId);
+                })
+                ->get();
+        });
     }
 
     /**
@@ -207,6 +257,10 @@ class PersonalData extends Component
                 $this->user->load('employee');
             }
 
+            // Cache für betroffene Daten ungültig machen
+            $userTeamIds = $this->user->teams->pluck('id')->implode('-');
+            Cache::forget("supervisors_user_teams_{$userTeamIds}_exclude_{$this->user->id}");
+
             Flux::toast(
                 text: __('Employee data updated successfully.'),
                 heading: __('Success.'),
@@ -229,6 +283,7 @@ class PersonalData extends Component
      */
     public function render(): View
     {
+        // Computed Properties vorab laden, um Eager Loading zu fördern
         $employeeStatusOptions = $this->employeeStatusOptions;
         $probationOptions = $this->probationOptions;
         $noticePeriodOptions = $this->noticePeriodOptions;

@@ -12,7 +12,6 @@ class ProfileController extends Controller
 
     public function show()
     {
-        //        $this->authorize('show', $company);
         $user = Auth::user();
 
         if (! $user) {

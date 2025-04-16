@@ -16,19 +16,21 @@
                     key="employee-update-{{ $user->id }}"
                 />
 
-
-                <livewire:alem.employee.profile.personal-data
-                    :user="$user"
-                />
-
                 <livewire:alem.employee.profile.employment-data
                     :user="$user"
                 />
 
 
-                <livewire:address.address-manager
-                    :addressable="$user"
-                />
+{{--                <livewire:alem.employee.profile.personal-data--}}
+{{--                    :user="$user"--}}
+{{--                />--}}
+
+
+
+
+{{--                <livewire:address.address-manager--}}
+{{--                    :addressable="$user"--}}
+{{--                />--}}
             @elseif($activeTab === 'report')
                 <livewire:alem.employee.report.report-table
                     :user="$user"

@@ -120,7 +120,7 @@
                 @endforelse
             </x-slot:body>
             <x-slot:pagination>
-                {{ $roles->links() }}
+{{--                {{ $roles->links() }}--}}
             </x-slot:pagination>
         </x-pupi.table.main>
     </x-pupi.table.container>

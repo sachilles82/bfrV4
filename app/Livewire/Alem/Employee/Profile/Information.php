@@ -83,29 +83,42 @@ class Information extends Component
      */
     public function getDepartmentsProperty()
     {
-        // Alle aktiven Departments laden, die zum aktuellen Team gehören
-        // Filtere nach aktuellem Team, falls ein Team ausgewählt ist
-        $teamId = ! empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
-
-        $query = Department::where('model_status', ModelStatus::ACTIVE->value);
-
-        if ($teamId) {
-            $query->where('team_id', $teamId);
-        }
-
-        return $query->get();
+        // Cache-Schlüssel mit aktuellem Team (garantiert eindeutige Daten pro Team)
+        $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
+        $cacheKey = "departments_active_team_" . ($teamId ?? 'none');
+        
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(10), function () use ($teamId) {
+            // Nur benötigte Felder selektieren statt select *
+            $query = Department::select(['id', 'name', 'team_id'])
+                ->where('model_status', ModelStatus::ACTIVE->value)
+                ->whereNull('deleted_at');
+            
+            if ($teamId) {
+                $query->where('team_id', $teamId);
+            }
+            
+            return $query->get();
+        });
     }
 
     #[On('roleUpdated')]
     public function getAvailableRolesProperty()
     {
-        return \App\Models\Spatie\Role::where(function ($query) {
-            $query->where('access', RoleHasAccessTo::EmployeePanel)
-                ->where('visible', RoleVisibility::Visible);
-        })
-            ->where('created_by', 1)                 // System-erstellte Rollen
-            ->orWhere('created_by', auth()->id())    // Oder vom aktuellen Benutzer erstellte Rollen
-            ->get();
+        // Cache-Key mit Benutzer-ID, um für jeden Benutzer eigene Rollen zu cachen
+        $cacheKey = 'roles_employee_panel_' . auth()->id();
+        
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(30), function () {
+            return \App\Models\Spatie\Role::select(['id', 'name', 'created_by'])
+                ->where(function ($query) {
+                    $query->where('access', RoleHasAccessTo::EmployeePanel)
+                        ->where('visible', RoleVisibility::Visible);
+                })
+                ->where(function ($query) {
+                    $query->where('created_by', 1)                // System-erstellte Rollen
+                        ->orWhere('created_by', auth()->id());   // Vom aktuellen Benutzer erstellte Rollen
+                })
+                ->get();
+        });
     }
 
     /**

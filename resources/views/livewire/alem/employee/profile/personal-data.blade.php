@@ -59,9 +59,9 @@
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
                                 <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.profession-form
-                                        lazy
-                                    />
+{{--                                    <livewire:alem.employee.setting.profession.profession-form--}}
+{{--                                        lazy--}}
+{{--                                    />--}}
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
@@ -95,9 +95,9 @@
 
                                 <!-- Trigger zum Öffnen des Stage-Modals -->
                                 <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.stage-form
-                                        lazy
-                                    />
+{{--                                    <livewire:alem.employee.setting.profession.stage-form--}}
+{{--                                        lazy--}}
+{{--                                    />--}}
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
