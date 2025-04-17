@@ -30,13 +30,9 @@ return new class extends Migration {
 
                 // Persönliche Informationen
                 $table->string('name');
-                $table->string('name_normalized')
-                    ->virtualAs("regexp_replace(lower(name), '[^a-z0-9]', '')")
-                    ->nullable()->index();
+                $table->string('name_normalized')->virtualAs("regexp_replace(lower(name), '[^a-z0-9]', '')")->nullable()->index();
                 $table->string('last_name')->nullable();
-                $table->string('last_name_normalized')
-                    ->virtualAs("regexp_replace(lower(last_name), '[^a-z0-9]', '')")
-                    ->nullable()->index();
+                $table->string('last_name_normalized')->virtualAs("regexp_replace(lower(last_name), '[^a-z0-9]', '')")->nullable()->index();
                 $table->string('gender')->default(Gender::Male)->nullable();
                 $table->string('phone_1')->nullable();
                 $table->string('phone_2')->nullable();
@@ -71,10 +67,8 @@ return new class extends Migration {
                 $table->index('joined_at');
                 $table->index('created_at');
 
-            }); // Ende Schema::create für MySQL
-
-            // *** NEU hinzugefügter FULLTEXT Index (MySQL-spezifisch) ***
-            // Muss nach der Tabellenerstellung hinzugefügt werden
+            });
+            // *** NEU hinzugefügter FULLTEXT Index für das Suchfeld (MySQL-spezifisch) ***
             DB::statement('ALTER TABLE users ADD FULLTEXT INDEX users_search_original_fulltext_idx (name, last_name, email, phone_1)');
 
         } // Ende if MySQL
