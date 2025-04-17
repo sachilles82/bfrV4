@@ -1,12 +1,26 @@
 <div wire:ignore.self>
-    <flux:modal name="edit-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl">
+    <flux:modal name="edit-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl"
+                wire:model="showModal">
         <div>
             <flux:heading size="lg">{{ __('Edit Employee') }}</flux:heading>
             <flux:subheading>{{ __('Update employee information') }}</flux:subheading>
         </div>
 
-        <!-- Formular: User- & Employee-Daten -->
-        <form wire:submit.prevent="updateEmployee" class="space-y-4">
+        <!-- Form with loading state display -->
+        <div wire:loading wire:target="loadUser" class="w-full py-8 flex justify-center">
+            <div class="flex flex-col items-center">
+                <!-- Add loading spinner or indicator here -->
+                <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">{{ __('Loading employee data...') }}</p>
+            </div>
+        </div>
+
+        <!-- Form: User & Employee Data -->
+        <form wire:submit.prevent="updateEmployee" class="space-y-4" wire:loading.remove wire:target="loadUser">
+
             <!-- Personal Information Section -->
             <div class="py-4">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -95,9 +109,11 @@
                                 variant="listbox"
                                 multiple
                                 placeholder="{{ __('Teams auswählen') }}">
-                                @foreach($this->teams as $team)
+                                @forelse($this->teams ?? [] as $team)
                                     <flux:option value="{{ $team->id }}">{{ $team->name }}</flux:option>
-                                @endforeach
+                                @empty
+                                    <flux:option value="">{{ __('No Teams found') }}</flux:option>
+                                @endforelse
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -118,56 +134,42 @@
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Department') }}">
-                                @forelse($this->departments as $department)
+                                @forelse($this->departments ?? [] as $department)
                                     <flux:option value="{{ $department->id }}">
                                         <span class="truncate">{{ $department->name }}</span>
                                     </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No Departments found') }}</flux:option>
                                 @endforelse
-
-                                <x-slot name="add">
-                                    <livewire:alem.department.create-department
-                                        lazy
-                                    />
-                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
 
                     <!-- Supervisor -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Supervisor') }}"
-                            for="supervisor"
-                            badge="{{ __('Optional') }}"
-                            :error="$errors->first('supervisor')"
-                            model="supervisor"
-                            help-text="{{ __('') }}">
-                            <flux:select
-                                class="mt-2"
-                                wire:model="supervisor"
-                                id="supervisor"
-                                variant="listbox"
-                                searchable
-                                placeholder="{{ __('Select Supervisor') }}">
-                                @foreach($this->supervisors as $supervisor)
-                                    <flux:option value="{{ $supervisor->id }}">
-                                        <div class="flex items-center gap-2 whitespace-nowrap">
-                                            <flux:avatar
-                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
-                                                circle
-                                                size="xs"
-                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
-                                                alt="{{ $supervisor->name }}"
-                                            />
-                                            {{ $supervisor->name }} {{ $supervisor->last_name }}
-                                        </div>
-                                    </flux:option>
-                                @endforeach
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
+                    <flux:select
+                        class="mt-2"
+                        wire:model="supervisor"
+                        id="supervisor"
+                        variant="listbox"
+                        searchable
+                        placeholder="{{ __('Select Supervisor') }}">
+                        @forelse($this->supervisors ?? [] as $supervisor)
+                            <flux:option value="{{ $supervisor->id }}">
+                                <div class="flex items-center gap-2 whitespace-nowrap">
+                                    <flux:avatar
+                                        name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
+                                        circle
+                                        size="xs"
+                                        src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
+                                        alt="{{ $supervisor->name }}"
+                                    />
+                                    {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                </div>
+                            </flux:option>
+                        @empty
+                            <flux:option value="">{{ __('No supervisors found') }}</flux:option>
+                        @endforelse
+                    </flux:select>
 
                     <!-- Roles -->
                     <div class="sm:col-span-3">
@@ -184,8 +186,7 @@
                                 variant="listbox"
                                 multiple
                                 placeholder="{{ __('Select roles') }}">
-                                @foreach($this->roles as $roleOption)
-
+                                @forelse($this->roles ?? [] as $roleOption)
                                     <div class="flex items-center gap-2">
                                         <flux:option value="{{ $roleOption->id }}">
                                             {{ __($roleOption->name) }}
@@ -196,7 +197,9 @@
                                             @endif
                                         </flux:option>
                                     </div>
-                                @endforeach
+                                @empty
+                                    <flux:option value="">{{ __('No roles found') }}</flux:option>
+                                @endforelse
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -206,7 +209,7 @@
                         <x-pupi.input.group
                             label="{{ __('Profession') }}"
                             for="profession"
-                            badge="{{ __('Optional') }}"
+                            badge="{{ __('Required') }}"
                             :error="$errors->first('profession')"
                             model="profession"
                             help-text="{{ __('') }}">
@@ -217,18 +220,13 @@
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Profession') }}">
-                                @forelse($this->professions as $prof)
+                                @forelse($this->professions ?? [] as $prof)
                                     <flux:option value="{{ $prof->id }}">
                                         <span class="truncate">{{ $prof->name }}</span>
                                     </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No professions found') }}</flux:option>
                                 @endforelse
-
-                                <!-- Trigger zum Öffnen des Profession-Modals -->
-                                <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.profession-form lazy/>
-                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -238,7 +236,7 @@
                         <x-pupi.input.group
                             label="{{ __('Stage') }}"
                             for="stage"
-                            badge="{{ __('Optional') }}"
+                            badge="{{ __('Required') }}"
                             :error="$errors->first('stage')"
                             model="stage"
                             help-text="{{ __('') }}">
@@ -249,20 +247,13 @@
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Stage') }}">
-                                @forelse($this->stages as $st)
+                                @forelse($this->stages ?? [] as $st)
                                     <flux:option value="{{ $st->id }}">
                                         <span class="truncate">{{ $st->name }}</span>
                                     </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No stages found') }}</flux:option>
                                 @endforelse
-
-                                <!-- Trigger zum Öffnen des Stage-Modals -->
-                                <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.stage-form
-                                        lazy
-                                    />
-                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -330,15 +321,14 @@
                             label="{{ __('Account Status') }}"
                             for="model_status"
                             badge="{{ __('Required') }}"
+                            :error="$errors->first('model_status')"
                             model="model_status"
-                            help-text="{{ __('') }}"
-                            :error="$errors->first('model_status')">
+                        >
                             <flux:select
+                                class="mt-2"
                                 wire:model="model_status"
                                 id="model_status"
-                                name="model_status"
-                                variant="listbox"
-                                placeholder="{{ __('Account Status') }}">
+                                variant="listbox">
                                 @foreach($modelStatusOptions as $statusOption)
                                     <flux:option value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
@@ -362,7 +352,7 @@
                 <flux:button wire:click="closeModal" type="button" variant="ghost">
                     {{ __('Cancel') }}
                 </flux:button>
-                <flux:button type="submit">
+                <flux:button type="submit" variant="primary">
                     {{ __('Update') }}
                 </flux:button>
             </div>

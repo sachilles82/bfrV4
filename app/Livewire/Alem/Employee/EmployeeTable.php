@@ -102,7 +102,7 @@ class EmployeeTable extends Component
      */
     public function edit($id): void
     {
-        $this->dispatch('edit-employee', $id); // Event für Modal etc.
+        $this->dispatch('edit-employee', $id);
     }
 
     /**

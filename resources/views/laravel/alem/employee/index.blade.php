@@ -27,9 +27,9 @@
             />
 
 {{--            <!-- Edit Component -->--}}
-{{--            <livewire:alem.employee.edit-employee--}}
-{{--                lazy--}}
-{{--            />--}}
+            <livewire:alem.employee.edit-employee
+                lazy
+            />
 
         </x-pupi.layout.form-index>
 
