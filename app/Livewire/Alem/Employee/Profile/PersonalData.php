@@ -14,10 +14,12 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 
+#[Lazy(isolate: false)]
 class PersonalData extends Component
 {
     use AuthorizesRequests, ValidatePersonalData;
@@ -116,22 +118,22 @@ class PersonalData extends Component
         // Cache-Schlüssel basierend auf Teams des aktuellen Benutzers
         $userTeamIds = $this->user->teams->pluck('id')->implode('-');
         $cacheKey = "supervisors_user_teams_{$userTeamIds}_exclude_{$this->user->id}";
-        
+
         return Cache::remember($cacheKey, now()->addMinutes(30), function () {
             // Manager-Rolle identifizieren
             $managerRole = Role::select('id')->where('name', 'Manager')->first();
-            
+
             if (!$managerRole) {
                 return collect();
             }
-            
+
             // Team-IDs des aktuellen Benutzers abrufen
             $userTeamIds = $this->user->teams->pluck('id')->toArray();
-            
+
             if (empty($userTeamIds)) {
                 return collect();
             }
-            
+
             // Benutzer mit Manager-Rolle finden, die in mindestens einem der Teams des aktuellen Benutzers sind
             return User::join('model_has_roles', function ($join) use ($managerRole) {
                     $join->on('users.id', '=', 'model_has_roles.model_id')
@@ -180,7 +182,7 @@ class PersonalData extends Component
         // Cache-Schlüssel mit Team-ID
         $teamId = $this->user->currentTeam?->id ?? 0;
         $cacheKey = "professions_team_{$teamId}";
-        
+
         return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($teamId) {
             return Profession::select(['id', 'name', 'team_id'])
                 ->when($teamId, function ($query) use ($teamId) {
@@ -199,7 +201,7 @@ class PersonalData extends Component
         // Cache-Schlüssel mit Team-ID
         $teamId = $this->user->currentTeam?->id ?? 0;
         $cacheKey = "stages_team_{$teamId}";
-        
+
         return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($teamId) {
             return Stage::select(['id', 'name', 'team_id'])
                 ->when($teamId, function ($query) use ($teamId) {

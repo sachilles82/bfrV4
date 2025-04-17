@@ -25,10 +25,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Barryvdh\Debugbar\Facades\Debugbar;
 
+#[Lazy(isolate: false)]
 class CreateEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee, WithModelStatusOptions;

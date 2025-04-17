@@ -46,9 +46,16 @@ class TestDataSeeder extends Seeder
 
         try {
             // Parameter für das Seeden
-            $employeeCount = 100000; // Anzahl der zu erstellenden Mitarbeiter
-            $managerCount = 100;    // Anzahl der Manager
+            $employeeCount = 1000000; // Anzahl der zu erstellenden Mitarbeiter für Team 1 (Betrieb 48)
+            $managerCount = 100;    // Anzahl der Manager für Team 1
             $chunkSize = 7500;      // Größere Chunks für bessere Performance
+
+            // Parameter für Betrieb 55 (Team 2)
+            $team2EmployeeCount = 100; // Anzahl der Mitarbeiter für Team 2 (Betrieb 55)
+            $team2ManagerCount = 4;   // Anzahl der Manager für Team 2
+            $team2DepartmentCount = 4; // Anzahl der Abteilungen für Team 2
+            $team2ProfessionCount = 10; // Anzahl der Berufe für Team 2
+            $team2StageCount = 10;     // Anzahl der Stufen für Team 2
 
             $this->command->info('Starte Erstellung der Testdaten...');
 
@@ -137,13 +144,23 @@ class TestDataSeeder extends Seeder
             $owner->company_id = $company->id;
             $owner->save();
 
-            // 4. Erstelle ein Team
-            $this->command->info('Erstelle Team...');
-            $team = Team::create([
+            // 4. Erstelle Teams
+            $this->command->info('Erstelle Teams...');
+
+            // Team 1 - Betrieb 48
+            $team1 = Team::create([
                 'name' => 'Betrieb 48',
                 'user_id' => $owner->id,
                 'company_id' => $company->id,
                 'personal_team' => true,
+            ]);
+
+            // Team 2 - Betrieb 55
+            $team2 = Team::create([
+                'name' => 'Betrieb 55',
+                'user_id' => $owner->id,
+                'company_id' => $company->id,
+                'personal_team' => false,
             ]);
 
             // Enum für Role Visibility importieren
@@ -204,14 +221,14 @@ class TestDataSeeder extends Seeder
             $owner->assignRole('owner');
 
             // Setze das Team als current_team_id für den Owner
-            $owner->current_team_id = $team->id;
+            $owner->current_team_id = $team1->id;
             $owner->save();
 
             // Commit die Transaktion für Basis-Entitäten
             DB::commit();
 
-            // 6. Erstelle Abteilungen
-            $this->command->info('Erstelle 100 Abteilungen...');
+            // 6. Erstelle Abteilungen für Team 1 (Betrieb 48)
+            $this->command->info('Erstelle 100 Abteilungen für Betrieb 48...');
             $departmentChunks = array_chunk(range(1, 100), min(100, $chunkSize));
             $this->command->getOutput()->progressStart(100);
 
@@ -224,7 +241,7 @@ class TestDataSeeder extends Seeder
                         'name' => 'Abteilung '.$i,
                         'description' => 'Beschreibung für Abteilung '.$i,
                         'company_id' => $company->id,
-                        'team_id' => $owner->current_team_id,
+                        'team_id' => $team1->id,
                         'created_by' => $owner->id,
                         'model_status' => ModelStatus::ACTIVE->value,
                         'created_at' => now(),
@@ -240,8 +257,34 @@ class TestDataSeeder extends Seeder
             $this->command->getOutput()->progressFinish();
             $this->command->newLine();
 
-            // 7. Erstelle Berufe
-            $this->command->info('Erstelle 50 Berufe...');
+            // Erstelle Abteilungen für Team 2 (Betrieb 55)
+            $this->command->info('Erstelle '.$team2DepartmentCount.' Abteilungen für Betrieb 55...');
+            $departmentsTeam2 = [];
+            $this->command->getOutput()->progressStart($team2DepartmentCount);
+
+            DB::beginTransaction();
+            for ($i = 1; $i <= $team2DepartmentCount; $i++) {
+                $departmentsTeam2[] = [
+                    'name' => 'B55 Abteilung '.$i,
+                    'description' => 'Beschreibung für B55 Abteilung '.$i,
+                    'company_id' => $company->id,
+                    'team_id' => $team2->id,
+                    'created_by' => $owner->id,
+                    'model_status' => ModelStatus::ACTIVE->value,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                $this->command->getOutput()->progressAdvance();
+            }
+
+            Department::insert($departmentsTeam2);
+            DB::commit();
+
+            $this->command->getOutput()->progressFinish();
+            $this->command->newLine();
+
+            // 7. Erstelle Berufe für Team 1 (Betrieb 48)
+            $this->command->info('Erstelle 50 Berufe für Betrieb 48...');
             $professionChunks = array_chunk(range(1, 50), min(50, $chunkSize));
             $this->command->getOutput()->progressStart(50);
 
@@ -253,7 +296,7 @@ class TestDataSeeder extends Seeder
                     $professions[] = [
                         'name' => 'Beruf'.$index,
                         'company_id' => $company->id,
-                        'team_id' => $team->id, // Korrigierte Team ID
+                        'team_id' => $team1->id,
                         'created_by' => $owner->id,
                         'created_at' => now(),
                         'updated_at' => now(),
@@ -269,9 +312,33 @@ class TestDataSeeder extends Seeder
             $this->command->getOutput()->progressFinish();
             $this->command->newLine();
 
-            // 8. Erstelle definierte Stufen
+            // Erstelle Berufe für Team 2 (Betrieb 55)
+            $this->command->info('Erstelle '.$team2ProfessionCount.' Berufe für Betrieb 55...');
+            $professionsTeam2 = [];
+            $this->command->getOutput()->progressStart($team2ProfessionCount);
+
+            DB::beginTransaction();
+            for ($i = 1; $i <= $team2ProfessionCount; $i++) {
+                $professionsTeam2[] = [
+                    'name' => 'B55 Beruf'.$i,
+                    'company_id' => $company->id,
+                    'team_id' => $team2->id,
+                    'created_by' => $owner->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                $this->command->getOutput()->progressAdvance();
+            }
+
+            Profession::insert($professionsTeam2);
+            DB::commit();
+
+            $this->command->getOutput()->progressFinish();
+            $this->command->newLine();
+
+            // 8. Erstelle definierte Stufen für Team 1 (Betrieb 48)
             $stageNames = ['Lehrling', 'Praktikant', 'Angelernt', 'Geselle', 'Facharbeiter', 'Meister', 'Experte', 'Leiter', 'Direktor', 'CEO', 'CTO', 'CFO', 'COO', 'CIO', 'CSO', 'CMO'];
-            $this->command->info('Erstelle '.count($stageNames).' definierte Stufen...');
+            $this->command->info('Erstelle '.count($stageNames).' definierte Stufen für Betrieb 48...');
             $this->command->getOutput()->progressStart(count($stageNames));
 
             DB::beginTransaction();
@@ -280,7 +347,7 @@ class TestDataSeeder extends Seeder
                 $stages[] = [
                     'name' => $stageName,
                     'company_id' => $company->id,
-                    'team_id' => $team->id,
+                    'team_id' => $team1->id,
                     'created_by' => $owner->id,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -293,11 +360,58 @@ class TestDataSeeder extends Seeder
             $this->command->getOutput()->progressFinish();
             $this->command->newLine();
 
-            // Lade IDs für Beziehungen
+            // Erstelle Stufen für Team 2 (Betrieb 55)
+            $stageNamesTeam2 = array_slice($stageNames, 0, $team2StageCount);
+            $this->command->info('Erstelle '.$team2StageCount.' Stufen für Betrieb 55...');
+            $this->command->getOutput()->progressStart($team2StageCount);
+
+            DB::beginTransaction();
+            $stagesTeam2 = [];
+            foreach ($stageNamesTeam2 as $stageName) {
+                $stagesTeam2[] = [
+                    'name' => 'B55 '.$stageName,
+                    'company_id' => $company->id,
+                    'team_id' => $team2->id,
+                    'created_by' => $owner->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                $this->command->getOutput()->progressAdvance();
+            }
+            Stage::insert($stagesTeam2);
+            DB::commit();
+
+            $this->command->getOutput()->progressFinish();
+            $this->command->newLine();
+
+            // Lade IDs für Beziehungen für Team 1 (Betrieb 48)
             $this->command->info('Lade IDs für Beziehungen...');
-            $departmentIds = Department::where('company_id', $company->id)->pluck('id')->toArray();
-            $professionIds = Profession::where('company_id', $company->id)->pluck('id')->toArray();
-            $stageIds = Stage::where('company_id', $company->id)->pluck('id')->toArray();
+            $departmentIds = Department::where('company_id', $company->id)
+                                      ->where('team_id', $team1->id)
+                                      ->pluck('id')
+                                      ->toArray();
+            $professionIds = Profession::where('company_id', $company->id)
+                                      ->where('team_id', $team1->id)
+                                      ->pluck('id')
+                                      ->toArray();
+            $stageIds = Stage::where('company_id', $company->id)
+                             ->where('team_id', $team1->id)
+                             ->pluck('id')
+                             ->toArray();
+
+            // Lade IDs für Beziehungen für Team 2 (Betrieb 55)
+            $departmentIdsTeam2 = Department::where('company_id', $company->id)
+                                           ->where('team_id', $team2->id)
+                                           ->pluck('id')
+                                           ->toArray();
+            $professionIdsTeam2 = Profession::where('company_id', $company->id)
+                                           ->where('team_id', $team2->id)
+                                           ->pluck('id')
+                                           ->toArray();
+            $stageIdsTeam2 = Stage::where('company_id', $company->id)
+                                  ->where('team_id', $team2->id)
+                                  ->pluck('id')
+                                  ->toArray();
 
             // Hole die Rollen-IDs
             $workerRoleId = $roles['Worker'];
@@ -308,13 +422,13 @@ class TestDataSeeder extends Seeder
             // Rolle-IDs für Nicht-Manager
             $nonManagerRoleIds = [$workerRoleId, $editorRoleId, $temporaryRoleId];
 
-            // 9. Erstelle Mitarbeiter
-            $this->command->info('Erstelle '.$employeeCount.' Mitarbeiter in Chunks von '.$chunkSize.'...');
+            // 9. Erstelle Mitarbeiter für Team 1 (Betrieb 48)
+            $this->command->info('Erstelle '.$employeeCount.' Mitarbeiter für Betrieb 48 in Chunks von '.$chunkSize.'...');
             $this->command->getOutput()->progressStart($employeeCount);
 
             // Vorgenerierter Passwort-Hash für bessere Performance
             $passwordHash = Hash::make('password');
-            $teamId = $team->id;
+            $teamId = $team1->id;
 
             // Zähle die erstellten Manager
             $managersCreated = 0;
@@ -431,8 +545,115 @@ class TestDataSeeder extends Seeder
             }
 
             $this->command->getOutput()->progressFinish();
+            $this->command->newLine();
+
+            // 10. Erstelle Mitarbeiter für Team 2 (Betrieb 55)
+            $this->command->info('Erstelle '.$team2EmployeeCount.' Mitarbeiter für Betrieb 55...');
+            $this->command->getOutput()->progressStart($team2EmployeeCount);
+
+            // Zähle die erstellten Manager für Team 2
+            $managersCreatedTeam2 = 0;
+
+            DB::beginTransaction();
+
+            $employeesTeam2 = [];
+            $roleAssignmentsTeam2 = [];
+            $teamAssignmentsTeam2 = [];
+
+            $currentTime = now();
+
+            for ($i = 0; $i < $team2EmployeeCount; $i++) {
+                $index = $employeeCount + $i + 1; // Fortlaufende Nummerierung nach Team 1
+
+                // Eindeutige E-Mail
+                $email = strtolower(Str::slug($faker->firstName)).'.'.strtolower(Str::slug($faker->lastName)).'.b55.'.$i.'@firma.ch';
+
+                // Zufälliges Eintrittsdatum in den letzten 3 Jahren
+                $joinedDate = Carbon::now()->subDays(rand(0, 365 * 3));
+
+                // Namen für den Benutzer
+                $firstName = $faker->firstName;
+                $lastName = $faker->lastName;
+
+                // Erstelle Benutzer-Daten
+                $userId = DB::table('users')->insertGetId([
+                    'name' => $firstName,
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'email_verified_at' => $currentTime,
+                    'password' => $passwordHash,
+                    'remember_token' => Str::random(10),
+                    'company_id' => $company->id,
+                    'user_type' => UserType::Employee->value,
+                    'department_id' => $departmentIdsTeam2[array_rand($departmentIdsTeam2)],
+                    'model_status' => ModelStatus::ACTIVE->value,
+                    'phone_1' => '+41'.rand(700000000, 799999999),
+                    'slug' => Str::slug($firstName.'-'.$lastName.'-b55-'.$i),
+                    'created_by' => $owner->id,
+                    'joined_at' => $joinedDate,
+                    'created_at' => $currentTime,
+                    'updated_at' => $currentTime,
+                ]);
+
+                // Erstelle Mitarbeiter-Daten
+                $randomStatus = $this->getRandomEmployeeStatus();
+                $employeesTeam2[] = [
+                    'user_id' => $userId,
+                    'profession_id' => $professionIdsTeam2[array_rand($professionIdsTeam2)],
+                    'stage_id' => $stageIdsTeam2[array_rand($stageIdsTeam2)],
+                    'personal_number' => 'B55-'.str_pad($i, 5, '0', STR_PAD_LEFT),
+                    'supervisor_id' => $owner->id,
+                    'employee_status' => $randomStatus->value,
+                    'created_at' => $currentTime,
+                    'updated_at' => $currentTime,
+                ];
+
+                // Rollenauswahl: Manager-Rolle nur für die ersten N Benutzer
+                if ($managersCreatedTeam2 < $team2ManagerCount) {
+                    $roleId = $managerRoleId;
+                    $managersCreatedTeam2++;
+                } else {
+                    // Für alle anderen: zufällige Nicht-Manager-Rolle
+                    $roleId = $nonManagerRoleIds[array_rand($nonManagerRoleIds)];
+                }
+
+                $roleAssignmentsTeam2[] = [
+                    'role_id' => $roleId,
+                    'model_type' => 'App\\Models\\User',
+                    'model_id' => $userId,
+                ];
+
+                // Team-Zuweisungen für Team 2
+                $teamAssignmentsTeam2[] = [
+                    'team_id' => $team2->id,
+                    'user_id' => $userId,
+                    'role' => 'editor',
+                    'created_at' => $currentTime,
+                    'updated_at' => $currentTime,
+                ];
+
+                $this->command->getOutput()->progressAdvance();
+            }
+
+            // Bulk-Insert für Team 2
+            if (! empty($employeesTeam2)) {
+                DB::table('employees')->insert($employeesTeam2);
+            }
+
+            if (! empty($roleAssignmentsTeam2)) {
+                DB::table('model_has_roles')->insert($roleAssignmentsTeam2);
+            }
+
+            if (! empty($teamAssignmentsTeam2)) {
+                DB::table('team_user')->insert($teamAssignmentsTeam2);
+            }
+
+            DB::commit();
+
+            $this->command->getOutput()->progressFinish();
             $this->command->info('Testdaten wurden erfolgreich erstellt!');
-            $this->command->info("Erstellt: $managersCreated Manager und " . ($employeeCount - $managersCreated) . " andere Mitarbeiter");
+            $this->command->info("Erstellt für Betrieb 48: $managersCreated Manager und " . ($employeeCount - $managersCreated) . " andere Mitarbeiter");
+            $this->command->info("Erstellt für Betrieb 55: $managersCreatedTeam2 Manager und " . ($team2EmployeeCount - $managersCreatedTeam2) . " andere Mitarbeiter");
 
         } catch (\Exception $e) {
             // Transaktion rückgängig machen, wenn ein Fehler auftritt

@@ -11,10 +11,12 @@ use App\Models\User;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 
+#[Lazy(isolate: false)]
 class Information extends Component
 {
     use AuthorizesRequests, ValidateInformation;
@@ -86,17 +88,17 @@ class Information extends Component
         // Cache-Schlüssel mit aktuellem Team (garantiert eindeutige Daten pro Team)
         $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : null;
         $cacheKey = "departments_active_team_" . ($teamId ?? 'none');
-        
+
         return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(10), function () use ($teamId) {
             // Nur benötigte Felder selektieren statt select *
             $query = Department::select(['id', 'name', 'team_id'])
                 ->where('model_status', ModelStatus::ACTIVE->value)
                 ->whereNull('deleted_at');
-            
+
             if ($teamId) {
                 $query->where('team_id', $teamId);
             }
-            
+
             return $query->get();
         });
     }
@@ -106,7 +108,7 @@ class Information extends Component
     {
         // Cache-Key mit Benutzer-ID, um für jeden Benutzer eigene Rollen zu cachen
         $cacheKey = 'roles_employee_panel_' . auth()->id();
-        
+
         return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(30), function () {
             return \App\Models\Spatie\Role::select(['id', 'name', 'created_by'])
                 ->where(function ($query) {

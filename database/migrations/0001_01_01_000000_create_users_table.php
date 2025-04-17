@@ -8,8 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      * Erstellt die Tabellen für Benutzer, Passwort-Reset-Tokens und Sitzungen.
@@ -43,7 +42,7 @@ return new class extends Migration
                 $table->string('phone_2')->nullable();
 
                 // Organisations- und Rollenzuordnung
-                $table->foreignId('company_id')->nullable()->index();
+                $table->foreignId('company_id')->nullable();
                 $table->foreignId('department_id')->nullable();
                 $table->string('user_type')->default(UserType::Employee);
                 $table->string('model_status')->default(ModelStatus::ACTIVE);
@@ -64,13 +63,13 @@ return new class extends Migration
                 $table->timestamps();
 
                 // --- Optimierte Indizes für häufig abgefragte Felder ---
-                $table->index(['id', 'name', 'last_name']);
                 $table->index(['user_type', 'model_status', 'deleted_at'], 'idx_user_type_status_deleted');
                 $table->index(['company_id', 'department_id'], 'idx_company_department');
 
-                // *** NEU hinzugefügte Standard-Indizes ***
-                $table->index('joined_at'); // Index für joined_at hinzugefügt
-                $table->index('phone_1');   // Index für phone_1 hinzugefügt
+                // Indexes für die Sortierfelder
+                $table->index('name');
+                $table->index('joined_at');
+                $table->index('created_at');
 
             }); // Ende Schema::create für MySQL
 
@@ -95,7 +94,7 @@ return new class extends Migration
         //                $table->string('phone_2')->nullable();
         //
         //                // Organisations- und Rollenzuordnung
-        //                $table->foreignId('company_id')->nullable()->index();
+        //                $table->foreignId('company_id')->nullable();
         //                $table->foreignId('department_id')->nullable();
         //                $table->string('user_type')->default(UserType::Employee);
         //                $table->string('model_status')->default(ModelStatus::ACTIVE);
@@ -121,15 +120,16 @@ return new class extends Migration
         //                // Bestehende Indizes
         //                $table->index(['user_type', 'model_status'], 'idx_user_type_status');
         //                $table->index(['company_id', 'department_id'], 'idx_company_department');
+//        $table->index('name');
+//        $table->index('joined_at');
+//        $table->index('created_at');
         //
         //                // PostgreSQL-spezifische normalisierte Indizes
         //                $table->rawIndex("regexp_replace(lower(name), '[^a-z0-9]', '')", 'users_name_normalized_index');
         //                $table->rawIndex("regexp_replace(lower(last_name), '[^a-z0-9]', '')", 'users_last_name_normalized_index');
         //
         //                // *** NEU hinzugefügte Standard-Indizes ***
-        //                $table->index('joined_at'); // Index für joined_at hinzugefügt
-        //                $table->index('phone_1');   // Index für phone_1 hinzugefügt
-        //                $table->index('created_at');
+        //
         //
         //                // Hinweis: Der MySQL FULLTEXT Index ist hier nicht direkt anwendbar.
         //                // PostgreSQL benötigt eine andere Konfiguration für Volltextsuche (z.B. tsvector, GIN).

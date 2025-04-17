@@ -13,8 +13,10 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Attributes\Lazy;
 use Livewire\Component;
 
+#[Lazy(isolate: false)]
 class EmploymentData extends Component
 {
     use AuthorizesRequests, ValidateEmploymentData;

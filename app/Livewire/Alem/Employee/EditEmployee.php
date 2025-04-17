@@ -18,10 +18,12 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+#[Lazy(isolate: false)]
 class EditEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee,
