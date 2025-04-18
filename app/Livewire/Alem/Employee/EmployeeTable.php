@@ -102,7 +102,8 @@ class EmployeeTable extends Component
      */
     public function edit($id): void
     {
-        $this->dispatch('edit-employee', $id);
+        // Just dispatch an event with the user ID
+        $this->dispatch('edit-employee', ['userId' => $id]);
     }
 
     /**

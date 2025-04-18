@@ -64,30 +64,35 @@ class EditEmployee extends Component
      * Event handler for edit-employee event
      */
     #[On('edit-employee')]
-    public function loadUser(int $id): void
+    public function loadUser($data): void
     {
-        $this->userId = $id;
-        $this->showModal = true;
-
-        // Reset form state
-        $this->userLoaded = false;
-        $this->dataLoaded = false;
-
-        // Only load user data - load dependencies on render
-        $this->loadUserData();
-
-        // Trigger the modal to open
-        $this->dispatch('modal-show', ['name' => 'edit-employee']);
+        $this->loadEmployee($data['userId']);
+        $this->modal('edit-employee')->show();
     }
+//    public function loadUser(int $id): void
+//    {
+//        $this->userId = $id;
+//        $this->showModal = true;
+//
+//        // Reset form state
+//        $this->userLoaded = false;
+//        $this->dataLoaded = false;
+//
+//        // Only load user data - load dependencies on render
+//        $this->loadUserData();
+//
+//        // Trigger the modal to open
+//        $this->dispatch('modal-show', ['name' => 'edit-employee']);
+//    }
 
     /**
      * Load user and employee data with optimized query
      */
-    private function loadUserData(): void
+    protected function loadEmployee($id): void
     {
-        if ($this->userLoaded || !$this->userId) {
-            return;
-        }
+//        if ($this->userLoaded || !$this->userId) {
+//            return;
+//        }
 
         try {
             // Fetch user with only necessary relations and fields
@@ -100,7 +105,7 @@ class EditEmployee extends Component
                     'teams:id,name',
                     'roles:id,name'
                 ])
-                ->findOrFail($this->userId);
+                ->findOrFail($id);
 
             // Populate user fields
             $this->name = $user->name;
@@ -123,7 +128,7 @@ class EditEmployee extends Component
                 $this->supervisor = $user->employee->supervisor_id;
             }
 
-            $this->userLoaded = true;
+//            $this->userLoaded = true;
         } catch (\Exception $e) {
             Debugbar::error('Error loading user data: ' . $e->getMessage());
             Flux::toast(
