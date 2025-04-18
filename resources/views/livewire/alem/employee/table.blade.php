@@ -88,7 +88,7 @@
 
     <!-- Tabelle -->
     <x-pupi.table.container>
-        <div x-data="{ checked:false }">
+        <div x-data="{ checked:false }" wire:key="employee-table-{{ now() }}">
             <x-pupi.table.main>
                 <x-slot:head>
                     <x-pupi.table.th.check-all/>
@@ -110,10 +110,12 @@
                 </x-slot:head>
                 <x-slot:body>
                     @if($statusFilter === 'trashed')
-                        <x-pupi.table.tr.trash-warning :colspan="9" />
+                        <x-pupi.table.tr.trash-warning :colspan="9"/>
                     @endif
                     @forelse($users as $user)
-                            <x-pupi.table.tr.selectable-row :id="$user->id">
+                        <x-pupi.table.tr.selectable-row
+                            :id="$user->id"
+                            wire:key="user-row-{{ $user->id }}">
                             <td class="relative px-7 sm:w-12 sm:px-6">
                                 <div x-show="checked" x-cloak
                                      class="absolute inset-y-0 left-0 w-0.5 dark:bg-indigo-500 bg-indigo-600"></div>
@@ -175,11 +177,7 @@
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <div class="text-gray-500 dark:text-gray-400">
-                                    @if($user->department)
                                         {{ $user->department->name }}
-                                    @else
-                                        <span class="text-gray-500 dark:text-gray-400"> {{ __('No Department') }}</span>
-                                    @endif
                                 </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
@@ -256,18 +254,16 @@
                                             </flux:menu.item>
                                         @elseif($user->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
                                             <!-- Options for archived users -->
-                                            <flux:modal.trigger name="edit-employee">
-{{--                                                <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">--}}
-{{--                                                    {{ __('Edit') }}--}}
-{{--                                                </flux:menu.item>--}}
-
-                                                <flux:menu.item
-                                                    x-on:click="$dispatch('open-edit-employee-modal', {userId: {{ $user->id }}})"
-                                                    icon="pencil-square"
-                                                >
-                                                    {{ __('Edit') }}
-                                                </flux:menu.item>
-                                            </flux:modal.trigger>
+                                            <flux:menu.item 
+                                                @click.stop.prevent="
+                                                    $dispatch('modal-show', { name: 'edit-employee' }); 
+                                                    $nextTick(() => {
+                                                        $dispatch('open-edit-employee-modal', {userId: {{ $user->id }}});
+                                                    });"
+                                                icon="pencil-square"
+                                            >
+                                                {{ __('Edit') }}
+                                            </flux:menu.item>
 
                                             <flux:separator class="my-1"/>
 
@@ -286,18 +282,16 @@
                                         @else
                                             <!-- Options for active users -->
 
-                                            <flux:modal.trigger name="edit-employee">
-{{--                                                <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">--}}
-{{--                                                    {{ __('Edit') }}--}}
-{{--                                                </flux:menu.item>--}}
-
-                                                <flux:menu.item
-                                                    x-on:click="$dispatch('open-edit-employee-modal', {userId: {{ $user->id }}})"
-                                                    icon="pencil-square"
-                                                >
-                                                    {{ __('Edit') }}
-                                                </flux:menu.item>
-                                            </flux:modal.trigger>
+                                            <flux:menu.item 
+                                                @click.stop.prevent="
+                                                    $dispatch('modal-show', { name: 'edit-employee' }); 
+                                                    $nextTick(() => {
+                                                        $dispatch('open-edit-employee-modal', {userId: {{ $user->id }}});
+                                                    });"
+                                                icon="pencil-square"
+                                            >
+                                                {{ __('Edit') }}
+                                            </flux:menu.item>
 
                                             <flux:menu.item wire:click="archive({{ $user->id }})"
                                                             icon="archive-box">

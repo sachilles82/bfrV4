@@ -170,93 +170,10 @@ class CreateEmployee extends Component
         }
     }
 
-//    /**
-//     * Load essential data for dropdowns
-//     */
-//    private function loadEssentialData(): void
-//    {
-//        try {
-//            // Store user data once to avoid multiple auth() calls
-//            $user = auth()->user();
-//            $currentTeamId = $user->current_team_id;
-//            $currentCompanyId = $user->company_id;
-//            $currentUserId = $user->id;
-//
-//            // Load teams with one query (if not already loaded)
-//            if ($this->teams === null) {
-//                $this->teams = Team::where('company_id', $currentCompanyId)
-//                    ->select(['id', 'name'])
-//                    ->orderBy('name')
-//                    ->get();
-//            }
-//
-//            // Load departments with one query - FIX: remove duplicate team_id condition
-//            if ($this->departments === null) {
-//                $query = Department::where('model_status', ModelStatus::ACTIVE->value)
-//                    ->where('company_id', $currentCompanyId)
-//                    ->where('team_id', $currentTeamId)
-//                    ->select(['id', 'name'])
-//                    ->orderBy('name');
-//
-//                $this->departments = $query->get();
-//            }
-//
-//            // Load roles with more efficient query
-//            if ($this->roles === null) {
-//                $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
-//                    ->where('visible', RoleVisibility::Visible->value)
-//                    ->where(function ($query) use ($currentUserId) {
-//                        $query->where('created_by', 1)
-//                            ->orWhere('created_by', $currentUserId);
-//                    })
-//                    ->select(['id', 'name', 'is_manager'])
-//                    ->get();
-//            }
-//
-//            // Load professions
-//            if ($this->professions === null) {
-//                $this->professions = Profession::where('company_id', $currentCompanyId)
-//                    ->select(['id', 'name'])
-//                    ->orderBy('name')
-//                    ->get();
-//            }
-//
-//            // Load stages
-//            if ($this->stages === null) {
-//                $this->stages = Stage::where('company_id', $currentCompanyId)
-//                    ->select(['id', 'name'])
-//                    ->orderBy('name')
-//                    ->get();
-//            }
-//
-//            // FIX: Optimize supervisors query - remove duplicate deleted_at check
-//            if ($this->supervisors === null) {
-//                $this->supervisors = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
-//                    ->join('model_has_roles', function ($join) {
-//                        $join->on('users.id', '=', 'model_has_roles.model_id')
-//                            ->where('model_has_roles.model_type', User::class);
-//                    })
-//                    ->join('roles', function ($join) {
-//                        $join->on('model_has_roles.role_id', '=', 'roles.id')
-//                            ->where('roles.is_manager', true);
-//                    })
-//                    ->where('users.company_id', $currentCompanyId)
-//                    ->whereNull('users.deleted_at')
-//                    ->orderBy('users.name')
-//                    ->distinct()
-//                    ->get();
-//            }
-//
-//            $this->dataLoaded = true;
-//        } catch (\Exception $e) {
-//            Debugbar::error('Error loading essential data: ' . $e->getMessage());
-//        }
-//    }
-
     /**
      * Lifecycle hook to make sure data is loaded even after validation errors
      */
-    public function hydrate()
+    public function hydrate(): void
     {
         if ($this->showModal && !$this->dataLoaded) {
             $this->loadEssentialData();
@@ -356,25 +273,6 @@ class CreateEmployee extends Component
     /**
      * Gets departments filtered by selected team
      */
-//    public function getDepartmentsProperty()
-//    {
-//        if ($this->showModal && $this->departments === null) {
-//            // If we need to filter by team
-//            $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : auth()->user()->current_team_id;
-//
-//            $query = Department::where('model_status', ModelStatus::ACTIVE->value)
-//                ->where('company_id', auth()->user()->company_id);
-//
-//            if ($teamId) {
-//                $query->where('team_id', $teamId);
-//            }
-//
-//            $this->departments = $query->select(['id', 'name'])->get();
-//        }
-//
-//        return $this->departments ?? collect();
-//    }
-
     public function getDepartmentsProperty()
     {
         if ($this->showModal && $this->departments === null) {

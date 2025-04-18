@@ -1,7 +1,14 @@
-<div wire:ignore.self x-data="{}" @open-edit-employee-modal.window="$wire.editEmployee($event.detail.userId)">
-
-    <flux:modal name="edit-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl"
-                wire:model="showModal">
+<div
+    x-data="{}"
+    @open-edit-employee-modal.window="$wire.editEmployee($event.detail.userId)"
+>
+    <flux:modal
+        name="edit-employee"
+        variant="flyout"
+        position="left"
+        class="space-y-6 lg:min-w-3xl"
+        wire:model="showModal"
+    >
         <div>
             <flux:heading size="lg">{{ __('Edit Employee') }}</flux:heading>
             <flux:subheading>{{ __('Update employee information') }}</flux:subheading>
@@ -10,12 +17,12 @@
         <!-- Form: User & Employee Data -->
         <form wire:submit.prevent="updateEmployee" class="space-y-4 relative">
             <!-- Loading Overlay -->
-            <div wire:loading wire:target="editEmployee, updateEmployee" class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/10  rounded-lg">
-            </div>
-
-            <!-- Zentrierter Spinner -->
-            <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20" wire:loading wire:target="editEmployee, updateEmployee">
-                <svg class="animate-spin h-12 w-12 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <div
+                wire:loading.delay
+                class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-lg"
+            >
+                <!-- Centered Spinner -->
+                <svg class="animate-spin h-12 w-12 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -40,11 +47,9 @@
                                 variant="listbox"
                                 placeholder="{{ __('Select gender') }}">
                                 @foreach(\App\Enums\User\Gender::cases() as $genderStatus)
-                                    <flux:option value="{{ $genderStatus }}">
+                                    <flux:option value="{{ $genderStatus->value }}">
                                         {{ $genderStatus->label() }}
                                     </flux:option>
-                                    <div wire:loading wire:target="editEmployee, updateEmployee" class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/10 backdrop-blur-xs rounded-lg">
-                                    </div>
                                 @endforeach
                             </flux:select>
                         </x-pupi.input.group>
@@ -199,17 +204,15 @@
                                 multiple
                                 placeholder="{{ __('Select roles') }}">
                                 @forelse($this->roles ?? [] as $roleOption)
-                                    <div class="flex items-center gap-2">
-                                        <flux:option value="{{ $roleOption->id }}">
-                                            {{ __($roleOption->name) }}
-                                            @if($roleOption->is_manager)
-                                                <span
-                                                    class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+                                    <flux:option value="{{ $roleOption->id }}">
+                                        {{ __($roleOption->name) }}
+                                        @if($roleOption->is_manager)
+                                            <span
+                                                class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
                                                 {{ __('Manager') }}
                                             </span>
-                                            @endif
-                                        </flux:option>
-                                    </div>
+                                        @endif
+                                    </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No roles found') }}</flux:option>
                                 @endforelse
@@ -281,7 +284,7 @@
                             :error="$errors->first('joined_at')"
                         >
                             <flux:date-picker
-                                wire:model.defer="joined_at"
+                                wire:model="joined_at"
                                 with-today
                                 week-numbers
                                 id="joined_at"
@@ -362,10 +365,21 @@
 
             <!-- Form Buttons -->
             <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                <flux:button wire:click="closeModal" type="button" variant="ghost" wire:loading.attr="disabled" wire:target="updateEmployee">
+                <flux:button
+                    wire:click="closeModal"
+                    type="button"
+                    variant="ghost"
+                    wire:loading.attr="disabled"
+                    wire:target="updateEmployee"
+                >
                     {{ __('Cancel') }}
                 </flux:button>
-                <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="updateEmployee">
+                <flux:button
+                    type="submit"
+                    variant="primary"
+                    wire:loading.attr="disabled"
+                    wire:target="updateEmployee"
+                >
                     <div wire:loading.flex wire:target="updateEmployee" class="items-center">
                         <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

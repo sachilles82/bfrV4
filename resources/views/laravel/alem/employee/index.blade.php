@@ -13,6 +13,7 @@
             <!--Create Button, open the Create Component-->
             <x-slot:create>
                 <livewire:alem.employee.create-employee
+                    wire:key="create-employee-component"
                     lazy
                 />
             </x-slot:create>
@@ -23,11 +24,13 @@
                 :teams="$teams"
                 :professions="$professions"
                 :stages="$stages"
-                 lazy
+                wire:key="employee-table-component"
+                lazy
             />
 
-{{--            <!-- Edit Component -->--}}
+            {{-- <!-- Edit Component --> --}}
             <livewire:alem.employee.edit-employee
+                wire:key="edit-employee-component"
                 lazy
             />
 

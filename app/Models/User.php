@@ -72,6 +72,7 @@ class User extends Authenticatable
         'joined_at',
         'user_type',
         'model_status',
+        'gender',
     ];
 
     /**
