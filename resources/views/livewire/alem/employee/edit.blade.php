@@ -7,22 +7,19 @@
             <flux:subheading>{{ __('Update employee information') }}</flux:subheading>
         </div>
 
-        <!-- Form with loading state display -->
-        <div wire:loading wire:target="editEmployee" class="w-full py-8 flex justify-center">
-            <div class="flex flex-col items-center">
-                <!-- Add loading spinner or indicator here -->
-                <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                     viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <p class="mt-2 text-gray-600 dark:text-gray-400">{{ __('Loading employee data...') }}</p>
-            </div>
-        </div>
-
         <!-- Form: User & Employee Data -->
-        <form wire:submit.prevent="updateEmployee" class="space-y-4" wire:loading.remove wire:target="editEmployee">
+        <form wire:submit.prevent="updateEmployee" class="space-y-4 relative">
+            <!-- Loading Overlay -->
+            <div wire:loading wire:target="editEmployee, updateEmployee" class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/10  rounded-lg">
+            </div>
+
+            <!-- Zentrierter Spinner -->
+            <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20" wire:loading wire:target="editEmployee, updateEmployee">
+                <svg class="animate-spin h-12 w-12 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
 
             <!-- Personal Information Section -->
             <div class="py-4">
@@ -46,6 +43,8 @@
                                     <flux:option value="{{ $genderStatus }}">
                                         {{ $genderStatus->label() }}
                                     </flux:option>
+                                    <div wire:loading wire:target="editEmployee, updateEmployee" class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-gray-900/10 backdrop-blur-xs rounded-lg">
+                                    </div>
                                 @endforeach
                             </flux:select>
                         </x-pupi.input.group>
@@ -363,11 +362,18 @@
 
             <!-- Form Buttons -->
             <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                <flux:button wire:click="closeModal" type="button" variant="ghost">
+                <flux:button wire:click="closeModal" type="button" variant="ghost" wire:loading.attr="disabled" wire:target="updateEmployee">
                     {{ __('Cancel') }}
                 </flux:button>
-                <flux:button type="submit" variant="primary">
-                    {{ __('Update') }}
+                <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="updateEmployee">
+                    <div wire:loading.flex wire:target="updateEmployee" class="items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ __('Saving...') }}
+                    </div>
+                    <span wire:loading.remove wire:target="updateEmployee">{{ __('Update') }}</span>
                 </flux:button>
             </div>
         </form>

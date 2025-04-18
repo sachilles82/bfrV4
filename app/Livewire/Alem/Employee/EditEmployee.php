@@ -509,8 +509,4 @@ class EditEmployee extends Component
         return view('livewire.alem.employee.edit', $viewData);
     }
 
-//    public function placeholder()
-//    {
-//
-//    }
 }

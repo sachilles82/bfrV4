@@ -10,12 +10,12 @@
         {{-- Das ist die Form mit der Create und der Table Componente --}}
         <x-pupi.layout.form-index>
 
-{{--            <!--Create Button, open the Create Component-->--}}
-{{--            <x-slot:create>--}}
-{{--                <livewire:alem.employee.create-employee--}}
-{{--                    lazy--}}
-{{--                />--}}
-{{--            </x-slot:create>--}}
+            <!--Create Button, open the Create Component-->
+            <x-slot:create>
+                <livewire:alem.employee.create-employee
+                    lazy
+                />
+            </x-slot:create>
 
 
             <livewire:alem.employee.employee-table
