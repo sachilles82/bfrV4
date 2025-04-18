@@ -47,6 +47,7 @@
 
         // Checkbox zurücksetzen
         resetCheckbox() {
+            if (!this.$refs.checkbox) return;
             this.$refs.checkbox.checked = false;
             this.$refs.checkbox.indeterminate = false;
         },
@@ -85,18 +86,21 @@
 
         // Setzt den Zustand auf vollständig ausgewählt
         setFullyCheckedState() {
+            if (!this.$refs.checkbox) return;
             this.$refs.checkbox.checked = true;
             this.$refs.checkbox.indeterminate = false;
         },
 
         // Setzt den Zustand auf nicht ausgewählt
         setUncheckedState() {
+            if (!this.$refs.checkbox) return;
             this.$refs.checkbox.checked = false;
             this.$refs.checkbox.indeterminate = false;
         },
 
         // Setzt den Zustand auf teilweise ausgewählt
         setIndeterminateState() {
+            if (!this.$refs.checkbox) return;
             this.$refs.checkbox.checked = false;
             this.$refs.checkbox.indeterminate = true;
         },
