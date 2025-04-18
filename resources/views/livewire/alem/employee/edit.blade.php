@@ -1,4 +1,5 @@
-<div wire:ignore.self>
+<div wire:ignore.self x-data="{}" @open-edit-employee-modal.window="$wire.editEmployee($event.detail.userId)">
+
     <flux:modal name="edit-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl"
                 wire:model="showModal">
         <div>
@@ -7,19 +8,21 @@
         </div>
 
         <!-- Form with loading state display -->
-        <div wire:loading wire:target="loadUser" class="w-full py-8 flex justify-center">
+        <div wire:loading wire:target="editEmployee" class="w-full py-8 flex justify-center">
             <div class="flex flex-col items-center">
                 <!-- Add loading spinner or indicator here -->
-                <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <p class="mt-2 text-gray-600 dark:text-gray-400">{{ __('Loading employee data...') }}</p>
             </div>
         </div>
 
         <!-- Form: User & Employee Data -->
-        <form wire:submit.prevent="updateEmployee" class="space-y-4" wire:loading.remove wire:target="loadUser">
+        <form wire:submit.prevent="updateEmployee" class="space-y-4" wire:loading.remove wire:target="editEmployee">
 
             <!-- Personal Information Section -->
             <div class="py-4">
@@ -146,30 +149,40 @@
                     </div>
 
                     <!-- Supervisor -->
-                    <flux:select
-                        class="mt-2"
-                        wire:model="supervisor"
-                        id="supervisor"
-                        variant="listbox"
-                        searchable
-                        placeholder="{{ __('Select Supervisor') }}">
-                        @forelse($this->supervisors ?? [] as $supervisor)
-                            <flux:option value="{{ $supervisor->id }}">
-                                <div class="flex items-center gap-2 whitespace-nowrap">
-                                    <flux:avatar
-                                        name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
-                                        circle
-                                        size="xs"
-                                        src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
-                                        alt="{{ $supervisor->name }}"
-                                    />
-                                    {{ $supervisor->name }} {{ $supervisor->last_name }}
-                                </div>
-                            </flux:option>
-                        @empty
-                            <flux:option value="">{{ __('No supervisors found') }}</flux:option>
-                        @endforelse
-                    </flux:select>
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Supervisor') }}"
+                            for="supervisor"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('supervisor')"
+                            model="supervisor"
+                            help-text="{{ __('') }}">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="supervisor"
+                                id="supervisor"
+                                variant="listbox"
+                                searchable
+                                placeholder="{{ __('Select Supervisor') }}">
+                                @forelse($this->supervisors ?? [] as $supervisor)
+                                    <flux:option value="{{ $supervisor->id }}">
+                                        <div class="flex items-center gap-2 whitespace-nowrap">
+                                            <flux:avatar
+                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
+                                                circle
+                                                size="xs"
+                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
+                                                alt="{{ $supervisor->name }}"
+                                            />
+                                            {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                        </div>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No supervisors found') }}</flux:option>
+                                @endforelse
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
 
                     <!-- Roles -->
                     <div class="sm:col-span-3">
@@ -191,7 +204,8 @@
                                         <flux:option value="{{ $roleOption->id }}">
                                             {{ __($roleOption->name) }}
                                             @if($roleOption->is_manager)
-                                                <span class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+                                                <span
+                                                    class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
                                                 {{ __('Manager') }}
                                             </span>
                                             @endif

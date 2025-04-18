@@ -257,7 +257,14 @@
                                         @elseif($user->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
                                             <!-- Options for archived users -->
                                             <flux:modal.trigger name="edit-employee">
-                                                <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
+{{--                                                <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">--}}
+{{--                                                    {{ __('Edit') }}--}}
+{{--                                                </flux:menu.item>--}}
+
+                                                <flux:menu.item
+                                                    x-on:click="$dispatch('open-edit-employee-modal', {userId: {{ $user->id }}})"
+                                                    icon="pencil-square"
+                                                >
                                                     {{ __('Edit') }}
                                                 </flux:menu.item>
                                             </flux:modal.trigger>
@@ -280,7 +287,14 @@
                                             <!-- Options for active users -->
 
                                             <flux:modal.trigger name="edit-employee">
-                                                <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">
+{{--                                                <flux:menu.item wire:click="edit({{ $user->id }})" icon="pencil-square">--}}
+{{--                                                    {{ __('Edit') }}--}}
+{{--                                                </flux:menu.item>--}}
+
+                                                <flux:menu.item
+                                                    x-on:click="$dispatch('open-edit-employee-modal', {userId: {{ $user->id }}})"
+                                                    icon="pencil-square"
+                                                >
                                                     {{ __('Edit') }}
                                                 </flux:menu.item>
                                             </flux:modal.trigger>

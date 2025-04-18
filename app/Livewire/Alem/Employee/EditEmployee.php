@@ -6,7 +6,9 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
+use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
+use App\Models\Alem\Employee;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\Spatie\Role;
@@ -18,457 +20,497 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Barryvdh\Debugbar\Facades\Debugbar;
 
 class EditEmployee extends Component
 {
-    use AuthorizesRequests, WithModelStatusOptions;
+    use AuthorizesRequests, ValidateEmployee, WithModelStatusOptions;
 
-    // Modal state
-    public $showModal = false;
-    private $dataLoaded = false;
-    private $userLoaded = false;
+    /**
+     * Modal state
+     */
+    public bool $showModal = false;
+    protected bool $dataLoaded = false;
 
-    // User identification
+    /**
+     * User identification
+     */
     public ?int $userId = null;
+    protected ?User $user = null;
 
-    // Form fields - User data
-    public $gender;
-    public $name;
-    public $last_name;
-    public $email;
-    public ?Carbon $joined_at = null;
+    /**
+     * User form fields
+     */
+    public ?string $name = null;
+    public ?string $last_name = null;
+    public ?string $email = null;
+    public ?string $gender = null;
+    public ?string $model_status = null;
+    public $joined_at = null;
     public $department = null;
-    public $selectedTeams = [];
-    public $selectedRoles = [];
-    public $model_status;
+    public array $selectedTeams = [];
+    public array $selectedRoles = [];
 
-    // Form fields - Employee data
-    public $employee_status;
-    public $profession;
-    public $stage;
+    /**
+     * Employee fields
+     */
+    public $employee_status = null;
+    public $profession = null;
+    public $stage = null;
     public $supervisor = null;
 
-    // Cached data collections
-    private $teams = null;
-    private $departments = null;
-    private $roles = null;
-    private $professions = null;
-    private $stages = null;
-    private $supervisors = null;
+    /**
+     * Cached data collections
+     */
+    protected array $cache = [
+        'teams' => null,
+        'departments' => null,
+        'roles' => null,
+        'professions' => null,
+        'stages' => null,
+        'supervisors' => null,
+    ];
 
     /**
-     * Event handler for edit-employee event
+     * Listener für den Empfang der Mitarbeiter-ID aus anderen Komponenten
+     *
+     * @param array|int $data Entweder ein Array mit 'userId' oder direkt die ID
+     * @return void
      */
-    #[On('edit-employee')]
-    public function loadUser($data): void
+
+    public function prepareEmployeeData($id): void
     {
-        $this->loadEmployee($data['userId']);
-        $this->modal('edit-employee')->show();
+        // Event dispatchen, das EditEmployee abfangen kann
+        $this->dispatch('edit-employee', ['userId' => $id]);
     }
-//    public function loadUser(int $id): void
-//    {
-//        $this->userId = $id;
-//        $this->showModal = true;
-//
-//        // Reset form state
-//        $this->userLoaded = false;
-//        $this->dataLoaded = false;
-//
-//        // Only load user data - load dependencies on render
-//        $this->loadUserData();
-//
-//        // Trigger the modal to open
-//        $this->dispatch('modal-show', ['name' => 'edit-employee']);
-//    }
 
-    /**
-     * Load user and employee data with optimized query
-     */
-    protected function loadEmployee($id): void
+    public function editEmployee($userId): void
     {
-//        if ($this->userLoaded || !$this->userId) {
-//            return;
-//        }
-
         try {
-            // Fetch user with only necessary relations and fields
-            $user = User::select([
-                'id', 'name', 'last_name', 'email', 'gender',
-                'model_status', 'joined_at', 'department_id'
-            ])
-                ->with([
-                    'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
-                    'teams:id,name',
-                    'roles:id,name'
-                ])
-                ->findOrFail($id);
+            $this->userId = $userId;
+            if (!$this->userId) {
+                throw new \Exception('Keine gültige Benutzer-ID empfangen');
 
-            // Populate user fields
-            $this->name = $user->name;
-            $this->last_name = $user->last_name;
-            $this->email = $user->email;
-            $this->gender = $user->gender;
-            $this->model_status = $user->model_status;
-            $this->joined_at = $user->joined_at;
-            $this->department = $user->department_id;
-
-            // Teams and roles
-            $this->selectedTeams = $user->teams->pluck('id')->toArray();
-            $this->selectedRoles = $user->roles->pluck('id')->toArray();
-
-            // Employee data
-            if ($user->employee) {
-                $this->employee_status = $user->employee->employee_status;
-                $this->profession = $user->employee->profession_id;
-                $this->stage = $user->employee->stage_id;
-                $this->supervisor = $user->employee->supervisor_id;
+                Log::error('Keine gültige Benutzer-ID empfangen');
             }
 
-//            $this->userLoaded = true;
+            // Benutzer mit allen relevanten Relationen laden
+            $this->user = User::with([
+                'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
+                'teams:id,name',
+                'roles:id,name'
+            ])->findOrFail($this->userId);
+
+            // Benutzerdaten in die Komponente laden
+            $this->fillFormWithUserData();
+
+            // Modal öffnen und Event-Zustand aktualisieren
+            $this->showModal = true;
+            $this->dataLoaded = false; // Daten beim Rendern neu laden
+
+            // Informiere UI über das Öffnen des Modals
+            $this->dispatch('modal-show', ['name' => 'edit-employee']);
         } catch (\Exception $e) {
-            Debugbar::error('Error loading user data: ' . $e->getMessage());
-            Flux::toast(
-                text: __('Error loading employee: ') . $e->getMessage(),
-                heading: __('Error'),
-                variant: 'danger'
-            );
-            $this->closeModal();
+            $this->handleError('Fehler beim Laden des Mitarbeiters', $e);
         }
     }
 
     /**
-     * Load essential dropdown data (lazy)
+     * Befüllt das Formular mit den Benutzerdaten
+     *
+     * @return void
      */
-    private function loadEssentialData(): void
+    protected function fillFormWithUserData(): void
+    {
+        if (!$this->user) {
+            return;
+        }
+
+        // Zurücksetzen aller relevanten Eigenschaften
+        $this->reset([
+            'name', 'last_name', 'email', 'gender', 'model_status',
+            'joined_at', 'department', 'selectedTeams', 'selectedRoles',
+            'employee_status', 'profession', 'stage', 'supervisor'
+        ]);
+
+        // Benutzerdaten zuweisen
+        $this->name = $this->user->name;
+        $this->last_name = $this->user->last_name;
+        $this->email = $this->user->email;
+        $this->gender = $this->user->gender;
+        $this->model_status = $this->user->model_status;
+        $this->joined_at = $this->user->joined_at;
+        $this->department = $this->user->department_id;
+
+        // Beziehungen zuweisen
+        $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
+        $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
+
+        // Mitarbeiterdaten zuweisen, falls vorhanden
+        if ($this->user->employee) {
+            $this->employee_status = $this->user->employee->employee_status;
+            $this->profession = $this->user->employee->profession_id;
+            $this->stage = $this->user->employee->stage_id;
+            $this->supervisor = $this->user->employee->supervisor_id;
+        }
+    }
+
+    /**
+     * Lädt alle für die Formulare benötigten Daten
+     *
+     * @return void
+     */
+    protected function loadEssentialData(): void
     {
         if ($this->dataLoaded) {
             return;
         }
 
         try {
-            $currentTeamId = auth()->user()->current_team_id;
+            $currentUserId = auth()->id();
             $currentCompanyId = auth()->user()->company_id;
+            $currentTeamId = auth()->user()->current_team_id;
 
-            // Teams
-            if ($this->teams === null) {
-                $this->teams = Team::where('company_id', $currentCompanyId)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
+            // Optimiertes Laden der Teams
+            $this->cache['teams'] = Team::where('company_id', $currentCompanyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
 
-            // Departments filtered by team
-            if ($this->departments === null) {
-                $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : $currentTeamId;
+            // Abteilungen basierend auf ausgewähltem Team
+            $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : $currentTeamId;
+            $this->cache['departments'] = Department::where('model_status', ModelStatus::ACTIVE->value)
+                ->where('company_id', $currentCompanyId)
+                ->when($teamId, function ($query) use ($teamId) {
+                    return $query->where('team_id', $teamId);
+                })
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
 
-                $query = Department::where('model_status', ModelStatus::ACTIVE->value)
-                    ->where('company_id', $currentCompanyId);
+            // Rollen mit optimierter Abfrage
+            $this->cache['roles'] = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
+                ->where('visible', RoleVisibility::Visible->value)
+                ->where(function ($query) use ($currentUserId) {
+                    $query->where('created_by', 1)
+                        ->orWhere('created_by', $currentUserId);
+                })
+                ->select(['id', 'name', 'is_manager'])
+                ->get();
 
-                if ($teamId) {
-                    $query->where('team_id', $teamId);
-                }
+            // Berufe und Karrierestufen
+            $this->cache['professions'] = Profession::where('company_id', $currentCompanyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
 
-                $this->departments = $query->select(['id', 'name'])->get();
-            }
+            $this->cache['stages'] = Stage::where('company_id', $currentCompanyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
 
-            // Roles
-            if ($this->roles === null) {
-                $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
-                    ->where('visible', RoleVisibility::Visible->value)
-                    ->where(function ($query) {
-                        $query->where('created_by', 1)
-                            ->orWhere('created_by', auth()->id());
-                    })
-                    ->select(['id', 'name', 'is_manager'])
-                    ->get();
-            }
-
-            // Professions
-            if ($this->professions === null) {
-                $this->professions = Profession::where('company_id', $currentCompanyId)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
-
-            // Stages
-            if ($this->stages === null) {
-                $this->stages = Stage::where('company_id', $currentCompanyId)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
-
-            // Supervisors (only get users with manager role)
-            if ($this->supervisors === null) {
-                $this->supervisors = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
-                    ->join('model_has_roles', function ($join) {
-                        $join->on('users.id', '=', 'model_has_roles.model_id')
-                            ->where('model_has_roles.model_type', User::class);
-                    })
-                    ->join('roles', function ($join) {
-                        $join->on('model_has_roles.role_id', '=', 'roles.id')
-                            ->where('roles.is_manager', true);
-                    })
-                    ->where('users.company_id', $currentCompanyId)
-                    ->where('users.id', '!=', $this->userId) // Exclude self from supervisors
-                    ->whereNull('users.deleted_at')
-                    ->orderBy('users.name')
-                    ->distinct()
-                    ->get();
-            }
+            // Optimiertes Laden der Vorgesetzten mit besserer Abfrage
+            $this->cache['supervisors'] = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', function($join) {
+                    $join->on('model_has_roles.role_id', '=', 'roles.id')
+                        ->where('roles.is_manager', true)
+                        ->where('model_has_roles.model_type', User::class);
+                })
+                ->where('users.company_id', $currentCompanyId)
+                ->whereNull('users.deleted_at')
+                ->when($this->userId, function ($query) {
+                    return $query->where('users.id', '!=', $this->userId);
+                })
+                ->distinct()
+                ->get();
 
             $this->dataLoaded = true;
         } catch (\Exception $e) {
-            Debugbar::error('Error loading dropdown data: ' . $e->getMessage());
+            $this->handleError('Fehler beim Laden der Formulardaten', $e);
+            $this->dataLoaded = false;
         }
     }
 
     /**
-     * Lifecycle hook to ensure data is loaded after validation errors
+     * Lädt die Daten für einen Dropdown bei Bedarf nach
+     *
+     * @param string $key
+     * @return mixed
      */
-    public function hydrate()
+    protected function getCachedData(string $key)
     {
-        if ($this->showModal) {
-            if (!$this->userLoaded && $this->userId) {
-                $this->loadUserData();
-            }
-
-            if (!$this->dataLoaded) {
-                $this->loadEssentialData();
-            }
+        if ($this->showModal && (!isset($this->cache[$key]) || $this->cache[$key] === null)) {
+            $this->loadEssentialData();
         }
+
+        return $this->cache[$key] ?? collect([]);
     }
 
     /**
-     * Property updated hook
-     */
-    public function updated($propertyName)
-    {
-        if ($propertyName === 'showModal' && $this->showModal) {
-            if (!$this->userLoaded && $this->userId) {
-                $this->loadUserData();
-            }
-
-            if (!$this->dataLoaded) {
-                $this->loadEssentialData();
-            }
-        }
-
-        if ($propertyName === 'selectedTeams') {
-            // Reset departments when teams change
-            $this->departments = null;
-        }
-    }
-
-    /**
-     * Update employee data
+     * Aktualisiert den Mitarbeiter in der Datenbank
+     *
+     * @return void
      */
     public function updateEmployee(): void
     {
-        // Validate data
-//        $this->validate([
-//            // User validation rules
-//            'gender' => 'required|string',
-//            'name' => 'required|string|min:3',
-//            'last_name' => 'required|string|min:3',
-//            'email' => 'required|email|unique:users,email,'.$this->userId,
-//            'model_status' => 'required|string',
-//            'joined_at' => 'nullable|date',
-//            'department' => 'required|exists:departments,id',
-//
-//            // Teams and roles validation
-//            'selectedTeams' => 'required|array|min:1',
-//            'selectedTeams.*' => 'exists:teams,id',
-//            'selectedRoles' => 'required|array|min:1',
-//            'selectedRoles.*' => 'exists:roles,id',
-//
-//            // Employee validation rules
-//            'employee_status' => 'required|string',
-//            'profession' => 'required|exists:professions,id',
-//            'stage' => 'required|exists:stages,id',
-//            'supervisor' => 'nullable|exists:users,id',);
-
         try {
+            $this->validate();
+
+            if (!$this->userId || !$this->user) {
+                throw new \Exception('Kein Mitarbeiter zum Aktualisieren ausgewählt.');
+            }
+
             DB::beginTransaction();
 
-            // 1. Update user
-            $user = User::findOrFail($this->userId);
+            // Benutzerdaten aktualisieren
+            $this->updateUserData();
 
-            $user->update([
-                'gender' => $this->gender,
-                'name' => $this->name,
-                'last_name' => $this->last_name,
-                'email' => $this->email,
-                'model_status' => $this->model_status,
-                'joined_at' => $this->joined_at,
-                'department_id' => $this->department,
-            ]);
+            // Beziehungen aktualisieren
+            $this->updateRelationships();
 
-            // 2. Update roles
-            $user->roles()->sync($this->selectedRoles);
-
-            // 3. Update teams
-            $user->teams()->sync($this->selectedTeams);
-
-            // 4. Update employee record
-            if ($user->employee) {
-                $user->employee->update([
-                    'employee_status' => $this->employee_status,
-                    'profession_id' => $this->profession,
-                    'stage_id' => $this->stage,
-                    'supervisor_id' => $this->supervisor,
-                ]);
-            }
+            // Mitarbeiterdaten aktualisieren
+            $this->updateEmployeeData();
 
             DB::commit();
 
-            // Show success message
             Flux::toast(
-                text: __('Employee updated successfully.'),
-                heading: __('Success'),
+                text: __('Mitarbeiter erfolgreich aktualisiert.'),
+                heading: __('Erfolg'),
                 variant: 'success'
             );
 
-            // Close modal and dispatch event to refresh table
+            // Modal schließen und Event auslösen
             $this->closeModal();
             $this->dispatch('employee-updated');
 
-        } catch (AuthorizationException $ae) {
-            DB::rollBack();
-            Flux::toast(
-                text: __('You are not authorized to update this employee.'),
-                heading: __('Error'),
-                variant: 'danger'
-            );
         } catch (\Exception $e) {
             DB::rollBack();
-            Debugbar::error('Error updating employee: ' . $e->getMessage());
-            Flux::toast(
-                text: __('Error updating employee: ') . $e->getMessage(),
-                heading: __('Error'),
-                variant: 'danger'
-            );
+            $this->handleError('Fehler beim Aktualisieren', $e);
         }
     }
 
     /**
-     * Close modal and reset state
+     * Aktualisiert die Benutzerdaten
+     */
+    protected function updateUserData(): void
+    {
+        $this->user->update([
+            'name' => $this->name,
+            'last_name' => $this->last_name,
+            'email' => $this->email,
+            'gender' => $this->gender,
+            'model_status' => $this->model_status,
+            'joined_at' => $this->joined_at,
+            'department_id' => $this->department,
+        ]);
+    }
+
+    /**
+     * Aktualisiert die Beziehungen des Benutzers
+     */
+    protected function updateRelationships(): void
+    {
+        $this->user->teams()->sync($this->selectedTeams);
+        $this->user->roles()->sync($this->selectedRoles);
+
+        // Stelle sicher, dass der Benutzer mindestens ein Team hat
+        if (empty($this->selectedTeams) && auth()->user()->currentTeam) {
+            $this->user->teams()->attach(auth()->user()->currentTeam->id, ['role' => 'member']);
+        }
+    }
+
+    /**
+     * Aktualisiert oder erstellt den Mitarbeiterdatensatz
+     */
+    protected function updateEmployeeData(): void
+    {
+        $employeeData = [
+            'employee_status' => $this->employee_status,
+            'profession_id' => $this->profession,
+            'stage_id' => $this->stage,
+            'supervisor_id' => $this->supervisor,
+        ];
+
+        if ($this->user->employee) {
+            $this->user->employee->update($employeeData);
+        } else {
+            // Falls noch kein Mitarbeiterdatensatz existiert, erstelle einen
+            $employeeData['user_id'] = $this->user->id;
+            $employeeData['uuid'] = \Illuminate\Support\Str::uuid();
+            Employee::create($employeeData);
+        }
+    }
+
+    /**
+     * Behandelt Reaktionen auf Änderungen von Eigenschaften
+     *
+     * @param string $propertyName
+     */
+    public function updated($propertyName): void
+    {
+        // Validierung bei Änderungen ausführen
+        // Kann bei Bedarf aktiviert werden, ist aber bei großen Formularen möglicherweise zu aggressiv
+        // $this->validateOnly($propertyName);
+
+        // Bei Änderung des Teams müssen die Abteilungen aktualisiert werden
+        if ($propertyName === 'selectedTeams') {
+            $this->cache['departments'] = null; // Cache für Abteilungen zurücksetzen
+
+            // Wenn ein Team ausgewählt wurde und die aktuelle Abteilung nicht zu diesem Team gehört
+            if (!empty($this->selectedTeams) && $this->department) {
+                $teamId = $this->selectedTeams[0];
+                $departmentExists = Department::where('id', $this->department)
+                    ->where('team_id', $teamId)
+                    ->exists();
+
+                if (!$departmentExists) {
+                    $this->department = null; // Zurücksetzen der Abteilung, wenn sie nicht zum Team gehört
+                }
+            }
+
+            // Neu laden der Abteilungen für das ausgewählte Team
+            $this->loadEssentialData();
+        }
+    }
+
+    /**
+     * Behandelt Fehler einheitlich
+     *
+     * @param string $message Die Fehlermeldung
+     * @param \Exception $exception Die aufgetretene Exception
+     * @return void
+     */
+    protected function handleError(string $message, \Exception $exception): void
+    {
+        // Fehler loggen
+        Log::error("{$message}: " . $exception->getMessage(), [
+            'exception' => $exception,
+            'user_id' => $this->userId,
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+        ]);
+
+        // Benutzer benachrichtigen
+        Flux::toast(
+            text: __("{$message}: ") . $exception->getMessage(),
+            heading: __('Fehler'),
+            variant: 'danger'
+        );
+    }
+
+    /**
+     * Schließt das Modal und setzt den Zustand zurück
      */
     public function closeModal(): void
     {
         $this->reset([
-            'userId', 'name', 'last_name', 'email', 'gender',
-            'model_status', 'joined_at', 'department', 'selectedTeams',
-            'selectedRoles', 'employee_status', 'profession', 'stage', 'supervisor'
+            'userId', 'user', 'gender', 'name', 'last_name', 'email',
+            'joined_at', 'department', 'selectedTeams', 'selectedRoles',
+            'model_status', 'employee_status', 'profession', 'stage', 'supervisor'
         ]);
 
         $this->showModal = false;
-        $this->userLoaded = false;
         $this->dataLoaded = false;
+        $this->cache = array_fill_keys(array_keys($this->cache), null);
 
-        // Reset cached collections
-        $this->departments = null;
-
-        // Close modal via dispatch
         $this->dispatch('modal-close', ['name' => 'edit-employee']);
     }
 
     /**
-     * Property getters for dropdown data
+     * Computed Properties für Dropdown-Daten
      */
-    public function getTeamsProperty()
+    #[Computed]
+    public function teams()
     {
-        if ($this->showModal && $this->teams === null) {
-            $this->loadEssentialData();
-        }
-        return $this->teams ?? collect();
+        return $this->getCachedData('teams');
     }
 
-    public function getDepartmentsProperty()
+    #[Computed]
+    public function departments()
     {
-        if ($this->showModal && $this->departments === null) {
-            $this->loadEssentialData();
-        }
-        return $this->departments ?? collect();
+        return $this->getCachedData('departments');
     }
 
-    public function getRolesProperty()
+    #[Computed]
+    public function roles()
     {
-        if ($this->showModal && $this->roles === null) {
-            $this->loadEssentialData();
-        }
-        return $this->roles ?? collect();
+        return $this->getCachedData('roles');
     }
 
-    public function getProfessionsProperty()
+    #[Computed]
+    public function professions()
     {
-        if ($this->showModal && $this->professions === null) {
-            $this->loadEssentialData();
-        }
-        return $this->professions ?? collect();
+        return $this->getCachedData('professions');
     }
 
-    public function getStagesProperty()
+    #[Computed]
+    public function stages()
     {
-        if ($this->showModal && $this->stages === null) {
-            $this->loadEssentialData();
-        }
-        return $this->stages ?? collect();
+        return $this->getCachedData('stages');
     }
 
-    public function getSupervisorsProperty()
+    #[Computed]
+    public function supervisors()
     {
-        if ($this->showModal && $this->supervisors === null) {
-            $this->loadEssentialData();
-        }
-        return $this->supervisors ?? collect();
+        return $this->getCachedData('supervisors');
     }
 
     /**
-     * Get employee status options
+     * Stellt Mitarbeiterstatus-Optionen für das Dropdown bereit
      */
-    public function getEmployeeStatusOptionsProperty()
+    #[Computed]
+    public function employeeStatusOptions()
     {
-        static $options = null;
-
-        if ($options === null) {
-            $options = collect(EmployeeStatus::cases())->map(function ($status) {
-                return [
-                    'value' => $status->value,
-                    'label' => $status->label(),
-                    'colors' => $status->colors(),
-                    'icon' => $status->icon(),
-                ];
-            })->toArray();
-        }
-
-        return $options;
+        return collect(EmployeeStatus::cases())->map(function ($status) {
+            return [
+                'value' => $status->value,
+                'label' => $status->label(),
+                'colors' => $status->colors(),
+                'icon' => $status->icon(),
+            ];
+        })->toArray();
     }
 
     /**
-     * Render component
+     * Rendert die Komponente
+     *
+     * @return View
      */
     public function render(): View
     {
-        // Lazy load data when modal is shown
-        if ($this->showModal) {
-            if (!$this->userLoaded && $this->userId) {
-                $this->loadUserData();
-            }
-
-            if (!$this->dataLoaded) {
-                $this->loadEssentialData();
-            }
+        // Lazy-Loading der Daten beim Anzeigen des Modals
+        if ($this->showModal && !$this->dataLoaded) {
+            $this->loadEssentialData();
         }
 
-        return view('livewire.alem.employee.edit', [
-            'employeeStatusOptions' => $this->employeeStatusOptions,
+        // Optimierte Weitergabe von Daten an die View
+        $viewData = [
+            'employeeStatusOptions' => $this->employeeStatusOptions(),
             'modelStatusOptions' => $this->modelStatusOptions,
-        ]);
+        ];
+
+        // Lazy-Loading der Dropdown-Daten nur wenn das Modal geöffnet ist
+        if ($this->showModal) {
+            $viewData = array_merge($viewData, [
+                'teams' => $this->teams(),
+                'departments' => $this->departments(),
+                'roles' => $this->roles(),
+                'professions' => $this->professions(),
+                'stages' => $this->stages(),
+                'supervisors' => $this->supervisors(),
+            ]);
+        }
+
+        return view('livewire.alem.employee.edit', $viewData);
     }
+
+//    public function placeholder()
+//    {
+//
+//    }
 }
