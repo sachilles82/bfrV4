@@ -20,11 +20,13 @@ trait WithEmployeeSorting
     {
         if ($this->sortCol) {
             $column = match ($this->sortCol) {
-                'name' => 'name',
-                'joined_at' => 'joined_at',
-                'created_at' => 'created_at',
+                'name' => 'users.name',
+                'joined_at' => 'users.joined_at',
+                default => 'users.created_at'
             };
             $query->orderBy($column, $this->sortAsc ? 'asc' : 'desc');
+        } else {
+            $query->orderBy('users.created_at', 'desc');
         }
 
         return $query;

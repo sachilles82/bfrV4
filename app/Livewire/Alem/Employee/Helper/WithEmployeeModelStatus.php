@@ -47,10 +47,10 @@ trait WithEmployeeModelStatus
     //    /**
     //     * Name des Events, das nach Status-Änderungen ausgelöst wird
     //     */
-    //    protected function getStatusUpdateEventName(): string
-    //    {
-    //        return 'employeeUpdated';
-    //    }
+        protected function getStatusUpdateEventName(): string
+        {
+            return 'employeeUpdated';
+        }
     //
     //    /**
     //     * Sendet ein modellspezifisches Event

@@ -23,9 +23,7 @@ trait Searchable
         }
 
         $databaseDriver = Config::get('database.default');
-        // Beachte: str_getcsv ist hier vielleicht nicht ideal für Fulltext,
-        // da es Begriffe trennt. Für Boolean Mode ist das aber oft ok.
-        // Ggf. den ganzen String verwenden oder anders aufbereiten.
+        // Suchbegriff aufbereiten und trimmen
         $searchString = trim($this->search);
 
         if (empty($searchString)) {
@@ -33,21 +31,26 @@ trait Searchable
         }
 
         if ($databaseDriver === 'mysql') {
-            // Bereite den Suchstring für den Boolean Mode vor
-            // +: Wort muss vorkommen (AND-Logik zwischen Wörtern)
-            // *: Erlaubt Präfix-Suche (wie LIKE 'wort%')
-            // Beispiel: "Max Müller" -> "+Max* +Müller*"
+            // Boolean-Modus Suchstring vorbereiten
+            // + = Wort muss vorkommen (AND-Logik)
+            // * = Präfix-Suche (wie LIKE 'wort%')
             $booleanSearchTerm = collect(explode(' ', $searchString)) // Einfach nach Leerzeichen trennen
                 ->filter()
                 ->map(fn ($term) => '+'.preg_replace('/[^A-Za-z0-9]/', '', $term).'*') // Normalisieren und für Boolean Mode formatieren
                 ->implode(' ');
 
             if (! empty($booleanSearchTerm)) {
-                $query->whereRaw(
-                    // ÄNDERUNG: Auf Originalspalten matchen
-                    'MATCH(name, last_name, email, phone_1) AGAINST (? IN BOOLEAN MODE)',
-                    [$booleanSearchTerm]
-                );
+                try {
+                    $query->whereRaw(
+                        // Qualifiziere alle Spalten mit dem Tabellennamen, um Mehrdeutigkeiten zu vermeiden
+                        'MATCH(users.name, users.last_name, users.email, users.phone_1) AGAINST (? IN BOOLEAN MODE)',
+                        [$booleanSearchTerm]
+                    );
+                } catch (\Exception $e) {
+                    // Fallback zur LIKE-Suche bei Fehlern (z.B. fehlender FULLTEXT-Index)
+                    \Illuminate\Support\Facades\Log::warning('FULLTEXT search failed, falling back to LIKE: ' . $e->getMessage());
+                    return $this->applyLegacySearch($query, $searchString);
+                }
             }
 
         } elseif ($databaseDriver === 'pgsql') {
@@ -81,10 +84,11 @@ trait Searchable
             foreach ($terms as $term) {
                 $likeTerm = $term.'%'; // Einfaches Präfix für Fallback
                 $q->where(function ($innerQ) use ($likeTerm) {
+                    // Auch hier alle Spalten mit Tabellennamen qualifizieren
                     $innerQ->orWhere('users.name', 'like', $likeTerm)
-                        ->orWhere('users.last_name', 'like', $likeTerm)
-                        ->orWhere('users.email', 'like', $likeTerm)
-                        ->orWhere('users.phone_1', 'like', $likeTerm);
+                           ->orWhere('users.last_name', 'like', $likeTerm)
+                           ->orWhere('users.email', 'like', $likeTerm)
+                           ->orWhere('users.phone_1', 'like', $likeTerm);
                 });
             }
         });

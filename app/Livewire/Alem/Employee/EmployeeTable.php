@@ -153,7 +153,7 @@ class EmployeeTable extends Component
         // Entfernt Duplikate, die durch JOINs entstehen könnten
         $query->distinct();
 
-        $users = $query->orderBy('created_at', 'desc')->simplePaginate($this->perPage);
+        $users = $query->simplePaginate($this->perPage);
         $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();
 
         return view('livewire.alem.employee.table', [
@@ -163,8 +163,8 @@ class EmployeeTable extends Component
         ]);
     }
 
-//    public function placeholder():View
-//    {
-//        return view('livewire.placeholders.employee.index');
-//    }
+    public function placeholder():View
+    {
+        return view('livewire.placeholders.employee.index');
+    }
 }
