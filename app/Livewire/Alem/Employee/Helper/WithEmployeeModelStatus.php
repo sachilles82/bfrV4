@@ -21,6 +21,14 @@ trait WithEmployeeModelStatus
     }
 
     /**
+     * Spezifizieren, dass die Filterung des Mitarbeiterstatus die users-Tabelle verwenden soll
+     */
+    protected function getStatusFilterTable(): string
+    {
+        return 'users';
+    }
+
+    /**
      * Der Anzeigename für das Modell
      */
     protected function getModelDisplayName(): string

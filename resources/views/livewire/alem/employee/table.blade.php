@@ -144,16 +144,16 @@
                                             {{ $user->name }} {{ $user->last_name }}
                                         </a>
                                         <div class="mt-1 text-gray-500 dark:text-gray-400">
-                                            @if($user->employee->profession)
-                                                {{ $user->employee->profession->name }}
+                                            @if($user->profession_name)
+                                                {{ $user->profession_name }}
                                             @endif
 
-                                            @if($user->employee->profession && $user->employee->stage)
+                                            @if($user->profession_name && $user->stage_name)
                                                 <span class="mx-1">•</span>
                                             @endif
 
-                                            @if($user->employee->stage)
-                                                {{ $user->employee->stage->name }}
+                                            @if($user->stage_name)
+                                                {{ $user->stage_name }}
                                             @endif
                                         </div>
                                     </div>
@@ -177,7 +177,7 @@
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <div class="text-gray-500 dark:text-gray-400">
-                                        {{ $user->department->name }}
+                                    {{ $user->department_name ?? '-' }}
                                 </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
@@ -214,12 +214,12 @@
                                 <flux:tooltip class="cursor-default" content="Settings">
                                     <div
                                         class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
-                                        {{  $user->employee->employee_status->colors() }}"
+                                        {{ \App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->colors() ?? '' }}"
                                     >
                                         <x-dynamic-component class="h-5 w-5"
-                                                             :component="$user->employee->employee_status->icon()"
+                                                             :component="\App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->icon() ?? 'heroicon-o-question-mark-circle'"
                                         />
-                                        <div>{{ $user->employee->employee_status->label() }}</div>
+                                        <div>{{ \App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->label() ?? 'Unknown' }}</div>
                                     </div>
                                 </flux:tooltip>
                             </x-pupi.table.tr.cell>
@@ -254,9 +254,9 @@
                                             </flux:menu.item>
                                         @elseif($user->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
                                             <!-- Options for archived users -->
-                                            <flux:menu.item 
+                                            <flux:menu.item
                                                 @click.stop.prevent="
-                                                    $dispatch('modal-show', { name: 'edit-employee' }); 
+                                                    $dispatch('modal-show', { name: 'edit-employee' });
                                                     $nextTick(() => {
                                                         $dispatch('open-edit-employee-modal', {userId: {{ $user->id }}});
                                                     });"
@@ -282,9 +282,9 @@
                                         @else
                                             <!-- Options for active users -->
 
-                                            <flux:menu.item 
+                                            <flux:menu.item
                                                 @click.stop.prevent="
-                                                    $dispatch('modal-show', { name: 'edit-employee' }); 
+                                                    $dispatch('modal-show', { name: 'edit-employee' });
                                                     $nextTick(() => {
                                                         $dispatch('open-edit-employee-modal', {userId: {{ $user->id }}});
                                                     });"

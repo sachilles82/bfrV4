@@ -4,6 +4,7 @@ namespace App\Livewire\Alem\Employee;
 
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
+use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\Searchable;
@@ -108,29 +109,34 @@ class EmployeeTable extends Component
             'users.slug',
             'users.company_id',
             'users.deleted_at',
+            'employees.id as employee_id',
+            'employees.employee_status',
+            'employees.profession_id',
+            'employees.stage_id',
+            'professions.name as profession_name',
+            'stages.name as stage_name',
+            'departments.name as department_name'
         ])
-            ->where('users.user_type', $this->userType)
-            ->where('users.model_status', ModelStatus::ACTIVE->value)
-            ->whereNull('users.deleted_at')
-        ;
-
-        $query->join('employees', 'users.id', '=', 'employees.user_id')
+            ->join('employees', 'users.id', '=', 'employees.user_id')
             ->join('team_user', function ($join) use ($authCurrentTeamId) {
                 $join->on('users.id', '=', 'team_user.user_id')
                     ->where('team_user.team_id', '=', $authCurrentTeamId);
-            });
+            })
+            ->leftJoin('professions', 'employees.profession_id', '=', 'professions.id')
+            ->leftJoin('stages', 'employees.stage_id', '=', 'stages.id')
+            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
+            ->where('users.user_type', $this->userType)
+            ->where('users.model_status', ModelStatus::ACTIVE->value)
+            ->whereNull('users.deleted_at');
 
         $query->with([
-            'employee' => function ($q_employee) {
-                $q_employee->select(['id', 'user_id', 'employee_status', 'profession_id', 'stage_id']);
-            },
-
-            'employee.profession:id,name',
-            'employee.stage:id,name',
-            'department:id,name',
-
             'roles' => function ($q_roles) {
                 $q_roles->where('visible', RoleVisibility::Visible->value)
+                    ->where('access', RoleHasAccessTo::EmployeePanel->value)
+                    ->where(function($query) {
+                        $query->where('created_by', 1)
+                            ->orWhere('company_id', auth()->user()->company_id);
+                    })
                     ->select('roles.id', 'roles.name');
             },
         ]);
@@ -138,12 +144,8 @@ class EmployeeTable extends Component
 
         $this->applySearch($query);
         $this->applySorting($query);
-
-
-        if ($this->statusFilter && $this->statusFilter !== ModelStatus::ACTIVE->value) {
-            $query->where('users.model_status', $this->statusFilter);
-        }
-
+        $this->applyStatusFilter($query);
+        //EmployeeStatusFilter
         if ($this->employeeStatusFilter) {
             $query->where('employees.employee_status', $this->employeeStatusFilter);
         }
@@ -151,14 +153,7 @@ class EmployeeTable extends Component
         // Entfernt Duplikate, die durch JOINs entstehen könnten
         $query->distinct();
 
-
-        $users = $query->simplePaginate(
-            $this->perPage,
-            ['users.*'],
-            'page'
-        );
-
-
+        $users = $query->orderBy('created_at', 'desc')->simplePaginate($this->perPage);
         $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();
 
         return view('livewire.alem.employee.table', [

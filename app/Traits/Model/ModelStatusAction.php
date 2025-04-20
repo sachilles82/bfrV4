@@ -68,22 +68,52 @@ trait ModelStatusAction
      * @param  Builder  $query  Die zu filternde Query
      * @return Builder Die gefilterte Query
      */
+//    protected function applyStatusFilter(Builder $query): Builder
+//    {
+//        switch ($this->statusFilter) {
+//            case 'archived':
+//                $query->where('model_status', ModelStatus::ARCHIVED);
+//                break;
+//            case 'trashed':
+//                $query->where('model_status', ModelStatus::TRASHED)
+//                    ->onlyTrashed();
+//                break;
+//            case 'active':
+//            default:
+//                $query->where('model_status', ModelStatus::ACTIVE);
+//        }
+//
+//        return $query;
+//    }
+
     protected function applyStatusFilter(Builder $query): Builder
     {
+        // Tabellennamen aus der Modellklasse holen oder benutzerdefinierte Überschreibung erlauben
+        $table = $this->getStatusFilterTable() ?? $query->getModel()->getTable();
+
         switch ($this->statusFilter) {
             case 'archived':
-                $query->where('model_status', ModelStatus::ARCHIVED);
+                $query->where("$table.model_status", ModelStatus::ARCHIVED);
                 break;
             case 'trashed':
-                $query->where('model_status', ModelStatus::TRASHED)
+                $query->where("$table.model_status", ModelStatus::TRASHED)
                     ->onlyTrashed();
                 break;
             case 'active':
             default:
-                $query->where('model_status', ModelStatus::ACTIVE);
+                $query->where("$table.model_status", ModelStatus::ACTIVE);
         }
 
         return $query;
+    }
+
+    /**
+     * Ermöglicht es Kind-Traits zu spezifizieren, welche Tabelle für den Status-Filter verwendet werden soll
+     * Überschreibe dies in deinem Trait, falls nötig
+     */
+    protected function getStatusFilterTable(): ?string
+    {
+        return null; // Standardimplementierung gibt null zurück
     }
 
     /**
