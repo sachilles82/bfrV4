@@ -254,16 +254,14 @@
                                             </flux:menu.item>
                                         @elseif($user->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
                                             <!-- Options for archived users -->
-                                            <flux:menu.item
-                                                @click.stop.prevent="
-                                                    $dispatch('modal-show', { name: 'edit-employee' });
-                                                    $nextTick(() => {
-                                                        $dispatch('open-edit-employee-modal', {userId: {{ $user->id }}});
-                                                    });"
-                                                icon="pencil-square"
-                                            >
-                                                {{ __('Edit') }}
-                                            </flux:menu.item>
+                                            <flux:modal.trigger name="edit-employee">
+                                                <flux:menu.item
+                                                    @click="$dispatch('open-edit-employee-modal', {userId: {{ $user->id }}})"
+                                                    icon="pencil-square"
+                                                >
+                                                    {{ __('Edit') }}
+                                                </flux:menu.item>
+                                            </flux:modal.trigger>
 
                                             <flux:separator class="my-1"/>
 
@@ -282,16 +280,14 @@
                                         @else
                                             <!-- Options for active users -->
 
-                                            <flux:menu.item
-                                                @click.stop.prevent="
-                                                    $dispatch('modal-show', { name: 'edit-employee' });
-                                                    $nextTick(() => {
-                                                        $dispatch('open-edit-employee-modal', {userId: {{ $user->id }}});
-                                                    });"
-                                                icon="pencil-square"
-                                            >
-                                                {{ __('Edit') }}
-                                            </flux:menu.item>
+                                            <flux:modal.trigger name="edit-employee">
+                                                <flux:menu.item
+                                                    @click="$dispatch('open-edit-employee-modal', {userId: {{ $user->id }}})"
+                                                    icon="pencil-square"
+                                                >
+                                                    {{ __('Edit') }}
+                                                </flux:menu.item>
+                                            </flux:modal.trigger>
 
                                             <flux:menu.item wire:click="archive({{ $user->id }})"
                                                             icon="archive-box">
