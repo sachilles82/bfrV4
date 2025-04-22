@@ -17,102 +17,102 @@
         <!-- Form: User & Employee Data -->
         <form wire:submit.prevent="updateEmployee" class="space-y-4 relative">
             <!-- Loading Overlay -->
-            <div
-                wire:loading
-                class="absolute inset-0 z-10 flex items-center justify-center"
-{{--bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-lg"--}}
-            >
-{{--                <!-- Centered Spinner -->--}}
-{{--                <svg class="animate-spin h-12 w-12 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">--}}
-{{--                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>--}}
-{{--                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>--}}
-{{--                </svg>--}}
-                <div class="py-4">
-                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                        <div class="sm:col-span-4">
-                            <div label="{{ __('Gender') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--            <div--}}
+            {{--                wire:loading--}}
+            {{--                class="absolute inset-0 z-10 flex items-center justify-center"--}}
+            {{--bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-lg"--}}
+            {{--            >--}}
+            {{--                <!-- Centered Spinner -->--}}
+            {{--                <svg class="animate-spin h-12 w-12 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">--}}
+            {{--                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>--}}
+            {{--                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>--}}
+            {{--                </svg>--}}
+            {{--                <div class="py-4">--}}
+            {{--                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">--}}
+            {{--                        <div class="sm:col-span-4">--}}
+            {{--                            <div label="{{ __('Gender') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('First Name') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('First Name') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Last Name') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Last Name') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Email') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Email') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Teams') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Teams') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Department') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Department') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Supervisor') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Supervisor') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Roles') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Roles') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Profession') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Profession') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Stage') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Stage') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Joined Date') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Joined Date') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
+            {{--                    </div>--}}
+            {{--                </div>--}}
 
-                <div class="py-4 border-t border-gray-200 dark:border-white/10">
-                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Employee Status') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
+            {{--                <div class="py-4 border-t border-gray-200 dark:border-white/10">--}}
+            {{--                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">--}}
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Employee Status') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
 
-                        <div class="sm:col-span-3">
-                            <div label="{{ __('Account Status') }}">
-                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {{--                        <div class="sm:col-span-3">--}}
+            {{--                            <div label="{{ __('Account Status') }}">--}}
+            {{--                                <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+            {{--                            </div>--}}
+            {{--                        </div>--}}
+            {{--                    </div>--}}
+            {{--                </div>--}}
+            {{--            </div>--}}
 
             <!-- Personal Information Section -->
             <div class="py-4">
@@ -126,18 +126,39 @@
                             :error="$errors->first('gender')"
                             model="gender"
                             help-text="{{ __('') }}">
-                            <flux:select
-                                class="mt-2"
-                                wire:model="gender"
-                                id="gender"
-                                variant="listbox"
-                                placeholder="{{ __('Select gender') }}">
-                                @foreach(\App\Enums\User\Gender::cases() as $genderStatus)
-                                    <flux:option value="{{ $genderStatus->value }}">
-                                        {{ $genderStatus->label() }}
-                                    </flux:option>
-                                @endforeach
-                            </flux:select>
+                            {{--                            <flux:select--}}
+                            {{--                                class="mt-2"--}}
+                            {{--                                wire:model="gender"--}}
+                            {{--                                id="gender"--}}
+                            {{--                                variant="listbox"--}}
+                            {{--                                placeholder="{{ __('Select gender') }}">--}}
+                            {{--                                @foreach(\App\Enums\User\Gender::cases() as $genderStatus)--}}
+                            {{--                                    <flux:option value="{{ $genderStatus->value }}">--}}
+                            {{--                                        {{ $genderStatus->label() }}--}}
+                            {{--                                    </flux:option>--}}
+                            {{--                                @endforeach--}}
+                            {{--                            </flux:select>--}}
+                            <div class="relative">
+                                <flux:select
+                                    class="mt-2"
+                                    wire:model="gender"
+                                    id="gender"
+                                    variant="listbox"
+                                    placeholder="{{ __('Select gender') }}">
+                                    @foreach(\App\Enums\User\Gender::cases() as $genderStatus)
+                                        <flux:option value="{{ $genderStatus->value }}">
+                                            {{ $genderStatus->label() }}
+                                        </flux:option>
+                                    @endforeach
+                                </flux:select>
+
+                                <div
+                                    wire:loading
+                                    wire:target="editEmployee"
+                                    class="absolute inset-0  flex items-center justify-center">
+                                    <div class="w-full h-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 block px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 "></div>
+                                </div>
+                            </div>
                         </x-pupi.input.group>
                     </div>
 
@@ -150,7 +171,15 @@
                             :error="$errors->first('name')"
                             help-text="{{ __('') }}"
                             model="name">
-                            <x-pupi.input.text wire:model="name" id="name" placeholder="{{ __('Enter name') }}"/>
+                            <div class="relative">
+                                <x-pupi.input.text wire:model="name" id="name" placeholder="{{ __('Enter name') }}"/>
+                                <div
+                                    wire:loading
+                                    wire:target="editEmployee"
+                                    class="absolute inset-0  flex items-center justify-center">
+                                    <div class="w-full h-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 block px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 "></div>
+                                </div>
+                            </div>
                         </x-pupi.input.group>
                     </div>
 

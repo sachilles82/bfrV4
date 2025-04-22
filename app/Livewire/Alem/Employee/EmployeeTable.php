@@ -80,15 +80,6 @@ class EmployeeTable extends Component
     }
 
     /**
-     * Öffnet den Bearbeitungsmodus für einen Mitarbeiter (sendet Event)
-     */
-    public function edit($id): void
-    {
-        // Just dispatch an event with the user ID
-        $this->dispatch('edit-employee', ['userId' => $id]);
-    }
-
-    /**
      * Render the component.
      */
     public function render(): View

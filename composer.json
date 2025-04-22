@@ -13,7 +13,6 @@
         "laravel/framework": "^11.9",
         "laravel/jetstream": "^5.2",
         "laravel/nova": "^4.0",
-        "laravel/octane": "^2.9",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.14",
         "laravel/tinker": "^2.9",
@@ -24,9 +23,7 @@
         "spatie/laravel-login-link": "^1.6",
         "spatie/laravel-permission": "^6.9",
         "spatie/laravel-ray": "^1.37",
-        "spatie/laravel-responsecache": "^7.6",
-        "spiral/roadrunner-cli": "2.6.0",
-        "spiral/roadrunner-http": "3.3.0"
+        "spatie/laravel-responsecache": "^7.6"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
