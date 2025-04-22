@@ -114,8 +114,6 @@ class CreateEmployee extends Component
 
                 if ($this->departments === null) {
                     $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
-                        ->where('company_id', $currentCompanyId)
-                        ->where('team_id', $currentTeamId)
                         ->select(['id', 'name'])
                         ->orderBy('name')
                         ->get();
@@ -188,7 +186,7 @@ class CreateEmployee extends Component
     {
         // Cache für Professions zurücksetzen
         $this->professions = null;
-        
+
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showModal) {
             $this->loadEssentialData();
@@ -205,7 +203,7 @@ class CreateEmployee extends Component
     {
         // Cache für Stages zurücksetzen
         $this->stages = null;
-        
+
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showModal) {
             $this->loadEssentialData();
@@ -222,7 +220,7 @@ class CreateEmployee extends Component
     {
         // Cache für Departments zurücksetzen
         $this->departments = null;
-        
+
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showModal) {
             $this->loadEssentialData();
