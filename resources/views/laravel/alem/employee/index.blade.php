@@ -19,14 +19,12 @@
 {{--            </x-slot:create>--}}
 
 
-{{--            <livewire:alem.employee.employee-table--}}
-{{--                :departments="$departments"--}}
-{{--                :teams="$teams"--}}
-{{--                :professions="$professions"--}}
-{{--                :stages="$stages"--}}
-{{--                wire:key="employee-table-component"--}}
-{{--                lazy--}}
-{{--            />--}}
+            <livewire:alem.employee.employee-table
+                :auth-user-id="$authUserId"
+                :current-team-id="$currentTeamId"
+                :company-id="$companyId"
+                wire:key="employee-table-component"
+            />
 
 {{--            --}}{{-- <!-- Edit Component --> --}}
 {{--            <livewire:alem.employee.edit-employee--}}

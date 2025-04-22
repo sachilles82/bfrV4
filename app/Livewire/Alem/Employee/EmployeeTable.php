@@ -14,7 +14,6 @@ use App\Livewire\Alem\Employee\Helper\WithEmployeeStatus;
 use App\Models\User;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -26,10 +25,23 @@ class EmployeeTable extends Component
         WithEmployeeStatus,
         WithPerPagePagination;
 
+    // Eigenschaften für vorgeladene Daten
+    public int $authUserId;
+    public int $currentTeamId;
+    public int $companyId;
+
     /**
      * Tabelle zeigt nur User mit user_typ employee
      */
     protected string $userType = UserType::Employee->value;
+
+
+    public function mount(int $authUserId, int $currentTeamId, int $companyId): void
+    {
+        $this->authUserId = $authUserId;
+        $this->currentTeamId = $currentTeamId;
+        $this->companyId = $companyId;
+    }
 
     /**
      * Hört auf das Event 'employee-created', 'employee-updated' und aktualisiert die Tabelle
@@ -84,7 +96,8 @@ class EmployeeTable extends Component
      */
     public function render(): View
     {
-        $authCurrentTeamId = Auth::user()?->currentTeam?->id;
+        $authCurrentTeamId = $this->currentTeamId;
+        $companyId = $this->companyId;
 
         $query = User::select([
             'users.id',
@@ -98,7 +111,6 @@ class EmployeeTable extends Component
             'users.model_status',
             'users.profile_photo_path',
             'users.slug',
-            'users.company_id',
             'users.deleted_at',
             'employees.id as employee_id',
             'employees.employee_status',
@@ -116,17 +128,15 @@ class EmployeeTable extends Component
             ->leftJoin('professions', 'employees.profession_id', '=', 'professions.id')
             ->leftJoin('stages', 'employees.stage_id', '=', 'stages.id')
             ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
-            ->where('users.user_type', $this->userType)
-            ->where('users.model_status', ModelStatus::ACTIVE->value)
-            ->whereNull('users.deleted_at');
+            ->where('users.user_type', $this->userType);
 
         $query->with([
-            'roles' => function ($q_roles) {
+            'roles' => function ($q_roles) use ($companyId) {
                 $q_roles->where('visible', RoleVisibility::Visible->value)
                     ->where('access', RoleHasAccessTo::EmployeePanel->value)
-                    ->where(function($query) {
+                    ->where(function($query) use ($companyId) {
                         $query->where('created_by', 1)
-                            ->orWhere('company_id', auth()->user()->company_id);
+                            ->orWhere('company_id', $companyId);
                     })
                     ->select('roles.id', 'roles.name');
             },
