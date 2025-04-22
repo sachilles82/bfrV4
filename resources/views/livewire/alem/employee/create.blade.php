@@ -1,7 +1,17 @@
 <div wire:ignore.self>
 
     <flux:modal name="create-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl"
-                wire:model="showModal">
+                wire:model="showModal" 
+                x-data="{
+                    initDropdowns() {
+                        // Event-Listener für Dropdown-Aktualisierungen hinzufügen
+                        window.addEventListener('dropdown-data-updated', () => {
+                            // Livewire-Komponente neu rendern, um aktualisierte Daten anzuzeigen
+                            @this.$refresh();
+                        });
+                    }
+                }"
+                x-init="initDropdowns()">
         <div>
             <flux:heading size="lg">{{ __('Create Employee') }}</flux:heading>
             <flux:subheading>{{ __('Fill out the details to create a new employee') }}</flux:subheading>
@@ -130,12 +140,11 @@
                                 @endforelse
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
-                                {{--                                    <x-slot name="add">--}}
-                                {{--                                        <livewire:alem.department.create-department--}}
-                                {{--                                            :display-mode="'dropdown'"--}}
-                                {{--                                            lazy--}}
-                                {{--                                        />--}}
-                                {{--                                    </x-slot>--}}
+                                                                    <x-slot name="add">
+                                                                        <livewire:alem.department.create-department
+                                                                            lazy
+                                                                        />
+                                                                    </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -231,9 +240,9 @@
                                 @endforelse
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
-                                {{--                                <x-slot name="add">--}}
-                                {{--                                    <livewire:alem.employee.setting.profession.profession-form lazy/>--}}
-                                {{--                                </x-slot>--}}
+                                                                <x-slot name="add">
+                                                                    <livewire:alem.employee.setting.profession.profession-form lazy/>
+                                                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -263,11 +272,11 @@
                                 @endforelse
 
                                 <!-- Trigger zum Öffnen des Stage-Modals -->
-                                {{--                                <x-slot name="add">--}}
-                                {{--                                    <livewire:alem.employee.setting.profession.stage-form--}}
-                                {{--                                        lazy--}}
-                                {{--                                    />--}}
-                                {{--                                </x-slot>--}}
+                                                                <x-slot name="add">
+                                                                    <livewire:alem.employee.setting.profession.stage-form
+                                                                        lazy
+                                                                    />
+                                                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>

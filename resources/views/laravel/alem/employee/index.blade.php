@@ -28,6 +28,9 @@
 
             {{-- <!-- Edit Component --> --}}
             <livewire:alem.employee.edit-employee
+                :auth-user-id="$authUserId"
+                :current-team-id="$currentTeamId"
+                :company-id="$companyId"
                 wire:key="edit-employee-component"
                 lazy
             />

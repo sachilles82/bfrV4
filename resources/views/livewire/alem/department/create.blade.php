@@ -1,8 +1,6 @@
 <div wire:ignore.self>
     <flux:modal.trigger name="create-department">
-        @if($displayMode === 'dropdown')
-            <x-pupi.button.open-manager/>
-        @endif
+        <x-pupi.button.open-manager/>
     </flux:modal.trigger>
     <flux:modal name="create-department"
                 variant="flyout" class="space-y-6">

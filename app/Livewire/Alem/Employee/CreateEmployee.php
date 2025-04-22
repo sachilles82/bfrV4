@@ -186,7 +186,15 @@ class CreateEmployee extends Component
     #[On('profession-updated')]
     public function refreshProfessions(): void
     {
+        // Cache für Professions zurücksetzen
         $this->professions = null;
+        
+        // Wenn das Modal geöffnet ist, Daten sofort neu laden
+        if ($this->showModal) {
+            $this->loadEssentialData();
+            // Event auslösen, um das UI zu aktualisieren
+            $this->dispatch('dropdown-data-updated');
+        }
     }
 
     /**
@@ -195,16 +203,32 @@ class CreateEmployee extends Component
     #[On('stage-updated')]
     public function refreshStages(): void
     {
+        // Cache für Stages zurücksetzen
         $this->stages = null;
+        
+        // Wenn das Modal geöffnet ist, Daten sofort neu laden
+        if ($this->showModal) {
+            $this->loadEssentialData();
+            // Event auslösen, um das UI zu aktualisieren
+            $this->dispatch('dropdown-data-updated');
+        }
     }
 
     /**
-     * Event-Handler für department-created
+     * Event-Handler für department-created und department-updated
      */
-    #[On('department-created')]
+    #[On(['department-created', 'department-updated'])]
     public function refreshDepartments(): void
     {
+        // Cache für Departments zurücksetzen
         $this->departments = null;
+        
+        // Wenn das Modal geöffnet ist, Daten sofort neu laden
+        if ($this->showModal) {
+            $this->loadEssentialData();
+            // Event auslösen, um das UI zu aktualisieren
+            $this->dispatch('dropdown-data-updated');
+        }
     }
 
     /**
@@ -227,11 +251,10 @@ class CreateEmployee extends Component
      */
     public function getProfessionsProperty()
     {
-        if ($this->showModal && $this->professions === null) {
+        if ($this->professions === null) {
             $this->loadEssentialData();
         }
-
-        return $this->professions ?? collect();
+        return $this->professions;
     }
 
     /**
@@ -239,11 +262,10 @@ class CreateEmployee extends Component
      */
     public function getStagesProperty()
     {
-        if ($this->showModal && $this->stages === null) {
+        if ($this->stages === null) {
             $this->loadEssentialData();
         }
-
-        return $this->stages ?? collect();
+        return $this->stages;
     }
 
     /**
@@ -251,11 +273,10 @@ class CreateEmployee extends Component
      */
     public function getRolesProperty()
     {
-        if ($this->showModal && $this->roles === null) {
+        if ($this->roles === null) {
             $this->loadEssentialData();
         }
-
-        return $this->roles ?? collect();
+        return $this->roles;
     }
 
     /**
@@ -263,11 +284,10 @@ class CreateEmployee extends Component
      */
     public function getTeamsProperty()
     {
-        if ($this->showModal && $this->teams === null) {
+        if ($this->teams === null) {
             $this->loadEssentialData();
         }
-
-        return $this->teams ?? collect();
+        return $this->teams;
     }
 
     /**
@@ -275,32 +295,33 @@ class CreateEmployee extends Component
      */
     public function getDepartmentsProperty()
     {
-        if ($this->showModal && $this->departments === null) {
-            // Store auth user data to avoid multiple calls
-            $user = auth()->user();
-            $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : $user->current_team_id;
-            $companyId = $user->company_id;
-
-            $query = Department::where('model_status', ModelStatus::ACTIVE->value)
-                ->where('company_id', $companyId)
-                ->where('team_id', $teamId)
-                ->select(['id', 'name']);
-
-            $this->departments = $query->get();
+        // Sicherstellen, dass alle Departments geladen sind
+        if ($this->departments === null) {
+            $this->loadEssentialData();
         }
 
-        return $this->departments ?? collect();
+        // Wenn kein Team ausgewählt ist, alle Departments zurückgeben
+        if (empty($this->selectedTeams) || count($this->selectedTeams) === 0) {
+            return $this->departments;
+        }
+
+        // Departments filtern basierend auf dem ausgewählten Team
+        $filteredDepartments = $this->departments->filter(function ($department) {
+            return in_array($department->team_id, $this->selectedTeams);
+        });
+
+        return $filteredDepartments;
     }
+
     /**
      * Gets supervisors list
      */
     public function getSupervisorsProperty()
     {
-        if ($this->showModal && $this->supervisors === null) {
+        if ($this->supervisors === null) {
             $this->loadEssentialData();
         }
-
-        return $this->supervisors ?? collect();
+        return $this->supervisors;
     }
 
     /**

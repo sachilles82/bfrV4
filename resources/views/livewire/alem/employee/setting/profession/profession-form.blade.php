@@ -110,6 +110,6 @@
                 @endforelse
             </flux:rows>
         </flux:table>
-        {{ $professions->links() }}
+        {{ $professions->links('livewire::simple-custom') }}
     </flux:modal>
 </div>

@@ -21,9 +21,9 @@
                 />
 
 
-{{--                <livewire:alem.employee.profile.personal-data--}}
-{{--                    :user="$user"--}}
-{{--                />--}}
+                <livewire:alem.employee.profile.personal-data
+                    :user="$user"
+                />
 
 
 

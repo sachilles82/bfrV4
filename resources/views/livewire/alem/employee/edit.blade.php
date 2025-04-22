@@ -7,7 +7,7 @@
         variant="flyout"
         position="left"
         class="space-y-6 lg:min-w-3xl"
-        wire:model="showModal"
+        wire:model="showEditModal"
     >
         <div>
             <flux:heading size="lg">{{ __('Edit Employee') }}</flux:heading>
