@@ -43,10 +43,10 @@ trait WithEmployeeModelStatus
     {
         return 'Employees';
     }
-    //
-    //    /**
-    //     * Name des Events, das nach Status-Änderungen ausgelöst wird
-    //     */
+
+        /**
+         * Name des Events, das nach Status-Änderungen ausgelöst wird
+         */
         protected function getStatusUpdateEventName(): string
         {
             return 'employeeUpdated';

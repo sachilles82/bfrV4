@@ -58,25 +58,10 @@ class EmployeeTable extends Component
      */
     public function updated($property): void
     {
-        // Prüfen, ob sich einer der Filter geändert hat
-        if (in_array($property, [
-            'search',
-            'statusFilter',
-            'employeeStatusFilter',
-            'sortCol',
-            'sortAsc',
-            'perPage',
-        ])) {
+
+        if (in_array($property, ['statusFilter', 'employeeStatusFilter'])) {
             $this->selectedIds = [];
-
-            if ($property !== 'perPage') {
-                $this->resetPage();
-            }
-
-            if ($property === 'statusFilter') {
-                $this->reset('employeeStatusFilter');
-            }
-
+            $this->reset('search', 'sortCol', 'sortAsc', 'perPage');
             $this->dispatch('update-table');
         }
     }
