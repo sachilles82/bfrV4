@@ -69,6 +69,10 @@ class CreateEmployee extends Component
     private $stages = null;
     private $supervisors = null;
 
+//    public int $authUserId;
+//    public int $currentTeamId;
+//    public int $companyId;
+
     /**
      * Lifecycle hook: wird aufgerufen, wenn das Modal geöffnet wird
      */

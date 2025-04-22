@@ -213,24 +213,24 @@ class EditEmployee extends Component
                     ->get();
             }
 
-            // Supervisors laden (falls noch nicht geladen)
-            if ($this->supervisors === null) {
-                // Optimierter JOIN für bessere Performance
-                $this->supervisors = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
-                    ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-                    ->join('roles', function($join) {
-                        $join->on('model_has_roles.role_id', '=', 'roles.id')
-                            ->where('roles.is_manager', true);
-                    })
-                    ->where('model_has_roles.model_type', User::class)
-                    ->where('users.company_id', $companyId)
-                    ->whereNull('users.deleted_at')
-                    ->when($this->userId, function ($query) {
-                        return $query->where('users.id', '!=', $this->userId);
-                    })
-                    ->distinct()
-                    ->get();
-            }
+//            // Supervisors laden (falls noch nicht geladen)
+//            if ($this->supervisors === null) {
+//                // Optimierter JOIN für bessere Performance
+//                $this->supervisors = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
+//                    ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+//                    ->join('roles', function($join) {
+//                        $join->on('model_has_roles.role_id', '=', 'roles.id')
+//                            ->where('roles.is_manager', true);
+//                    })
+//                    ->where('model_has_roles.model_type', User::class)
+//                    ->where('users.company_id', $companyId)
+//                    ->whereNull('users.deleted_at')
+//                    ->when($this->userId, function ($query) {
+//                        return $query->where('users.id', '!=', $this->userId);
+//                    })
+//                    ->distinct()
+//                    ->get();
+//            }
 
             $this->dataLoadedEdit = true;
         } catch (\Exception $e) {

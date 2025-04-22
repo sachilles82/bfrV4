@@ -390,11 +390,15 @@ class EmployeeIndexController extends Controller
         $currentTeamId = $authUser->currentTeam->id;
         $companyId = $authUser->company_id;
 
-        return view('laravel.alem.employee.index', [
+        return view('laravel.alem.employee.index',
+
+            [
             'authUserId' => $authUser->id,
             'currentTeamId' => $currentTeamId,
             'companyId' => $companyId,
-        ]);
+        ]
+
+        );
     }
 
 }
