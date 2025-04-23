@@ -254,7 +254,7 @@ class EditEmployee extends Component
             $this->dispatch('employee-updated');
 
             Flux::toast(
-                text: __('Employee data updated successfully.'),
+                text: __('Employee Profile updated successfully.'),
                 heading: __('Success.'),
                 variant: 'success'
             );
