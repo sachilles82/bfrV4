@@ -13,10 +13,13 @@ use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+
+// Entferne Auth, wenn nicht mehr direkt benötigt
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Enums\Role\RoleHasAccessTo;
@@ -27,6 +30,7 @@ use App\Traits\Model\WithModelStatusOptions;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Illuminate\Support\Collection;
 
 #[Lazy(isolate: false)]
 class EditEmployee extends Component
@@ -38,10 +42,11 @@ class EditEmployee extends Component
     private bool $dataLoadedEdit = false;
 
     // User identification
+    #[Locked]
     public ?int $userId = null;
     public ?User $user = null;
 
-    // Eigenschaften für vorgeladene Daten - optimiert für Livewire-Komponente
+    // Eigenschaften für vorgeladene Daten - diese werden automatisch von Livewire befüllt
     public ?int $authUserId = null;
     public ?int $currentTeamId = null;
     public ?int $companyId = null;
@@ -63,40 +68,24 @@ class EditEmployee extends Component
     public $stage = null;
     public $supervisor = null;
 
-    // Optimierung: Cache-Eigenschaften privat lassen
-    private $teams = null;
-    private $departments = null;
-    private $roles = null;
-    private $professions = null;
-    private $stages = null;
-    private $supervisors = null;
+    // Optimierung: Cache-Eigenschaften privat lassen und initialisieren
+    private ?Collection $teams = null;
+    private ?Collection $departments = null;
+    private ?Collection $roles = null;
+    private ?Collection $professions = null;
+    private ?Collection $stages = null;
+    private ?Collection $supervisors = null;
 
-    /**
-     * Mount-Methode speichert übergebene Parameter
-     */
-    public function mount(?int $authUserId = null, ?int $currentTeamId = null, ?int $companyId = null): void
-    {
-        // Speichere übergebene Parameter für spätere Verwendung
-        $this->authUserId = $authUserId;
-        $this->currentTeamId = $currentTeamId;
-        $this->companyId = $companyId;
-    }
-
-    /**
-     * Listen for edit-employee event
-     */
     #[On('edit-employee')]
     public function editEmployee($userId): void
     {
         try {
-            // Optimierte Prüfung des userId-Formats
             $this->userId = is_array($userId) && isset($userId['userId']) ? $userId['userId'] : $userId;
 
             if (!$this->userId) {
-                throw new \Exception('Keine gültige Benutzer-ID empfangen');
+                throw new \Exception(__('Keine gültige Benutzer-ID empfangen'));
             }
 
-            // User mit allen relevanten Relationen laden - optimiertes Eager-Loading
             $this->user = User::with([
                 'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
                 'teams:id,name',
@@ -104,20 +93,15 @@ class EditEmployee extends Component
                 'department:id,name'
             ])->findOrFail($this->userId);
 
-            // Formular mit Benutzerdaten füllen
             $this->fillFormWithUserData();
 
-            // Modal öffnen und Daten-Lade-Flag zurücksetzen
             $this->showEditModal = true;
             $this->dataLoadedEdit = false;
 
-            // Daten sofort laden, um Timing-Probleme zu vermeiden
             $this->loadEssentialData();
 
-            // Modal über UI anzeigen
-            $this->dispatch('modal-show-edit', ['name' => 'edit-employee']);
         } catch (\Exception $e) {
-            $this->handleError('Fehler beim Laden des Mitarbeiters', $e);
+            $this->handleError(__('Fehler beim Laden des Mitarbeiters', $e ->getMessage()), $e);
         }
     }
 
@@ -128,48 +112,50 @@ class EditEmployee extends Component
     {
         if (!$this->user) return;
 
-        // Benutzergrundlage Daten
+        $this->gender = $this->user->gender;
         $this->name = $this->user->name;
         $this->last_name = $this->user->last_name;
         $this->email = $this->user->email;
-        $this->gender = $this->user->gender;
-        $this->model_status = $this->user->model_status;
-        $this->joined_at = $this->user->joined_at;
+
+        $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
         $this->department = $this->user->department_id;
 
-        // Beziehungen
-        $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
+        $this->model_status = $this->user->model_status;
+        $this->joined_at = $this->user->joined_at;
+
+
         $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
 
-        // Mitarbeiterdaten, falls vorhanden
-        if ($this->user->employee) {
-            // Enum-Werte als Strings für Formularbindung
-            $this->employee_status = $this->user->employee->employee_status instanceof EmployeeStatus
-                ? $this->user->employee->employee_status->value
-                : $this->user->employee->employee_status;
-
-            $this->profession = $this->user->employee->profession_id;
-            $this->stage = $this->user->employee->stage_id;
-            $this->supervisor = $this->user->employee->supervisor_id;
+        if ($employee = $this->user->employee) {
+            $this->employee_status = $employee->employee_status instanceof EmployeeStatus
+                ? $employee->employee_status->value
+                : $employee->employee_status;
+            $this->profession = $employee->profession_id;
+            $this->stage = $employee->stage_id;
+            $this->supervisor = $employee->supervisor_id;
+        } else {
+            // Standardwerte falls kein Employee-Datensatz existiert
+            $this->employee_status = null;
+            $this->profession = null;
+            $this->stage = null;
+            $this->supervisor = null;
         }
     }
 
     /**
-     * Load all data needed for form dropdowns - optimierte Verwendung übergebener Parameter
+     * Load all data needed for form dropdowns - uses passed properties
      */
     protected function loadEssentialData(): void
     {
-        if ($this->dataLoadedEdit) return;
+
+        if (!$this->showEditModal || $this->dataLoadedEdit) {
+            return;
+        }
 
         try {
-            // Optimierung: Verwende vorgeladene Parameter anstatt auth()->user() wiederholt aufzurufen
-            $currentUserId = $this->authUserId ?? auth()->id();
-            $companyId = $this->companyId ?? auth()->user()->company_id;
+            $currentUserId = $this->authUserId;
+            $companyId = $this->companyId;
 
-            // Verwende das erste ausgewählte Team oder das übergebene aktuelle Team
-            $teamId = !empty($this->selectedTeams) ? $this->selectedTeams[0] : $this->currentTeamId;
-
-            // Teams laden (falls noch nicht geladen)
             if ($this->teams === null) {
                 $this->teams = Team::where('company_id', $companyId)
                     ->select(['id', 'name'])
@@ -177,86 +163,67 @@ class EditEmployee extends Component
                     ->get();
             }
 
-            // Departments laden (falls noch nicht geladen)
+            // TeamScope ist aktiv, filtert automatisch nach Auth::user()->currentTeam->id
             if ($this->departments === null) {
                 $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
-                    ->where('team_id', $teamId)
                     ->select(['id', 'name'])
                     ->orderBy('name')
                     ->get();
             }
 
-            // Rollen laden (falls noch nicht geladen)
+            if ($this->supervisors === null) {
+                $this->supervisors = User::query()
+                    ->where('company_id', $companyId)
+                    ->whereHas('roles', fn($q) => $q->where('is_manager', true))
+                    ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+                    ->distinct()
+                    ->get();
+            }
+
             if ($this->roles === null) {
                 $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
                     ->where('visible', RoleVisibility::Visible->value)
-                    ->whereIn('created_by', [1, $currentUserId]) // Optimiert mit whereIn statt where-or
+                    ->whereIn('created_by', [1, $currentUserId])
                     ->select(['id', 'name', 'is_manager'])
                     ->get();
             }
 
-            // Professionen laden (falls noch nicht geladen)
+            // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
             if ($this->professions === null) {
-                $this->professions = Profession::where('company_id', $companyId)
-                    ->where('team_id', $teamId)
-                    ->select(['id', 'name'])
+                $this->professions = Profession::select(['id', 'name'])
                     ->orderBy('name')
                     ->get();
             }
 
-            // Stages laden (falls noch nicht geladen)
+            // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
             if ($this->stages === null) {
-                $this->stages = Stage::where('company_id', $companyId)
-                    ->where('team_id', $teamId)
-                    ->select(['id', 'name'])
+                $this->stages = Stage::select(['id', 'name'])
                     ->orderBy('name')
                     ->get();
             }
 
-//            // Supervisors laden (falls noch nicht geladen)
-//            if ($this->supervisors === null) {
-//                // Optimierter JOIN für bessere Performance
-//                $this->supervisors = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
-//                    ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-//                    ->join('roles', function($join) {
-//                        $join->on('model_has_roles.role_id', '=', 'roles.id')
-//                            ->where('roles.is_manager', true);
-//                    })
-//                    ->where('model_has_roles.model_type', User::class)
-//                    ->where('users.company_id', $companyId)
-//                    ->whereNull('users.deleted_at')
-//                    ->when($this->userId, function ($query) {
-//                        return $query->where('users.id', '!=', $this->userId);
-//                    })
-//                    ->distinct()
-//                    ->get();
-//            }
+            $this->dataLoadedEdit = true; // Setze das Flag erst, wenn alles versucht wurde (Fehler werden intern behandelt)
 
-            $this->dataLoadedEdit = true;
         } catch (\Exception $e) {
-            $this->handleError('Error loading form data', $e);
+            $this->handleError('Genereller Fehler beim Laden der Formulardaten', $e);
+            $this->dataLoadedEdit = false; // Sicherstellen, dass bei Fehler erneut geladen werden kann
         }
     }
+
+
 
     /**
      * Update employee in database
      */
     public function updateEmployee(): void
     {
-        if (!$this->dataLoadedEdit) {
-            $this->loadEssentialData();
-        }
-
-        // Sicherstellen, dass enums als string-werte vorliegen
-        if ($this->employee_status instanceof EmployeeStatus) {
-            $this->employee_status = $this->employee_status->value;
-        }
-        if ($this->model_status instanceof ModelStatus) {
-            $this->model_status = $this->model_status->value;
-        }
+        // Konvertiere Enums zu Strings für die Validierung/Speicherung
+        $this->employee_status = $this->employee_status instanceof EmployeeStatus ? $this->employee_status->value : $this->employee_status;
+        $this->model_status = $this->model_status instanceof ModelStatus ? $this->model_status->value : $this->model_status;
 
         try {
-            // Validiere die Eingaben
+            // Passe die Validierungsregel für 'supervisor' an, um den aktuellen Benutzer auszuschließen
+            $this->rules['supervisor'] = ['required', 'exists:users,id', Rule::notIn([$this->userId])];
             $this->validate();
 
             if (!$this->userId) {
@@ -266,14 +233,14 @@ class EditEmployee extends Component
             DB::beginTransaction();
 
             try {
-                // User-Daten in einer Abfrage aktualisieren
+                // User-Daten aktualisieren
                 User::where('id', $this->userId)->update([
                     'name' => $this->name,
                     'last_name' => $this->last_name,
                     'email' => $this->email,
                     'gender' => $this->gender,
                     'model_status' => $this->model_status,
-                    'joined_at' => Carbon::parse($this->joined_at)->format('Y-m-d'),
+                    'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at)->format('Y-m-d') : null,
                     'department_id' => $this->department,
                 ]);
 
@@ -288,17 +255,19 @@ class EditEmployee extends Component
                     ]
                 );
 
-                // Beziehungen aktualisieren
-                $user = User::findOrFail($this->userId);
-                $user->roles()->sync($this->selectedRoles);
-                $user->teams()->sync($this->selectedTeams);
+                // Beziehungen aktualisieren (User neu laden, da update() keine Model-Instanz zurückgibt)
+                $updatedUser = User::find($this->userId);
+                if ($updatedUser) {
+                    $updatedUser->roles()->sync($this->selectedRoles);
+                    $updatedUser->teams()->sync($this->selectedTeams);
+                } else {
+                    throw new \Exception('Benutzer nach Update nicht gefunden.');
+                }
 
-                // Transaktion abschließen
                 DB::commit();
 
-                // UI aktualisieren
-                $this->showEditModal = false;
-                $this->dispatch('employee-updated');
+                $this->closeModal(); // Modal schließen und Reset durchführen
+                $this->dispatch('employee-updated'); // Event für Tabellen-Refresh
                 $this->dispatch('notify', [
                     'type' => 'success',
                     'message' => 'Mitarbeiter wurde erfolgreich aktualisiert.'
@@ -306,135 +275,62 @@ class EditEmployee extends Component
 
             } catch (\Exception $e) {
                 DB::rollBack();
-                throw $e;
+                // Gib den Fehler an die handleError Methode weiter
+                $this->handleError('Fehler beim Speichern in der Datenbank', $e);
+                // Breche hier ab, da die Transaktion fehlgeschlagen ist
+                return;
             }
 
         } catch (ValidationException $e) {
-            // Nur bei Validierungsfehlern das Modal offen halten
+            // Halte das Modal offen und zeige Validierungsfehler an
             $this->dispatch('notify', [
                 'type' => 'error',
                 'message' => 'Bitte korrigieren Sie die markierten Felder.'
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
-            $this->handleError('Fehler beim Aktualisieren des Mitarbeiters', $e);
+            // Bei anderen unerwarteten Fehlern
+            DB::rollBack(); // Sicherstellen, dass Rollback erfolgt
+            $this->handleError('Unerwarteter Fehler beim Aktualisieren', $e);
         }
     }
 
-    /**
-     * Handle an error by logging it and showing a notification
-     */
-    private function handleError(string $message, \Exception $exception): void
-    {
-        Log::error("{$message}: " . $exception->getMessage(), [
-            'exception' => $exception->getMessage(),
-            'user_id' => $this->userId,
-            'file' => $exception->getFile(),
-            'line' => $exception->getLine(),
-        ]);
 
-        $this->dispatch('notify', [
-            'type' => 'error',
-            'message' => $message . ': ' . $this->getUserFriendlyErrorMessage($exception)
-        ]);
-    }
-
-    /**
-     * Konvertiert technische Fehlermeldungen in benutzerfreundliche Nachrichten
-     */
-    private function getUserFriendlyErrorMessage(\Exception $exception): string
-    {
-        $message = $exception->getMessage();
-
-        if (strpos($message, 'Duplicate entry') !== false && strpos($message, 'email') !== false) {
-            return 'Diese E-Mail-Adresse wird bereits verwendet.';
-        }
-        if (strpos($message, 'Column not found') !== false) {
-            return 'Datenbankfehler: Ein erforderliches Feld konnte nicht gefunden werden.';
-        }
-        if (strpos($message, 'foreign key constraint fails') !== false) {
-            return 'Beziehungsproblem: Ein verknüpfter Datensatz existiert nicht oder kann nicht aktualisiert werden.';
-        }
-
-        return 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-    }
-
-    /**
-     * Handle property updates
-     */
-    public function updated($propertyName): void
-    {
-        // Daten laden, wenn Modal angezeigt wird
-        if ($propertyName === 'showEditModal' && $this->showEditModal && !$this->dataLoadedEdit) {
-            $this->loadEssentialData();
-        }
-
-        // Abteilungen zurücksetzen, wenn Team-Auswahl sich ändert
-        if ($propertyName === 'selectedTeams') {
-            $this->departments = null;
-
-            // Wenn Team gewählt und aktuelle Abteilung nicht zu diesem Team gehört, Abteilung zurücksetzen
-            if (!empty($this->selectedTeams) && $this->department) {
-                $teamId = $this->selectedTeams[0];
-                $departmentExists = Department::where('id', $this->department)
-                    ->where('team_id', $teamId)
-                    ->exists();
-
-                if (!$departmentExists) {
-                    $this->department = null;
-                }
-            }
-        }
-    }
-
-    /**
-     * Force hydration to load data after rendering
-     */
-    public function hydrate(): void
-    {
-        if ($this->showEditModal && !$this->dataLoadedEdit) {
-            $this->loadEssentialData();
-        }
-    }
-
-    // Event Handler für Cache-Invalidierung
+    // --- Event Handler für Cache-Invalidierung ---
     #[On('profession-updated')]
     public function refreshProfessions(): void
     {
         $this->professions = null;
+        if ($this->showEditModal) $this->loadEssentialData();
     }
 
     #[On('stage-updated')]
     public function refreshStages(): void
     {
         $this->stages = null;
+        if ($this->showEditModal) $this->loadEssentialData();
     }
 
-    #[On('department-created')]
-    #[On('department-updated')]
+    #[On(['department-created', 'department-updated'])]
     public function refreshDepartments(): void
     {
         $this->departments = null;
+        if ($this->showEditModal) $this->loadEssentialData();
     }
 
     /**
      * Get employee status options for dropdown - static caching
      */
-    public function getEmployeeStatusOptionsProperty()
+    public function getEmployeeStatusOptionsProperty(): array
     {
         static $options = null;
-
         if ($options === null) {
-            $options = collect(EmployeeStatus::cases())->map(function ($status) {
-                return [
-                    'value' => $status->value,
-                    'label' => $status->label(),
-                    'colors' => $status->colors(),
-                    'icon' => $status->icon(),
-                ];
-            })->toArray();
+            $options = collect(EmployeeStatus::cases())->map(fn($status) => [
+                'value' => $status->value,
+                'label' => $status->label(),
+                'colors' => $status->colors(),
+                'icon' => $status->icon(),
+            ])->toArray();
         }
-
         return $options;
     }
 
@@ -443,17 +339,16 @@ class EditEmployee extends Component
      */
     public function closeModal(): void
     {
-        // Reset component properties
         $this->reset([
-            'userId', 'showEditModal', 'dataLoadedEdit',
+            'userId', 'user', 'showEditModal', 'dataLoadedEdit',
             'name', 'last_name', 'email', 'gender',
             'model_status', 'joined_at', 'department',
             'selectedTeams', 'selectedRoles',
             'employee_status', 'profession', 'stage', 'supervisor'
         ]);
+        $this->resetErrorBag(); // Validierungsfehler zurücksetzen
 
-        // Reset cached data
-        $this->user = null;
+        // Reset cached data (private properties)
         $this->teams = null;
         $this->departments = null;
         $this->roles = null;
@@ -461,68 +356,48 @@ class EditEmployee extends Component
         $this->stages = null;
         $this->supervisors = null;
 
-        // Close modal
+        // Close modal via Alpine.js
         $this->dispatch('modal-close-edit', ['name' => 'edit-employee']);
     }
 
-    // Getter für Dropdown-Daten
-    public function getTeamsProperty()
+    #[Computed]
+    public function teams(): Collection
     {
-        if ($this->showEditModal && $this->teams === null) {
-            $this->loadEssentialData();
-        }
         return $this->teams ?? collect();
     }
 
-    public function getDepartmentsProperty()
+    #[Computed]
+    public function departments(): Collection
     {
-        if ($this->showEditModal && $this->departments === null) {
-            $this->loadEssentialData();
-        }
         return $this->departments ?? collect();
     }
 
-    public function getRolesProperty()
+    #[Computed]
+    public function roles(): Collection
     {
-        if ($this->showEditModal && $this->roles === null) {
-            $this->loadEssentialData();
-        }
         return $this->roles ?? collect();
     }
 
-    public function getProfessionsProperty()
+    #[Computed]
+    public function professions(): Collection
     {
-        if ($this->showEditModal && $this->professions === null) {
-            $this->loadEssentialData();
-        }
         return $this->professions ?? collect();
     }
 
-    public function getStagesProperty()
+    #[Computed]
+    public function property(): Collection
     {
-        if ($this->showEditModal && $this->stages === null) {
-            $this->loadEssentialData();
-        }
         return $this->stages ?? collect();
     }
 
-    public function getSupervisorsProperty()
+    #[Computed]
+    public function supervisors(): Collection
     {
-        if ($this->showEditModal && $this->supervisors === null) {
-            $this->loadEssentialData();
-        }
         return $this->supervisors ?? collect();
     }
 
-    /**
-     * Render component
-     */
     public function render(): View
     {
-        if ($this->showEditModal && !$this->dataLoadedEdit) {
-            $this->loadEssentialData();
-        }
-
         return view('livewire.alem.employee.edit', [
             'employeeStatusOptions' => $this->employeeStatusOptions,
             'modelStatusOptions' => $this->modelStatusOptions,
@@ -530,13 +405,47 @@ class EditEmployee extends Component
     }
 
     /**
-     * Invalidiert relevante Caches
+     * Handle an error by logging it and showing a notification
      */
-    protected function refreshRelatedCaches(): void
+    private function handleError(string $message, \Exception $exception): void
     {
-        app()->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-        $this->refreshProfessions();
-        $this->refreshStages();
-        $this->refreshDepartments();
+        Log::error("{$message}: " . $exception->getMessage(), [
+            'exception_message' => $exception->getMessage(), // Umbenannt für Klarheit
+            'user_id' => $this->userId,
+            'auth_user_id' => $this->authUserId,
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => $exception->getTraceAsString() // Füge Stack Trace hinzu für besseres Debugging
+        ]);
+
+        // Sende nur eine generische Fehlermeldung an den Benutzer, außer bei bekannten Problemen
+        $this->dispatch('notify', [
+            'type' => 'error',
+            'message' => $this->getUserFriendlyErrorMessage($exception, $message) // Übergebe ursprüngliche Nachricht
+        ]);
     }
+
+    /**
+     * Konvertiert technische Fehlermeldungen in benutzerfreundliche Nachrichten
+     */
+    private function getUserFriendlyErrorMessage(\Exception $exception, string $contextMessage): string
+    {
+        $technicalMessage = $exception->getMessage();
+
+        // Spezifische, sichere Fehlermeldungen
+        if (strpos($technicalMessage, 'Duplicate entry') !== false && strpos($technicalMessage, 'email') !== false) {
+            return 'Diese E-Mail-Adresse wird bereits verwendet.';
+        }
+        if (strpos($technicalMessage, 'foreign key constraint fails') !== false) {
+            return 'Ein verknüpfter Datensatz (z.B. Abteilung, Rolle) existiert nicht oder kann nicht zugewiesen werden.';
+        }
+        if (strpos($technicalMessage, 'Missing essential IDs') !== false) {
+            return 'Ein interner Fehler ist aufgetreten (fehlende IDs). Bitte Seite neu laden.';
+        }
+
+        // Generische Fehlermeldung für unerwartete Fehler
+        Log::warning("Anzeige einer generischen Fehlermeldung für: {$contextMessage} - {$technicalMessage}");
+        return 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut oder kontaktieren Sie den Support.';
+    }
+
 }

@@ -156,7 +156,8 @@
                                     wire:loading
                                     wire:target="editEmployee"
                                     class="absolute inset-0  flex items-center justify-center">
-                                    <div class="w-full h-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 block px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 "></div>
+                                    <div
+                                        class="w-full h-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 block px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 "></div>
                                 </div>
                             </div>
                         </x-pupi.input.group>
@@ -177,7 +178,8 @@
                                     wire:loading
                                     wire:target="editEmployee"
                                     class="absolute inset-0  flex items-center justify-center">
-                                    <div class="w-full h-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 block px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 "></div>
+                                    <div
+                                        class="w-full h-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 block px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 "></div>
                                 </div>
                             </div>
                         </x-pupi.input.group>
@@ -263,45 +265,51 @@
                                 @empty
                                     <flux:option value="">{{ __('No Departments found') }}</flux:option>
                                 @endforelse
+                                <!-- Trigger zum Öffnen des Profession-Modals -->
+                                <x-slot name="add">
+                                    <livewire:alem.department.create-department
+                                        lazy
+                                    />
+                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
 
                     <!-- Supervisor -->
-{{--                    <div class="sm:col-span-3">--}}
-{{--                        <x-pupi.input.group--}}
-{{--                            label="{{ __('Supervisor') }}"--}}
-{{--                            for="supervisor"--}}
-{{--                            badge="{{ __('Required') }}"--}}
-{{--                            :error="$errors->first('supervisor')"--}}
-{{--                            model="supervisor"--}}
-{{--                            help-text="{{ __('') }}">--}}
-{{--                            <flux:select--}}
-{{--                                class="mt-2"--}}
-{{--                                wire:model="supervisor"--}}
-{{--                                id="supervisor"--}}
-{{--                                variant="listbox"--}}
-{{--                                searchable--}}
-{{--                                placeholder="{{ __('Select Supervisor') }}">--}}
-{{--                                @forelse($this->supervisors ?? [] as $supervisor)--}}
-{{--                                    <flux:option value="{{ $supervisor->id }}">--}}
-{{--                                        <div class="flex items-center gap-2 whitespace-nowrap">--}}
-{{--                                            <flux:avatar--}}
-{{--                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"--}}
-{{--                                                circle--}}
-{{--                                                size="xs"--}}
-{{--                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"--}}
-{{--                                                alt="{{ $supervisor->name }}"--}}
-{{--                                            />--}}
-{{--                                            {{ $supervisor->name }} {{ $supervisor->last_name }}--}}
-{{--                                        </div>--}}
-{{--                                    </flux:option>--}}
-{{--                                @empty--}}
-{{--                                    <flux:option value="">{{ __('No supervisors found') }}</flux:option>--}}
-{{--                                @endforelse--}}
-{{--                            </flux:select>--}}
-{{--                        </x-pupi.input.group>--}}
-{{--                    </div>--}}
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Supervisor') }}"
+                            for="supervisor"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('supervisor')"
+                            model="supervisor"
+                            help-text="{{ __('') }}">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="supervisor"
+                                id="supervisor"
+                                variant="listbox"
+                                searchable
+                                placeholder="{{ __('Select Supervisor') }}">
+                                @forelse($this->supervisors ?? [] as $supervisor)
+                                    <flux:option value="{{ $supervisor->id }}">
+                                        <div class="flex items-center gap-2 whitespace-nowrap">
+                                            <flux:avatar
+                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
+                                                circle
+                                                size="xs"
+                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
+                                                alt="{{ $supervisor->name }}"
+                                            />
+                                            {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                        </div>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No supervisors found') }}</flux:option>
+                                @endforelse
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
 
                     <!-- Roles -->
                     <div class="sm:col-span-3">
@@ -358,6 +366,12 @@
                                 @empty
                                     <flux:option value="">{{ __('No professions found') }}</flux:option>
                                 @endforelse
+                                <!-- Trigger zum Öffnen des Profession-Modals -->
+                                <x-slot name="add">
+                                    <livewire:alem.employee.setting.profession.profession-form
+                                        lazy
+                                    />
+                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -385,6 +399,11 @@
                                 @empty
                                     <flux:option value="">{{ __('No stages found') }}</flux:option>
                                 @endforelse
+                                <x-slot name="add">
+                                    <livewire:alem.employee.setting.profession.stage-form
+                                        lazy
+                                    />
+                                </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -496,9 +515,12 @@
                     wire:target="updateEmployee"
                 >
                     <div wire:loading.flex wire:target="updateEmployee" class="items-center">
-                        <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         {{ __('Saving...') }}
                     </div>

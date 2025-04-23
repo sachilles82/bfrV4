@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Profession extends Model
 {
-    use BelongsToTeam, HasFactory;
+    use BelongsToCompany, HasFactory;
 
     protected $fillable = [
         'name',
