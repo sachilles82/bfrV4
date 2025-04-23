@@ -71,7 +71,7 @@ class EditEmployee extends Component
     private ?Collection $stages = null;
     private ?Collection $supervisors = null;
 
-    #[On('edit-employee')]
+    #[On('open-edit-modal')]
     public function editEmployee($userId): void
     {
         try {

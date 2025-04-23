@@ -1,7 +1,4 @@
-<div
-    x-data="{}"
-    @open-edit-employee-modal.window="$wire.editEmployee($event.detail.userId)"
->
+<div>
     <flux:modal
         name="edit-employee"
         variant="flyout"
