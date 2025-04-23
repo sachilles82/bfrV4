@@ -9,6 +9,7 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class StateForm extends Component
@@ -17,6 +18,7 @@ class StateForm extends Component
 
     public array $countries = [];
 
+    #[Locked]
     public ?int $stateId = null;
 
     public ?string $name = null;

@@ -10,6 +10,7 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -25,6 +26,7 @@ class CityForm extends Component
 
     public ?int $selectedState = null;
 
+    #[Locked]
     public ?int $cityId = null;
 
     public string $name = '';

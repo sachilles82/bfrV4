@@ -4,7 +4,6 @@ namespace App\Livewire\Alem\Employee;
 
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
-use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
@@ -12,10 +11,7 @@ use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-
-// Entferne Auth, wenn nicht mehr direkt benötigt
-use Illuminate\Validation\Rule;
+use Flux\Flux;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
@@ -28,7 +24,6 @@ use App\Models\Spatie\Role;
 use App\Models\Team;
 use App\Traits\Model\WithModelStatusOptions;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Illuminate\Support\Collection;
 
@@ -39,7 +34,7 @@ class EditEmployee extends Component
 
     // Modal state
     public bool $showEditModal = false;
-    private bool $dataLoadedEdit = false;
+    public bool $dataLoadedEdit = false;
 
     // User identification
     #[Locked]
@@ -63,10 +58,10 @@ class EditEmployee extends Component
     public array $selectedRoles = [];
 
     // Employee fields
-    public $employee_status = null;
-    public $profession = null;
-    public $stage = null;
-    public $supervisor = null;
+    public ?string $employee_status = null;
+    public ?int $profession = null;
+    public ?int $stage = null;
+    public ?int $supervisor = null;
 
     // Optimierung: Cache-Eigenschaften privat lassen und initialisieren
     private ?Collection $teams = null;
@@ -80,11 +75,10 @@ class EditEmployee extends Component
     public function editEmployee($userId): void
     {
         try {
-            $this->userId = is_array($userId) && isset($userId['userId']) ? $userId['userId'] : $userId;
 
-            if (!$this->userId) {
-                throw new \Exception(__('Keine gültige Benutzer-ID empfangen'));
-            }
+//            $this->authorize('update', User::class);
+
+            $this->userId = $userId;
 
             $this->user = User::with([
                 'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
@@ -93,22 +87,30 @@ class EditEmployee extends Component
                 'department:id,name'
             ])->findOrFail($this->userId);
 
-            $this->fillFormWithUserData();
+            $this->loadEmployeeData();
 
             $this->showEditModal = true;
             $this->dataLoadedEdit = false;
 
-            $this->loadEssentialData();
+            $this->loadRelationData();
 
-        } catch (\Exception $e) {
-            $this->handleError(__('Fehler beim Laden des Mitarbeiters', $e ->getMessage()), $e);
+        } catch (\Throwable $e) {
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
+            Flux::toast(
+                text: __('An error occurred while loading the employee.'),
+                heading: __('Error.'),
+                variant: 'danger'
+            );
         }
     }
 
     /**
      * Fill form with user data
      */
-    protected function fillFormWithUserData(): void
+    protected function loadEmployeeData(): void
     {
         if (!$this->user) return;
 
@@ -133,19 +135,13 @@ class EditEmployee extends Component
             $this->profession = $employee->profession_id;
             $this->stage = $employee->stage_id;
             $this->supervisor = $employee->supervisor_id;
-        } else {
-            // Standardwerte falls kein Employee-Datensatz existiert
-            $this->employee_status = null;
-            $this->profession = null;
-            $this->stage = null;
-            $this->supervisor = null;
         }
     }
 
     /**
      * Load all data needed for form dropdowns - uses passed properties
      */
-    protected function loadEssentialData(): void
+    protected function loadRelationData(): void
     {
 
         if (!$this->showEditModal || $this->dataLoadedEdit) {
@@ -204,12 +200,20 @@ class EditEmployee extends Component
 
             $this->dataLoadedEdit = true; // Setze das Flag erst, wenn alles versucht wurde (Fehler werden intern behandelt)
 
-        } catch (\Exception $e) {
-            $this->handleError('Genereller Fehler beim Laden der Formulardaten', $e);
+        } catch (\Throwable $e) {
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
+            Flux::toast(
+                text: __('An error occurred while loading the employee data.'),
+                heading: __('Error.'),
+                variant: 'danger'
+            );
+
             $this->dataLoadedEdit = false; // Sicherstellen, dass bei Fehler erneut geladen werden kann
         }
     }
-
 
 
     /**
@@ -217,80 +221,54 @@ class EditEmployee extends Component
      */
     public function updateEmployee(): void
     {
-        // Konvertiere Enums zu Strings für die Validierung/Speicherung
-        $this->employee_status = $this->employee_status instanceof EmployeeStatus ? $this->employee_status->value : $this->employee_status;
-        $this->model_status = $this->model_status instanceof ModelStatus ? $this->model_status->value : $this->model_status;
-
         try {
-            // Passe die Validierungsregel für 'supervisor' an, um den aktuellen Benutzer auszuschließen
-            $this->rules['supervisor'] = ['required', 'exists:users,id', Rule::notIn([$this->userId])];
+
             $this->validate();
 
-            if (!$this->userId) {
-                throw new \Exception('Kein Mitarbeiter zur Aktualisierung ausgewählt.');
-            }
-
-            DB::beginTransaction();
-
-            try {
-                // User-Daten aktualisieren
-                User::where('id', $this->userId)->update([
-                    'name' => $this->name,
-                    'last_name' => $this->last_name,
-                    'email' => $this->email,
-                    'gender' => $this->gender,
-                    'model_status' => $this->model_status,
-                    'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at)->format('Y-m-d') : null,
-                    'department_id' => $this->department,
-                ]);
-
-                // Employee-Daten aktualisieren oder erstellen
-                Employee::updateOrCreate(
-                    ['user_id' => $this->userId],
-                    [
-                        'employee_status' => $this->employee_status,
-                        'profession_id' => $this->profession,
-                        'stage_id' => $this->stage,
-                        'supervisor_id' => $this->supervisor,
-                    ]
-                );
-
-                // Beziehungen aktualisieren (User neu laden, da update() keine Model-Instanz zurückgibt)
-                $updatedUser = User::find($this->userId);
-                if ($updatedUser) {
-                    $updatedUser->roles()->sync($this->selectedRoles);
-                    $updatedUser->teams()->sync($this->selectedTeams);
-                } else {
-                    throw new \Exception('Benutzer nach Update nicht gefunden.');
-                }
-
-                DB::commit();
-
-                $this->closeModal(); // Modal schließen und Reset durchführen
-                $this->dispatch('employee-updated'); // Event für Tabellen-Refresh
-                $this->dispatch('notify', [
-                    'type' => 'success',
-                    'message' => 'Mitarbeiter wurde erfolgreich aktualisiert.'
-                ]);
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                // Gib den Fehler an die handleError Methode weiter
-                $this->handleError('Fehler beim Speichern in der Datenbank', $e);
-                // Breche hier ab, da die Transaktion fehlgeschlagen ist
-                return;
-            }
-
-        } catch (ValidationException $e) {
-            // Halte das Modal offen und zeige Validierungsfehler an
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => 'Bitte korrigieren Sie die markierten Felder.'
+            User::where('id', $this->userId)->update([
+                'name' => $this->name,
+                'last_name' => $this->last_name,
+                'email' => $this->email,
+                'gender' => $this->gender,
+                'model_status' => $this->model_status,
+                'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at)->format('Y-m-d') : null,
+                'department_id' => $this->department,
             ]);
-        } catch (\Exception $e) {
-            // Bei anderen unerwarteten Fehlern
-            DB::rollBack(); // Sicherstellen, dass Rollback erfolgt
-            $this->handleError('Unerwarteter Fehler beim Aktualisieren', $e);
+
+            $employee = Employee::where('user_id', $this->userId)->first();
+
+            $employee->update([
+                'employee_status' => $this->employee_status,
+                'profession_id' => $this->profession,
+                'stage_id' => $this->stage,
+                'supervisor_id' => $this->supervisor,
+            ]);
+
+            $updatedUser = User::find($this->userId);
+
+            $updatedUser->roles()->sync($this->selectedRoles);
+            $updatedUser->teams()->sync($this->selectedTeams);
+
+            $this->finish();
+
+            $this->dispatch('employee-updated');
+
+            Flux::toast(
+                text: __('Employee data updated successfully.'),
+                heading: __('Success.'),
+                variant: 'success'
+            );
+
+        } catch (\Throwable $e) {
+            if ($e instanceof ValidationException) {
+                throw $e;
+            }
+
+            Flux::toast(
+                text: __('An error occurred while saving the employee.'),
+                heading: __('Error.'),
+                variant: 'danger'
+            );
         }
     }
 
@@ -300,21 +278,21 @@ class EditEmployee extends Component
     public function refreshProfessions(): void
     {
         $this->professions = null;
-        if ($this->showEditModal) $this->loadEssentialData();
+        if ($this->showEditModal) $this->loadRelationData();
     }
 
     #[On('stage-updated')]
     public function refreshStages(): void
     {
         $this->stages = null;
-        if ($this->showEditModal) $this->loadEssentialData();
+        if ($this->showEditModal) $this->loadRelationData();
     }
 
     #[On(['department-created', 'department-updated'])]
     public function refreshDepartments(): void
     {
         $this->departments = null;
-        if ($this->showEditModal) $this->loadEssentialData();
+        if ($this->showEditModal) $this->loadRelationData();
     }
 
     /**
@@ -337,8 +315,10 @@ class EditEmployee extends Component
     /**
      * Close modal and reset state
      */
-    public function closeModal(): void
+    public function finish(): void
     {
+        $this->modal('edit-employee')->close();
+
         $this->reset([
             'userId', 'user', 'showEditModal', 'dataLoadedEdit',
             'name', 'last_name', 'email', 'gender',
@@ -346,7 +326,8 @@ class EditEmployee extends Component
             'selectedTeams', 'selectedRoles',
             'employee_status', 'profession', 'stage', 'supervisor'
         ]);
-        $this->resetErrorBag(); // Validierungsfehler zurücksetzen
+
+        $this->resetValidation();
 
         // Reset cached data (private properties)
         $this->teams = null;
@@ -355,9 +336,6 @@ class EditEmployee extends Component
         $this->professions = null;
         $this->stages = null;
         $this->supervisors = null;
-
-        // Close modal via Alpine.js
-        $this->dispatch('modal-close-edit', ['name' => 'edit-employee']);
     }
 
     #[Computed]
@@ -385,7 +363,7 @@ class EditEmployee extends Component
     }
 
     #[Computed]
-    public function property(): Collection
+    public function stages(): Collection
     {
         return $this->stages ?? collect();
     }
@@ -403,49 +381,4 @@ class EditEmployee extends Component
             'modelStatusOptions' => $this->modelStatusOptions,
         ]);
     }
-
-    /**
-     * Handle an error by logging it and showing a notification
-     */
-    private function handleError(string $message, \Exception $exception): void
-    {
-        Log::error("{$message}: " . $exception->getMessage(), [
-            'exception_message' => $exception->getMessage(), // Umbenannt für Klarheit
-            'user_id' => $this->userId,
-            'auth_user_id' => $this->authUserId,
-            'file' => $exception->getFile(),
-            'line' => $exception->getLine(),
-            'trace' => $exception->getTraceAsString() // Füge Stack Trace hinzu für besseres Debugging
-        ]);
-
-        // Sende nur eine generische Fehlermeldung an den Benutzer, außer bei bekannten Problemen
-        $this->dispatch('notify', [
-            'type' => 'error',
-            'message' => $this->getUserFriendlyErrorMessage($exception, $message) // Übergebe ursprüngliche Nachricht
-        ]);
-    }
-
-    /**
-     * Konvertiert technische Fehlermeldungen in benutzerfreundliche Nachrichten
-     */
-    private function getUserFriendlyErrorMessage(\Exception $exception, string $contextMessage): string
-    {
-        $technicalMessage = $exception->getMessage();
-
-        // Spezifische, sichere Fehlermeldungen
-        if (strpos($technicalMessage, 'Duplicate entry') !== false && strpos($technicalMessage, 'email') !== false) {
-            return 'Diese E-Mail-Adresse wird bereits verwendet.';
-        }
-        if (strpos($technicalMessage, 'foreign key constraint fails') !== false) {
-            return 'Ein verknüpfter Datensatz (z.B. Abteilung, Rolle) existiert nicht oder kann nicht zugewiesen werden.';
-        }
-        if (strpos($technicalMessage, 'Missing essential IDs') !== false) {
-            return 'Ein interner Fehler ist aufgetreten (fehlende IDs). Bitte Seite neu laden.';
-        }
-
-        // Generische Fehlermeldung für unerwartete Fehler
-        Log::warning("Anzeige einer generischen Fehlermeldung für: {$contextMessage} - {$technicalMessage}");
-        return 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut oder kontaktieren Sie den Support.';
-    }
-
 }
