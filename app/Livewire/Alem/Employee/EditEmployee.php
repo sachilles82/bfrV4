@@ -13,7 +13,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
@@ -28,7 +27,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Illuminate\Support\Collection;
 
-#[Lazy(isolate: false)]
 class EditEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee, WithModelStatusOptions;
@@ -92,7 +90,7 @@ class EditEmployee extends Component
         $this->showEditModal = true;
         $this->dataLoadedEdit = false;
 
-        $this->loadRelationData();
+        $this->loadDataForDropDowns();
     }
 
     /**
@@ -129,7 +127,7 @@ class EditEmployee extends Component
     /**
      * Load all data needed for form dropdowns - uses passed properties
      */
-    protected function loadRelationData(): void
+    protected function loadDataForDropDowns(): void
     {
 
         if (!$this->showEditModal || $this->dataLoadedEdit) {
@@ -140,6 +138,8 @@ class EditEmployee extends Component
 
         $currentUserId = $this->authUserId;
         $companyId = $this->companyId;
+
+        // Diese Daten können mit Redis gecached werden
 
         if ($this->teams === null) {
             $this->teams = Team::where('company_id', $companyId)
@@ -259,26 +259,26 @@ class EditEmployee extends Component
     }
 
 
-    // --- Event Handler für Cache-Invalidierung ---
+    // ---  Wenn einer dieser Models refresh wird, sollen die Daten neubefüllt werden
     #[On('profession-updated')]
     public function refreshProfessions(): void
     {
         $this->professions = null;
-        if ($this->showEditModal) $this->loadRelationData();
+        if ($this->showEditModal) $this->loadDataForDropDowns();
     }
 
     #[On('stage-updated')]
     public function refreshStages(): void
     {
         $this->stages = null;
-        if ($this->showEditModal) $this->loadRelationData();
+        if ($this->showEditModal) $this->loadDataForDropDowns();
     }
 
     #[On(['department-created', 'department-updated'])]
     public function refreshDepartments(): void
     {
         $this->departments = null;
-        if ($this->showEditModal) $this->loadRelationData();
+        if ($this->showEditModal) $this->loadDataForDropDowns();
     }
 
     /**
