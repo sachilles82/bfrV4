@@ -17,8 +17,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('company_id');
-            $table->index('team_id');
             $table->index('created_by');
+
+            $table->index(['company_id', 'name'], 'professions_company_id_name_index');
         });
     }
 

@@ -88,8 +88,7 @@ class EmployeeTable extends Component
         $perPage = $this->perPage;
         $currentPage = Paginator::resolveCurrentPage('page');
 
-        // === Schritt 1: IDs der relevanten Benutzer ermitteln (PERPAGE + 1!) ===
-        $baseUserQuery = User::select('users.id')
+        $query = User::select('users.id')
             ->when($this->employeeStatusFilter || $this->search, function ($q) {
                 if (!collect($q->getQuery()->joins)->pluck('table')->contains('employees')) {
                     $q->join('employees', 'users.id', '=', 'employees.user_id');
@@ -102,17 +101,18 @@ class EmployeeTable extends Component
             ->where('users.user_type', $this->userType);
 
         // Filter anwenden
-        $this->applySearch($baseUserQuery);
-        $this->applyStatusFilter($baseUserQuery);
+        $this->applySearch($query);
+        $this->applyStatusFilter($query);
+
         if ($this->employeeStatusFilter) {
-            $baseUserQuery->where('employees.employee_status', $this->employeeStatusFilter);
+            $query->where('employees.employee_status', $this->employeeStatusFilter);
         }
 
         // Sortierung anwenden
-        $this->applySorting($baseUserQuery);
+        $this->applySorting($query);
 
         // IDs für die aktuelle Seite holen + EINE MEHR
-        $userIdsIncludingNext = $baseUserQuery
+        $userIdsIncludingNext = $query
             ->limit($perPage + 1)
             ->offset(($currentPage - 1) * $perPage)
             ->pluck('users.id');

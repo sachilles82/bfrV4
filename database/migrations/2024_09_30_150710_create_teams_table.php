@@ -20,6 +20,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('company_id');
+            $table->index(['company_id', 'name']);
         });
     }
 

@@ -195,7 +195,7 @@
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <flux:tooltip class="cursor-default"
-                                              content="{{ __('Hired on: ') }}
+                                              content="{{ __('Hired: ') }}
                                                           {{ $user->joined_at ? $user->joined_at->format('d.m.Y') : __('Not set') }}"
                                               position="top">
                                     <div class="text-gray-500 dark:text-gray-400">
@@ -211,21 +211,26 @@
                                 @endif
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
-                                <flux:tooltip class="cursor-default" content="Settings">
-                                    <div
-                                        class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
+                                <div
+                                    class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
                                         {{ \App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->colors() ?? '' }}"
-                                    >
-                                        <x-dynamic-component class="h-5 w-5"
-                                                             :component="\App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->icon() ?? 'heroicon-o-question-mark-circle'"
-                                        />
-                                        <div>{{ \App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->label() ?? 'Unknown' }}</div>
-                                    </div>
-                                </flux:tooltip>
+                                >
+                                    <x-dynamic-component class="h-5 w-5"
+                                                         :component="\App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->icon() ?? 'heroicon-o-question-mark-circle'"
+                                    />
+                                    <div>{{ \App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->label() ?? 'Unknown' }}</div>
+                                </div>
                             </x-pupi.table.tr.cell>
                             <x-pupi.table.tr.cell>
                                 <div class="text-gray-500 dark:text-gray-400">
-                                    {{ $user->created_at->diffForHumans() }}
+                                    <flux:tooltip class="cursor-default"
+                                                  content="{{ __('Created: ') }}
+                                                          {{ $user->created_at ? $user->created_at->format('d.m.Y') : __('Not set') }}"
+                                                  position="top">
+                                        <div class="text-gray-500 dark:text-gray-400">
+                                            {{ $user->created_at ? $user->created_at->diffForHumans() : __('Not available') }}
+                                        </div>
+                                    </flux:tooltip>
                                 </div>
                             </x-pupi.table.tr.cell>
                             <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">

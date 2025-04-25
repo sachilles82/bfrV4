@@ -23,10 +23,14 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
 
+            $table->index('name');
             $table->index('company_id');
             $table->index('team_id');
             $table->index('model_status');
-            $table->index(['team_id', 'model_status', 'deleted_at'], 'departments_team_status_deleted_index');
+            $table->index(
+                ['team_id', 'model_status', 'deleted_at', 'name'],
+                'departments_team_status_deleted_name_index'
+            );
         });
     }
 
