@@ -30,7 +30,6 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Barryvdh\Debugbar\Facades\Debugbar;
 
-#[Lazy(isolate: false)]
 class CreateEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee, WithModelStatusOptions;
@@ -77,10 +76,10 @@ class CreateEmployee extends Component
      * Lifecycle hook: wird aufgerufen, wenn das Modal geöffnet wird
      */
     #[On('modal-show')]
-    public function loadData(): void
+    public function openCreateEmployeeModal(): void
     {
         $this->setDefaultValues();
-        $this->loadEssentialData();
+        $this->loadRelationData();
     }
 
     /**
@@ -89,6 +88,10 @@ class CreateEmployee extends Component
     private function setDefaultValues(): void
     {
         $this->gender = Gender::Male->value;
+
+//        $currentTeamId = auth()->user()->current_team_id;
+//        $this->selectedTeams = [$currentTeamId];
+
         $this->model_status = ModelStatus::ACTIVE->value;
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->invitations = true;
@@ -97,7 +100,7 @@ class CreateEmployee extends Component
     /**
      * Load essential data for dropdowns using batched queries in a transaction
      */
-    private function loadEssentialData(): void
+    private function loadRelationData(): void
     {
         try {
             // Store user data once to avoid multiple auth() calls
@@ -106,69 +109,73 @@ class CreateEmployee extends Component
             $currentCompanyId = $user->company_id;
             $currentUserId = $user->id;
 
-            // Use a transaction to batch all queries together
-            DB::transaction(function() use ($currentTeamId, $currentCompanyId, $currentUserId) {
-                // Only run queries for data we haven't loaded yet
-                if ($this->teams === null) {
-                    $this->teams = Team::where('company_id', $currentCompanyId)
-                        ->select(['id', 'name'])
-                        ->orderBy('name')
-                        ->get();
-                }
+            if ($this->teams === null) {
+                $this->teams = Team::where('company_id', $currentCompanyId)
+                    ->select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            }
 
-                if ($this->departments === null) {
-                    $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
-                        ->select(['id', 'name'])
-                        ->orderBy('name')
-                        ->get();
-                }
+            if ($this->departments === null) {
+                $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
+                    ->select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            }
 
-                if ($this->roles === null) {
-                    $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
-                        ->where('visible', RoleVisibility::Visible->value)
-                        ->where(function ($query) use ($currentUserId) {
-                            $query->where('created_by', 1)
-                                ->orWhere('created_by', $currentUserId);
-                        })
-                        ->select(['id', 'name', 'is_manager'])
-                        ->get();
-                }
+            if ($this->roles === null) {
+                $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
+                    ->where('visible', RoleVisibility::Visible->value)
+                    ->where(function ($query) use ($currentUserId) {
+                        $query->where('created_by', 1)
+                            ->orWhere('created_by', $currentUserId);
+                    })
+                    ->select(['id', 'name', 'is_manager'])
+                    ->get();
+            }
 
-                if ($this->professions === null) {
-                    $this->professions = Profession::where('company_id', $currentCompanyId)
-                        ->select(['id', 'name'])
-                        ->orderBy('name')
-                        ->get();
-                }
+            if ($this->professions === null) {
+                $this->professions = Profession::where('company_id', $currentCompanyId)
+                    ->select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            }
 
-                if ($this->stages === null) {
-                    $this->stages = Stage::where('company_id', $currentCompanyId)
-                        ->select(['id', 'name'])
-                        ->orderBy('name')
-                        ->get();
-                }
+            if ($this->stages === null) {
+                $this->stages = Stage::where('company_id', $currentCompanyId)
+                    ->select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            }
 
-                if ($this->supervisors === null) {
-                    $this->supervisors = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
-                        ->join('model_has_roles', function ($join) {
-                            $join->on('users.id', '=', 'model_has_roles.model_id')
-                                ->where('model_has_roles.model_type', User::class);
-                        })
-                        ->join('roles', function ($join) {
-                            $join->on('model_has_roles.role_id', '=', 'roles.id')
-                                ->where('roles.is_manager', true);
-                        })
-                        ->where('users.company_id', $currentCompanyId)
-                        ->whereNull('users.deleted_at')
-                        ->orderBy('users.name')
-                        ->distinct()
-                        ->get();
-                }
-            }, 3); // Using lower isolation level (3) for better read performance
+            if ($this->supervisors === null) {
+                $this->supervisors = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
+                    ->join('model_has_roles', function ($join) {
+                        $join->on('users.id', '=', 'model_has_roles.model_id')
+                            ->where('model_has_roles.model_type', User::class);
+                    })
+                    ->join('roles', function ($join) {
+                        $join->on('model_has_roles.role_id', '=', 'roles.id')
+                            ->where('roles.is_manager', true);
+                    })
+                    ->where('users.company_id', $currentCompanyId)
+                    ->whereNull('users.deleted_at')
+                    ->orderBy('users.name')
+                    ->distinct()
+                    ->get();
+            }
+
+
 
             $this->dataLoaded = true;
-        } catch (\Exception $e) {
-            Debugbar::error('Error loading essential data: ' . $e->getMessage());
+        }
+        catch (\Throwable $e) {
+
+            Flux::toast(
+                text: __('An error occurred while loading the employee.'),
+                heading: __('Error.'),
+                variant: 'danger'
+            );
         }
     }
 
@@ -178,7 +185,7 @@ class CreateEmployee extends Component
     public function hydrate(): void
     {
         if ($this->showModal && !$this->dataLoaded) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
     }
 
@@ -193,7 +200,7 @@ class CreateEmployee extends Component
 
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showModal) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
         }
@@ -210,7 +217,7 @@ class CreateEmployee extends Component
 
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showModal) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
         }
@@ -227,7 +234,7 @@ class CreateEmployee extends Component
 
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showModal) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
         }
@@ -239,7 +246,7 @@ class CreateEmployee extends Component
     public function updated($propertyName)
     {
         if ($propertyName === 'showModal' && $this->showModal && !$this->dataLoaded) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
 
         if ($propertyName === 'selectedTeams') {
@@ -254,7 +261,7 @@ class CreateEmployee extends Component
     public function getProfessionsProperty()
     {
         if ($this->professions === null) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
         return $this->professions;
     }
@@ -265,7 +272,7 @@ class CreateEmployee extends Component
     public function getStagesProperty()
     {
         if ($this->stages === null) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
         return $this->stages;
     }
@@ -276,7 +283,7 @@ class CreateEmployee extends Component
     public function getRolesProperty()
     {
         if ($this->roles === null) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
         return $this->roles;
     }
@@ -287,7 +294,7 @@ class CreateEmployee extends Component
     public function getTeamsProperty()
     {
         if ($this->teams === null) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
         return $this->teams;
     }
@@ -299,7 +306,7 @@ class CreateEmployee extends Component
     {
         // Sicherstellen, dass alle Departments geladen sind
         if ($this->departments === null) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
 
         // Wenn kein Team ausgewählt ist, alle Departments zurückgeben
@@ -321,7 +328,7 @@ class CreateEmployee extends Component
     public function getSupervisorsProperty()
     {
         if ($this->supervisors === null) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
         return $this->supervisors;
     }
@@ -353,7 +360,7 @@ class CreateEmployee extends Component
     public function saveEmployee(): void
     {
         if (!$this->dataLoaded) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
 
         // Sichere Passwortgenerierung
@@ -503,7 +510,7 @@ class CreateEmployee extends Component
     public function render(): View
     {
         if ($this->showModal && !$this->dataLoaded) {
-            $this->loadEssentialData();
+            $this->loadRelationData();
         }
 
         return view('livewire.alem.employee.create', [

@@ -12,6 +12,7 @@ use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
 use Carbon\Carbon;
 use Flux\Flux;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
@@ -72,39 +73,26 @@ class EditEmployee extends Component
     private ?Collection $supervisors = null;
 
     #[On('open-edit-modal')]
-    public function editEmployee($userId): void
+    public function openEditEmployeeModal($userId): void
     {
-        try {
 
-//            $this->authorize('update', User::class);
+        // $this->authorize('update', User::class);
 
-            $this->userId = $userId;
+        $this->userId = $userId;
+        //mache hier join wie in der table
+        $this->user = User::with([
+            'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
+            'teams:id,name',
+            'roles:id,name',
+            'department:id,name'
+        ])->findOrFail($this->userId);
 
-            $this->user = User::with([
-                'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
-                'teams:id,name',
-                'roles:id,name',
-                'department:id,name'
-            ])->findOrFail($this->userId);
+        $this->loadEmployeeData();
 
-            $this->loadEmployeeData();
+        $this->showEditModal = true;
+        $this->dataLoadedEdit = false;
 
-            $this->showEditModal = true;
-            $this->dataLoadedEdit = false;
-
-            $this->loadRelationData();
-
-        } catch (\Throwable $e) {
-            if ($e instanceof ValidationException) {
-                throw $e;
-            }
-
-            Flux::toast(
-                text: __('An error occurred while loading the employee.'),
-                heading: __('Error.'),
-                variant: 'danger'
-            );
-        }
+        $this->loadRelationData();
     }
 
     /**
@@ -149,69 +137,66 @@ class EditEmployee extends Component
         }
 
         try {
-            $currentUserId = $this->authUserId;
-            $companyId = $this->companyId;
 
-            if ($this->teams === null) {
-                $this->teams = Team::where('company_id', $companyId)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
+        $currentUserId = $this->authUserId;
+        $companyId = $this->companyId;
 
-            // TeamScope ist aktiv, filtert automatisch nach Auth::user()->currentTeam->id
-            if ($this->departments === null) {
-                $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
+        if ($this->teams === null) {
+            $this->teams = Team::where('company_id', $companyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+        }
 
-            if ($this->supervisors === null) {
-                $this->supervisors = User::query()
-                    ->where('company_id', $companyId)
-                    ->whereHas('roles', fn($q) => $q->where('is_manager', true))
-                    ->select(['id', 'name', 'last_name', 'profile_photo_path'])
-                    ->distinct()
-                    ->get();
-            }
+        // TeamScope ist aktiv, filtert automatisch nach Auth::user()->currentTeam->id
+        if ($this->departments === null) {
+            $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+        }
 
-            if ($this->roles === null) {
-                $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
-                    ->where('visible', RoleVisibility::Visible->value)
-                    ->whereIn('created_by', [1, $currentUserId])
-                    ->select(['id', 'name', 'is_manager'])
-                    ->get();
-            }
+        if ($this->supervisors === null) {
+            $this->supervisors = User::query()
+                ->where('company_id', $companyId)
+                ->whereHas('roles', fn($q) => $q->where('is_manager', true))
+                ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+                ->distinct()
+                ->get();
+        }
 
-            // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
-            if ($this->professions === null) {
-                $this->professions = Profession::select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
+        if ($this->roles === null) {
+            $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
+                ->where('visible', RoleVisibility::Visible->value)
+                ->whereIn('created_by', [1, $currentUserId])
+                ->select(['id', 'name', 'is_manager'])
+                ->get();
+        }
 
-            // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
-            if ($this->stages === null) {
-                $this->stages = Stage::select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
+        // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
+        if ($this->professions === null) {
+            $this->professions = Profession::select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+        }
 
-            $this->dataLoadedEdit = true; // Setze das Flag erst, wenn alles versucht wurde (Fehler werden intern behandelt)
+        // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
+        if ($this->stages === null) {
+            $this->stages = Stage::select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+        }
 
-        } catch (\Throwable $e) {
-            if ($e instanceof ValidationException) {
-                throw $e;
-            }
+        $this->dataLoadedEdit = true;
+
+        }
+        catch (\Throwable $e) {
 
             Flux::toast(
-                text: __('An error occurred while loading the employee data.'),
+                text: __('An error occurred while loading the employee Relation Data.'),
                 heading: __('Error.'),
                 variant: 'danger'
             );
-
-            $this->dataLoadedEdit = false; // Sicherstellen, dass bei Fehler erneut geladen werden kann
         }
     }
 
@@ -224,6 +209,8 @@ class EditEmployee extends Component
         try {
 
             $this->validate();
+
+            DB::beginTransaction();
 
             User::where('id', $this->userId)->update([
                 'name' => $this->name,
@@ -249,6 +236,8 @@ class EditEmployee extends Component
             $updatedUser->roles()->sync($this->selectedRoles);
             $updatedUser->teams()->sync($this->selectedTeams);
 
+            DB::commit();
+
             $this->finish();
 
             $this->dispatch('employee-updated');
@@ -260,9 +249,6 @@ class EditEmployee extends Component
             );
 
         } catch (\Throwable $e) {
-            if ($e instanceof ValidationException) {
-                throw $e;
-            }
 
             Flux::toast(
                 text: __('An error occurred while saving the employee.'),
@@ -317,7 +303,6 @@ class EditEmployee extends Component
      */
     public function finish(): void
     {
-        $this->modal('edit-employee')->close();
 
         $this->reset([
             'userId', 'user', 'showEditModal', 'dataLoadedEdit',
@@ -336,6 +321,8 @@ class EditEmployee extends Component
         $this->professions = null;
         $this->stages = null;
         $this->supervisors = null;
+
+        $this->modal('edit-employee')->close();
     }
 
     #[Computed]
