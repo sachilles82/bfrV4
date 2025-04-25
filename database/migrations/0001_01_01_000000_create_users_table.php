@@ -68,6 +68,10 @@ return new class extends Migration {
                 $table->index('created_by');
                 $table->index('deleted_at');
 
+                // === Index für performante Tabelle ===
+                $table->index(['user_type', 'model_status', 'deleted_at', 'created_at'], 'idx_users_filter_sort');
+
+
             });
             // *** FULLTEXT Index für das Suchfeld (MySQL-spezifisch) ***
             DB::statement('ALTER TABLE users ADD FULLTEXT INDEX users_search_original_fulltext_idx (name, last_name, email, phone_1)');
@@ -146,5 +150,14 @@ return new class extends Migration {
         //            $table->longText('payload');
         //            $table->integer('last_activity')->index();
         //        });
+    }
+
+    public function down(): void
+    {
+        // Beim Zurückrollen der *create*-Migration wird die ganze Tabelle gelöscht.
+        Schema::dropIfExists('users');
+        // Falls du in DIESER Migration noch andere Tabellen erstellt hast
+        // (z.B. password_reset_tokens, sessions), füge hier auch deren
+        // Schema::dropIfExists(...) hinzu.
     }
 };
