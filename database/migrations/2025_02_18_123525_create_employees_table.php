@@ -17,14 +17,13 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index()->constrained('users')->cascadeOnDelete();
-            $table->uuid('uuid')->nullable()->unique();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
 
             $table->string('personal_number')->nullable();
             $table->foreignId('profession_id')->constrained('professions')->cascadeOnDelete();
             $table->foreignId('stage_id')->constrained('stages')->cascadeOnDelete();
             $table->string('employment_type')->nullable();
-            // Verwende die moderne foreignId-Methode mit constrained und cascadeOnDelete
+
             $table->foreignId('supervisor_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->string('probation_enum')->default(Probation::THREE_MONTHS->value);
             $table->date('probation_at')->nullable();
@@ -43,12 +42,18 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->index(['user_id', 'employee_status'], 'idx_user_status');
-            $table->index(['profession_id', 'stage_id'], 'idx_profession_stage');
-            $table->index(['employee_status', 'profession_id'], 'idx_status_profession');
-
-            $table->index('supervisor_id', 'idx_supervisor');
-            $table->index('employee_status', 'idx_employee_status');
+            $table->index('user_id');
+            $table->index('profession_id');
+            $table->index('stage_id');
+            $table->index('supervisor_id');
+            $table->index('employee_status');
+//
+//            $table->index(['user_id', 'employee_status'], 'idx_user_status');
+//            $table->index(['profession_id', 'stage_id'], 'idx_profession_stage');
+//            $table->index(['employee_status', 'profession_id'], 'idx_status_profession');
+//
+//            $table->index('supervisor_id', 'idx_supervisor');
+//            $table->index('employee_status', 'idx_employee_status');
         });
     }
 

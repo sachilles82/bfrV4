@@ -19,7 +19,10 @@ return new class extends Migration
             $table->foreignId('team_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->timestamps();
-            $table->index(['name', 'state_id', 'team_id', 'created_by']);
+
+            $table->index('state_id');
+            $table->index('team_id');
+            $table->index('created_by');
         });
     }
 

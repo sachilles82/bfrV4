@@ -217,7 +217,7 @@
                     @endforelse
                 </x-slot:body>
                 <x-slot:pagination>
-                    {{ $departments->links('livewire::simple-custom') }}
+{{--                    {{ $departments->links() }}--}}
                 </x-slot:pagination>
             </x-pupi.table.main>
         </div>

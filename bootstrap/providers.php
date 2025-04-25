@@ -1,7 +1,6 @@
 <?php
 
 return [
-    // Laravel Core Service Provider
     App\Providers\AppServiceProvider::class,
     App\Providers\AuthServiceProvider::class,
     App\Providers\EventServiceProvider::class,
@@ -9,4 +8,5 @@ return [
     App\Providers\JetstreamServiceProvider::class,
     App\Providers\NovaServiceProvider::class,
     App\Providers\RouteServiceProvider::class,
+//    App\Providers\TelescopeServiceProvider::class,
 ];

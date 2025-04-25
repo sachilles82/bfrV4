@@ -14,16 +14,18 @@ return new class extends Migration
     {
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->index(); // Bestehender Index
+            $table->string('name');
             $table->text('description')->nullable();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('team_id')->index()->constrained()->cascadeOnDelete(); // Bestehender Index
+            $table->foreignId('team_id')->constrained()->cascadeOnDelete();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->string('model_status')->default(ModelStatus::ACTIVE);
-            $table->softDeletes(); // Fügt die deleted_at Spalte hinzu
+            $table->softDeletes();
             $table->timestamps();
 
-            // *** NEU hinzugefügter zusammengesetzter Index ***
+            $table->index('company_id');
+            $table->index('team_id');
+            $table->index('model_status');
             $table->index(['team_id', 'model_status', 'deleted_at'], 'departments_team_status_deleted_index');
         });
     }

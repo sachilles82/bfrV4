@@ -77,7 +77,8 @@ class EditEmployee extends Component
         // $this->authorize('update', User::class);
 
         $this->userId = $userId;
-        //mache hier join wie in der table
+
+        // Kein Join in der Edit und Create verwenden. Nur in der Table ist es sinnvoll
         $this->user = User::with([
             'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
             'teams:id,name',

@@ -55,7 +55,6 @@ return new class extends Migration {
                 $table->string('profile_photo_path', 2048)->nullable();
 
                 $table->softDeletes();
-                $table->index('deleted_at');
                 $table->timestamps();
 
                 // --- Optimierte Indizes für häufig abgefragte Felder ---
@@ -66,9 +65,11 @@ return new class extends Migration {
                 $table->index('name');
                 $table->index('joined_at');
                 $table->index('created_at');
+                $table->index('created_by');
+                $table->index('deleted_at');
 
             });
-            // *** NEU hinzugefügter FULLTEXT Index für das Suchfeld (MySQL-spezifisch) ***
+            // *** FULLTEXT Index für das Suchfeld (MySQL-spezifisch) ***
             DB::statement('ALTER TABLE users ADD FULLTEXT INDEX users_search_original_fulltext_idx (name, last_name, email, phone_1)');
 
         } // Ende if MySQL

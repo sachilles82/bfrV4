@@ -318,7 +318,10 @@
                     @endforelse
                 </x-slot:body>
                 <x-slot:pagination>
-                    {{ $users->links('livewire::simple-custom') }}
+                    @include('vendor.livewire.performance-paginator', [
+                        'paginator' => $users,
+                        'hasMorePages' => $hasMorePagesBoolean
+                    ])
                 </x-slot:pagination>
             </x-pupi.table.main>
         </div>

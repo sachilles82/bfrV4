@@ -28,8 +28,6 @@ class Employee extends Model
      */
     protected $fillable = [
         'user_id',
-        'uuid',
-
         // Personal Data
         'personal_number',
         'profession_id',

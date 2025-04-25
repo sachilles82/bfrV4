@@ -14,6 +14,7 @@ use App\Livewire\Alem\Employee\Helper\WithEmployeeStatus;
 use App\Models\User;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
+use Illuminate\Pagination\Paginator;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -79,75 +80,171 @@ class EmployeeTable extends Component
     /**
      * Render the component.
      */
+
     public function render(): View
     {
         $authCurrentTeamId = $this->currentTeamId;
         $companyId = $this->companyId;
+        $perPage = $this->perPage;
+        $currentPage = Paginator::resolveCurrentPage('page');
 
-        $query = User::select([
-            'users.id',
-            'users.department_id',
-            'users.name',
-            'users.last_name',
-            'users.phone_1',
-            'users.email',
-            'users.joined_at',
-            'users.created_at',
-            'users.model_status',
-            'users.profile_photo_path',
-            'users.slug',
-            'users.deleted_at',
-            'employees.id as employee_id',
-            'employees.employee_status',
-            'employees.profession_id',
-            'employees.stage_id',
-            'professions.name as profession_name',
-            'stages.name as stage_name',
-            'departments.name as department_name'
-        ])
-            ->join('employees', 'users.id', '=', 'employees.user_id')
+        // === Schritt 1: IDs der relevanten Benutzer ermitteln (PERPAGE + 1!) ===
+        $baseUserQuery = User::select('users.id')
+            ->when($this->employeeStatusFilter || $this->search, function ($q) {
+                if (!collect($q->getQuery()->joins)->pluck('table')->contains('employees')) {
+                    $q->join('employees', 'users.id', '=', 'employees.user_id');
+                }
+            })
             ->join('team_user', function ($join) use ($authCurrentTeamId) {
                 $join->on('users.id', '=', 'team_user.user_id')
                     ->where('team_user.team_id', '=', $authCurrentTeamId);
             })
-            ->leftJoin('professions', 'employees.profession_id', '=', 'professions.id')
-            ->leftJoin('stages', 'employees.stage_id', '=', 'stages.id')
-            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
             ->where('users.user_type', $this->userType);
 
-        $query->with([
-            'roles' => function ($q_roles) use ($companyId) {
-                $q_roles->where('visible', RoleVisibility::Visible->value)
-                    ->where('access', RoleHasAccessTo::EmployeePanel->value)
-                    ->where(function($query) use ($companyId) {
-                        $query->where('created_by', 1)
-                            ->orWhere('company_id', $companyId);
-                    })
-                    ->select('roles.id', 'roles.name');
-            },
-        ]);
-
-
-        $this->applySearch($query);
-        $this->applySorting($query);
-        $this->applyStatusFilter($query);
-        //EmployeeStatusFilter
+        // Filter anwenden
+        $this->applySearch($baseUserQuery);
+        $this->applyStatusFilter($baseUserQuery);
         if ($this->employeeStatusFilter) {
-            $query->where('employees.employee_status', $this->employeeStatusFilter);
+            $baseUserQuery->where('employees.employee_status', $this->employeeStatusFilter);
         }
 
-        // Entfernt Duplikate, die durch JOINs entstehen könnten
-        $query->distinct();
+        // Sortierung anwenden
+        $this->applySorting($baseUserQuery);
 
-        $users = $query->simplePaginate($this->perPage);
-        $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();
+        // IDs für die aktuelle Seite holen + EINE MEHR
+        $userIdsIncludingNext = $baseUserQuery
+            ->limit($perPage + 1)
+            ->offset(($currentPage - 1) * $perPage)
+            ->pluck('users.id');
 
+        // Bestimme, ob es mehr Seiten gibt
+        $hasMore = $userIdsIncludingNext->count() > $perPage;
+
+        // Nimm nur die IDs für die *aktuelle* Seite
+        $userIds = $userIdsIncludingNext->take($perPage);
+
+        // === Schritt 2: Vollständige Daten für diese IDs laden ===
+        $usersCollection = collect(); // Verwende einen anderen Variablennamen hier
+        if ($userIds->isNotEmpty()) {
+            $usersCollection = User::select([
+                'users.id', 'users.department_id', 'users.name', 'users.last_name', 'users.phone_1',
+                'users.email', 'users.joined_at', 'users.created_at', 'users.model_status',
+                'users.profile_photo_path', 'users.slug', 'users.deleted_at',
+                'employees.id as employee_id', 'employees.employee_status', 'employees.profession_id',
+                'employees.stage_id', 'professions.name as profession_name',
+                'stages.name as stage_name', 'departments.name as department_name'
+            ])
+                ->join('employees', 'users.id', '=', 'employees.user_id')
+                ->leftJoin('professions', 'employees.profession_id', '=', 'professions.id')
+                ->leftJoin('stages', 'employees.stage_id', '=', 'stages.id')
+                ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
+                ->with(['roles' => function ($q_roles) use ($companyId) {
+                    $q_roles->where('visible', RoleVisibility::Visible->value)
+                        ->where('access', RoleHasAccessTo::EmployeePanel->value)
+                        ->where(function($query) use ($companyId) {
+                            $query->where('created_by', 1)
+                                ->orWhere('company_id', $companyId);
+                        })
+                        ->select('roles.id', 'roles.name');
+                },
+                ])
+                ->whereIn('users.id', $userIds)
+                // ->orderBy($this->sortCol ?: 'users.created_at', $this->sortAsc ? 'asc' : 'desc') // Sortierung ist hier nicht mehr nötig, da wir nach IDs sortieren
+                ->get();
+
+            // Sortiere die Ergebnisse manuell basierend auf der Reihenfolge der IDs aus Schritt 1
+            $userIdsOrder = $userIds->flip();
+            $usersCollection = $usersCollection->sortBy(function ($user) use ($userIdsOrder) {
+                return $userIdsOrder[$user->id] ?? PHP_INT_MAX;
+            });
+        }
+
+        $paginator = new Paginator(
+            $usersCollection,
+            $perPage,
+            $currentPage,
+            ['path' => Paginator::resolveCurrentPath(), 'pageName' => 'page']
+        );
+
+        $this->idsOnPage = $usersCollection->pluck('id')->map(fn($id) => (string)$id)->toArray();
+
+        // Übergebe den Paginator UND die $hasMore Information an die View
         return view('livewire.alem.employee.table', [
-            'users' => $users,
+            'users' => $paginator,
             'statuses' => ModelStatus::cases(),
             'employeeStatuses' => EmployeeStatus::cases(),
+            'hasMorePagesBoolean' => $hasMore,
         ]);
     }
+//    public function render(): View
+//    {
+//        $authCurrentTeamId = $this->currentTeamId;
+//        $companyId = $this->companyId;
+//
+//        $query = User::select([
+//            'users.id',
+//            'users.department_id',
+//            'users.name',
+//            'users.last_name',
+//            'users.phone_1',
+//            'users.email',
+//            'users.joined_at',
+//            'users.created_at',
+//            'users.model_status',
+//            'users.profile_photo_path',
+//            'users.slug',
+//            'users.deleted_at',
+//            'employees.id as employee_id',
+//            'employees.employee_status',
+//            'employees.profession_id',
+//            'employees.stage_id',
+//            'professions.name as profession_name',
+//            'stages.name as stage_name',
+//            'departments.name as department_name'
+//        ])
+//            ->join('employees', 'users.id', '=', 'employees.user_id')
+//            ->join('team_user', function ($join) use ($authCurrentTeamId) {
+//                $join->on('users.id', '=', 'team_user.user_id')
+//                    ->where('team_user.team_id', '=', $authCurrentTeamId);
+//            })
+//            ->leftJoin('professions', 'employees.profession_id', '=', 'professions.id')
+//            ->leftJoin('stages', 'employees.stage_id', '=', 'stages.id')
+//            ->leftJoin('departments', 'users.department_id', '=', 'departments.id')
+//            ->where('users.user_type', $this->userType);
+//
+//        $query->with([
+//            'roles' => function ($q_roles) use ($companyId) {
+//                $q_roles->where('visible', RoleVisibility::Visible->value)
+//                    ->where('access', RoleHasAccessTo::EmployeePanel->value)
+//                    ->where(function($query) use ($companyId) {
+//                        $query->where('created_by', 1)
+//                            ->orWhere('company_id', $companyId);
+//                    })
+//                    ->select('roles.id', 'roles.name');
+//            },
+//        ]);
+//
+//
+//        $this->applySearch($query);
+//        $this->applySorting($query);
+//        $this->applyStatusFilter($query);
+//        //EmployeeStatusFilter
+//        if ($this->employeeStatusFilter) {
+//            $query->where('employees.employee_status', $this->employeeStatusFilter);
+//        }
+//
+//        // Entfernt Duplikate, die durch JOINs entstehen könnten
+////        $query->distinct();
+//
+//        $users = $query->simplePaginate($this->perPage);
+//        $this->idsOnPage = $users->pluck('id')->map(fn($id) => (string)$id)->toArray();
+//
+//        return view('livewire.alem.employee.table', [
+//            'users' => $users,
+//            'statuses' => ModelStatus::cases(),
+//            'employeeStatuses' => EmployeeStatus::cases(),
+//        ]);
+//    }
 
     public function placeholder():View
     {

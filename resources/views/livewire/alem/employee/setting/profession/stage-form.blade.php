@@ -95,6 +95,6 @@
                 @endforelse
             </flux:rows>
         </flux:table>
-        {{ $stages->links('livewire::simple-custom') }}
+        {{ $stages->links() }}
     </flux:modal>
 </div>

@@ -15,6 +15,9 @@ return new class extends Migration
             $table->foreignId('team_id')->index()->constrained()->cascadeOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->cascadeOnDelete(); // Wenn User gelöscht wird, werden zugehörige Stages ebenfalls gelöscht
             $table->timestamps();
+
+            $table->index('company_id');
+            $table->index('created_by');
         });
     }
 };

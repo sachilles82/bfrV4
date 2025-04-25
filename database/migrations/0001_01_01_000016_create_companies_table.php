@@ -29,9 +29,10 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
 
+            $table->index('company_name');
             $table->index('owner_id');
             $table->index('created_by');
-            $table->index('company_name');
+            $table->index('industry_id');
             $table->index('is_active');
             $table->index(['company_name', 'is_active']);
         });

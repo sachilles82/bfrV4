@@ -168,7 +168,7 @@
                     @endforelse
                 </flux:rows>
             </flux:table>
-            {{ $states->links() }}
+{{--            {{ $states->links() }}--}}
         </div>
     </flux:modal>
 </div>
