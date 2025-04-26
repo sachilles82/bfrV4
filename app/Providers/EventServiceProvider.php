@@ -21,4 +21,8 @@ class EventServiceProvider extends ServiceProvider
     {
         //
     }
+
+    protected array $observers = [
+         'App\Models\Alem\Department' => 'App\Observers\Alem\DepartmentObserver',
+    ];
 }

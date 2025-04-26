@@ -10,9 +10,12 @@ use App\Models\Alem\Employee\Employee;
 use App\Models\Alem\Employee\Setting\Profession;
 use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Carbon\Carbon;
 use Flux\Flux;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -124,76 +127,112 @@ class EditEmployee extends Component
         }
     }
 
+
     /**
-     * Load all data needed for form dropdowns - uses passed properties
+     * Erzeugt einen firmenbezogenen Cache-Key
      */
+    private function getCompanyCacheKey(string $type): string
+    {
+        return "company_{$this->companyId}_{$type}_list";
+    }
+
+    /**
+     * Lädt Daten aus dem Cache oder aus der Datenbank und speichert sie im Cache
+     */
+    private function getDataFromCache(string $type, callable $queryCallback): Collection
+    {
+        $cacheKey = $this->getCompanyCacheKey($type);
+
+        return Cache::rememberForever($cacheKey, function() use ($queryCallback) {
+            return $queryCallback();
+        });
+    }
+
+
+    /**
+     * Invalidiert den Cache für einen bestimmten Datentyp in einer Firma
+     */
+    public static function invalidateCache(string $type, int $companyId): void
+    {
+        Cache::forget("company_{$companyId}_{$type}_list");
+    }
+
+
     protected function loadRelationForDropDowns(): void
     {
-
         if (!$this->showEditModal || $this->dataLoadedEdit) {
             return;
         }
 
         try {
-
-            $currentUserId = $this->authUserId;
             $companyId = $this->companyId;
 
-            // Diese Daten können mit Redis gecached werden
-
+            // Teams laden - Cache-Key: company_X_teams_list
             if ($this->teams === null) {
-                $this->teams = Team::where('company_id', $companyId)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
+                $this->teams = $this->getDataFromCache('teams', function() use ($companyId) {
+                    return Team::where('company_id', $companyId)
+                        ->select(['id', 'name'])
+                        ->orderBy('name')
+                        ->get();
+                });
             }
 
-            // TeamScope ist aktiv, filtert automatisch nach Auth::user()->currentTeam->id
+            // Departments laden - Cache-Key: company_X_departments_list
             if ($this->departments === null) {
-                $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
+                $this->departments = $this->getDataFromCache('departments', function() {
+                    return Department::where('model_status', ModelStatus::ACTIVE->value)
+                        ->select(['id', 'name'])
+                        ->orderBy('name')
+                        ->get();
+                });
             }
 
+            // Supervisors laden - Cache-Key: company_X_supervisors_list
             if ($this->supervisors === null) {
-                $this->supervisors = User::query()
-                    ->where('company_id', $companyId)
-                    ->whereHas('roles', fn($q) => $q->where('is_manager', true))
-                    ->select(['id', 'name', 'last_name', 'profile_photo_path'])
-                    ->distinct()
-                    ->get();
+                $this->supervisors = $this->getDataFromCache('supervisors', function() use ($companyId) {
+                    return User::query()
+                        ->where('company_id', $companyId)
+                        ->whereHas('roles', fn($q) => $q->where('is_manager', true))
+                        ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+                        ->distinct()
+                        ->get();
+                });
             }
 
+            // Roles laden - Cache-Key: company_X_roles_list
             if ($this->roles === null) {
-                $this->roles = Role::where(function ($query) use ($companyId) {
-                    $query->where('created_by', 1)
-                        ->orWhere('company_id', $companyId);
-                })
-                    ->where('access', RoleHasAccessTo::EmployeePanel->value)
-                    ->where('visible', RoleVisibility::Visible->value)
-                    ->select(['id', 'name', 'is_manager'])
-                    ->get();
+                $this->roles = $this->getDataFromCache('roles', function() use ($companyId) {
+                    return Role::where(function ($query) use ($companyId) {
+                        $query->where('created_by', 1)
+                            ->orWhere('company_id', $companyId);
+                    })
+                        ->where('access', RoleHasAccessTo::EmployeePanel->value)
+                        ->where('visible', RoleVisibility::Visible->value)
+                        ->select(['id', 'name', 'is_manager'])
+                        ->get();
+                });
             }
 
-            // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
+            // Professions laden - Cache-Key: company_X_professions_list
             if ($this->professions === null) {
-                $this->professions = Profession::select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
+                $this->professions = $this->getDataFromCache('professions', function() {
+                    return Profession::select(['id', 'name'])
+                        ->orderBy('name')
+                        ->get();
+                });
             }
 
-            // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
+            // Stages laden - Cache-Key: company_X_stages_list
             if ($this->stages === null) {
-                $this->stages = Stage::select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
+                $this->stages = $this->getDataFromCache('stages', function() {
+                    return Stage::select(['id', 'name'])
+                        ->orderBy('name')
+                        ->get();
+                });
             }
 
             $this->dataLoadedEdit = true;
-
         } catch (\Throwable $e) {
-
             Flux::toast(
                 text: __('An error occurred while loading the employee Relation Data.'),
                 heading: __('Error.'),
@@ -201,7 +240,6 @@ class EditEmployee extends Component
             );
         }
     }
-
 
     /**
      * Update employee in database

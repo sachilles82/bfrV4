@@ -35,7 +35,7 @@ class CreateEmployee extends Component
     use AuthorizesRequests, ValidateEmployee, WithModelStatusOptions;
 
     // Modal state
-    public $showModal = false;
+    public $showCreateModal = false;
     private $dataLoaded = false;
 
     public ?int $userId = null;
@@ -78,24 +78,14 @@ class CreateEmployee extends Component
     #[On('modal-show')]
     public function openCreateEmployeeModal(): void
     {
-        $this->setDefaultValues();
-        $this->loadRelationData();
-    }
-
-    /**
-     * Set default values for form fields
-     */
-    private function setDefaultValues(): void
-    {
         $this->gender = Gender::Male->value;
-
-//        $currentTeamId = auth()->user()->current_team_id;
-//        $this->selectedTeams = [$currentTeamId];
-
         $this->model_status = ModelStatus::ACTIVE->value;
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->invitations = true;
+
+        $this->loadRelationData();
     }
+
 
     /**
      * Load essential data for dropdowns using batched queries in a transaction
@@ -184,7 +174,7 @@ class CreateEmployee extends Component
      */
     public function hydrate(): void
     {
-        if ($this->showModal && !$this->dataLoaded) {
+        if ($this->showCreateModal && !$this->dataLoaded) {
             $this->loadRelationData();
         }
     }
@@ -199,7 +189,7 @@ class CreateEmployee extends Component
         $this->professions = null;
 
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
-        if ($this->showModal) {
+        if ($this->showCreateModal) {
             $this->loadRelationData();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
@@ -216,7 +206,7 @@ class CreateEmployee extends Component
         $this->stages = null;
 
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
-        if ($this->showModal) {
+        if ($this->showCreateModal) {
             $this->loadRelationData();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
@@ -233,7 +223,7 @@ class CreateEmployee extends Component
         $this->departments = null;
 
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
-        if ($this->showModal) {
+        if ($this->showCreateModal) {
             $this->loadRelationData();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
@@ -245,7 +235,7 @@ class CreateEmployee extends Component
      */
     public function updated($propertyName)
     {
-        if ($propertyName === 'showModal' && $this->showModal && !$this->dataLoaded) {
+        if ($propertyName === 'showCreateModal' && $this->showCreateModal && !$this->dataLoaded) {
             $this->loadRelationData();
         }
 
@@ -368,7 +358,7 @@ class CreateEmployee extends Component
 
         $this->validate();
 
-        $this->showModal = false;
+        $this->showCreateModal = false;
 
         try {
             DB::beginTransaction();
@@ -509,7 +499,7 @@ class CreateEmployee extends Component
      */
     public function render(): View
     {
-        if ($this->showModal && !$this->dataLoaded) {
+        if ($this->showCreateModal && !$this->dataLoaded) {
             $this->loadRelationData();
         }
 

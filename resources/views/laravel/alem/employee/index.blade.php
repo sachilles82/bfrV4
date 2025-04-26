@@ -27,7 +27,7 @@
                 lazy
             />
 
-             <!-- Edit Component -->
+{{--             <!-- Edit Component -->--}}
             <livewire:alem.employee.edit-employee
                 :auth-user-id="$authUserId"
                 :current-team-id="$currentTeamId"
