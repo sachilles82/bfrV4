@@ -156,14 +156,14 @@ class EditEmployee extends Component
                     ->get();
             }
 
-//            if ($this->supervisors === null) {
-//                $this->supervisors = User::query()
-//                    ->where('company_id', $companyId)
-//                    ->whereHas('roles', fn($q) => $q->where('is_manager', true))
-//                    ->select(['id', 'name', 'last_name', 'profile_photo_path'])
-//                    ->distinct()
-//                    ->get();
-//            }
+            if ($this->supervisors === null) {
+                $this->supervisors = User::query()
+                    ->where('company_id', $companyId)
+                    ->whereHas('roles', fn($q) => $q->where('is_manager', true))
+                    ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+                    ->distinct()
+                    ->get();
+            }
 
             if ($this->roles === null) {
                 $this->roles = Role::where(function ($query) use ($companyId) {

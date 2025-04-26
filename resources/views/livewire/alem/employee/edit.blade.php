@@ -13,104 +13,173 @@
 
         <!-- Form: User & Employee Data -->
         <form wire:submit.prevent="updateEmployee" class="space-y-4 relative">
-            <!-- Loading Overlay -->
-                        <div
-                            wire:loading
-                            class="absolute inset-0 z-10 flex items-center justify-center"
-            bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-lg"
-                        >
-                            <!-- Centered Spinner -->
-                            <svg class="animate-spin h-12 w-12 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <div class="py-4">
-                                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                                    <div class="sm:col-span-4">
-                                        <div label="{{ __('Gender') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
+            <div wire:loading
+                 class="absolute inset-0 z-10 flex-col items-stretch justify-start bg-white/50 dark:bg-gray-900/50">
+                <!-- Header skeleton -->
 
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('First Name') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
+                <!-- Form skeleton -->
+                <div class="">
+                    <!-- Personal Information Section -->
+                    <div class="py-3">
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                            <!-- Gender -->
 
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Last Name') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Email') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Teams') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Department') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Supervisor') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Roles') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Profession') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Stage') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Joined Date') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
+                            <div class="sm:col-span-4">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Gender') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="py-4 border-t border-gray-200 dark:border-white/10">
-                                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Employee Status') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
+                            <!-- First Name -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('First Name') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
                                     </div>
+                                </div>
+                            </div>
 
-                                    <div class="sm:col-span-3">
-                                        <div label="{{ __('Account Status') }}">
-                                            <div class="mt-2 h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                                        </div>
+                            <!-- Last Name -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Last Name') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Email') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Teams -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Teams') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Department -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Department') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Supervisor -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Supervisor') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Roles -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Roles') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Profession -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Profession') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stage -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Stage') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Joined Date -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Joined Date') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
+                    <!-- Status Section -->
+                    <div class="py-4 border-t border-gray-200 dark:border-white/10">
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+                            <!-- Employee Status -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Employee Status') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Model Status -->
+                            <div class="sm:col-span-3">
+                                <label
+                                    class="block text-sm/6 font-medium text-gray-700 dark:text-white">{{ __('Account Status') }}</label>
+                                <div class="mt-2">
+                                    <div
+                                        class="block w-full h-9 rounded-md px-3 py-1.5 animate-pulse bg-gray-200 dark:bg-gray-700">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Buttons -->
+                    {{--                    <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">--}}
+                    {{--                        <div class="h-10 w-20 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"></div>--}}
+                    {{--                        <div class="h-10 w-24 animate-pulse rounded-md bg-indigo-100 dark:bg-indigo-900/20"></div>--}}
+                    {{--                    </div>--}}
+                </div>
+            </div>
             <!-- Personal Information Section -->
             <div class="py-4">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -123,18 +192,6 @@
                             :error="$errors->first('gender')"
                             model="gender"
                             help-text="{{ __('') }}">
-                            {{--                            <flux:select--}}
-                            {{--                                class="mt-2"--}}
-                            {{--                                wire:model="gender"--}}
-                            {{--                                id="gender"--}}
-                            {{--                                variant="listbox"--}}
-                            {{--                                placeholder="{{ __('Select gender') }}">--}}
-                            {{--                                @foreach(\App\Enums\User\Gender::cases() as $genderStatus)--}}
-                            {{--                                    <flux:option value="{{ $genderStatus->value }}">--}}
-                            {{--                                        {{ $genderStatus->label() }}--}}
-                            {{--                                    </flux:option>--}}
-                            {{--                                @endforeach--}}
-                            {{--                            </flux:select>--}}
                             <div class="relative">
                                 <flux:select
                                     class="mt-2"
@@ -273,40 +330,40 @@
                     </div>
 
                     <!-- Supervisor -->
-{{--                    <div class="sm:col-span-3">--}}
-{{--                        <x-pupi.input.group--}}
-{{--                            label="{{ __('Supervisor') }}"--}}
-{{--                            for="supervisor"--}}
-{{--                            badge="{{ __('Required') }}"--}}
-{{--                            :error="$errors->first('supervisor')"--}}
-{{--                            model="supervisor"--}}
-{{--                            help-text="{{ __('') }}">--}}
-{{--                            <flux:select--}}
-{{--                                class="mt-2"--}}
-{{--                                wire:model="supervisor"--}}
-{{--                                id="supervisor"--}}
-{{--                                variant="listbox"--}}
-{{--                                searchable--}}
-{{--                                placeholder="{{ __('Select Supervisor') }}">--}}
-{{--                                @forelse($this->supervisors ?? [] as $supervisor)--}}
-{{--                                    <flux:option value="{{ $supervisor->id }}">--}}
-{{--                                        <div class="flex items-center gap-2 whitespace-nowrap">--}}
-{{--                                            <flux:avatar--}}
-{{--                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"--}}
-{{--                                                circle--}}
-{{--                                                size="xs"--}}
-{{--                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"--}}
-{{--                                                alt="{{ $supervisor->name }}"--}}
-{{--                                            />--}}
-{{--                                            {{ $supervisor->name }} {{ $supervisor->last_name }}--}}
-{{--                                        </div>--}}
-{{--                                    </flux:option>--}}
-{{--                                @empty--}}
-{{--                                    <flux:option value="">{{ __('No supervisors found') }}</flux:option>--}}
-{{--                                @endforelse--}}
-{{--                            </flux:select>--}}
-{{--                        </x-pupi.input.group>--}}
-{{--                    </div>--}}
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Supervisor') }}"
+                            for="supervisor"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('supervisor')"
+                            model="supervisor"
+                            help-text="{{ __('') }}">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="supervisor"
+                                id="supervisor"
+                                variant="listbox"
+                                searchable
+                                placeholder="{{ __('Select Supervisor') }}">
+                                @forelse($this->supervisors ?? [] as $supervisor)
+                                    <flux:option value="{{ $supervisor->id }}">
+                                        <div class="flex items-center gap-2 whitespace-nowrap">
+                                            <flux:avatar
+                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
+                                                circle
+                                                size="xs"
+                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
+                                                alt="{{ $supervisor->name }}"
+                                            />
+                                            {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                        </div>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No supervisors found') }}</flux:option>
+                                @endforelse
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
 
                     <!-- Roles -->
                     <div class="sm:col-span-3">
