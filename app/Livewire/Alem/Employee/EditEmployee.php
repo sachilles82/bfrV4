@@ -90,7 +90,7 @@ class EditEmployee extends Component
         $this->showEditModal = true;
         $this->dataLoadedEdit = false;
 
-        $this->loadDataForDropDowns();
+        $this->loadRelationForDropDowns();
     }
 
     /**
@@ -127,7 +127,7 @@ class EditEmployee extends Component
     /**
      * Load all data needed for form dropdowns - uses passed properties
      */
-    protected function loadDataForDropDowns(): void
+    protected function loadRelationForDropDowns(): void
     {
 
         if (!$this->showEditModal || $this->dataLoadedEdit) {
@@ -136,61 +136,63 @@ class EditEmployee extends Component
 
         try {
 
-        $currentUserId = $this->authUserId;
-        $companyId = $this->companyId;
+            $currentUserId = $this->authUserId;
+            $companyId = $this->companyId;
 
-        // Diese Daten können mit Redis gecached werden
+            // Diese Daten können mit Redis gecached werden
 
-        if ($this->teams === null) {
-            $this->teams = Team::where('company_id', $companyId)
-                ->select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-        }
+            if ($this->teams === null) {
+                $this->teams = Team::where('company_id', $companyId)
+                    ->select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            }
 
-        // TeamScope ist aktiv, filtert automatisch nach Auth::user()->currentTeam->id
-        if ($this->departments === null) {
-            $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
-                ->select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-        }
+            // TeamScope ist aktiv, filtert automatisch nach Auth::user()->currentTeam->id
+            if ($this->departments === null) {
+                $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
+                    ->select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            }
 
-        if ($this->supervisors === null) {
-            $this->supervisors = User::query()
-                ->where('company_id', $companyId)
-                ->whereHas('roles', fn($q) => $q->where('is_manager', true))
-                ->select(['id', 'name', 'last_name', 'profile_photo_path'])
-                ->distinct()
-                ->get();
-        }
+//            if ($this->supervisors === null) {
+//                $this->supervisors = User::query()
+//                    ->where('company_id', $companyId)
+//                    ->whereHas('roles', fn($q) => $q->where('is_manager', true))
+//                    ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+//                    ->distinct()
+//                    ->get();
+//            }
 
-        if ($this->roles === null) {
-            $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
-                ->where('visible', RoleVisibility::Visible->value)
-                ->whereIn('created_by', [1, $currentUserId])
-                ->select(['id', 'name', 'is_manager'])
-                ->get();
-        }
+            if ($this->roles === null) {
+                $this->roles = Role::where(function ($query) use ($companyId) {
+                    $query->where('created_by', 1)
+                        ->orWhere('company_id', $companyId);
+                })
+                    ->where('access', RoleHasAccessTo::EmployeePanel->value)
+                    ->where('visible', RoleVisibility::Visible->value)
+                    ->select(['id', 'name', 'is_manager'])
+                    ->get();
+            }
 
-        // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
-        if ($this->professions === null) {
-            $this->professions = Profession::select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-        }
+            // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
+            if ($this->professions === null) {
+                $this->professions = Profession::select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            }
 
-        // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
-        if ($this->stages === null) {
-            $this->stages = Stage::select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-        }
+            // CompanyScope ist aktiv, filtert automatisch nach Auth::user()->company_id
+            if ($this->stages === null) {
+                $this->stages = Stage::select(['id', 'name'])
+                    ->orderBy('name')
+                    ->get();
+            }
 
-        $this->dataLoadedEdit = true;
+            $this->dataLoadedEdit = true;
 
-        }
-        catch (\Throwable $e) {
+        } catch (\Throwable $e) {
 
             Flux::toast(
                 text: __('An error occurred while loading the employee Relation Data.'),
@@ -264,21 +266,21 @@ class EditEmployee extends Component
     public function refreshProfessions(): void
     {
         $this->professions = null;
-        if ($this->showEditModal) $this->loadDataForDropDowns();
+        if ($this->showEditModal) $this->loadRelationForDropDowns();
     }
 
     #[On('stage-updated')]
     public function refreshStages(): void
     {
         $this->stages = null;
-        if ($this->showEditModal) $this->loadDataForDropDowns();
+        if ($this->showEditModal) $this->loadRelationForDropDowns();
     }
 
     #[On(['department-created', 'department-updated'])]
     public function refreshDepartments(): void
     {
         $this->departments = null;
-        if ($this->showEditModal) $this->loadDataForDropDowns();
+        if ($this->showEditModal) $this->loadRelationForDropDowns();
     }
 
     /**

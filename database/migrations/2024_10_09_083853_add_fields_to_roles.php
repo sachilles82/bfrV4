@@ -28,7 +28,7 @@ return new class extends Migration
             $table->index('visible');
             $table->index('is_manager');
             $table->index(['company_id', 'access', 'visible']);
-//            $table->index(['access', 'visible', 'created_by'], 'roles_access_visible_created_by_index');
+            $table->index(['access', 'visible', 'created_by'], 'roles_access_visible_created_by_index');
         });
     }
 };
