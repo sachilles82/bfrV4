@@ -80,6 +80,8 @@ class EditEmployee extends Component
 
         $this->userId = $userId;
 
+        $this->loadRelationForDropDowns();
+
         // Kein Join in der Edit und Create verwenden. Nur in der Table ist es sinnvoll
         $this->user = User::with([
             'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
@@ -93,7 +95,6 @@ class EditEmployee extends Component
         $this->showEditModal = true;
         $this->dataLoadedEdit = false;
 
-        $this->loadRelationForDropDowns();
     }
 
     /**
