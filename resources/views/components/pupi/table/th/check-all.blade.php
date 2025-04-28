@@ -20,22 +20,31 @@
 <script>
     Alpine.data('checkAll', () => ({
         init() {
-            this.updateCheckboxState();
-
-            // Überwache Änderungen an den ausgewählten IDs und den IDs auf der Seite
-            this.$wire.$watch('selectedIds', () => {
+            this.$nextTick(() => {
                 this.updateCheckboxState();
             });
 
+
+            // Überwache Änderungen an den ausgewählten IDs und den IDs auf der Seite
+            this.$wire.$watch('selectedIds', () => {
+                this.$nextTick(() => {
+                    this.updateCheckboxState();
+                });
+            });
+
             this.$wire.$watch('idsOnPage', () => {
-                this.updateCheckboxState();
+                this.$nextTick(() => {
+                    this.updateCheckboxState();
+                });
             });
         },
 
         // Handler für das update-table Event
         handleTableUpdate() {
-            this.resetCheckbox();
-            this.updateCheckboxState();
+            this.$nextTick(() => {
+                this.resetCheckbox();
+                this.updateCheckboxState();
+            });
         },
 
         // Handler für das employee-updated Event

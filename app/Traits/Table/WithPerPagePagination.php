@@ -12,7 +12,7 @@ trait WithPerPagePagination
 
     public int $perPage = 7;
 
-    protected string $paginationTheme = 'simple-custom'; // Auf unser neues benutzerdefiniertes Template umstellen
+    protected string $paginationTheme = 'custom';
 
     /**
      * @throws ContainerExceptionInterface

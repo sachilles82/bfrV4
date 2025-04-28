@@ -85,10 +85,10 @@
         </div>
     </div>
 
-
+{{--    wire:key="employee-table-{{ now() }}"--}}
     <!-- Tabelle -->
-    <x-pupi.table.container>
-        <div x-data="{ checked:false }" wire:key="employee-table-{{ now() }}">
+    <x-pupi.table.container wire:key="employee-table-{{ now() }}">
+        <div x-data="{ checked:false }">
             <x-pupi.table.main>
                 <x-slot:head>
                     <x-pupi.table.th.check-all/>
@@ -120,6 +120,7 @@
                                 <div x-show="checked" x-cloak
                                      class="absolute inset-y-0 left-0 w-0.5 dark:bg-indigo-500 bg-indigo-600"></div>
                                 <x-pupi.table.tr.checkbox x-model="checked"
+{{--                                                          id="select-all-checkbox-input"--}}
                                                           wire:model="selectedIds"
                                                           value="{{ $user->id}}"/>
                             </td>
@@ -323,10 +324,12 @@
                     @endforelse
                 </x-slot:body>
                 <x-slot:pagination>
-                    @include('vendor.livewire.performance-paginator', [
-                        'paginator' => $users,
-                        'hasMorePages' => $hasMorePagesBoolean
-                    ])
+                    {{ $users->links() }}
+
+{{--                    @include('vendor.livewire.performance-paginator', [--}}
+{{--                        'paginator' => $users,--}}
+{{--                        'hasMorePages' => $hasMorePagesBoolean--}}
+{{--                    ])--}}
                 </x-slot:pagination>
             </x-pupi.table.main>
         </div>
