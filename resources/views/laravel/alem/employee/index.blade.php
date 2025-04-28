@@ -27,14 +27,14 @@
                 lazy
             />
 
-             <!-- Edit Component -->
-            <livewire:alem.employee.edit-employee
-                :auth-user-id="$authUserId"
-                :current-team-id="$currentTeamId"
-                :company-id="$companyId"
-                wire:key="edit-employee-component"
-                lazy
-            />
+{{--             <!-- Edit Component -->--}}
+{{--            <livewire:alem.employee.edit-employee--}}
+{{--                :auth-user-id="$authUserId"--}}
+{{--                :current-team-id="$currentTeamId"--}}
+{{--                :company-id="$companyId"--}}
+{{--                wire:key="edit-employee-component"--}}
+{{--                lazy--}}
+{{--            />--}}
 
         </x-pupi.layout.form-index>
 
