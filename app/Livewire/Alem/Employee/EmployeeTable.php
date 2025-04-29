@@ -127,14 +127,11 @@ class EmployeeTable extends Component
             ->leftJoin('stages', 'employees.stage_id', '=', 'stages.id')
             ->leftJoin('departments', 'users.department_id', '=', 'departments.id');
 
-        // WHERE Bedingungen für den Basiszustand (ohne Suche/Filter)
         $query->where('users.user_type', $this->userType);
 
         $this->applySearch($query);
         $this->applyStatusFilter($query);
-        if ($this->employeeStatusFilter) {
-            $query->where('employees.employee_status', $this->employeeStatusFilter);
-        }
+        $this->applyEmployeeStatusFilter($query);
 
 
         $this->applySorting($query);

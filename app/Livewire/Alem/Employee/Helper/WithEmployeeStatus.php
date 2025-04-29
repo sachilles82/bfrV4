@@ -50,7 +50,11 @@ trait WithEmployeeStatus
      */
     protected function applyEmployeeStatusFilter(Builder $query): Builder
     {
-        return $this->applyModelSpecificStatusFilter($query);
+        if (!empty($this->employeeStatusFilter)) {
+            $query->where('employees.employee_status', $this->employeeStatusFilter); // - Die korrekte Logik für den Join
+        }
+
+        return $query;
     }
 
     /**
