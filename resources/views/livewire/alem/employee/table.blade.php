@@ -287,16 +287,11 @@
                                             <!-- Options for active users -->
 
                                             <flux:modal.trigger name="edit-employee">
-{{--                                                <flux:menu.item--}}
-{{--                                                    @click="$dispatch('open-edit-employee-modal', {userId: {{ $user->id }}})"--}}
-{{--                                                    icon="pencil-square"--}}
-{{--                                                >--}}
-
                                                 <flux:menu.item
                                                     wire:click="$dispatch('open-edit-modal', { userId: {{ $user->id }} })"
                                                     icon="pencil-square"
                                                 >
-                                                    {{ __('Edit') }}
+                                                    {{ __('AAEdit') }}
                                                 </flux:menu.item>
                                             </flux:modal.trigger>
 
