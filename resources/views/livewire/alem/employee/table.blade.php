@@ -260,16 +260,6 @@
                                             </flux:menu.item>
                                         @elseif($user->model_status === \App\Enums\Model\ModelStatus::ARCHIVED)
                                             <!-- Options for archived users -->
-                                            <flux:modal.trigger name="edit-employee">
-                                                <flux:menu.item
-                                                    @click="$dispatch('open-edit-employee-modal', {userId: {{ $user->id }}})"
-                                                    icon="pencil-square"
-                                                >
-                                                    {{ __('Edit') }}
-                                                </flux:menu.item>
-                                            </flux:modal.trigger>
-
-                                            <flux:separator class="my-1"/>
 
                                             <flux:menu.item wire:click="activate({{ $user->id }})"
                                                             icon="check-circle">
@@ -291,7 +281,7 @@
                                                     wire:click="$dispatch('open-edit-modal', { userId: {{ $user->id }} })"
                                                     icon="pencil-square"
                                                 >
-                                                    {{ __('AAEdit') }}
+                                                    {{ __('Edit') }}
                                                 </flux:menu.item>
                                             </flux:modal.trigger>
 
