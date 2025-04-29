@@ -15,11 +15,9 @@ use App\Models\User;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
-use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy(isolate: false)]
 class EmployeeTable extends Component
 {
     use Searchable, WithEmployeeModelStatus, WithEmployeeSorting,
@@ -87,19 +85,17 @@ class EmployeeTable extends Component
 
         $query = User::query();
 
-        // ----------- Änderung hier: FORCE INDEX nur wenn nicht gesucht wird -----------
+        // ----------- FORCE INDEX nur wenn nicht gesucht wird -----------
         if (empty($this->search)) {
-            // Index nur erzwingen, wenn KEIN Suchbegriff vorhanden ist
+            // Index nur erzwingen, wenn KEINE Suche stattfindet
             $query->from(DB::raw('`users` FORCE INDEX (`idx_users_filter_sort`)'));
         } else {
             // Wenn gesucht wird, NICHT den Index erzwingen,
             // damit der FULLTEXT Index genutzt werden kann.
-            // Stelle sicher, dass die Tabelle korrekt gesetzt ist (Eloquent macht das meist automatisch)
             $query->from('users'); // Explizit setzen schadet nicht
         }
-        // ----------------------- Ende der Änderung --------------------------------
+        // ----------------------- Ende FORCE INDEX --------------------------------
 
-        // Wähle spezifische Spalten aus
         $query->select([
             'users.id', 'users.department_id', 'users.name', 'users.last_name', 'users.phone_1',
             'users.email', 'users.joined_at', 'users.created_at', 'users.model_status',
@@ -111,13 +107,13 @@ class EmployeeTable extends Component
 
         $query->with([
             'roles' => function ($q_roles) use ($companyId) {
-                $q_roles->select('roles.id', 'roles.name')
-                    ->where('visible', RoleVisibility::Visible->value)
+                $q_roles->where('visible', RoleVisibility::Visible->value)
                     ->where('access', RoleHasAccessTo::EmployeePanel->value)
                     ->where(function($query) use ($companyId) {
                         $query->where('created_by', 1)
                             ->orWhere('company_id', $companyId);
-                    });
+                    })
+                    ->select('roles.id', 'roles.name');
             },
         ]);
 

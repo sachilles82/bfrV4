@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Department extends Model
 {
-    //    use HasFactory;
+        use HasFactory;
     use BelongsToTeam;
     use ModelPermanentDeletion;
     use ModelStatusManagement{
