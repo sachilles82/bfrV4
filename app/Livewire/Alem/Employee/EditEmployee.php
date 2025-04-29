@@ -50,14 +50,14 @@ class EditEmployee extends Component
     public ?string $last_name = null;
     public ?string $email = null;
     public ?string $gender = null;
-    public ?string $model_status = null;
+    public ?ModelStatus $model_status = null;
     public $joined_at = null;
     public $department = null;
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
     // Employee fields
-    public ?string $employee_status = null;
+    public ?EmployeeStatus $employee_status = null;
     public ?int $profession = null;
     public ?int $stage = null;
     public ?int $supervisor = null;
@@ -110,6 +110,7 @@ class EditEmployee extends Component
         $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
         $this->department = $this->user->department_id;
 
+        // ModelStatus ENUM
         $this->model_status = $this->user->model_status;
         $this->joined_at = $this->user->joined_at;
 
@@ -117,9 +118,9 @@ class EditEmployee extends Component
         $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
 
         if ($employee = $this->user->employee) {
-            $this->employee_status = $employee->employee_status instanceof EmployeeStatus
-                ? $employee->employee_status->value
-                : $employee->employee_status;
+            // Employee Status ENUM
+            $this->employee_status = $employee->employee_status;
+
             $this->profession = $employee->profession_id;
             $this->stage = $employee->stage_id;
             $this->supervisor = $employee->supervisor_id;

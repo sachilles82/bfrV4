@@ -37,13 +37,11 @@ trait ValidateEmployee
                 'required',
                 'exists:departments,id',
                 function ($attribute, $value, $fail) {
-                    if (!empty($this->selectedTeams)) {
-                        // Prüfen, ob die Abteilung zu einem der ausgewählten Teams gehört
-                        $departmentTeamId = Department::find($value)->team_id ?? null;
-
-                        if (!in_array($departmentTeamId, $this->selectedTeams)) {
-                            $fail(__('The selected department must belong to one of the selected teams.'));
-                        }
+                    $departmentExistsInTeam = Department::where('id', $value)
+                        ->whereIn('team_id', $this->selectedTeams) // Prüft gegen alle ausgewählten Teams
+                        ->exists();
+                    if (!$departmentExistsInTeam) {
+                        $fail(__('The selected department must belong to one of the selected teams.'));
                     }
                 },
             ],
@@ -55,13 +53,12 @@ trait ValidateEmployee
             'profession' => 'required|exists:professions,id',
             'stage' => 'required|exists:stages,id',
 
-            'employee_status' => ['required', Rule::in(array_column(EmployeeStatus::cases(), 'value'))],
+            'employee_status' => ['required', Rule::enum(EmployeeStatus::class)],
             'joined_at' => 'required|date|before_or_equal:today',
 
             'model_status' => [
                 'required',
-                'string',
-                new Enum(ModelStatus::class),
+                Rule::enum(ModelStatus::class),
             ],
 
         ];
