@@ -44,33 +44,4 @@ trait WithEmployeeModelStatus
         return 'Employees';
     }
 
-        /**
-         * Name des Events, das nach Status-Änderungen ausgelöst wird
-         */
-        protected function getStatusUpdateEventName(): string
-        {
-            return 'employeeUpdated';
-        }
-    //
-    //    /**
-    //     * Sendet ein modellspezifisches Event
-    //     *
-    //     * @param string $action Die Aktion (z.B. 'created', 'updated', 'deleted')
-    //     */
-    //    protected function dispatchModelEvent(string $action): void
-    //    {
-    //        // Hier wird direkt der Modeltyp (z.B. 'employee') + Aktion gesendet
-    //        $modelType = strtolower($this->getModelDisplayName());
-    //        $this->dispatch("{$modelType}-{$action}");
-    //    }
-    //
-    //    /**
-    //     * Sendet ein Event zur Aktualisierung der modellspezifischen Tabelle
-    //     * Ersetzt den generischen 'update-table' Event
-    //     */
-    //    protected function dispatchTableUpdateEvent(): void
-    //    {
-    //        $modelType = strtolower($this->getModelDisplayName());
-    //        $this->dispatch("{$modelType}-table-updated");
-    //    }
 }

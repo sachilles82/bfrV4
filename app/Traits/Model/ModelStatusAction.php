@@ -68,24 +68,6 @@ trait ModelStatusAction
      * @param  Builder  $query  Die zu filternde Query
      * @return Builder Die gefilterte Query
      */
-//    protected function applyStatusFilter(Builder $query): Builder
-//    {
-//        switch ($this->statusFilter) {
-//            case 'archived':
-//                $query->where('model_status', ModelStatus::ARCHIVED);
-//                break;
-//            case 'trashed':
-//                $query->where('model_status', ModelStatus::TRASHED)
-//                    ->onlyTrashed();
-//                break;
-//            case 'active':
-//            default:
-//                $query->where('model_status', ModelStatus::ACTIVE);
-//        }
-//
-//        return $query;
-//    }
-
     protected function applyStatusFilter(Builder $query): Builder
     {
         // Tabellennamen aus der Modellklasse holen oder benutzerdefinierte Überschreibung erlauben
@@ -322,13 +304,36 @@ trait ModelStatusAction
         }
 
         if ($count > 0) {
-            $this->showToast(
-                __(':count :name status updated successfully.', [
+            $message = match ($action) {
+                'active' => __(':count :name activated.', [ // Nachricht für 'active'
                     'count' => $count,
-                    'name' => $count === 1
-                        ? $this->getModelDisplayName()
-                        : $this->getModelDisplayNamePlural(),
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural(),
                 ]),
+                'archived' => __(':count :name moved to archive.', [ // Nachricht für 'archived'
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural(),
+                ]),
+                'trashed' => __(':count :name moved to trash.', [ // Nachricht für 'trashed'
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural(),
+                ]),
+                'restore_to_active' => __(':count :name restored to active.', [ // Nachricht für 'restore_to_active'
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural(),
+                ]),
+                'restore_to_archive' => __(':count :name restored to archive.', [ // Nachricht für 'restore_to_archive'
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural(),
+                ]),
+                default => __(':count :name status updated successfully.', [ // Fallback (sollte nicht vorkommen)
+                    'count' => $count,
+                    'name' => $count === 1 ? $this->getModelDisplayName() : $this->getModelDisplayNamePlural(),
+                ]),
+            };
+
+            // Zeige den Toast mit der dynamisch bestimmten Nachricht an
+            $this->showToast(
+                $message,
                 'Success',
                 'success'
             );
@@ -375,8 +380,6 @@ trait ModelStatusAction
         $this->resetSelections();
         $this->dispatchStatusEvents();
     }
-
-    // Hilfsmethoden
 
     /**
      * Setzt ein Model auf aktiv
@@ -447,25 +450,13 @@ trait ModelStatusAction
     }
 
     /**
-     * Sendet Events zur UI-Aktualisierung
-     * Der Event-Name kann in der Komponente überschrieben werden.
+     * Sendet Events zur Tabelle-Aktualisierung des Models
      */
     private function dispatchStatusEvents(): void
     {
-        // Standardmäßig "modelUpdated" senden, kann in der Komponente angepasst werden
-        $updateEvent = $this->getStatusUpdateEventName() ?? 'modelUpdated';
-        $this->dispatch($updateEvent);
-        $this->dispatch('update-table');
-    }
-
-    /**
-     * Gibt den Event-Namen für Status-Updates zurück
-     * Kann in der Komponente überschrieben werden, um benutzerdefinierte Events zu senden
-     *
-     * @return string|null Der Event-Name oder null für Standardverhalten
-     */
-    protected function getStatusUpdateEventName(): ?string
-    {
-        return null; // Standard: 'modelUpdated' (siehe dispatchStatusEvents)
+        // Hole den Anzeigenamen des Models (z.B. "Employee") und konvertiere ihn zu Kleinbuchstaben (z.B. "employee")
+        $modelType = strtolower($this->getModelDisplayName());
+        // Sende das spezifische Event (z.B. "employee-model-update")
+        $this->dispatch("{$modelType}-model-update");
     }
 }

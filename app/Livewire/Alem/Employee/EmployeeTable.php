@@ -45,7 +45,7 @@ class EmployeeTable extends Component
     /**
      * Hört auf das Event 'employee-created', 'employee-updated' und aktualisiert die Tabelle
      */
-    #[On(['employee-created', 'employee-updated'])]
+    #[On(['employee-created', 'employee-updated', 'employee-model-update'])]
     public function refreshTable(): void
     {
         $this->resetPage();
@@ -61,7 +61,7 @@ class EmployeeTable extends Component
         if (in_array($property, ['statusFilter', 'employeeStatusFilter'])) {
             $this->selectedIds = [];
             $this->reset('search', 'sortCol', 'sortAsc', 'perPage');
-            $this->dispatch('update-table');
+//            $this->dispatch('update-table');
         }
     }
 

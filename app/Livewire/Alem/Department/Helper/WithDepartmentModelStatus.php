@@ -33,11 +33,4 @@ trait WithDepartmentModelStatus
         return 'Departments';
     }
 
-    /**
-     * Name des Events, das nach Status-Änderungen ausgelöst wird
-     */
-    protected function getStatusUpdateEventName(): string
-    {
-        return 'department-updated';
-    }
 }
