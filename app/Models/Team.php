@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Alem\Company;
+use App\Traits\Cache\WithRedisCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Jetstream\Events\TeamCreated;
@@ -13,6 +14,21 @@ use Laravel\Jetstream\Team as JetstreamTeam;
 class Team extends JetstreamTeam
 {
     use HasFactory;
+    use WithRedisCache;
+
+    /**
+     * The key used for caching this model
+     *
+     * @var string
+     */
+    protected $cacheKey = 'teams_cache';
+
+    /**
+     * Cache duration in seconds (-1 for forever)
+     *
+     * @var int
+     */
+    protected $cacheDuration = 86400; // 24 hours
 
     /**
      * The attributes that are mass assignable.
@@ -53,6 +69,19 @@ class Team extends JetstreamTeam
     {
         return $this->belongsTo(Company::class);
 
+    }
+
+    /**
+     * Get teams for a specific company with caching
+     */
+    public static function getCompanyTeams(int $companyId)
+    {
+        return self::cacheCompanyResult($companyId, function() use ($companyId) {
+            return self::where('company_id', $companyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+        });
     }
 
     protected static function booted(): void

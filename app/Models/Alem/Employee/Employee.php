@@ -70,6 +70,9 @@ class Employee extends Model
         'religion' => Religion::class,
         'civil_status' => CivilStatus::class,
         'residence_permit' => Residence::class,
+        'profession_id' => 'integer',
+        'stage_id' => 'integer',
+        'supervisor_id' => 'integer',
     ];
 
     /**

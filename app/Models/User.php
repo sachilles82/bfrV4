@@ -11,6 +11,7 @@ use App\Models\Alem\Department;
 use App\Models\Alem\Employee\Employee;
 use App\Scopes\TeamScope;
 use App\Traits\BelongsToCompany;
+use App\Traits\Cache\WithRedisCache;
 use App\Traits\HasAddress;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
@@ -52,6 +53,22 @@ class User extends Authenticatable
     use SoftDeletes;
     use TwoFactorAuthenticatable;
     use Searchable;
+    use WithRedisCache;
+
+    /**
+     * The key used for caching this model
+     *
+     * @var string
+     */
+    protected $cacheKey = 'users_cache';
+
+    /**
+     * Cache duration in seconds
+     *
+     * @var int
+     */
+    protected $cacheDuration = 3600; // 1 hour
+
 
     /**
      * The attributes that are mass assignable.
@@ -97,6 +114,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'joined_at' => 'date',
         'model_status' => ModelStatus::class,
+        'department_id' => 'integer',
     ];
 
     /**
@@ -200,6 +218,34 @@ class User extends Authenticatable
     //        return $query->where('user_type', UserType::Employee)
     //            ->where('model_status', ModelStatus::ACTIVE);
     //    }
+
+    /**
+     * Get company-specific cache key
+     *
+     * @return string|null
+     */
+    public function getCompanyCacheKey(): ?string
+    {
+        if (property_exists($this, 'company_id') && $this->company_id) {
+            return "company_{$this->company_id}_user_cache";
+        }
+
+        return null;
+    }
+    /**
+     * Get managers for a specific company with caching
+     */
+    public static function getCompanyManagers(int $companyId)
+    {
+        return self::cacheCompanyResult($companyId, function() use ($companyId) {
+            return self::where('company_id', $companyId)
+                ->whereHas('roles', fn($q) => $q->where('is_manager', true))
+                ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+                ->distinct()
+                ->get();
+        }, 'user');
+    }
+
 
     /**
      * Definiert, welche Daten des Models an den Suchindex gesendet werden sollen.

@@ -58,9 +58,9 @@ class EditEmployee extends Component
 
     // Employee fields
     public ?EmployeeStatus $employee_status = null;
-    public ?int $profession = null;
-    public ?int $stage = null;
-    public ?int $supervisor = null;
+    public $profession = null;
+    public $stage = null;
+    public $supervisor = null;
 
     // Optimierung: Cache-Eigenschaften privat lassen und initialisieren
     private ?Collection $teams = null;
@@ -128,36 +128,6 @@ class EditEmployee extends Component
     }
 
 
-    /**
-     * Erzeugt einen firmenbezogenen Cache-Key
-     */
-    private function getCompanyCacheKey(string $type): string
-    {
-        return "company_{$this->companyId}_{$type}_list";
-    }
-
-    /**
-     * Lädt Daten aus dem Cache oder aus der Datenbank und speichert sie im Cache
-     */
-    private function getDataFromCache(string $type, callable $queryCallback): Collection
-    {
-        $cacheKey = $this->getCompanyCacheKey($type);
-
-        return Cache::rememberForever($cacheKey, function() use ($queryCallback) {
-            return $queryCallback();
-        });
-    }
-
-
-    /**
-     * Invalidiert den Cache für einen bestimmten Datentyp in einer Firma
-     */
-    public static function invalidateCache(string $type, int $companyId): void
-    {
-        Cache::forget("company_{$companyId}_{$type}_list");
-    }
-
-
     protected function loadRelationForDropDowns(): void
     {
         if (!$this->showEditModal || $this->dataLoadedEdit) {
@@ -166,72 +136,40 @@ class EditEmployee extends Component
 
         try {
             $companyId = $this->companyId;
+            $teamId = $this->currentTeamId;
 
-            // Teams laden - Cache-Key: company_X_teams_list
+            // Teams laden mit Caching
             if ($this->teams === null) {
-                $this->teams = $this->getDataFromCache('teams', function() use ($companyId) {
-                    return Team::where('company_id', $companyId)
-                        ->select(['id', 'name'])
-                        ->orderBy('name')
-                        ->get();
-                });
+                $this->teams = Team::getCompanyTeams($companyId);
             }
 
-            // Departments laden - Cache-Key: company_X_departments_list
+            // Departments laden mit Caching
             if ($this->departments === null) {
-                $this->departments = $this->getDataFromCache('departments', function() {
-                    return Department::where('model_status', ModelStatus::ACTIVE->value)
-                        ->select(['id', 'name'])
-                        ->orderBy('name')
-                        ->get();
-                });
+                $this->departments = Department::getDepartmentsForTeam($teamId);
             }
 
-            // Supervisors laden - Cache-Key: company_X_supervisors_list
+            // Supervisors laden mit Caching
             if ($this->supervisors === null) {
-                $this->supervisors = $this->getDataFromCache('supervisors', function() use ($companyId) {
-                    return User::query()
-                        ->where('company_id', $companyId)
-                        ->whereHas('roles', fn($q) => $q->where('is_manager', true))
-                        ->select(['id', 'name', 'last_name', 'profile_photo_path'])
-                        ->distinct()
-                        ->get();
-                });
+                $this->supervisors = User::getCompanyManagers($companyId);
             }
 
-            // Roles laden - Cache-Key: company_X_roles_list
+            // Roles laden mit Caching
             if ($this->roles === null) {
-                $this->roles = $this->getDataFromCache('roles', function() use ($companyId) {
-                    return Role::where(function ($query) use ($companyId) {
-                        $query->where('created_by', 1)
-                            ->orWhere('company_id', $companyId);
-                    })
-                        ->where('access', RoleHasAccessTo::EmployeePanel->value)
-                        ->where('visible', RoleVisibility::Visible->value)
-                        ->select(['id', 'name', 'is_manager'])
-                        ->get();
-                });
+                $this->roles = Role::getEmployeePanelRoles($companyId);
             }
 
-            // Professions laden - Cache-Key: company_X_professions_list
+            // Professions laden mit Caching
             if ($this->professions === null) {
-                $this->professions = $this->getDataFromCache('professions', function() {
-                    return Profession::select(['id', 'name'])
-                        ->orderBy('name')
-                        ->get();
-                });
+                $this->professions = Profession::getCompanyProfessions($companyId);
             }
 
-            // Stages laden - Cache-Key: company_X_stages_list
+            // Stages laden mit Caching
             if ($this->stages === null) {
-                $this->stages = $this->getDataFromCache('stages', function() {
-                    return Stage::select(['id', 'name'])
-                        ->orderBy('name')
-                        ->get();
-                });
+                $this->stages = Stage::getCompanyStages($companyId);
             }
 
             $this->dataLoadedEdit = true;
+
         } catch (\Throwable $e) {
             Flux::toast(
                 text: __('An error occurred while loading the employee Relation Data.'),
@@ -240,6 +178,7 @@ class EditEmployee extends Component
             );
         }
     }
+
 
     /**
      * Update employee in database
@@ -304,6 +243,8 @@ class EditEmployee extends Component
     public function refreshProfessions(): void
     {
         $this->professions = null;
+        // Neuer Cache-Ansatz für Profession-Updates
+        Profession::flushCompanyCache($this->companyId);
         if ($this->showEditModal) $this->loadRelationForDropDowns();
     }
 
@@ -311,6 +252,8 @@ class EditEmployee extends Component
     public function refreshStages(): void
     {
         $this->stages = null;
+        // Neuer Cache-Ansatz für Stage-Updates
+        Stage::flushCompanyCache($this->companyId);
         if ($this->showEditModal) $this->loadRelationForDropDowns();
     }
 
@@ -318,6 +261,8 @@ class EditEmployee extends Component
     public function refreshDepartments(): void
     {
         $this->departments = null;
+        // Durch den neuen Team-basierten Ansatz für Departments
+        Department::flushTeamCache($this->currentTeamId);
         if ($this->showEditModal) $this->loadRelationForDropDowns();
     }
 
