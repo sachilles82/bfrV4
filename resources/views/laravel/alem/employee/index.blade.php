@@ -24,7 +24,6 @@
                 :current-team-id="$currentTeamId"
                 :company-id="$companyId"
                 wire:key="employee-table-component"
-                lazy
             />
 
              <!-- Edit Component -->
@@ -33,7 +32,6 @@
                 :current-team-id="$currentTeamId"
                 :company-id="$companyId"
                 wire:key="edit-employee-component"
-                lazy
             />
 
         </x-pupi.layout.form-index>

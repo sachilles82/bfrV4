@@ -15,9 +15,11 @@ use App\Models\User;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+#[Lazy(isolate: false)]
 class EmployeeTable extends Component
 {
     use Searchable, WithEmployeeModelStatus, WithEmployeeSorting,

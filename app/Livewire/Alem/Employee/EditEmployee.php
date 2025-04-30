@@ -15,6 +15,7 @@ use Flux\Flux;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -27,6 +28,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Illuminate\Support\Collection;
 
+#[Lazy(isolate: false)]
 class EditEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee, WithModelStatusOptions;
