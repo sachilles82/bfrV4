@@ -11,8 +11,8 @@
 
             <flux:modal.trigger name="create-employee">
                 <div
+                    @click="$dispatch('create-employee-modal')"
                     class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
-
                     <x-pupi.icon.create class="-ml-1.5 size-5"/>
                     {{ __('Create') }}
                 </div>
@@ -85,7 +85,7 @@
         </div>
     </div>
 
-{{--    wire:key="employee-table-{{ now() }}"--}}
+    {{--    wire:key="employee-table-{{ now() }}"--}}
     <!-- Tabelle -->
     <x-pupi.table.container wire:key="employee-table-{{ now() }}">
         <div x-data="{ checked:false }">
@@ -120,7 +120,7 @@
                                 <div x-show="checked" x-cloak
                                      class="absolute inset-y-0 left-0 w-0.5 dark:bg-indigo-500 bg-indigo-600"></div>
                                 <x-pupi.table.tr.checkbox x-model="checked"
-{{--                                                          id="select-all-checkbox-input"--}}
+                                                          {{--                                                          id="select-all-checkbox-input"--}}
                                                           wire:model="selectedIds"
                                                           value="{{ $user->id}}"/>
                             </td>
@@ -278,7 +278,7 @@
 
                                             <flux:modal.trigger name="edit-employee">
                                                 <flux:menu.item
-                                                    wire:click="$dispatch('open-edit-modal', { userId: {{ $user->id }} })"
+                                                    @click="$dispatch('edit-employee-modal', { userId: {{ $user->id }} })"
                                                     icon="pencil-square"
                                                 >
                                                     {{ __('Edit') }}
@@ -311,10 +311,10 @@
                 <x-slot:pagination>
                     {{ $users->links() }}
 
-{{--                    @include('vendor.livewire.performance-paginator', [--}}
-{{--                        'paginator' => $users,--}}
-{{--                        'hasMorePages' => $hasMorePagesBoolean--}}
-{{--                    ])--}}
+                    {{--                    @include('vendor.livewire.performance-paginator', [--}}
+                    {{--                        'paginator' => $users,--}}
+                    {{--                        'hasMorePages' => $hasMorePagesBoolean--}}
+                    {{--                    ])--}}
                 </x-slot:pagination>
             </x-pupi.table.main>
         </div>

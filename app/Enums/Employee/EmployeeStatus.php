@@ -42,4 +42,18 @@ enum EmployeeStatus: string
             self::LEAVE => 'icon.x-mark',
         };
     }
+
+    public static function getOptions(): array
+    {
+        return collect(self::cases())
+            ->map(function (self $status) {
+                return [
+                    'value' => $status->value,
+                    'label' => $status->label(),
+                    'colors' => $status->colors(),
+                    'icon' => $status->icon(),
+                ];
+            })
+            ->toArray();
+    }
 }

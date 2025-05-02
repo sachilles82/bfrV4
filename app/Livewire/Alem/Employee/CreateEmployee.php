@@ -4,8 +4,6 @@ namespace App\Livewire\Alem\Employee;
 
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
-use App\Enums\Role\RoleHasAccessTo;
-use App\Enums\Role\RoleVisibility;
 use App\Enums\User\Gender;
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
@@ -18,33 +16,39 @@ use App\Models\Team;
 use App\Models\User;
 use App\Traits\Model\WithModelStatusOptions;
 use Flux\Flux;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Barryvdh\Debugbar\Facades\Debugbar;
 
+#[Lazy(isolate: false)]
 class CreateEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee, WithModelStatusOptions;
 
-    // Modal state
-    public $showCreateModal = false;
-    private $dataLoaded = false;
+    // Modal-Status
+    public bool $showCreateModal = false;
+    private bool $dataLoaded = false;
 
     public ?int $userId = null;
-    public $selectedRoles = [];
+    public array $selectedRoles = [];
     public $model_status;
     public $employee_status;
     public $invitations = true;
 
-    // User Fields
+    // Eigenschaften für vorgeladene Daten - werden von Livewire automatisch befüllt
+    public ?int $authUserId = null;
+    public ?int $currentTeamId = null;
+    public ?int $companyId = null;
+
+    // Benutzer-Felder
     public $gender;
     public $name;
     public $last_name;
@@ -53,29 +57,26 @@ class CreateEmployee extends Component
     public $password;
     public ?Carbon $joined_at = null;
     public $department = null;
-    public $selectedTeams = [];
+    public array $selectedTeams = [];
 
-    // Employee Fields
+    // Mitarbeiter-Felder
     public $profession;
     public $stage;
     public $supervisor = null;
 
-    // Lazy-loaded data containers (private properties)
-    private $teams = null;
-    private $departments = null;
-    private $roles = null;
-    private $professions = null;
-    private $stages = null;
-    private $supervisors = null;
-
-//    public int $authUserId;
-//    public int $currentTeamId;
-//    public int $companyId;
+    // Cache-Eigenschaften - privat und initialisieren bei Bedarf
+    private ?Collection $teams = null;
+    private ?Collection $departments = null;
+    private ?Collection $roles = null;
+    private ?Collection $professions = null;
+    private ?Collection $stages = null;
+    private ?Collection $supervisors = null;
 
     /**
-     * Lifecycle hook: wird aufgerufen, wenn das Modal geöffnet wird
+     * Lebenszyklusmethode: Wird aufgerufen, wenn das Modal geöffnet wird
+     * Initialisiert Standardwerte und lädt Dropdown-Daten
      */
-    #[On('modal-show')]
+    #[On('create-employee-modal')]
     public function openCreateEmployeeModal(): void
     {
         $this->gender = Gender::Male->value;
@@ -83,86 +84,61 @@ class CreateEmployee extends Component
         $this->employee_status = EmployeeStatus::PROBATION->value;
         $this->invitations = true;
 
-        $this->loadRelationData();
+        $this->loadRelationForDropDowns();
+
+        $this->showCreateModal = true;
+        $this->dataLoaded = false;
     }
 
-
     /**
-     * Load essential data for dropdowns using batched queries in a transaction
+     * Lädt alle erforderlichen Daten für Dropdowns aus dem Cache
      */
-    private function loadRelationData(): void
+    private function loadRelationForDropDowns(): void
     {
+        if (!$this->showCreateModal || $this->dataLoaded) {
+            return;
+        }
+
         try {
-            // Store user data once to avoid multiple auth() calls
-            $user = auth()->user();
-            $currentTeamId = $user->current_team_id;
-            $currentCompanyId = $user->company_id;
-            $currentUserId = $user->id;
+            $companyId = $this->companyId;
+            $teamId = $this->currentTeamId;
 
+            // Teams laden mit Caching
             if ($this->teams === null) {
-                $this->teams = Team::where('company_id', $currentCompanyId)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
+                $this->teams = Team::getCompanyTeams($companyId);
             }
 
+            // Departments laden mit Caching
             if ($this->departments === null) {
-                $this->departments = Department::where('model_status', ModelStatus::ACTIVE->value)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
+                $this->departments = Department::getDepartmentsForTeam($teamId);
             }
 
-            if ($this->roles === null) {
-                $this->roles = Role::where('access', RoleHasAccessTo::EmployeePanel->value)
-                    ->where('visible', RoleVisibility::Visible->value)
-                    ->where(function ($query) use ($currentUserId) {
-                        $query->where('created_by', 1)
-                            ->orWhere('created_by', $currentUserId);
-                    })
-                    ->select(['id', 'name', 'is_manager'])
-                    ->get();
-            }
-
-            if ($this->professions === null) {
-                $this->professions = Profession::where('company_id', $currentCompanyId)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
-
-            if ($this->stages === null) {
-                $this->stages = Stage::where('company_id', $currentCompanyId)
-                    ->select(['id', 'name'])
-                    ->orderBy('name')
-                    ->get();
-            }
-
+            // Supervisors laden mit Caching
             if ($this->supervisors === null) {
-                $this->supervisors = User::select(['users.id', 'users.name', 'users.last_name', 'users.profile_photo_path'])
-                    ->join('model_has_roles', function ($join) {
-                        $join->on('users.id', '=', 'model_has_roles.model_id')
-                            ->where('model_has_roles.model_type', User::class);
-                    })
-                    ->join('roles', function ($join) {
-                        $join->on('model_has_roles.role_id', '=', 'roles.id')
-                            ->where('roles.is_manager', true);
-                    })
-                    ->where('users.company_id', $currentCompanyId)
-                    ->whereNull('users.deleted_at')
-                    ->orderBy('users.name')
-                    ->distinct()
-                    ->get();
+                $this->supervisors = User::getCompanyManagers($companyId);
             }
 
+            // Roles laden mit Caching
+            if ($this->roles === null) {
+                $this->roles = Role::getEmployeePanelRoles($companyId);
+            }
 
+            // Professions laden mit Caching
+            if ($this->professions === null) {
+                $this->professions = Profession::getCompanyProfessions($companyId);
+            }
+
+            // Stages laden mit Caching
+            if ($this->stages === null) {
+                $this->stages = Stage::getCompanyStages($companyId);
+            }
 
             $this->dataLoaded = true;
-        }
-        catch (\Throwable $e) {
+
+        } catch (\Throwable $e) {
 
             Flux::toast(
-                text: __('An error occurred while loading the employee.'),
+                text: __('An error occurred while loading the Relation Data.'),
                 heading: __('Error.'),
                 variant: 'danger'
             );
@@ -170,34 +146,35 @@ class CreateEmployee extends Component
     }
 
     /**
-     * Lifecycle hook to make sure data is loaded even after validation errors
+     * Lebenszyklusmethode um sicherzustellen, dass Daten auch nach Validierungsfehlern geladen sind
      */
     public function hydrate(): void
     {
         if ($this->showCreateModal && !$this->dataLoaded) {
-            $this->loadRelationData();
+            $this->loadRelationForDropDowns();
         }
     }
 
     /**
-     * Event-Handler für profession-updated
+     * Aktualisiert die Cache-Daten für Professionen
      */
     #[On('profession-updated')]
     public function refreshProfessions(): void
     {
-        // Cache für Professions zurücksetzen
         $this->professions = null;
+
+        Profession::flushCompanyCache($this->companyId);
 
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showCreateModal) {
-            $this->loadRelationData();
+            $this->loadRelationForDropDowns();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
         }
     }
 
     /**
-     * Event-Handler für stage-updated
+     * Aktualisiert die Cache-Daten für Stages
      */
     #[On('stage-updated')]
     public function refreshStages(): void
@@ -205,156 +182,126 @@ class CreateEmployee extends Component
         // Cache für Stages zurücksetzen
         $this->stages = null;
 
+        // Neuer Cache-Ansatz - optimiert wie in EditEmployee
+        Stage::flushCompanyCache($this->companyId);
+
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showCreateModal) {
-            $this->loadRelationData();
+            $this->loadRelationForDropDowns();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
         }
     }
 
     /**
-     * Event-Handler für department-created und department-updated
+     * Aktualisiert die Cache-Daten für Departments
      */
     #[On(['department-created', 'department-updated'])]
     public function refreshDepartments(): void
     {
-        // Cache für Departments zurücksetzen
         $this->departments = null;
+
+        Department::flushTeamCache($this->currentTeamId);
 
         // Wenn das Modal geöffnet ist, Daten sofort neu laden
         if ($this->showCreateModal) {
-            $this->loadRelationData();
+            $this->loadRelationForDropDowns();
             // Event auslösen, um das UI zu aktualisieren
             $this->dispatch('dropdown-data-updated');
         }
     }
 
     /**
-     * This method is called when properties are updated
+     * Gibt die Liste der Berufe zurück
      */
-    public function updated($propertyName)
+    #[Computed]
+    public function professions(): Collection
     {
-        if ($propertyName === 'showCreateModal' && $this->showCreateModal && !$this->dataLoaded) {
-            $this->loadRelationData();
+        if ($this->professions === null && $this->showCreateModal && !$this->dataLoaded) {
+            $this->loadRelationForDropDowns();
         }
-
-        if ($propertyName === 'selectedTeams') {
-            $this->departments = null;
-            $this->department = null;
-        }
+        return $this->professions ?? collect();
     }
 
     /**
-     * Gets professions list
+     * Gibt die Liste der Karrierestufen zurück
      */
-    public function getProfessionsProperty()
+    #[Computed]
+    public function stages(): Collection
     {
-        if ($this->professions === null) {
-            $this->loadRelationData();
+        if ($this->stages === null && $this->showCreateModal && !$this->dataLoaded) {
+            $this->loadRelationForDropDowns();
         }
-        return $this->professions;
+        return $this->stages ?? collect();
     }
 
     /**
-     * Gets stages list
+     * Gibt die Liste der Rollen zurück
      */
-    public function getStagesProperty()
+    #[Computed]
+    public function roles(): Collection
     {
-        if ($this->stages === null) {
-            $this->loadRelationData();
+        if ($this->roles === null && $this->showCreateModal && !$this->dataLoaded) {
+            $this->loadRelationForDropDowns();
         }
-        return $this->stages;
+        return $this->roles ?? collect();
     }
 
     /**
-     * Gets roles list
+     * Gibt die Liste der Teams zurück
      */
-    public function getRolesProperty()
+    #[Computed]
+    public function teams(): Collection
     {
-        if ($this->roles === null) {
-            $this->loadRelationData();
+        if ($this->teams === null && $this->showCreateModal && !$this->dataLoaded) {
+            $this->loadRelationForDropDowns();
         }
-        return $this->roles;
+        return $this->teams ?? collect();
     }
 
     /**
-     * Gets teams list
+     * Gibt die Liste der Abteilungen zurück,
      */
-    public function getTeamsProperty()
+    #[Computed]
+    public function departments(): Collection
     {
-        if ($this->teams === null) {
-            $this->loadRelationData();
+        if ($this->departments === null && $this->showCreateModal && !$this->dataLoaded) {
+            $this->loadRelationForDropDowns();
         }
-        return $this->teams;
+        return $this->departments ?? collect();
     }
 
     /**
-     * Gets departments filtered by selected team
+     * Gibt die Liste der Supervisoren zurück
      */
-    public function getDepartmentsProperty()
+    #[Computed]
+    public function supervisors(): Collection
     {
-        // Sicherstellen, dass alle Departments geladen sind
-        if ($this->departments === null) {
-            $this->loadRelationData();
+        if ($this->supervisors === null && $this->showCreateModal && !$this->dataLoaded) {
+            $this->loadRelationForDropDowns();
         }
-
-        // Wenn kein Team ausgewählt ist, alle Departments zurückgeben
-        if (empty($this->selectedTeams) || count($this->selectedTeams) === 0) {
-            return $this->departments;
-        }
-
-        // Departments filtern basierend auf dem ausgewählten Team
-        $filteredDepartments = $this->departments->filter(function ($department) {
-            return in_array($department->team_id, $this->selectedTeams);
-        });
-
-        return $filteredDepartments;
+        return $this->supervisors ?? collect();
     }
 
     /**
-     * Gets supervisors list
+     * Gibt die Optionen für den Mitarbeiterstatus zurück
      */
-    public function getSupervisorsProperty()
+    #[Computed]
+    public function employeeStatusOptions(): array
     {
-        if ($this->supervisors === null) {
-            $this->loadRelationData();
-        }
-        return $this->supervisors;
+        return EmployeeStatus::getOptions();
     }
 
     /**
-     * Get employee status options - use memoization for frequently accessed data
-     */
-    public function getEmployeeStatusOptionsProperty()
-    {
-        static $options = null;
-
-        if ($options === null) {
-            $options = collect(EmployeeStatus::cases())->map(function ($status) {
-                return [
-                    'value' => $status->value,
-                    'label' => $status->label(),
-                    'colors' => $status->colors(),
-                    'icon' => $status->icon(),
-                ];
-            })->toArray();
-        }
-
-        return $options;
-    }
-
-    /**
-     * Save employee
+     * Führt alle notwendigen DB-Operationen in einer Transaktion aus und speichert den Mitarbeiter
      */
     public function saveEmployee(): void
     {
         if (!$this->dataLoaded) {
-            $this->loadRelationData();
+            $this->loadRelationForDropDowns();
         }
 
-        // Sichere Passwortgenerierung
-        $this->generatedPassword = $this->generateSecurePassword();
+        $this->password = Str::password();
 
         $this->validate();
 
@@ -363,13 +310,12 @@ class CreateEmployee extends Component
         try {
             DB::beginTransaction();
 
-            // 1. Create user
             $user = User::create([
                 'gender' => $this->gender,
                 'name' => $this->name,
                 'last_name' => $this->last_name,
                 'email' => $this->email,
-                'password' => Hash::make($this->generatedPassword),
+                'password' => Hash::make($this->password),
                 'email_verified_at' => now(),
                 'department_id' => $this->department,
                 'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
@@ -379,12 +325,10 @@ class CreateEmployee extends Component
                 'created_by' => auth()->id(),
             ]);
 
-            // 2. Assign roles
             if (!empty($this->selectedRoles)) {
                 $user->roles()->sync($this->selectedRoles);
             }
 
-            // 3. Create employee record
             Employee::create([
                 'user_id' => $user->id,
                 'uuid' => (string)Str::uuid(),
@@ -394,7 +338,6 @@ class CreateEmployee extends Component
                 'supervisor_id' => $this->supervisor,
             ]);
 
-            // 4. Assign teams
             if (!empty($this->selectedTeams)) {
                 $teamsWithRole = [];
                 foreach ($this->selectedTeams as $teamId) {
@@ -408,14 +351,15 @@ class CreateEmployee extends Component
                 $user->teams()->attach(auth()->user()->currentTeam, ['role' => 'member']);
             }
 
-            // 5. Send invitation (if enabled)
             if ($this->invitations) {
-                // TODO: Email notification implementation
+                // TODO: E-Mail-Benachrichtigung implementieren
             }
 
             DB::commit();
 
-            $this->resetForm();
+            $this->closeCreateEmployeeModal();
+
+            $this->dispatch('employee-created');
 
             Flux::toast(
                 text: __('Employee created successfully.'),
@@ -423,29 +367,20 @@ class CreateEmployee extends Component
                 variant: 'success'
             );
 
-            $this->dispatch('employee-created');
+        } catch (\Throwable $e) {
 
-        } catch (AuthorizationException $ae) {
-            DB::rollBack();
             Flux::toast(
-                text: __('You are not authorized to create employees.'),
-                heading: __('Error'),
-                variant: 'danger'
-            );
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Flux::toast(
-                text: __('Error: ') . $e->getMessage(),
-                heading: __('Error'),
+                text: __('An error occurred while saving the employee.'),
+                heading: __('Error.'),
                 variant: 'danger'
             );
         }
     }
 
     /**
-     * Reset form and close modal
+     * Setzt das Formular zurück und schließt das Modal
      */
-    public function resetForm(): void
+    public function closeCreateEmployeeModal(): void
     {
         $this->reset([
             'name', 'last_name', 'email', 'password', 'gender', 'selectedRoles',
@@ -453,54 +388,25 @@ class CreateEmployee extends Component
             'model_status', 'employee_status', 'invitations',
         ]);
 
-        $this->generatedPassword = null;
+        $this->resetValidation();
+
+        $this->password = null;
+        $this->teams = null;
+        $this->departments = null;
+        $this->roles = null;
+        $this->professions = null;
+        $this->stages = null;
+        $this->supervisors = null;
+
+        $this->modal('create-employee')->close();
 
         $this->dataLoaded = false;
-
-        // Reset to default values
-        $this->setDefaultValues();
     }
 
-    /**
-     * Generiert ein sicheres, zufälliges Passwort mit Buchstaben, Zahlen und Sonderzeichen
-     * Länge: 10 Zeichen, mindestens je ein Zeichen aus jeder Kategorie
-     */
-    private function generateSecurePassword(): string
-    {
-        $lowercase = 'abcdefghijklmnopqrstuvwxyz';
-        $uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $numbers = '0123456789';
-        $special = '!@#$%^&*()_-+=<>?';
-
-        // Mindestens ein Zeichen aus jeder Kategorie
-        $password = [
-            $lowercase[random_int(0, strlen($lowercase) - 1)],
-            $uppercase[random_int(0, strlen($uppercase) - 1)],
-            $numbers[random_int(0, strlen($numbers) - 1)],
-            $special[random_int(0, strlen($special) - 1)],
-        ];
-
-        // Restliche Zeichen bis zur gewünschten Länge auffüllen
-        $allChars = $lowercase . $uppercase . $numbers . $special;
-        $passwordLength = random_int(8, 10); // Zufällige Länge zwischen 8 und 10
-
-        for ($i = count($password); $i < $passwordLength; $i++) {
-            $password[] = $allChars[random_int(0, strlen($allChars) - 1)];
-        }
-
-        // Reihenfolge durchmischen
-        shuffle($password);
-
-        return implode('', $password);
-    }
-
-    /**
-     * Render component
-     */
     public function render(): View
     {
         if ($this->showCreateModal && !$this->dataLoaded) {
-            $this->loadRelationData();
+            $this->loadRelationForDropDowns();
         }
 
         return view('livewire.alem.employee.create', [

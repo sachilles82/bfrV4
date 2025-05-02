@@ -12,15 +12,12 @@ use App\Models\Alem\Employee\Setting\Stage;
 use App\Models\User;
 use Carbon\Carbon;
 use Flux\Flux;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\Attributes\On;
-use App\Enums\Role\RoleHasAccessTo;
-use App\Enums\Role\RoleVisibility;
 use App\Models\Spatie\Role;
 use App\Models\Team;
 use App\Traits\Model\WithModelStatusOptions;
@@ -72,7 +69,7 @@ class EditEmployee extends Component
     private ?Collection $stages = null;
     private ?Collection $supervisors = null;
 
-    #[On('open-edit-modal')]
+    #[On('edit-employee-modal')]
     public function openEditEmployeeModal($userId): void
     {
 
@@ -174,7 +171,7 @@ class EditEmployee extends Component
 
         } catch (\Throwable $e) {
             Flux::toast(
-                text: __('An error occurred while loading the employee Relation Data.'),
+                text: __('An error occurred while loading the Relation Data.'),
                 heading: __('Error.'),
                 variant: 'danger'
             );
@@ -219,7 +216,7 @@ class EditEmployee extends Component
 
             DB::commit();
 
-            $this->finish();
+            $this->closeEditEmployeeModal();
 
             $this->dispatch('employee-updated');
 
@@ -232,7 +229,7 @@ class EditEmployee extends Component
         } catch (\Throwable $e) {
 
             Flux::toast(
-                text: __('An error occurred while saving the employee.'),
+                text: __('An error occurred while editing the employee.'),
                 heading: __('Error.'),
                 variant: 'danger'
             );
@@ -271,24 +268,16 @@ class EditEmployee extends Component
     /**
      * Get employee status options for dropdown - static caching
      */
-    public function getEmployeeStatusOptionsProperty(): array
+    #[Computed]
+    public function employeeStatusOptions(): array
     {
-        static $options = null;
-        if ($options === null) {
-            $options = collect(EmployeeStatus::cases())->map(fn($status) => [
-                'value' => $status->value,
-                'label' => $status->label(),
-                'colors' => $status->colors(),
-                'icon' => $status->icon(),
-            ])->toArray();
-        }
-        return $options;
+        return EmployeeStatus::getOptions();
     }
 
     /**
      * Close modal and reset state
      */
-    public function finish(): void
+    public function closeEditEmployeeModal(): void
     {
 
         $this->reset([

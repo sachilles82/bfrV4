@@ -1,17 +1,6 @@
 <div wire:ignore.self>
 
-    <flux:modal name="create-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl"
-                wire:model="showModal"
-                x-data="{
-                    initDropdowns() {
-                        // Event-Listener für Dropdown-Aktualisierungen hinzufügen
-                        window.addEventListener('dropdown-data-updated', () => {
-                            // Livewire-Komponente neu rendern, um aktualisierte Daten anzuzeigen
-                            @this.$refresh();
-                        });
-                    }
-                }"
-                x-init="initDropdowns()">
+    <flux:modal name="create-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl">
         <div>
             <flux:heading size="lg">{{ __('Create Employee') }}</flux:heading>
             <flux:subheading>{{ __('Fill out the details to create a new employee') }}</flux:subheading>
@@ -427,7 +416,7 @@
 
             <!-- Form Buttons -->
             <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                <flux:button wire:click="resetForm" type="button" variant="ghost">
+                <flux:button wire:click="closeCreateEmployeeModal" type="button" variant="ghost">
                     {{ __('Cancel') }}
                 </flux:button>
                 <flux:button type="submit">

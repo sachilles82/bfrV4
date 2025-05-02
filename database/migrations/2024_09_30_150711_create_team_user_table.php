@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('role')->nullable();
             $table->timestamps();
 
+            $table->index(['team_id', 'user_id'], 'idx_team_user_team_user');
+            $table->index(['user_id', 'team_id'], 'idx_team_user_user_team');
             $table->unique(['team_id', 'user_id']);
             $table->index('user_id');
         });

@@ -115,6 +115,8 @@ class User extends Authenticatable
         'joined_at' => 'date',
         'model_status' => ModelStatus::class,
         'department_id' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 
     /**
@@ -218,29 +220,43 @@ class User extends Authenticatable
     //        return $query->where('user_type', UserType::Employee)
     //            ->where('model_status', ModelStatus::ACTIVE);
     //    }
-
-    /**
-     * Get company-specific cache key
-     *
-     * @return string|null
-     */
-    public function getCompanyCacheKey(): ?string
-    {
-        if (property_exists($this, 'company_id') && $this->company_id) {
-            return "company_{$this->company_id}_user_cache";
-        }
-
-        return null;
-    }
+//
+//    /**
+//     * Get company-specific cache key
+//     *
+//     * @return string|null
+//     */
+//    public function getCompanyCacheKey(): ?string
+//    {
+//        if (property_exists($this, 'company_id') && $this->company_id) {
+//            return "company_{$this->company_id}_user_cache";
+//        }
+//
+//        return null;
+//    }
     /**
      * Get managers for a specific company with caching
      */
     public static function getCompanyManagers(int $companyId)
     {
         return self::cacheCompanyResult($companyId, function() use ($companyId) {
-            return self::where('company_id', $companyId)
-                ->whereHas('roles', fn($q) => $q->where('is_manager', true))
-                ->select(['id', 'name', 'last_name', 'profile_photo_path'])
+            return self::select([
+                'users.id',
+                'users.name',
+                'users.last_name',
+                'users.profile_photo_path'
+            ])
+                ->join('model_has_roles', function ($join) {
+                    $join->on('users.id', '=', 'model_has_roles.model_id')
+                        ->where('model_has_roles.model_type', User::class);
+                })
+                ->join('roles', function ($join) {
+                    $join->on('model_has_roles.role_id', '=', 'roles.id')
+                        ->where('roles.is_manager', true);
+                })
+                ->where('users.company_id', $companyId)
+                ->whereNull('users.deleted_at')
+                ->orderBy('users.name')
                 ->distinct()
                 ->get();
         }, 'user');

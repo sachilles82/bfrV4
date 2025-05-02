@@ -554,7 +554,7 @@
             <!-- Form Buttons -->
             <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
                 <flux:button
-                    wire:click="closeModal"
+                    wire:click="closeEditEmployeeModal"
                     type="button"
                     variant="ghost"
                     wire:loading.attr="disabled"
