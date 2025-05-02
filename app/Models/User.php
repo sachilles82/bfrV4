@@ -85,11 +85,13 @@ class User extends Authenticatable
         'slug',
         'company_id',
         'team_id',
+        'created_by',
         'department_id',
         'joined_at',
         'user_type',
         'model_status',
         'gender',
+        'email_verified_at',
     ];
 
     /**
