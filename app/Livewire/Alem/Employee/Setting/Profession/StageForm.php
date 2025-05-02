@@ -41,6 +41,8 @@ class StageForm extends Component
                     'name' => $this->name,
                 ]);
 
+                $this->dispatch('stage-updated');
+
                 Flux::toast(
                     text: __('Stage updated successfully.'),
                     heading: __('Success.'),
@@ -52,14 +54,14 @@ class StageForm extends Component
                     'name' => $this->name,
                 ]);
 
+                $this->dispatch('stage-created');
+
                 Flux::toast(
                     text: __('Stage created successfully.'),
                     heading: __('Success.'),
                     variant: 'success'
                 );
             }
-
-            $this->dispatch('stage-updated');
 
         } catch (\Throwable $e) {
             if ($e instanceof ValidationException) {
@@ -90,6 +92,7 @@ class StageForm extends Component
             $this->editing = true;
 
         } catch (\Throwable $e) {
+
             Flux::toast(
                 text: __('Cannot edit this stage.'),
                 heading: __('Error'),
@@ -108,7 +111,10 @@ class StageForm extends Component
                 ->findOrFail($id);
 
             $stage->delete();
-            $this->dispatch('stage-updated');
+            $this->finish();
+
+
+            $this->dispatch('stage-deleted');
 
             Flux::toast(
                 text: __('Stage deleted successfully.'),
@@ -116,9 +122,8 @@ class StageForm extends Component
                 variant: 'success'
             );
 
-            $this->finish();
-
         } catch (\Throwable $e) {
+
             Flux::toast(
                 text: __('Cannot delete this stage.'),
                 heading: __('Error'),
@@ -149,6 +154,7 @@ class StageForm extends Component
     {
         $query = Stage::where('created_by',
             Auth::id())->orderBy('id');
+
         $stages = $this->applySimplePagination($query);
 
         return view('livewire.alem.employee.setting.profession.stage-form', [

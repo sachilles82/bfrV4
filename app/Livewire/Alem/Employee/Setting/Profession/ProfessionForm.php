@@ -41,6 +41,8 @@ class ProfessionForm extends Component
                     'name' => $this->name,
                 ]);
 
+                $this->dispatch('profession-updated');
+
                 Flux::toast(
                     text: __('Profession updated successfully.'),
                     heading: __('Success.'),
@@ -52,14 +54,14 @@ class ProfessionForm extends Component
                     'name' => $this->name,
                 ]);
 
+                $this->dispatch('profession-created');
+
                 Flux::toast(
                     text: __('Profession created successfully.'),
                     heading: __('Success.'),
                     variant: 'success'
                 );
             }
-
-            $this->dispatch('profession-updated');
 
         } catch (\Throwable $e) {
             // Validierungsfehler direkt weiterwerfen
@@ -91,6 +93,7 @@ class ProfessionForm extends Component
             $this->editing = true;
 
         } catch (\Throwable $e) {
+
             Flux::toast(
                 text: __('Cannot edit this profession.'),
                 heading: __('Error'),
@@ -110,7 +113,8 @@ class ProfessionForm extends Component
 
             $profession->delete();
             $this->finish();
-            $this->dispatch('profession-updated');
+
+            $this->dispatch('profession-deleted');
 
             Flux::toast(
                 text: __('Profession deleted successfully.'),
@@ -119,6 +123,7 @@ class ProfessionForm extends Component
             );
 
         } catch (\Throwable $e) {
+
             Flux::toast(
                 text: __('Cannot delete this profession.'),
                 heading: __('Error'),
@@ -149,6 +154,7 @@ class ProfessionForm extends Component
     {
         $query = Profession::where('created_by',
             Auth::id())->orderBy('id');
+
         $professions = $this->applySimplePagination($query);
 
         return view('livewire.alem.employee.setting.profession.profession-form', [

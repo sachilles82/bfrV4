@@ -158,7 +158,7 @@ class CreateEmployee extends Component
     /**
      * Aktualisiert die Cache-Daten für Professionen
      */
-    #[On('profession-updated')]
+    #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
     public function refreshProfessions(): void
     {
         $this->professions = null;
@@ -176,7 +176,7 @@ class CreateEmployee extends Component
     /**
      * Aktualisiert die Cache-Daten für Stages
      */
-    #[On('stage-updated')]
+    #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
     public function refreshStages(): void
     {
         // Cache für Stages zurücksetzen
@@ -196,7 +196,7 @@ class CreateEmployee extends Component
     /**
      * Aktualisiert die Cache-Daten für Departments
      */
-    #[On(['department-created', 'department-updated'])]
+    #[On(['department-updated', 'department-created', 'department-deleted'])]
     public function refreshDepartments(): void
     {
         $this->departments = null;
