@@ -50,11 +50,11 @@ class ProfessionForm extends Component
                 );
             } else {
 
-                Profession::create([
+                $profession = Profession::create([
                     'name' => $this->name,
                 ]);
 
-                $this->dispatch('profession-created');
+                $this->dispatch('profession-created', id: $profession->id);
 
                 Flux::toast(
                     text: __('Profession created successfully.'),

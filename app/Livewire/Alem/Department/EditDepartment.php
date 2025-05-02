@@ -77,8 +77,6 @@ class EditDepartment extends Component
                 'model_status' => $this->model_status,
             ]);
 
-            Department::flushCompanyCache(auth()->user()->company_id);
-
             $this->closeModal();
 
             Flux::toast(

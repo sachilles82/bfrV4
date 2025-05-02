@@ -50,11 +50,11 @@ class StageForm extends Component
                 );
             } else {
 
-                Stage::create([
+                $stage = Stage::create([
                     'name' => $this->name,
                 ]);
 
-                $this->dispatch('stage-created');
+                $this->dispatch('stage-created', id: $stage->id);
 
                 Flux::toast(
                     text: __('Stage created successfully.'),

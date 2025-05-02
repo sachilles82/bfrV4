@@ -37,13 +37,15 @@ class CreateDepartment extends Component
         $this->validate();
 
         try {
-            Department::create([
+            $department = Department::create([
                 'name' => $this->name,
                 'description' => $this->description,
                 'model_status' => $this->model_status,
                 'company_id' => auth()->user()->company_id,
                 'created_by' => auth()->id(),
             ]);
+
+            $this->dispatch('department-created', id: $department->id);
 
             $this->resetForm();
 
@@ -53,7 +55,6 @@ class CreateDepartment extends Component
                 variant: 'success'
             );
 
-            $this->dispatch('department-created');
 
         } catch (\Exception $e) {
             Flux::toast(

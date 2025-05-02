@@ -23,8 +23,10 @@
                     label="{{ __('Profession') }}"
                     for="name"
                     badge="{{ __('Required') }}"
-                    :error="$errors->first('name')">
-                    <x-pupi.input.text wire:model.defer="name" id="name"
+                    :error="$errors->first('name')"
+                    help-text="{{ __('') }}"
+                    model="name">
+                    <x-pupi.input.text wire:model="name" id="name"
                                        placeholder="{{ __('Enter profession name') }}"/>
                 </x-pupi.input.group>
             </div>

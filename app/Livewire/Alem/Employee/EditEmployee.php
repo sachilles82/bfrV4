@@ -32,7 +32,7 @@ class EditEmployee extends Component
 
     // Modal state
     public bool $showEditModal = false;
-    public bool $dataLoadedEdit = false;
+    private bool $dataLoaded = false;
 
     // User identification
     #[Locked]
@@ -90,7 +90,7 @@ class EditEmployee extends Component
         $this->loadEmployeeData();
 
         $this->showEditModal = true;
-        $this->dataLoadedEdit = false;
+        $this->dataLoaded = false;
 
     }
 
@@ -129,7 +129,7 @@ class EditEmployee extends Component
 
     protected function loadRelationForDropDowns(): void
     {
-        if (!$this->showEditModal || $this->dataLoadedEdit) {
+        if (!$this->showEditModal || $this->dataLoaded) {
             return;
         }
 
@@ -167,7 +167,7 @@ class EditEmployee extends Component
                 $this->stages = Stage::getCompanyStages($companyId);
             }
 
-            $this->dataLoadedEdit = true;
+            $this->dataLoaded = true;
 
         } catch (\Throwable $e) {
             Flux::toast(
@@ -184,9 +184,9 @@ class EditEmployee extends Component
      */
     public function updateEmployee(): void
     {
-        try {
+        $this->validate();
 
-            $this->validate();
+        try {
 
             DB::beginTransaction();
 
@@ -236,105 +236,175 @@ class EditEmployee extends Component
         }
     }
 
-
-    // ---  Wenn einer dieser Models refresh wird, sollen die Daten neubefüllt werden
-    #[On('profession-updated')]
-    public function refreshProfessions(): void
+    /**
+     * Lebenszyklusmethode um sicherzustellen, dass Daten auch nach Validierungsfehlern geladen sind
+     */
+    public function hydrate(): void
     {
-        $this->professions = null;
-        // Neuer Cache-Ansatz für Profession-Updates
-        Profession::flushCompanyCache($this->companyId);
-        if ($this->showEditModal) $this->loadRelationForDropDowns();
-    }
-
-    #[On('stage-updated')]
-    public function refreshStages(): void
-    {
-        $this->stages = null;
-        // Neuer Cache-Ansatz für Stage-Updates
-        Stage::flushCompanyCache($this->companyId);
-        if ($this->showEditModal) $this->loadRelationForDropDowns();
-    }
-
-    #[On(['department-created', 'department-updated'])]
-    public function refreshDepartments(): void
-    {
-        $this->departments = null;
-        // Durch den neuen Team-basierten Ansatz für Departments
-        Department::flushTeamCache($this->currentTeamId);
-        if ($this->showEditModal) $this->loadRelationForDropDowns();
+        if ($this->showEditModal && !$this->dataLoaded) {
+            $this->loadRelationForDropDowns();
+        }
     }
 
     /**
-     * Get employee status options for dropdown - static caching
+     * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt
+     */
+    #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
+    public function refreshProfessions($id = null): void
+    {
+        Profession::flushCompanyCache($this->companyId);
+
+        $this->dataLoaded = false;
+
+        $this->professions = null;
+
+        $this->loadRelationForDropDowns();
+
+        if ($id) {
+            $this->profession = $id;
+        }
+
+        if ($this->profession) {
+            $professionExists = $this->professions?->contains('id', $this->profession);
+            if (!$professionExists) {
+                $this->profession = null;
+            }
+        }
+    }
+
+
+    /**
+     * Gibt die Liste der Berufe zurück
+     */
+    #[Computed]
+    public function professions(): Collection
+    {
+        if ($this->professions === null && $this->showEditModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->professions ?? collect();
+    }
+
+    /**
+     * Aktualisiert die Cache-Daten für Stages
+     */
+    #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
+    public function refreshStages($id = null): void
+    {
+        Stage::flushCompanyCache($this->companyId);
+
+        $this->dataLoaded = false;
+
+        $this->stages = null;
+
+        $this->loadRelationForDropDowns();
+
+        if ($id) {
+            $this->stage = $id;
+        }
+
+        if ($this->stage) {
+            $stageExists = $this->stages?->contains('id', $this->stage);
+            if (!$stageExists) {
+                $this->stage = null;
+            }
+        }
+    }
+
+    /**
+     * Gibt die Liste der Karrierestufen zurück
+     */
+    #[Computed]
+    public function stages(): Collection
+    {
+        if ($this->stages === null && $this->showEditModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->stages ?? collect();
+    }
+
+    /**
+     * Aktualisiert die Cache-Daten für Departments
+     */
+    #[On(['department-updated', 'department-created', 'department-deleted'])]
+    public function refreshDepartments($id = null): void
+    {
+        Department::flushTeamCache($this->currentTeamId);
+
+        $this->dataLoaded = false;
+
+        $this->departments = null;
+
+        $this->loadRelationForDropDowns();
+
+        if ($id) {
+            $this->department = $id;
+        }
+
+        if ($this->department) {
+            $departmentExists = $this->departments?->contains('id', $this->department);
+            if (!$departmentExists) {
+                $this->department = null;
+            }
+        }
+    }
+
+    /**
+     * Gibt die Liste der Abteilungen zurück,
+     */
+    #[Computed]
+    public function departments(): Collection
+    {
+        if ($this->departments === null && $this->showEditModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->departments ?? collect();
+    }
+
+
+    /**
+     * Gibt die Liste der Rollen zurück
+     */
+    #[Computed]
+    public function roles(): Collection
+    {
+        if ($this->roles === null && $this->showEditModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->roles ?? collect();
+    }
+
+    /**
+     * Gibt die Liste der Teams zurück
+     */
+    #[Computed]
+    public function teams(): Collection
+    {
+        if ($this->teams === null && $this->showEditModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->teams ?? collect();
+    }
+
+    /**
+     * Gibt die Liste der Supervisoren zurück
+     */
+    #[Computed]
+    public function supervisors(): Collection
+    {
+        if ($this->supervisors === null && $this->showEditModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->supervisors ?? collect();
+    }
+
+    /**
+     * Gibt die Optionen für den Mitarbeiterstatus zurück
      */
     #[Computed]
     public function employeeStatusOptions(): array
     {
         return EmployeeStatus::getOptions();
-    }
-
-    /**
-     * Close modal and reset state
-     */
-    public function closeEditEmployeeModal(): void
-    {
-
-        $this->reset([
-            'userId', 'user', 'showEditModal', 'dataLoadedEdit',
-            'name', 'last_name', 'email', 'gender',
-            'model_status', 'joined_at', 'department',
-            'selectedTeams', 'selectedRoles',
-            'employee_status', 'profession', 'stage', 'supervisor'
-        ]);
-
-        $this->resetValidation();
-
-        // Reset cached data (private properties)
-        $this->teams = null;
-        $this->departments = null;
-        $this->roles = null;
-        $this->professions = null;
-        $this->stages = null;
-        $this->supervisors = null;
-
-        $this->modal('edit-employee')->close();
-    }
-
-    #[Computed]
-    public function teams(): Collection
-    {
-        return $this->teams ?? collect();
-    }
-
-    #[Computed]
-    public function departments(): Collection
-    {
-        return $this->departments ?? collect();
-    }
-
-    #[Computed]
-    public function roles(): Collection
-    {
-        return $this->roles ?? collect();
-    }
-
-    #[Computed]
-    public function professions(): Collection
-    {
-        return $this->professions ?? collect();
-    }
-
-    #[Computed]
-    public function stages(): Collection
-    {
-        return $this->stages ?? collect();
-    }
-
-    #[Computed]
-    public function supervisors(): Collection
-    {
-        return $this->supervisors ?? collect();
     }
 
     public function render(): View

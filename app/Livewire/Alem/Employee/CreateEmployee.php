@@ -156,60 +156,31 @@ class CreateEmployee extends Component
     }
 
     /**
-     * Aktualisiert die Cache-Daten für Professionen
+     * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt
      */
     #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
-    public function refreshProfessions(): void
+    public function refreshProfessions($id = null): void
     {
-        $this->professions = null;
-
         Profession::flushCompanyCache($this->companyId);
 
-        // Wenn das Modal geöffnet ist, Daten sofort neu laden
-        if ($this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-            // Event auslösen, um das UI zu aktualisieren
-            $this->dispatch('dropdown-data-updated');
+        $this->dataLoaded = false;
+
+        $this->professions = null;
+
+        $this->loadRelationForDropDowns();
+
+        if ($id) {
+            $this->profession = $id;
+        }
+
+        if ($this->profession) {
+            $professionExists = $this->professions?->contains('id', $this->profession);
+            if (!$professionExists) {
+                $this->profession = null;
+            }
         }
     }
 
-    /**
-     * Aktualisiert die Cache-Daten für Stages
-     */
-    #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
-    public function refreshStages(): void
-    {
-        // Cache für Stages zurücksetzen
-        $this->stages = null;
-
-        // Neuer Cache-Ansatz - optimiert wie in EditEmployee
-        Stage::flushCompanyCache($this->companyId);
-
-        // Wenn das Modal geöffnet ist, Daten sofort neu laden
-        if ($this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-            // Event auslösen, um das UI zu aktualisieren
-            $this->dispatch('dropdown-data-updated');
-        }
-    }
-
-    /**
-     * Aktualisiert die Cache-Daten für Departments
-     */
-    #[On(['department-updated', 'department-created', 'department-deleted'])]
-    public function refreshDepartments(): void
-    {
-        $this->departments = null;
-
-        Department::flushTeamCache($this->currentTeamId);
-
-        // Wenn das Modal geöffnet ist, Daten sofort neu laden
-        if ($this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-            // Event auslösen, um das UI zu aktualisieren
-            $this->dispatch('dropdown-data-updated');
-        }
-    }
 
     /**
      * Gibt die Liste der Berufe zurück
@@ -217,10 +188,36 @@ class CreateEmployee extends Component
     #[Computed]
     public function professions(): Collection
     {
-        if ($this->professions === null && $this->showCreateModal && !$this->dataLoaded) {
+        if ($this->professions === null && $this->showCreateModal) {
             $this->loadRelationForDropDowns();
         }
         return $this->professions ?? collect();
+    }
+
+    /**
+     * Aktualisiert die Cache-Daten für Stages
+     */
+    #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
+    public function refreshStages($id = null): void
+    {
+        Stage::flushCompanyCache($this->companyId);
+
+        $this->dataLoaded = false;
+
+        $this->stages = null;
+
+        $this->loadRelationForDropDowns();
+
+        if ($id) {
+            $this->stage = $id;
+        }
+
+        if ($this->stage) {
+            $stageExists = $this->stages?->contains('id', $this->stage);
+            if (!$stageExists) {
+                $this->stage = null;
+            }
+        }
     }
 
     /**
@@ -229,11 +226,50 @@ class CreateEmployee extends Component
     #[Computed]
     public function stages(): Collection
     {
-        if ($this->stages === null && $this->showCreateModal && !$this->dataLoaded) {
-            $this->loadRelationForDropDowns();
-        }
+        if ($this->stages === null && $this->showCreateModal) {
+        $this->loadRelationForDropDowns();
+    }
         return $this->stages ?? collect();
     }
+
+    /**
+     * Aktualisiert die Cache-Daten für Departments
+     */
+    #[On(['department-updated', 'department-created', 'department-deleted'])]
+    public function refreshDepartments($id = null): void
+    {
+        Department::flushTeamCache($this->currentTeamId);
+
+        $this->dataLoaded = false;
+
+        $this->departments = null;
+
+        $this->loadRelationForDropDowns();
+
+        if ($id) {
+            $this->department = $id;
+        }
+
+        if ($this->department) {
+            $departmentExists = $this->departments?->contains('id', $this->department);
+            if (!$departmentExists) {
+                $this->department = null;
+            }
+        }
+    }
+
+    /**
+     * Gibt die Liste der Abteilungen zurück,
+     */
+    #[Computed]
+    public function departments(): Collection
+    {
+        if ($this->departments === null && $this->showCreateModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->departments ?? collect();
+    }
+
 
     /**
      * Gibt die Liste der Rollen zurück
@@ -241,7 +277,7 @@ class CreateEmployee extends Component
     #[Computed]
     public function roles(): Collection
     {
-        if ($this->roles === null && $this->showCreateModal && !$this->dataLoaded) {
+        if ($this->roles === null && $this->showCreateModal) {
             $this->loadRelationForDropDowns();
         }
         return $this->roles ?? collect();
@@ -253,22 +289,10 @@ class CreateEmployee extends Component
     #[Computed]
     public function teams(): Collection
     {
-        if ($this->teams === null && $this->showCreateModal && !$this->dataLoaded) {
+        if ($this->teams === null && $this->showCreateModal) {
             $this->loadRelationForDropDowns();
         }
         return $this->teams ?? collect();
-    }
-
-    /**
-     * Gibt die Liste der Abteilungen zurück,
-     */
-    #[Computed]
-    public function departments(): Collection
-    {
-        if ($this->departments === null && $this->showCreateModal && !$this->dataLoaded) {
-            $this->loadRelationForDropDowns();
-        }
-        return $this->departments ?? collect();
     }
 
     /**
@@ -277,7 +301,7 @@ class CreateEmployee extends Component
     #[Computed]
     public function supervisors(): Collection
     {
-        if ($this->supervisors === null && $this->showCreateModal && !$this->dataLoaded) {
+        if ($this->supervisors === null && $this->showCreateModal) {
             $this->loadRelationForDropDowns();
         }
         return $this->supervisors ?? collect();
@@ -303,9 +327,9 @@ class CreateEmployee extends Component
 
         $this->password = Str::password();
 
-        $this->validate();
-
         $this->showCreateModal = false;
+
+        $this->validate();
 
         try {
             DB::beginTransaction();
