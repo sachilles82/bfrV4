@@ -43,7 +43,7 @@ enum EmployeeStatus: string
         };
     }
 
-    public static function getOptions(): array
+    public static function getEmployeeOptions(): array
     {
         return collect(self::cases())
             ->map(function (self $status) {

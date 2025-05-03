@@ -6,15 +6,15 @@ use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Department\Helper\ValidateDepartment;
 use App\Models\Alem\Department;
 use App\Traits\Modal\WithPlaceholder;
-use App\Traits\Model\WithModelStatusOptions;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class CreateDepartment extends Component
 {
-    use AuthorizesRequests, ValidateDepartment, WithModelStatusOptions,
+    use AuthorizesRequests, ValidateDepartment,
         WithPlaceholder;
 
     public ?int $departmentId = null; // !Muss in jeder Komponente sein
@@ -71,6 +71,15 @@ class CreateDepartment extends Component
         $this->resetErrorBag();
         $this->model_status = ModelStatus::ACTIVE->value;
         $this->modal('create-department')->close();
+    }
+
+    /**
+     * Gibt die Optionen für den Modelstatus zurück
+     */
+    #[Computed]
+    public function modelStatusOptions(): array
+    {
+        return ModelStatus::getModelOptions();
     }
 
     public function render(): View

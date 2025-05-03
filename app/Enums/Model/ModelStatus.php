@@ -34,4 +34,18 @@ enum ModelStatus: string
             self::TRASHED => 'icon.trash',
         };
     }
+
+    public static function getModelOptions(): array
+    {
+        return collect(self::cases())
+            ->map(function (self $status) {
+                return [
+                    'value' => $status->value,
+                    'label' => $status->label(),
+                    'colors' => $status->colors(),
+                    'icon' => $status->icon(),
+                ];
+            })
+            ->toArray();
+    }
 }

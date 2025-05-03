@@ -20,7 +20,6 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Models\Spatie\Role;
 use App\Models\Team;
-use App\Traits\Model\WithModelStatusOptions;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Illuminate\Support\Collection;
@@ -28,7 +27,7 @@ use Illuminate\Support\Collection;
 #[Lazy(isolate: false)]
 class EditEmployee extends Component
 {
-    use AuthorizesRequests, ValidateEmployee, WithModelStatusOptions;
+    use AuthorizesRequests, ValidateEmployee;
 
     // Modal state
     public bool $showEditModal = false;
@@ -404,7 +403,16 @@ class EditEmployee extends Component
     #[Computed]
     public function employeeStatusOptions(): array
     {
-        return EmployeeStatus::getOptions();
+        return EmployeeStatus::getEmployeeOptions();
+    }
+
+    /**
+     * Gibt die Optionen für den Modelstatus zurück
+     */
+    #[Computed]
+    public function modelStatusOptions(): array
+    {
+        return ModelStatus::getModelOptions();
     }
 
     public function render(): View

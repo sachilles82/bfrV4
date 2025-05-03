@@ -5,6 +5,7 @@ namespace App\Livewire\Alem\Employee\Profile;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
+use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Employee\Profile\Helper\ValidatePersonalData;
 use App\Models\Alem\Employee\Employee;
 use App\Models\Alem\Employee\Setting\Profession;
@@ -14,6 +15,7 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -108,6 +110,15 @@ class PersonalData extends Component
                 ];
             });
         });
+    }
+
+    /**
+     * Gibt die Optionen für den Modelstatus zurück
+     */
+    #[Computed]
+    public function modelStatusOptions(): array
+    {
+        return ModelStatus::getOptions();
     }
 
     /**
