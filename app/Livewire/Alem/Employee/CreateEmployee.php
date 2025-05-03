@@ -409,7 +409,6 @@ class CreateEmployee extends Component
 
             Employee::create([
                 'user_id' => $user->id,
-                'uuid' => (string)Str::uuid(),
                 'profession_id' => $this->profession,
                 'stage_id' => $this->stage,
                 'employee_status' => $this->employee_status,
