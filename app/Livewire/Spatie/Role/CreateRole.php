@@ -41,6 +41,7 @@ class CreateRole extends Component
                 'is_manager' => $this->is_manager,
             ]);
             $this->modal('role-add')->close();
+
             $this->dispatch('role-created');
 
             Flux::toast(

@@ -425,7 +425,16 @@ class CreateEmployee extends Component
 
         $this->modal('create-employee')->close();
 
+        // HINZUGEFÜGT: Cache-Properties bereinigen, um Speicher freizugeben
+        $this->teams = null;
+        $this->departments = null;
+        $this->roles = null;
+        $this->professions = null;
+        $this->stages = null;
+        $this->supervisors = null;
+
         $this->dataLoaded = false;
+        $this->showCreateModal = false;
     }
 
     public function render(): View

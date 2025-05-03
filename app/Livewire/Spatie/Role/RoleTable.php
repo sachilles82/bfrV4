@@ -92,6 +92,8 @@ class RoleTable extends Component
                 'is_manager' => $this->is_manager,
             ]);
 
+            $this->dispatch('role-updated');
+
             Flux::toast(
                 text: __('Role updated successfully.'),
                 heading: __('Success.'),
@@ -122,6 +124,8 @@ class RoleTable extends Component
             $this->authorize('delete', $role);
 
             $role->delete();
+
+            $this->dispatch('role-deleted');
 
             Flux::toast(
                 text: __('Role deleted successfully.'),

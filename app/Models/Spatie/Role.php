@@ -7,6 +7,7 @@ use App\Enums\Role\RoleVisibility;
 use App\Models\User;
 use App\Traits\Cache\WithRedisCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
@@ -102,6 +103,17 @@ class Role extends SpatieRole
                     $role->team_id = $user->currentTeam?->id;
                 }
             }
+        });
+
+        // Event-Hooks für Cache-Invalidierung
+        static::saved(function($role) {
+            self::flushCompanyCache($role->company_id);
+            self::flushGlobalRoleCache();
+        });
+
+        static::deleted(function($role) {
+            self::flushCompanyCache($role->company_id);
+            self::flushGlobalRoleCache();
         });
     }
 

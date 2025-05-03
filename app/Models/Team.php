@@ -93,5 +93,14 @@ class Team extends JetstreamTeam
                 $team->company_id = auth()->user()->company_id;
             }
         });
+
+        // Event-Hooks für Cache-Invalidierung
+        static::saved(function($role) {
+            self::flushCompanyCache($role->company_id);
+        });
+
+        static::deleted(function($role) {
+            self::flushCompanyCache($role->company_id);
+        });
     }
 }

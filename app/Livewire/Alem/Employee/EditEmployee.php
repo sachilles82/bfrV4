@@ -240,21 +240,35 @@ class EditEmployee extends Component
     }
 
     /**
-     * Setzt das Formular zurück und schließt das Modal
+     * Setzt das Formular zurück und schließt das Modal.
+     * Bereinigt zusätzlich alle Cache-Properties, um Speicher freizugeben.
      */
     public function closeEditEmployeeModal(): void
     {
+        // Formularfelder zurücksetzen
         $this->reset([
             'name', 'last_name', 'email', 'gender', 'model_status', 'joined_at', 'department',
             'employee_status', 'profession', 'stage', 'supervisor',
             'selectedRoles', 'selectedTeams',
         ]);
 
+        // Fehlermeldungen zurücksetzen
         $this->resetErrorBag();
 
+        // Modal schließen
         $this->modal('edit-employee')->close();
 
+        // HINZUGEFÜGT: Cache-Properties bereinigen, um Speicher freizugeben
+        $this->teams = null;
+        $this->departments = null;
+        $this->roles = null;
+        $this->professions = null;
+        $this->stages = null;
+        $this->supervisors = null;
+
+        // Status zurücksetzen
         $this->dataLoaded = false;
+        $this->showEditModal = false;
     }
 
     /**
@@ -268,24 +282,35 @@ class EditEmployee extends Component
     }
 
     /**
-     * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt
+     * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt.
+     * Wird aufgerufen, wenn Professionen erstellt, aktualisiert oder gelöscht werden.
+     *
+     * @param int|null $id Die ID der neuen/aktualisierten Profession, falls vorhanden
+     * @return void
      */
     #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
-    public function refreshProfessions($id = null): void
+    public function refreshProfessions(int $id = null): void
     {
+        // Cache in der Datenbank leeren
         Profession::flushCompanyCache($this->companyId);
 
-        $this->dataLoaded = false;
-
+        // Lokale Cache-Variable zurücksetzen
         $this->professions = null;
 
+        // Laden-Status zurücksetzen
+        $this->dataLoaded = false;
+
+        // Daten neu laden
         $this->loadRelationForDropDowns();
 
+        // Falls eine neue Profession erstellt wurde, diese automatisch auswählen
         if ($id) {
             $this->profession = $id;
         }
 
+        // Prüfe, ob die aktuell ausgewählte Profession noch existiert
         if ($this->profession) {
+            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
             $professionExists = $this->professions?->contains('id', $this->profession);
             if (!$professionExists) {
                 $this->profession = null;
@@ -295,36 +320,53 @@ class EditEmployee extends Component
 
 
     /**
-     * Gibt die Liste der Berufe zurück
+     * Gibt die Liste der Berufe (Professionen) zurück.
+     * Enthält zusätzliche Null-Safety-Checks.
+     *
+     * @return Collection
      */
     #[Computed]
     public function professions(): Collection
     {
+        // Prüfe, ob Daten geladen werden müssen
         if ($this->professions === null && $this->showEditModal) {
             $this->loadRelationForDropDowns();
         }
+
+        // Null-Safety-Check nach dem Laden
         return $this->professions ?? collect();
     }
 
     /**
-     * Aktualisiert die Cache-Daten für Stages
+     * Aktualisiert die Cache-Daten für Stages.
+     * Wird aufgerufen, wenn Stages erstellt, aktualisiert oder gelöscht werden.
+     *
+     * @param int|null $id Die ID der neuen/aktualisierten Stage, falls vorhanden
+     * @return void
      */
     #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
-    public function refreshStages($id = null): void
+    public function refreshStages(int $id = null): void
     {
+        // Cache in der Datenbank leeren
         Stage::flushCompanyCache($this->companyId);
 
-        $this->dataLoaded = false;
-
+        // Lokale Cache-Variable zurücksetzen
         $this->stages = null;
 
+        // Laden-Status zurücksetzen
+        $this->dataLoaded = false;
+
+        // Daten neu laden
         $this->loadRelationForDropDowns();
 
+        // Falls eine neue Stage erstellt wurde, diese automatisch auswählen
         if ($id) {
             $this->stage = $id;
         }
 
+        // Prüfe, ob die aktuell ausgewählte Stage noch existiert
         if ($this->stage) {
+            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
             $stageExists = $this->stages?->contains('id', $this->stage);
             if (!$stageExists) {
                 $this->stage = null;
@@ -345,24 +387,35 @@ class EditEmployee extends Component
     }
 
     /**
-     * Aktualisiert die Cache-Daten für Departments
+     * Aktualisiert die Cache-Daten für Departments.
+     * Wird aufgerufen, wenn Departments erstellt, aktualisiert oder gelöscht werden.
+     *
+     * @param int|null $id Die ID des neuen/aktualisierten Departments, falls vorhanden
+     * @return void
      */
     #[On(['department-updated', 'department-created', 'department-deleted'])]
-    public function refreshDepartments($id = null): void
+    public function refreshDepartments(int $id = null): void
     {
+        // Cache in der Datenbank leeren
         Department::flushTeamCache($this->currentTeamId);
 
-        $this->dataLoaded = false;
-
+        // Lokale Cache-Variable zurücksetzen
         $this->departments = null;
 
+        // Laden-Status zurücksetzen
+        $this->dataLoaded = false;
+
+        // Daten neu laden
         $this->loadRelationForDropDowns();
 
+        // Falls ein neues Department erstellt wurde, dieses automatisch auswählen
         if ($id) {
             $this->department = $id;
         }
 
+        // Prüfe, ob das aktuell ausgewählte Department noch existiert
         if ($this->department) {
+            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
             $departmentExists = $this->departments?->contains('id', $this->department);
             if (!$departmentExists) {
                 $this->department = null;
@@ -371,14 +424,20 @@ class EditEmployee extends Component
     }
 
     /**
-     * Gibt die Liste der Abteilungen zurück,
+     * Gibt die Liste der Abteilungen (Departments) zurück.
+     * Enthält Null-Safety-Checks und lädt Daten bei Bedarf nach.
+     *
+     * @return Collection
      */
     #[Computed]
     public function departments(): Collection
     {
+        // Prüfe, ob Daten geladen werden müssen
         if ($this->departments === null && $this->showEditModal) {
             $this->loadRelationForDropDowns();
         }
+
+        // Null-Safety-Check nach dem Laden
         return $this->departments ?? collect();
     }
 
@@ -450,61 +509,34 @@ class EditEmployee extends Component
     }
 
     /**
-     * Gibt die Liste der Supervisoren zurück,
-     * EXKLUSIVE des aktuell bearbeiteten Benutzers.
-     * Fügt Debugging-Logs hinzu.
+     * Gibt die Liste der Supervisoren zurück, exklusive des aktuell bearbeiteten Benutzers.
+     * Enthält zusätzliche Null-Safety-Checks.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     #[Computed]
     public function supervisors(): Collection
     {
-        // Logge den Aufruf und die ID, die ausgeschlossen werden soll
-        Log::debug("Computed property 'supervisors()' aufgerufen.");
-        Log::debug("-> User ID (this->userId) zum Ausschließen: " . ($this->userId ?? 'NULL'));
-
-        // 1. Sicherstellen, dass die Supervisor-Daten grundsätzlich geladen sind
+        // Prüfe, ob Daten geladen werden müssen
         if ($this->supervisors === null && $this->showEditModal) {
-            Log::debug("-> Supervisors Collection ist null und Modal ist offen. Rufe loadRelationForDropDowns().");
             $this->loadRelationForDropDowns();
-            Log::debug("-> loadRelationForDropDowns() ausgeführt.");
-        } elseif ($this->supervisors !== null) {
-            Log::debug("-> Supervisors Collection ist bereits geladen (nicht null).");
-        } elseif (!$this->showEditModal) {
-            Log::debug("-> Modal ist nicht offen (showEditModal=false), keine Daten geladen.");
         }
 
-        // 2. Wenn die Liste nach dem Ladeversuch immer noch null ist (z.B. Fehler),
-        //    eine leere Collection zurückgeben.
+        // Zusätzlicher Null-Safety-Check nach dem Laden
         if ($this->supervisors === null) {
-            Log::warning("-> Supervisors Collection ist immer noch null. Gebe leere Collection zurück.");
-            return collect(); // Leere Collection statt null
+            return collect();
         }
 
-        // Logge die Daten *vor* dem Filtern
-        $initialCount = $this->supervisors->count();
-        $initialIds = $this->supervisors->pluck('id')->implode(', ');
-        Log::debug("-> Anzahl Supervisoren VOR Filterung: {$initialCount}");
-        Log::debug("-> IDs VOR Filterung: [{$initialIds}]");
+        // Zusätzlicher Null-Safety-Check für userId
+        $currentUserId = $this->userId ?? 0;
 
-        // 3. Filtere die geladene Collection: Entferne den aktuellen Benutzer.
-        $userIdToExclude = $this->userId; // In lokaler Variable speichern für Closure
-        $filteredSupervisors = $this->supervisors->reject(function ($supervisor) use ($userIdToExclude) {
-            $shouldReject = $supervisor->id === $userIdToExclude;
-            // Optional: Sehr detailliertes Logging für jeden Vergleich (kann viele Logs erzeugen!)
-            // Log::debug("---> Vergleiche Supervisor ID {$supervisor->id} mit User ID {$userIdToExclude}. Ergebnis (reject?): " . ($shouldReject ? 'JA' : 'NEIN'));
-            return $shouldReject;
+        // Filtere den aktuellen Benutzer aus der Liste, prüfe, ob supervisor ein gültiges Objekt mit id ist
+        return $this->supervisors->reject(function ($supervisor) use ($currentUserId) {
+
+            return $supervisor && isset($supervisor->id) && $supervisor->id === $currentUserId;
         });
-
-        // Logge die Daten *nach* dem Filtern
-        $finalCount = $filteredSupervisors->count();
-        $finalIds = $filteredSupervisors->pluck('id')->implode(', ');
-        Log::debug("-> Anzahl Supervisoren NACH Filterung: {$finalCount}");
-        Log::debug("-> IDs NACH Filterung: [{$finalIds}]");
-
-        // 4. Gib die gefilterte Liste zurück
-        return $filteredSupervisors;
     }
+
 
     /**
      * Gibt die Optionen für den Mitarbeiterstatus zurück
