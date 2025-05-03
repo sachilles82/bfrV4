@@ -154,25 +154,37 @@ class CreateEmployee extends Component
         }
     }
 
+
     /**
-     * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt
+     * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt.
+     * Wird aufgerufen, wenn Professionen erstellt, aktualisiert oder gelöscht werden.
+     *
+     * @param int|null $id Die ID der neuen/aktualisierten Profession, falls vorhanden
+     * @return void
      */
     #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
-    public function refreshProfessions($id = null): void
+    public function refreshProfessions(?int $id = null): void
     {
+        // Cache in der Datenbank leeren
         Profession::flushCompanyCache($this->companyId);
 
-        $this->dataLoaded = false;
-
+        // Lokale Cache-Variable zurücksetzen
         $this->professions = null;
 
+        // Laden-Status zurücksetzen
+        $this->dataLoaded = false;
+
+        // Daten neu laden
         $this->loadRelationForDropDowns();
 
+        // Falls eine neue Profession erstellt wurde, diese automatisch auswählen
         if ($id) {
             $this->profession = $id;
         }
 
+        // Prüfe, ob die aktuell ausgewählte Profession noch existiert
         if ($this->profession) {
+            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
             $professionExists = $this->professions?->contains('id', $this->profession);
             if (!$professionExists) {
                 $this->profession = null;
@@ -182,36 +194,53 @@ class CreateEmployee extends Component
 
 
     /**
-     * Gibt die Liste der Berufe zurück
+     * Gibt die Liste der Berufe (Professionen) zurück.
+     * Enthält zusätzliche Null-Safety-Checks.
+     *
+     * @return Collection
      */
     #[Computed]
     public function professions(): Collection
     {
+        // Prüfe, ob Daten geladen werden müssen
         if ($this->professions === null && $this->showCreateModal) {
             $this->loadRelationForDropDowns();
         }
+
+        // Null-Safety-Check nach dem Laden
         return $this->professions ?? collect();
     }
 
     /**
-     * Aktualisiert die Cache-Daten für Stages
+     * Aktualisiert die Cache-Daten für Stages.
+     * Wird aufgerufen, wenn Stages erstellt, aktualisiert oder gelöscht werden.
+     *
+     * @param int|null $id Die ID der neuen/aktualisierten Stage, falls vorhanden
+     * @return void
      */
     #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
-    public function refreshStages($id = null): void
+    public function refreshStages(?int $id = null): void
     {
+        // Cache in der Datenbank leeren
         Stage::flushCompanyCache($this->companyId);
 
-        $this->dataLoaded = false;
-
+        // Lokale Cache-Variable zurücksetzen
         $this->stages = null;
 
+        // Laden-Status zurücksetzen
+        $this->dataLoaded = false;
+
+        // Daten neu laden
         $this->loadRelationForDropDowns();
 
+        // Falls eine neue Stage erstellt wurde, diese automatisch auswählen
         if ($id) {
             $this->stage = $id;
         }
 
+        // Prüfe, ob die aktuell ausgewählte Stage noch existiert
         if ($this->stage) {
+            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
             $stageExists = $this->stages?->contains('id', $this->stage);
             if (!$stageExists) {
                 $this->stage = null;
@@ -232,24 +261,35 @@ class CreateEmployee extends Component
     }
 
     /**
-     * Aktualisiert die Cache-Daten für Departments
+     * Aktualisiert die Cache-Daten für Departments.
+     * Wird aufgerufen, wenn Departments erstellt, aktualisiert oder gelöscht werden.
+     *
+     * @param int|null $id Die ID des neuen/aktualisierten Departments, falls vorhanden
+     * @return void
      */
     #[On(['department-updated', 'department-created', 'department-deleted'])]
-    public function refreshDepartments($id = null): void
+    public function refreshDepartments(?int $id = null): void
     {
+        // Cache in der Datenbank leeren
         Department::flushTeamCache($this->currentTeamId);
 
-        $this->dataLoaded = false;
-
+        // Lokale Cache-Variable zurücksetzen
         $this->departments = null;
 
+        // Laden-Status zurücksetzen
+        $this->dataLoaded = false;
+
+        // Daten neu laden
         $this->loadRelationForDropDowns();
 
+        // Falls ein neues Department erstellt wurde, dieses automatisch auswählen
         if ($id) {
             $this->department = $id;
         }
 
+        // Prüfe, ob das aktuell ausgewählte Department noch existiert
         if ($this->department) {
+            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
             $departmentExists = $this->departments?->contains('id', $this->department);
             if (!$departmentExists) {
                 $this->department = null;
@@ -258,14 +298,20 @@ class CreateEmployee extends Component
     }
 
     /**
-     * Gibt die Liste der Abteilungen zurück,
+     * Gibt die Liste der Abteilungen (Departments) zurück.
+     * Enthält Null-Safety-Checks und lädt Daten bei Bedarf nach.
+     *
+     * @return Collection
      */
     #[Computed]
     public function departments(): Collection
     {
+        // Prüfe, ob Daten geladen werden müssen
         if ($this->departments === null && $this->showCreateModal) {
             $this->loadRelationForDropDowns();
         }
+
+        // Null-Safety-Check nach dem Laden
         return $this->departments ?? collect();
     }
 
@@ -439,13 +485,6 @@ class CreateEmployee extends Component
 
     public function render(): View
     {
-        if ($this->showCreateModal && !$this->dataLoaded) {
-            $this->loadRelationForDropDowns();
-        }
-
-        return view('livewire.alem.employee.create', [
-            'employeeStatusOptions' => $this->employeeStatusOptions,
-            'modelStatusOptions' => $this->modelStatusOptions,
-        ]);
+        return view('livewire.alem.employee.create');
     }
 }

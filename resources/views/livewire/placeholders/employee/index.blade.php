@@ -12,16 +12,12 @@
                     {{ __('Active') }}
                 </a>
                 <a href="#"
-                class="dark:text-gray-400 text-gray-700">
-                {{ __('Inactive') }}
-                </a>
-                <a href="#"
                    class="dark:text-gray-400 text-gray-700">
                     {{ __('Archived') }}
                 </a>
                 <a href="#"
                    class="dark:text-gray-400 text-gray-700">
-                    {{ __('Trashed') }}
+                    {{ __('In Trash') }}
                 </a>
             </div>
 

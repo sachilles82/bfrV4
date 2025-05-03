@@ -83,7 +83,7 @@ class EditEmployee extends Component
         $this->user = User::with([
             'employee:id,user_id,employee_status,profession_id,stage_id,supervisor_id',
             'teams:id,name',
-            'roles:id,name',
+            'roles:id,name,is_manager',
             'department:id,name'
         ])->findOrFail($this->userId);
 
@@ -187,7 +187,7 @@ class EditEmployee extends Component
     {
         $this->validate();
 
-//        try {
+        try {
 
         DB::beginTransaction();
 
@@ -201,21 +201,24 @@ class EditEmployee extends Component
             'department_id' => $this->department,
         ]);
 
-        $employee = Employee::where('user_id', $this->userId)->first();
+        Employee::updateOrCreate(
+            ['user_id' => $this->userId],
+            [
+                'employee_status' => $this->employee_status,
+                'profession_id' => $this->profession,
+                'stage_id' => $this->stage,
+                'supervisor_id' => $this->supervisor,
+            ]
+        );
 
-        $employee->update([
-            'employee_status' => $this->employee_status,
-            'profession_id' => $this->profession,
-            'stage_id' => $this->stage,
-            'supervisor_id' => $this->supervisor,
-        ]);
+        $this->user->loadMissing('roles:id,name,is_manager');
 
-        $updatedUser = User::find($this->userId);
+        if ($this->user->relationLoaded('roles')) {
+            $this->checkRoleChangesForManager($this->user);
+        }
 
-        $this->checkRoleChangesForManager();
-
-        $updatedUser->roles()->sync($this->selectedRoles);
-        $updatedUser->teams()->sync($this->selectedTeams);
+        $this->user->roles()->sync($this->selectedRoles);
+        $this->user->teams()->sync($this->selectedTeams);
 
         DB::commit();
 
@@ -229,14 +232,14 @@ class EditEmployee extends Component
             variant: 'success'
         );
 
-//        } catch (\Throwable $e) {
-//
-//            Flux::toast(
-//                text: __('An error occurred while editing the employee.'),
-//                heading: __('Error.'),
-//                variant: 'danger'
-//            );
-//        }
+        } catch (\Throwable $e) {
+
+            Flux::toast(
+                text: __('An error occurred while editing the employee.'),
+                heading: __('Error.'),
+                variant: 'danger'
+            );
+        }
     }
 
     /**
@@ -289,7 +292,7 @@ class EditEmployee extends Component
      * @return void
      */
     #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
-    public function refreshProfessions(int $id = null): void
+    public function refreshProfessions(?int $id = null): void
     {
         // Cache in der Datenbank leeren
         Profession::flushCompanyCache($this->companyId);
@@ -345,7 +348,7 @@ class EditEmployee extends Component
      * @return void
      */
     #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
-    public function refreshStages(int $id = null): void
+    public function refreshStages(?int $id = null): void
     {
         // Cache in der Datenbank leeren
         Stage::flushCompanyCache($this->companyId);
@@ -394,7 +397,7 @@ class EditEmployee extends Component
      * @return void
      */
     #[On(['department-updated', 'department-created', 'department-deleted'])]
-    public function refreshDepartments(int $id = null): void
+    public function refreshDepartments(?int $id = null): void
     {
         // Cache in der Datenbank leeren
         Department::flushTeamCache($this->currentTeamId);
@@ -467,44 +470,61 @@ class EditEmployee extends Component
     }
 
     /**
-     * Überprüft, ob sich das Set der Manager-Rollen eines Benutzers ändert
-     * und aktualisiert die Supervisor-Liste entsprechend. (Robuste Version mit Detail-Log)
+     * Prüft auf Änderungen bei Manager-Rollen und leert ggf. den Manager-Cache.
+     * Geht davon aus, dass $user->roles und $this->roles geladen sind.
      *
+     * @param User $user Der Benutzer (mit geladenen Rollen).
      * @return void
      */
-    private function checkRoleChangesForManager(): void
+    private function checkRoleChangesForManager(User $user): void
     {
-        $user = User::with('roles:id,is_manager')->find($this->userId);
+        // Sicherstellen, dass benötigte Daten vorhanden sind
+        if (!$user->relationLoaded('roles')) {
+            // Versuche nachzuladen, wenn die Relation fehlt (Fallback)
+            $user->loadMissing('roles:id,is_manager');
+            if (!$user->relationLoaded('roles')) {
+                // Abbruch, wenn Rollen nicht geladen werden konnten
+                return;
+            }
+        }
 
+        if (empty($this->companyId)) {
+            // Abbruch, wenn keine Firmen-ID vorhanden ist
+            return;
+        }
+
+        // Hole die verfügbaren Rollen (aus dem lokalen Property-Cache)
+        $availableRoles = $this->roles;
+        if ($availableRoles === null) {
+            // Versuche Dropdown-Daten neu zu laden, wenn lokaler Cache leer ist
+            $this->loadRelationForDropDowns();
+            $availableRoles = $this->roles;
+            if ($availableRoles === null) {
+                // Abbruch, wenn verfügbare Rollen nicht geladen werden konnten
+                return;
+            }
+        }
+
+        // Alte Manager-Rollen-IDs aus der geladenen User-Relation extrahieren
         $oldManagerRoleIds = $user->roles
             ->where('is_manager', true)
             ->pluck('id')
             ->sort()->values()->all();
 
-        $availableRoles = $this->roles;
-        if ($availableRoles === null) {
-            Log::warning("Roles collection was null in checkRoleChangesForManager for user {$this->userId}. Attempting to load.");
-
-            $this->loadRelationForDropDowns();
-            $availableRoles = $this->roles;
-            if ($availableRoles === null) {
-                Log::error("Failed to load roles collection in checkRoleChangesForManager for user {$this->userId}. Cannot compare roles.");
-                return;
-            }
-        }
-
+        // Neue Manager-Rollen-IDs aus der aktuellen Auswahl ($this->selectedRoles) bestimmen
         $newManagerRoleIds = $availableRoles
             ->whereIn('id', $this->selectedRoles)
             ->where('is_manager', true)
             ->pluck('id')
             ->sort()->values()->all();
 
+        // Vergleiche alte und neue Manager-Rollen
         if ($oldManagerRoleIds !== $newManagerRoleIds) {
-
+            // Leere den globalen Manager-Cache für die Firma
             User::flushManagerCache($this->companyId);
-
-            $this->dataLoaded = false;
+            // Setze lokale Caches zurück, um Neuladen zu erzwingen
             $this->supervisors = null;
+            $this->dataLoaded = false;
         }
     }
 
@@ -558,9 +578,6 @@ class EditEmployee extends Component
 
     public function render(): View
     {
-        return view('livewire.alem.employee.edit', [
-            'employeeStatusOptions' => $this->employeeStatusOptions,
-            'modelStatusOptions' => $this->modelStatusOptions,
-        ]);
+        return view('livewire.alem.employee.edit');
     }
 }

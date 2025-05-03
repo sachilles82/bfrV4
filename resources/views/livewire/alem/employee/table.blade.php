@@ -7,6 +7,7 @@
 
             <x-pupi.actions.status-filter
                 :statusFilter="$statusFilter"
+                :options="$modelStatuses" {{-- Übergib die Variable aus render() --}}
             />
 
             <flux:modal.trigger name="create-employee">
@@ -64,15 +65,17 @@
 
                         <flux:option wire:click="setAllStatus" value="">{{ __('All Status') }}</flux:option>
 
-                        @foreach($employeeStatuses as $empStatus)
-                            <flux:option value="{{ $empStatus->value }}">
-                                <div class="inline-flex items-center">
-                                    <span class="mr-2">
-                                        <x-dynamic-component
-                                            :component="$empStatus->icon()"
-                                            class="h-4 w-4 rounded-md {{ $empStatus->colors() ?? '' }}"/>
-                                    </span>
-                                    {{ $empStatus->label() }}
+                        @foreach($this->employeeStatusOptions() as $statusOption)
+                            <flux:option
+                                wire:key="employee-status-option-{{ $statusOption['value'] }}"
+                                value="{{ $statusOption['value'] }}">
+                                <div class="flex items-center">
+                                            <span class="mr-2">
+                                                <x-dynamic-component
+                                                    :component="$statusOption['icon']"
+                                                    class="h-5 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
+                                            </span>
+                                    <span>{{ $statusOption['label'] }}</span>
                                 </div>
                             </flux:option>
                         @endforeach

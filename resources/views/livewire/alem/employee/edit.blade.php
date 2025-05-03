@@ -422,8 +422,10 @@
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Profession') }}">
-                                @forelse($this->professions ?? [] as $prof)
-                                    <flux:option value="{{ $prof->id }}">
+                                @forelse($this->professions() as $prof)
+                                    <flux:option
+                                        wire:key="profession-option-{{ $prof->id }}"
+                                        value="{{ $prof->id }}">
                                         <span class="truncate">{{ $prof->name }}</span>
                                     </flux:option>
                                 @empty
@@ -514,8 +516,10 @@
                                 wire:model="employee_status"
                                 id="employee_status"
                                 variant="listbox">
-                                @foreach($employeeStatusOptions as $statusOption)
-                                    <flux:option value="{{ $statusOption['value'] }}">
+                                @foreach($this->employeeStatusOptions() as $statusOption)
+                                    <flux:option
+                                        wire:key="employee-status-option-{{ $statusOption['value'] }}"
+                                        value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
                                             <span class="mr-2">
                                                 <x-dynamic-component
@@ -544,14 +548,16 @@
                                 wire:model="model_status"
                                 id="model_status"
                                 variant="listbox">
-                                @foreach($modelStatusOptions as $statusOption)
-                                    <flux:option value="{{ $statusOption['value'] }}">
+                                @foreach($this->modelStatusOptions() as $statusOption)
+                                    <flux:option
+                                        wire:key="model-status-option-{{ $statusOption['value'] }}"
+                                        value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
-                                            <span class="mr-2">
-                                                <x-dynamic-component
-                                                    :component="$statusOption['icon']"
-                                                    class="{{ $statusOption['colors'] ?? '' }}"/>
-                                            </span>
+                                                <span class="mr-2">
+                                                    <x-dynamic-component
+                                                        :component="$statusOption['icon']"
+                                                        class="h-5 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
+                                                </span>
                                             <span>{{ $statusOption['label'] }}</span>
                                         </div>
                                     </flux:option>

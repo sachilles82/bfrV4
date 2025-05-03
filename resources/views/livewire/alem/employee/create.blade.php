@@ -96,10 +96,16 @@
                                 id="selectedTeams"
                                 variant="listbox"
                                 multiple
-                                placeholder="{{ __('Teams auswählen') }}">
-                                @foreach($this->teams ?? [] as $team)
-                                    <flux:option value="{{ $team->id }}">{{ $team->name }}</flux:option>
-                                @endforeach
+                                placeholder="{{ __('Select Teams') }}">
+                                @forelse($this->teams() as $team)
+                                    <flux:option
+                                        wire:key="team-option-{{ $team->id }}"
+                                        value="{{ $team->id }}">
+                                        <span class="truncate">{{ $team->name }}</span>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No teams found') }}</flux:option>
+                                @endforelse
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -119,13 +125,15 @@
                                 id="department"
                                 variant="listbox"
                                 searchable
-                                placeholder="{{ __('Department auswählen') }}">
-                                @forelse($this->departments ?? [] as $department)
-                                    <flux:option value="{{ $department->id }}">
-                                        <span class="truncate">{{ $department->name }}</span>
+                                placeholder="{{ __('Select Department') }}">
+                                @forelse($this->departments() as $dept)
+                                    <flux:option
+                                        wire:key="department-option-{{ $dept->id }}"
+                                        value="{{ $dept->id }}">
+                                        <span class="truncate">{{ $dept->name }}</span>
                                     </flux:option>
                                 @empty
-                                    <flux:option value="">{{ __('No Departments found') }}</flux:option>
+                                    <flux:option value="">{{ __('No departments found') }}</flux:option>
                                 @endforelse
 
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
@@ -154,8 +162,9 @@
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Supervisor') }}">
-                                @forelse($this->supervisors ?? [] as $supervisor)
-                                    <flux:option value="{{ $supervisor->id }}">
+                                @forelse($this->supervisors() as $supervisor)
+                                    <flux:option wire:key="supervisor-option-{{ $supervisor->id }}"
+                                                 value="{{ $supervisor->id }}">
                                         <div class="flex items-center gap-2 whitespace-nowrap">
                                             <flux:avatar
                                                 name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
@@ -167,7 +176,9 @@
                                             {{ $supervisor->name }} {{ $supervisor->last_name }}
                                         </div>
                                     </flux:option>
-                                    @endforeach
+                                @empty
+                                    <flux:option value="">{{ __('No supervisors found') }}</flux:option>
+                                @endforelse
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -187,19 +198,21 @@
                                 variant="listbox"
                                 multiple
                                 placeholder="{{ __('Select roles') }}">
-                                @foreach($this->roles ?? [] as $roleOption)
-                                    <div class="flex items-center gap-2">
-                                        <flux:option value="{{ $roleOption->id }}">
-                                            {{ __($roleOption->name) }}
-                                            @if($roleOption->is_manager)
-                                                <span
-                                                    class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+                                @forelse($this->roles() as $roleOption)
+                                    <flux:option
+                                        wire:key="role-option-{{ $roleOption->id }}"
+                                        value="{{ $roleOption->id }}">
+                                        {{ __($roleOption->name) }}
+                                        @if($roleOption->is_manager)
+                                            <span
+                                                class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
                                                 {{ __('Manager') }}
                                             </span>
-                                            @endif
-                                        </flux:option>
-                                    </div>
-                                @endforeach
+                                        @endif
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No roles found') }}</flux:option>
+                                @endforelse
                             </flux:select>
                         </x-pupi.input.group>
                     </div>
@@ -220,17 +233,19 @@
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Profession') }}">
-                                @forelse($this->professions ?? [] as $prof)
-                                    <flux:option value="{{ $prof->id }}">
+                                @forelse($this->professions() as $prof)
+                                    <flux:option
+                                        wire:key="profession-option-{{ $prof->id }}"
+                                        value="{{ $prof->id }}">
                                         <span class="truncate">{{ $prof->name }}</span>
                                     </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No professions found') }}</flux:option>
                                 @endforelse
-
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
                                 <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.profession-form lazy/>
+                                    <livewire:alem.employee.setting.profession.profession-form
+                                        lazy/>
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
@@ -252,8 +267,10 @@
                                 variant="listbox"
                                 searchable
                                 placeholder="{{ __('Select Stage') }}">
-                                @forelse($this->stages ?? [] as $st)
-                                    <flux:option value="{{ $st->id }}">
+                                @forelse($this->stages() as $st)
+                                    <flux:option
+                                        wire:key="stage-option-{{ $st->id }}"
+                                        value="{{ $st->id }}">
                                         <span class="truncate">{{ $st->name }}</span>
                                     </flux:option>
                                 @empty
@@ -312,8 +329,10 @@
                                 wire:model="employee_status"
                                 id="employee_status"
                                 variant="listbox">
-                                @foreach($employeeStatusOptions as $statusOption)
-                                    <flux:option value="{{ $statusOption['value'] }}">
+                                @foreach($this->employeeStatusOptions() as $statusOption)
+                                    <flux:option
+                                        wire:key="employee-status-option-{{ $statusOption['value'] }}"
+                                        value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
                                             <span class="mr-2">
                                                 <x-dynamic-component
@@ -342,14 +361,16 @@
                                 wire:model="model_status"
                                 id="model_status"
                                 variant="listbox">
-                                @foreach($modelStatusOptions as $statusOption)
-                                    <flux:option value="{{ $statusOption['value'] }}">
+                                @foreach($this->modelStatusOptions() as $statusOption)
+                                    <flux:option
+                                        wire:key="model-status-option-{{ $statusOption['value'] }}"
+                                        value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
-                                    <span class="mr-2">
-                                        <x-dynamic-component
-                                            :component="$statusOption['icon']"
-                                            class="{{ $statusOption['colors'] ?? '' }}"/>
-                                    </span>
+                                                <span class="mr-2">
+                                                    <x-dynamic-component
+                                                        :component="$statusOption['icon']"
+                                                        class="h-5 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
+                                                </span>
                                             <span>{{ $statusOption['label'] }}</span>
                                         </div>
                                     </flux:option>

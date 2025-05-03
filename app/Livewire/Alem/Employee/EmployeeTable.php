@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -75,6 +76,24 @@ class EmployeeTable extends Component
         $this->resetPage();
         $this->reset('search', 'sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter');
         $this->selectedIds = [];
+    }
+
+    /**
+     * Gibt die Optionen für den Mitarbeiterstatus zurück
+     */
+    #[Computed]
+    public function employeeStatusOptions(): array
+    {
+        return EmployeeStatus::getEmployeeOptions();
+    }
+
+    /**
+     * Gibt die Optionen für den Modelstatus zurück
+     */
+    #[Computed]
+    public function modelStatusOptions(): array
+    {
+        return ModelStatus::getModelOptions();
     }
 
     /**
@@ -143,8 +162,7 @@ class EmployeeTable extends Component
 
         return view('livewire.alem.employee.table', [
             'users' => $users,
-            'statuses' => ModelStatus::cases(),
-            'employeeStatuses' => EmployeeStatus::cases(),
+            'modelStatuses' => $this->modelStatusOptions, //brauch ich, weil ich die in der Blade brauche
         ]);
     }
 
