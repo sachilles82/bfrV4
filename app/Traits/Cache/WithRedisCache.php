@@ -96,7 +96,6 @@ trait WithRedisCache
     protected function getManagerUserCacheKey(int $companyId): string
     {
         if ($companyId <= 0) {
-            // Log::warning("Invalid companyId ({$companyId}) provided for getManagerUserCacheKey."); // Entfernt
             return 'invalid_company_manager_users_cache';
         }
         return "company_{$companyId}_manager_users_cache";
@@ -269,12 +268,10 @@ trait WithRedisCache
             $companyKey = $instance->generateCompanyCacheKey($companyId);
             Cache::forget($companyKey);
 
-
             // Spezifische Keys (falls zutreffend)
             if ($instance instanceof User) {
                 $managerKey = $instance->getManagerUserCacheKey($companyId);
                 Cache::forget($managerKey);
-
             }
 
         } catch (\Throwable $e) {

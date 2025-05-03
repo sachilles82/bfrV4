@@ -13,6 +13,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
@@ -169,6 +170,7 @@ class EditEmployee extends Component
             $this->dataLoaded = true;
 
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Fehler beim Laden der Relationen: " . $e->getMessage());
             Flux::toast(
                 text: __('An error occurred while loading the Relation Data.'),
                 heading: __('Error.'),
@@ -185,54 +187,56 @@ class EditEmployee extends Component
     {
         $this->validate();
 
-        try {
+//        try {
 
-            DB::beginTransaction();
+        DB::beginTransaction();
 
-            User::where('id', $this->userId)->update([
-                'name' => $this->name,
-                'last_name' => $this->last_name,
-                'email' => $this->email,
-                'gender' => $this->gender,
-                'model_status' => $this->model_status,
-                'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at)->format('Y-m-d') : null,
-                'department_id' => $this->department,
-            ]);
+        User::where('id', $this->userId)->update([
+            'name' => $this->name,
+            'last_name' => $this->last_name,
+            'email' => $this->email,
+            'gender' => $this->gender,
+            'model_status' => $this->model_status,
+            'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at)->format('Y-m-d') : null,
+            'department_id' => $this->department,
+        ]);
 
-            $employee = Employee::where('user_id', $this->userId)->first();
+        $employee = Employee::where('user_id', $this->userId)->first();
 
-            $employee->update([
-                'employee_status' => $this->employee_status,
-                'profession_id' => $this->profession,
-                'stage_id' => $this->stage,
-                'supervisor_id' => $this->supervisor,
-            ]);
+        $employee->update([
+            'employee_status' => $this->employee_status,
+            'profession_id' => $this->profession,
+            'stage_id' => $this->stage,
+            'supervisor_id' => $this->supervisor,
+        ]);
 
-            $updatedUser = User::find($this->userId);
+        $updatedUser = User::find($this->userId);
 
-            $updatedUser->roles()->sync($this->selectedRoles);
-            $updatedUser->teams()->sync($this->selectedTeams);
+        $this->checkRoleChangesForManager();
 
-            DB::commit();
+        $updatedUser->roles()->sync($this->selectedRoles);
+        $updatedUser->teams()->sync($this->selectedTeams);
 
-            $this->closeEditEmployeeModal();
+        DB::commit();
 
-            $this->dispatch('employee-updated');
+        $this->closeEditEmployeeModal();
 
-            Flux::toast(
-                text: __('Employee Profile updated successfully.'),
-                heading: __('Success.'),
-                variant: 'success'
-            );
+        $this->dispatch('employee-updated');
 
-        } catch (\Throwable $e) {
+        Flux::toast(
+            text: __('Employee Profile updated successfully.'),
+            heading: __('Success.'),
+            variant: 'success'
+        );
 
-            Flux::toast(
-                text: __('An error occurred while editing the employee.'),
-                heading: __('Error.'),
-                variant: 'danger'
-            );
-        }
+//        } catch (\Throwable $e) {
+//
+//            Flux::toast(
+//                text: __('An error occurred while editing the employee.'),
+//                heading: __('Error.'),
+//                variant: 'danger'
+//            );
+//        }
     }
 
     /**
@@ -404,15 +408,102 @@ class EditEmployee extends Component
     }
 
     /**
-     * Gibt die Liste der Supervisoren zurück
+     * Überprüft, ob sich das Set der Manager-Rollen eines Benutzers ändert
+     * und aktualisiert die Supervisor-Liste entsprechend. (Robuste Version mit Detail-Log)
+     *
+     * @return void
+     */
+    private function checkRoleChangesForManager(): void
+    {
+        $user = User::with('roles:id,is_manager')->find($this->userId);
+
+        $oldManagerRoleIds = $user->roles
+            ->where('is_manager', true)
+            ->pluck('id')
+            ->sort()->values()->all();
+
+        $availableRoles = $this->roles;
+        if ($availableRoles === null) {
+            Log::warning("Roles collection was null in checkRoleChangesForManager for user {$this->userId}. Attempting to load.");
+
+            $this->loadRelationForDropDowns();
+            $availableRoles = $this->roles;
+            if ($availableRoles === null) {
+                Log::error("Failed to load roles collection in checkRoleChangesForManager for user {$this->userId}. Cannot compare roles.");
+                return;
+            }
+        }
+
+        $newManagerRoleIds = $availableRoles
+            ->whereIn('id', $this->selectedRoles)
+            ->where('is_manager', true)
+            ->pluck('id')
+            ->sort()->values()->all();
+
+        if ($oldManagerRoleIds !== $newManagerRoleIds) {
+
+            User::flushManagerCache($this->companyId);
+
+            $this->dataLoaded = false;
+            $this->supervisors = null;
+        }
+    }
+
+    /**
+     * Gibt die Liste der Supervisoren zurück,
+     * EXKLUSIVE des aktuell bearbeiteten Benutzers.
+     * Fügt Debugging-Logs hinzu.
+     *
+     * @return \Illuminate\Support\Collection
      */
     #[Computed]
     public function supervisors(): Collection
     {
+        // Logge den Aufruf und die ID, die ausgeschlossen werden soll
+        Log::debug("Computed property 'supervisors()' aufgerufen.");
+        Log::debug("-> User ID (this->userId) zum Ausschließen: " . ($this->userId ?? 'NULL'));
+
+        // 1. Sicherstellen, dass die Supervisor-Daten grundsätzlich geladen sind
         if ($this->supervisors === null && $this->showEditModal) {
+            Log::debug("-> Supervisors Collection ist null und Modal ist offen. Rufe loadRelationForDropDowns().");
             $this->loadRelationForDropDowns();
+            Log::debug("-> loadRelationForDropDowns() ausgeführt.");
+        } elseif ($this->supervisors !== null) {
+            Log::debug("-> Supervisors Collection ist bereits geladen (nicht null).");
+        } elseif (!$this->showEditModal) {
+            Log::debug("-> Modal ist nicht offen (showEditModal=false), keine Daten geladen.");
         }
-        return $this->supervisors ?? collect();
+
+        // 2. Wenn die Liste nach dem Ladeversuch immer noch null ist (z.B. Fehler),
+        //    eine leere Collection zurückgeben.
+        if ($this->supervisors === null) {
+            Log::warning("-> Supervisors Collection ist immer noch null. Gebe leere Collection zurück.");
+            return collect(); // Leere Collection statt null
+        }
+
+        // Logge die Daten *vor* dem Filtern
+        $initialCount = $this->supervisors->count();
+        $initialIds = $this->supervisors->pluck('id')->implode(', ');
+        Log::debug("-> Anzahl Supervisoren VOR Filterung: {$initialCount}");
+        Log::debug("-> IDs VOR Filterung: [{$initialIds}]");
+
+        // 3. Filtere die geladene Collection: Entferne den aktuellen Benutzer.
+        $userIdToExclude = $this->userId; // In lokaler Variable speichern für Closure
+        $filteredSupervisors = $this->supervisors->reject(function ($supervisor) use ($userIdToExclude) {
+            $shouldReject = $supervisor->id === $userIdToExclude;
+            // Optional: Sehr detailliertes Logging für jeden Vergleich (kann viele Logs erzeugen!)
+            // Log::debug("---> Vergleiche Supervisor ID {$supervisor->id} mit User ID {$userIdToExclude}. Ergebnis (reject?): " . ($shouldReject ? 'JA' : 'NEIN'));
+            return $shouldReject;
+        });
+
+        // Logge die Daten *nach* dem Filtern
+        $finalCount = $filteredSupervisors->count();
+        $finalIds = $filteredSupervisors->pluck('id')->implode(', ');
+        Log::debug("-> Anzahl Supervisoren NACH Filterung: {$finalCount}");
+        Log::debug("-> IDs NACH Filterung: [{$finalIds}]");
+
+        // 4. Gib die gefilterte Liste zurück
+        return $filteredSupervisors;
     }
 
     /**

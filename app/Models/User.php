@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
@@ -217,25 +218,19 @@ class User extends Authenticatable
         return $this->belongsTo(Company::class);
     }
 
-    //    public function scopeActiveEmployees($query)
-    //    {
-    //        return $query->where('user_type', UserType::Employee)
-    //            ->where('model_status', ModelStatus::ACTIVE);
-    //    }
-//
-//    /**
-//     * Get company-specific cache key
-//     *
-//     * @return string|null
-//     */
-//    public function getCompanyCacheKey(): ?string
-//    {
-//        if (property_exists($this, 'company_id') && $this->company_id) {
-//            return "company_{$this->company_id}_user_cache";
-//        }
-//
-//        return null;
-//    }
+    /**
+     * Leert den spezifischen Manager-Cache für eine Firma
+     *
+     * @param int $companyId
+     * @return void
+     */
+    public static function flushManagerCache(int $companyId): void
+    {
+        $instance = new static;
+        $managerCacheKey = $instance->getManagerUserCacheKey($companyId);
+
+        Cache::forget($managerCacheKey);
+    }
     /**
      * Get managers for a specific company with caching
      */

@@ -44,7 +44,18 @@ trait ValidateEmployee
             ],
 
             // Supervisor
-            'supervisor' => ['required', 'exists:users,id', 'different:userId'],
+//            'supervisor' => ['required', 'exists:users,id', 'different:userId'],
+
+            // --- Supervisor Regeln ---
+            'supervisor' => [
+                'required', 'integer', 'exists:users,id',
+
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if ($value == $this->userId) {
+                        $fail(__('You cannot be your own supervisor.'));
+                    }
+                },
+            ],
 
             // Employee fields
             'profession' => 'required|exists:professions,id',
@@ -94,6 +105,7 @@ trait ValidateEmployee
             // Supervisor messages
             'supervisor.required' => __('Supervisor is required.'),
             'supervisor.exists' => __('The selected supervisor is invalid.'),
+
 
             // Employee field messages
             'profession.required' => __('Profession is required.'),
