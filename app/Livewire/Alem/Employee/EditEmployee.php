@@ -185,9 +185,9 @@ class EditEmployee extends Component
     {
         $this->validate();
 
-//        try {
-//
-//            DB::beginTransaction();
+        try {
+
+            DB::beginTransaction();
 
             User::where('id', $this->userId)->update([
                 'name' => $this->name,
@@ -225,14 +225,14 @@ class EditEmployee extends Component
                 variant: 'success'
             );
 
-//        } catch (\Throwable $e) {
-//
-//            Flux::toast(
-//                text: __('An error occurred while editing the employee.'),
-//                heading: __('Error.'),
-//                variant: 'danger'
-//            );
-//        }
+        } catch (\Throwable $e) {
+
+            Flux::toast(
+                text: __('An error occurred while editing the employee.'),
+                heading: __('Error.'),
+                variant: 'danger'
+            );
+        }
     }
 
     /**
