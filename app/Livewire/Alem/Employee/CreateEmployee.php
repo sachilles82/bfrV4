@@ -226,8 +226,8 @@ class CreateEmployee extends Component
     public function stages(): Collection
     {
         if ($this->stages === null && $this->showCreateModal) {
-        $this->loadRelationForDropDowns();
-    }
+            $this->loadRelationForDropDowns();
+        }
         return $this->stages ?? collect();
     }
 
@@ -415,20 +415,13 @@ class CreateEmployee extends Component
     public function closeCreateEmployeeModal(): void
     {
         $this->reset([
-            'name', 'last_name', 'email', 'password', 'gender', 'selectedRoles',
-            'joined_at', 'profession', 'stage', 'selectedTeams', 'supervisor',
-            'model_status', 'employee_status', 'invitations',
+            'gender', 'name', 'last_name', 'email', 'selectedTeams',
+            'department', 'supervisor', 'selectedRoles', 'profession',
+            'stage', 'joined_at', 'employee_status', 'model_status',
+            'invitations', 'password'
         ]);
 
-        $this->resetValidation();
-
-        $this->password = null;
-        $this->teams = null;
-        $this->departments = null;
-        $this->roles = null;
-        $this->professions = null;
-        $this->stages = null;
-        $this->supervisors = null;
+        $this->resetErrorBag();
 
         $this->modal('create-employee')->close();
 

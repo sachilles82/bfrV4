@@ -185,9 +185,9 @@ class EditEmployee extends Component
     {
         $this->validate();
 
-        try {
-
-            DB::beginTransaction();
+//        try {
+//
+//            DB::beginTransaction();
 
             User::where('id', $this->userId)->update([
                 'name' => $this->name,
@@ -225,14 +225,32 @@ class EditEmployee extends Component
                 variant: 'success'
             );
 
-        } catch (\Throwable $e) {
+//        } catch (\Throwable $e) {
+//
+//            Flux::toast(
+//                text: __('An error occurred while editing the employee.'),
+//                heading: __('Error.'),
+//                variant: 'danger'
+//            );
+//        }
+    }
 
-            Flux::toast(
-                text: __('An error occurred while editing the employee.'),
-                heading: __('Error.'),
-                variant: 'danger'
-            );
-        }
+    /**
+     * Setzt das Formular zurück und schließt das Modal
+     */
+    public function closeEditEmployeeModal(): void
+    {
+        $this->reset([
+            'name', 'last_name', 'email', 'gender', 'model_status', 'joined_at', 'department',
+            'employee_status', 'profession', 'stage', 'supervisor',
+            'selectedRoles', 'selectedTeams',
+        ]);
+
+        $this->resetErrorBag();
+
+        $this->modal('edit-employee')->close();
+
+        $this->dataLoaded = false;
     }
 
     /**

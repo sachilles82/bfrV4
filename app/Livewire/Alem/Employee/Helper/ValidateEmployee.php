@@ -30,15 +30,12 @@ trait ValidateEmployee
             'selectedTeams' => 'required|array|min:1',
             'selectedTeams.*' => ['exists:teams,id'],
 
-            // Department
-//            'department' => ['required', 'exists:departments,id'],
-
             'department' => [
                 'required',
                 'exists:departments,id',
                 function ($attribute, $value, $fail) {
                     $departmentExistsInTeam = Department::where('id', $value)
-                        ->whereIn('team_id', $this->selectedTeams) // Prüft gegen alle ausgewählten Teams
+                        ->whereIn('team_id', $this->selectedTeams)
                         ->exists();
                     if (!$departmentExistsInTeam) {
                         $fail(__('The selected department must belong to one of the selected teams.'));
@@ -56,9 +53,7 @@ trait ValidateEmployee
             'employee_status' => ['required', Rule::enum(EmployeeStatus::class)],
             'joined_at' => 'required|date|before_or_equal:today',
 
-            'model_status' => [
-                'required',
-                Rule::enum(ModelStatus::class),
+            'model_status' => ['required', Rule::enum(ModelStatus::class),
             ],
 
         ];
