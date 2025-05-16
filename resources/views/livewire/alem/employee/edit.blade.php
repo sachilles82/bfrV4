@@ -7,14 +7,6 @@
         wire:model="showEditModal"
     >
         <div>
-            {{--            <div wire:loading>--}}
-            {{--                <flux:heading size="lg">{{ __('Loading Employee Data') }}</flux:heading>--}}
-            {{--            </div>--}}
-
-            {{--            <div wire:loading.remove>--}}
-            {{--                <flux:heading size="lg">{{ __('Edit Employee') }}</flux:heading>--}}
-            {{--            </div>--}}
-
             <flux:heading size="lg">{{ __('Edit Employee') }}</flux:heading>
 
             <flux:subheading>{{ __('Update employee information') }}</flux:subheading>
@@ -23,7 +15,10 @@
         <!-- Form: User & Employee Data -->
         <form wire:submit.prevent="updateEmployee">
 
-            <div class="space-y-4 relative w-full inset-0 backdrop-blur-sm z-10 overflow-auto " wire:loading>
+            <div wire:loading
+                 wire:target.except="updateEmployee"
+                 class="space-y-4 relative w-full inset-0 backdrop-blur-sm z-10 overflow-auto"
+            >
                 <!-- Personal Information Skeleton -->
                 <div class="py-4">
                     <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -31,10 +26,12 @@
                         <div class="sm:col-span-4">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -42,10 +39,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -53,10 +52,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -64,10 +65,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -75,10 +78,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -86,10 +91,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -97,10 +104,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -108,10 +117,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -119,10 +130,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -130,10 +143,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -141,10 +156,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
                     </div>
@@ -157,10 +174,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-32 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
 
@@ -168,10 +187,12 @@
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="flex items-center">
-                                    <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
-                                    <div class="ml-2 h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-32 animate-pulse"></div>
+                                    <div
+                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
                                 </div>
-                                <div class="w-full h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div
+                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
                         </div>
                     </div>
@@ -179,13 +200,16 @@
 
                 <!-- Form Buttons -->
                 <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                    <div class="h-10 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
-                    <div class="h-10 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+                    <div class="h-8 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
+                    <div class="h-8 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                 </div>
             </div>
 
             <!-- Personal Information Section -->
-            <div class="space-y-4 relative" wire:loading.remove>
+            <div wire:loading.remove
+                 wire:target.except="updateEmployee"
+                 class="space-y-4 relative"
+            >
                 <div class="py-4">
                     <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                         <!-- Gender -->
@@ -210,14 +234,6 @@
                                             </flux:option>
                                         @endforeach
                                     </flux:select>
-
-                                    <div
-                                        wire:loading
-                                        wire:target="editEmployee"
-                                        class="absolute inset-0  flex items-center justify-center">
-                                        <div
-                                            class="w-full h-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 block px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 "></div>
-                                    </div>
                                 </div>
                             </x-pupi.input.group>
                         </div>
@@ -234,13 +250,6 @@
                                 <div class="relative">
                                     <x-pupi.input.text wire:model="name" id="name"
                                                        placeholder="{{ __('Enter name') }}"/>
-                                    <div
-                                        wire:loading
-                                        wire:target="editEmployee"
-                                        class="absolute inset-0  flex items-center justify-center">
-                                        <div
-                                            class="w-full h-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700 block px-3 py-1.5 text-base dark:text-white text-gray-900 outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 "></div>
-                                    </div>
                                 </div>
                             </x-pupi.input.group>
                         </div>
@@ -530,7 +539,7 @@
                                             <span class="mr-2">
                                                 <x-dynamic-component
                                                     :component="$statusOption['icon']"
-                                                    class="h-5 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
+                                                    class="h-4 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
                                             </span>
                                                 <span>{{ $statusOption['label'] }}</span>
                                             </div>
@@ -562,7 +571,7 @@
                                                 <span class="mr-2">
                                                     <x-dynamic-component
                                                         :component="$statusOption['icon']"
-                                                        class="h-5 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
+                                                        class="h-4 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
                                                 </span>
                                                 <span>{{ $statusOption['label'] }}</span>
                                             </div>
