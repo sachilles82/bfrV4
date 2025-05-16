@@ -27,8 +27,13 @@
         class="xl:mt-5 mt-1 h-full flex flex-col items-center justify-between space-y-3 md:flex-row md:space-y-0 md:space-x-4">
         <div class="w-full lg:w-1/3 md:w-1/2">
             <div class="mt-3 flex sm:mt-0">
-                <x-pupi.actions.search/>
-                <x-pupi.actions.reset-filters/>
+
+                <x-pupi.actions.search
+                />
+
+                <x-pupi.actions.reset-filters
+                />
+
             </div>
         </div>
         <div
@@ -50,13 +55,14 @@
                         </span>
                     </div>
 
-
                     <x-pupi.actions.bulkexport
                         :statusFilter="$statusFilter"
                     />
+
                     <x-pupi.actions.bulkstatus
                         :statusFilter="$statusFilter"
                     />
+
                 </div>
 
                 <div>

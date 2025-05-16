@@ -3,7 +3,7 @@
     <flux:dropdown align="end" offset="-15">
         <flux:button
             icon-trailing="chevron-down">
-            {{ __('Status') }}
+            {{ __('Actions') }}
         </flux:button>
 
         <flux:menu class="min-w-32">
