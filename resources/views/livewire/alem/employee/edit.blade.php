@@ -25,11 +25,7 @@
                         <!-- Gender -->
                         <div class="sm:col-span-4">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -38,11 +34,7 @@
                         <!-- First Name -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -51,11 +43,7 @@
                         <!-- Last Name -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -64,11 +52,7 @@
                         <!-- Email -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -77,11 +61,7 @@
                         <!-- Teams -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -90,11 +70,7 @@
                         <!-- Department -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -103,11 +79,7 @@
                         <!-- Supervisor -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -116,11 +88,7 @@
                         <!-- Roles -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -129,11 +97,7 @@
                         <!-- Profession -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -142,11 +106,7 @@
                         <!-- Stage -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -155,11 +115,7 @@
                         <!-- Joined Date -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -173,11 +129,7 @@
                         <!-- Employee Status -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-32 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-32 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -186,11 +138,7 @@
                         <!-- Account Status -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="flex items-center">
-                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-32 animate-pulse"></div>
-                                    <div
-                                        class="ml-2 h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-16 animate-pulse"></div>
-                                </div>
+                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-32 animate-pulse"></div>
                                 <div
                                     class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
                             </div>
@@ -200,8 +148,8 @@
 
                 <!-- Form Buttons -->
                 <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                    <div class="h-8 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                    <div class="h-8 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
+                    <div class="h-9 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
+                    <div class="h-9 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
                 </div>
             </div>
 
