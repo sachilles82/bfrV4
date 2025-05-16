@@ -23,7 +23,7 @@
 
             <flux:modal.trigger name="create-employee">
                 <div
-                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer">
+                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs">
 
                     <x-pupi.icon.create class="-ml-1.5 size-5"/>
                     {{ __('Create') }}
@@ -44,14 +44,14 @@
                     <input
                            type="text"
                            placeholder="{{ __('Search #') }}"
-                           class="block w-full rounded-md rounded-r-none bg-white border-0 py-1.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:focus:outline-indigo-500 dark:outline-gray-700/50 dark:bg-gray-800/50 dark:text-white sm:pl-9 sm:text-sm/6">
+                           class="block w-full rounded-md rounded-r-none bg-white border-0 py-1.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-700/50 dark:bg-gray-800/50 dark:text-white sm:pl-9 sm:text-sm/6">
                 </div>
 
                 <button
                         type="button"
-                        class="py-1.5 px-3 sm:text-sm/6 rounded-l-none inline-flex justify-center items-center gap-2 rounded-md font-medium bg-white text-gray-500 shadow-sm align-middle hover:bg-gray-50
-                         border-0 outline-1 -outline-offset-1 outline-gray-300 hover:focus:outline-2 hover:focus-within:-outline-offset-2 hover:focus-within:outline-indigo-600 dark:hover:focus:outline-indigo-500 dark:outline-gray-700/50
-                         text-sm dark:bg-gray-800/50 dark:hover:bg-gray-800 dark:text-gray-400 dark:hover:text-white">
+                        class="py-1.5 px-3 sm:text-sm/6 rounded-l-none inline-flex justify-center items-center gap-2 rounded-md font-medium bg-white text-gray-500 align-middle
+                         border-0 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-700/50
+                         text-sm dark:bg-gray-800/50 dark:text-gray-400">
                     <x-pupi.icon.arrow-path/>
                 </button>
 
@@ -61,19 +61,6 @@
         <div
             class="flex flex-col items-stretch justify-end shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
             <div class="flex items-center justify-end w-full space-x-1 md:w-auto">
-                <!-- Bulk-Actions Dropdown wird hier eingebunden -->
-
-                <div class="flex space-x-1" x-show="$wire.selectedIds.length > 0" x-cloak>
-                    <div class="hidden sm:flex items-center justify-center">
-                        <span class="text-indigo-600 dark:text-indigo-400">
-                            <span x-text="$wire.selectedIds.length"
-                                  class="pr-2 text-sm font-semibold text-indigo-600 border-r border-gray-200 dark:border-gray-700 dark:text-indigo-600"></span>
-                            <span class="pl-2 pr-2">
-                                {{ __('Selected') }}
-                            </span>
-                        </span>
-                    </div>
-                </div>
 
                 <div>
                     <flux:select
