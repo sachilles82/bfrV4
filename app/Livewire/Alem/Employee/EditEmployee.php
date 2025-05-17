@@ -268,7 +268,6 @@ class EditEmployee extends Component
         $this->supervisors = null;
 
         $this->dataLoaded = false;
-
     }
 
     public function resetFormFields(): void
