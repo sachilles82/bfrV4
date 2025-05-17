@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Models\Alem\Employee\Setting;
+namespace App\Models\Alem\QuickCrud;
 
-use App\Models\Alem\Employee\Employee;
+use App\Models\Alem\Employee;
 use App\Traits\BelongsToCompany;
-use App\Traits\BelongsToTeam;
 use App\Traits\Cache\WithRedisCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

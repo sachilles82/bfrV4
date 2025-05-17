@@ -1,14 +1,14 @@
 <?php
 
-namespace Database\Factories\Alem\Employee\Setting;
+namespace Database\Factories\Alem;
 
-use App\Models\Alem\Employee\Setting\Profession;
+use App\Models\Alem\Employee;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
-class ProfessionFactory extends Factory
+class EmployeeFactory extends Factory
 {
-    protected $model = Profession::class;
+    protected $model = Employee::class;
 
     public function definition(): array
     {

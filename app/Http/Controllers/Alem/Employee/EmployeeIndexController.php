@@ -5,8 +5,8 @@
 //use App\Enums\Role\RoleVisibility;
 //use App\Http\Controllers\Controller;
 //use App\Models\Alem\Department;
-//use App\Models\Alem\Employee\Setting\Profession;
-//use App\Models\Alem\Employee\Setting\Stage;
+//use App\Models\Alem\QuickCrud\Profession;
+//use App\Models\Alem\QuickCrud\Stage;
 //use App\Models\Team;
 //use Barryvdh\Debugbar\Facades\Debugbar;
 //use Illuminate\Contracts\View\View;
@@ -314,8 +314,8 @@
 //use App\Enums\Role\RoleVisibility;
 //use App\Http\Controllers\Controller;
 //use App\Models\Alem\Department;
-//use App\Models\Alem\Employee\Setting\Profession;
-//use App\Models\Alem\Employee\Setting\Stage;
+//use App\Models\Alem\QuickCrud\Profession;
+//use App\Models\Alem\QuickCrud\Stage;
 //use App\Models\Team;
 //use Illuminate\Contracts\View\View;
 //use Illuminate\Support\Facades\Auth;

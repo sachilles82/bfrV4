@@ -6,23 +6,23 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
-use App\Models\Alem\Employee\Employee;
-use App\Models\Alem\Employee\Setting\Profession;
-use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Alem\Employee;
+use App\Models\Alem\QuickCrud\Profession;
+use App\Models\Alem\QuickCrud\Stage;
+use App\Models\Spatie\Role;
+use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
 use Flux\Flux;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
-use Livewire\Component;
 use Livewire\Attributes\On;
-use App\Models\Spatie\Role;
-use App\Models\Team;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\View\View;
-use Illuminate\Support\Collection;
+use Livewire\Component;
 
 #[Lazy(isolate: false)]
 class EditEmployee extends Component

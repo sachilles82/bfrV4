@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Alem\Employee;
+namespace App\Models\Alem;
 
 use App\Enums\Employee\CivilStatus;
 use App\Enums\Employee\EmployeeStatus;
@@ -8,8 +8,8 @@ use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
-use App\Models\Alem\Employee\Setting\Profession;
-use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Alem\QuickCrud\Profession;
+use App\Models\Alem\QuickCrud\Stage;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusManagement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

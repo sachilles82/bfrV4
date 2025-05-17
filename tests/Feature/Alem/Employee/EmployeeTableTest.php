@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\Employee\EmployeeStatus as EmpStatusEnum; // Alias hinzugefügt
+use App\Enums\Employee\EmployeeStatus as EmpStatusEnum;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
@@ -8,16 +8,18 @@ use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\EmployeeTable;
 use App\Models\Alem\Company;
 use App\Models\Alem\Department;
-use App\Models\Alem\Employee\Employee;
-use App\Models\Alem\Employee\Setting\Profession;
-use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Alem\Employee;
 use App\Models\Alem\Industry;
+use App\Models\Alem\QuickCrud\Profession;
+use App\Models\Alem\QuickCrud\Stage;
 use App\Models\Spatie\Role;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB; // Für DB::raw
 use Livewire\Livewire;
+
+// Alias hinzugefügt
+// Für DB::raw
 
 uses(RefreshDatabase::class);
 

@@ -1,14 +1,13 @@
 <?php
 
-namespace Database\Factories\Alem\Employee\Setting;
+namespace Database\Factories\Alem\QuickCrud;
 
-use App\Models\Alem\Employee\Setting\Stage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
-class StageFactory extends Factory
+class ProfessionFactory extends Factory
 {
-    protected $model = Stage::class;
+    protected $model = \App\Models\Alem\QuickCrud\Profession::class;
 
     public function definition(): array
     {

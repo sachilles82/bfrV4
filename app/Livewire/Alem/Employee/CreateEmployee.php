@@ -8,9 +8,8 @@ use App\Enums\User\Gender;
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
-use App\Models\Alem\Employee\Employee;
-use App\Models\Alem\Employee\Setting\Profession;
-use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Alem\QuickCrud\Profession;
+use App\Models\Alem\QuickCrud\Stage;
 use App\Models\Spatie\Role;
 use App\Models\Team;
 use App\Models\User;
@@ -407,7 +406,7 @@ class CreateEmployee extends Component
                 $user->roles()->sync($this->selectedRoles);
             }
 
-            Employee::create([
+            \App\Models\Alem\Employee::create([
                 'user_id' => $user->id,
                 'profession_id' => $this->profession,
                 'stage_id' => $this->stage,

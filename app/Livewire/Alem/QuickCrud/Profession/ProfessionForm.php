@@ -3,7 +3,7 @@
 namespace App\Livewire\Alem\QuickCrud\Profession;
 
 use App\Livewire\Alem\QuickCrud\Profession\Helper\ValidateProfessionForm;
-use App\Models\Alem\Employee\Setting\Profession;
+use App\Models\Alem\QuickCrud\Profession;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;

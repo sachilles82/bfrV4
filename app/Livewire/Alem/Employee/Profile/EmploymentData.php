@@ -7,7 +7,7 @@ use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
 use App\Livewire\Alem\Employee\Profile\Helper\ValidateEmploymentData;
 use App\Models\Address\Country;
-use App\Models\Alem\Employee\Employee;
+use App\Models\Alem\Employee;
 use App\Models\User;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;

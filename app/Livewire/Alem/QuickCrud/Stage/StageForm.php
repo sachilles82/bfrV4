@@ -3,7 +3,7 @@
 namespace App\Livewire\Alem\QuickCrud\Stage;
 
 use App\Livewire\Alem\QuickCrud\Stage\Helper\ValidateStageForm;
-use App\Models\Alem\Employee\Setting\Stage;
+use App\Models\Alem\QuickCrud\Stage;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;

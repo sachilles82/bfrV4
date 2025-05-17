@@ -2,7 +2,7 @@
 
 namespace App\Policies\Alem\Employee;
 
-use App\Models\Alem\Employee\Employee;
+use App\Models\Alem\Employee;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -25,12 +25,12 @@ class EmployeePolicy
         return true;
     }
 
-    public function update(User $user, Employee $employee): bool
+    public function update(User $user, \App\Models\Alem\Employee $employee): bool
     {
         return true;
     }
 
-    public function delete(User $user, Employee $employee): bool
+    public function delete(User $user, \App\Models\Alem\Employee $employee): bool
     {
         return true;
     }
