@@ -1,7 +1,7 @@
 @props(['statusFilter', 'options'])
 
 <div
-    class="order-last flex w-full gap-x-8 text-sm/6 font-semibold sm:order-none sm:w-auto sm:border-l sm:border-gray-200 sm:dark:border-gray-500 sm:pl-6 sm:text-sm/7">
+    class="order-last flex w-full gap-x-8 text-sm/6 font-semibold sm:order-none sm:w-auto sm:border-l sm:border-gray-200 sm:dark:border-gray-700 sm:pl-6 sm:text-sm/7">
 
     @foreach($options as $status)
         {{-- Beispiel für Active - passe die Logik für die anderen ggf. an oder mache es dynamischer --}}

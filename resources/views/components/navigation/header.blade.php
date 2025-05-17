@@ -1,5 +1,5 @@
 <flux:header container
-             class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 dark:border-white/5">
+             class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-white/5">
     <flux:sidebar.toggle
         x-on:click="menu = true"
         variant="ghost"

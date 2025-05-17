@@ -6,7 +6,7 @@
             </h1>
 
             <div
-                class="order-last flex w-full gap-x-8 text-sm/6 font-semibold sm:order-none sm:w-auto sm:border-l sm:border-gray-200 sm:dark:border-gray-500 sm:pl-6 sm:text-sm/7">
+                class="order-last flex w-full gap-x-8 text-sm/6 font-semibold sm:order-none sm:w-auto sm:border-l sm:border-gray-200 sm:dark:border-gray-700 sm:pl-6 sm:text-sm/7">
                 <a href="#"
                    class="dark:text-indigo-400 text-indigo-600">
                     {{ __('Active') }}
