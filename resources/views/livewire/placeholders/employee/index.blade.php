@@ -23,7 +23,8 @@
 
             <flux:modal.trigger name="create-employee">
                 <div
-                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs">
+                    class="ml-auto flex items-center gap-x-1 rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-xs cursor-pointer">
+
 
                     <x-pupi.icon.create class="-ml-1.5 size-5"/>
                     {{ __('Create') }}
