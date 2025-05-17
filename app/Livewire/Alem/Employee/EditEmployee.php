@@ -13,7 +13,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
@@ -189,48 +188,48 @@ class EditEmployee extends Component
 
         try {
 
-        DB::beginTransaction();
+            DB::beginTransaction();
 
-        User::where('id', $this->userId)->update([
-            'name' => $this->name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-            'gender' => $this->gender,
-            'model_status' => $this->model_status,
-            'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at)->format('Y-m-d') : null,
-            'department_id' => $this->department,
-        ]);
+            User::where('id', $this->userId)->update([
+                'name' => $this->name,
+                'last_name' => $this->last_name,
+                'email' => $this->email,
+                'gender' => $this->gender,
+                'model_status' => $this->model_status,
+                'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at)->format('Y-m-d') : null,
+                'department_id' => $this->department,
+            ]);
 
-        Employee::updateOrCreate(
-            ['user_id' => $this->userId],
-            [
-                'employee_status' => $this->employee_status,
-                'profession_id' => $this->profession,
-                'stage_id' => $this->stage,
-                'supervisor_id' => $this->supervisor,
-            ]
-        );
+            Employee::updateOrCreate(
+                ['user_id' => $this->userId],
+                [
+                    'employee_status' => $this->employee_status,
+                    'profession_id' => $this->profession,
+                    'stage_id' => $this->stage,
+                    'supervisor_id' => $this->supervisor,
+                ]
+            );
 
-        $this->user->loadMissing('roles:id,name,is_manager');
+            $this->user->loadMissing('roles:id,name,is_manager');
 
-        if ($this->user->relationLoaded('roles')) {
-            $this->checkRoleChangesForManager($this->user);
-        }
+            if ($this->user->relationLoaded('roles')) {
+                $this->checkRoleChangesForManager($this->user);
+            }
 
-        $this->user->roles()->sync($this->selectedRoles);
-        $this->user->teams()->sync($this->selectedTeams);
+            $this->user->roles()->sync($this->selectedRoles);
+            $this->user->teams()->sync($this->selectedTeams);
 
-        DB::commit();
+            DB::commit();
 
-        $this->closeEditEmployeeModal();
+            $this->closeEditEmployeeModal();
 
-        $this->dispatch('employee-updated');
+            $this->dispatch('employee-updated');
 
-        Flux::toast(
-            text: __('Employee Profile updated successfully.'),
-            heading: __('Success.'),
-            variant: 'success'
-        );
+            Flux::toast(
+                text: __('Employee Profile updated successfully.'),
+                heading: __('Success.'),
+                variant: 'success'
+            );
 
         } catch (\Throwable $e) {
 
@@ -248,20 +247,19 @@ class EditEmployee extends Component
      */
     public function closeEditEmployeeModal(): void
     {
-        // Formularfelder zurücksetzen
-        $this->reset([
-            'name', 'last_name', 'email', 'gender', 'model_status', 'joined_at', 'department',
-            'employee_status', 'profession', 'stage', 'supervisor',
-            'selectedRoles', 'selectedTeams',
-        ]);
-
-        // Fehlermeldungen zurücksetzen
         $this->resetErrorBag();
 
-        // Modal schließen
         $this->modal('edit-employee')->close();
 
-        // HINZUGEFÜGT: Cache-Properties bereinigen, um Speicher freizugeben
+        $this->showEditModal = false;
+
+        // Setzt verzögert 1ms die Formularfelder zurück
+        $this->js("
+        setTimeout(() => {
+            \$wire.resetFormFields();
+        }, 1);
+    ");
+
         $this->teams = null;
         $this->departments = null;
         $this->roles = null;
@@ -269,9 +267,17 @@ class EditEmployee extends Component
         $this->stages = null;
         $this->supervisors = null;
 
-        // Status zurücksetzen
         $this->dataLoaded = false;
-        $this->showEditModal = false;
+
+    }
+
+    public function resetFormFields(): void
+    {
+        $this->reset([
+            'name', 'last_name', 'email', 'gender', 'model_status', 'joined_at', 'department',
+            'employee_status', 'profession', 'stage', 'supervisor',
+            'selectedRoles', 'selectedTeams',
+        ]);
     }
 
     /**
