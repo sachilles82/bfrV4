@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Setting\Profession\Helper;
+namespace App\Livewire\Alem\QuickCrud\Profession\Helper;
 
 trait ValidateProfessionForm
 {

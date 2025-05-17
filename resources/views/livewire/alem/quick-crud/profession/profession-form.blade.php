@@ -112,6 +112,6 @@
                 @endforelse
             </flux:rows>
         </flux:table>
-{{--        {{ $professions->links() }}--}}
+        {{--        {{ $professions->links() }}--}}
     </flux:modal>
 </div>

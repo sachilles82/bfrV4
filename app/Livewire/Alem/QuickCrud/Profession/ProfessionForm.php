@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Setting\Profession;
+namespace App\Livewire\Alem\QuickCrud\Profession;
 
-use App\Livewire\Alem\Employee\Setting\Profession\Helper\ValidateStageForm;
-use App\Models\Alem\Employee\Setting\Stage;
+use App\Livewire\Alem\QuickCrud\Profession\Helper\ValidateProfessionForm;
+use App\Models\Alem\Employee\Setting\Profession;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
@@ -13,63 +13,64 @@ use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
-class StageForm extends Component
+class ProfessionForm extends Component
 {
-    use ValidateStageForm, WithPerPagePagination, WithPlaceholder;
+    use ValidateProfessionForm, WithPerPagePagination, WithPlaceholder;
 
     #[Locked]
-    public ?int $stageId = null;
+    public ?int $professionId = null;
 
     public ?string $name = null;
 
     public bool $editing = false;
 
     /**
-     * Speichert oder aktualisiert eine Stage.
+     * Speichert oder aktualisiert eine Profession.
      */
-    public function saveStage(): void
+    public function saveProfession(): void
     {
         try {
-            // Validierung durchführen – bei Fehlern wird automatisch eine ValidationException geworfen
+
             $this->validate();
 
-            if ($this->editing && $this->stageId) {
-                $stage = Stage::where('created_by', Auth::id())
-                    ->findOrFail($this->stageId);
+            if ($this->editing && $this->professionId) {
+                $profession = Profession::where('created_by', Auth::id())
+                    ->findOrFail($this->professionId);
 
-                $stage->update([
+                $profession->update([
                     'name' => $this->name,
                 ]);
 
-                $this->dispatch('stage-updated');
+                $this->dispatch('profession-updated');
 
                 Flux::toast(
-                    text: __('Stage updated successfully.'),
+                    text: __('Profession updated successfully.'),
                     heading: __('Success.'),
                     variant: 'success'
                 );
             } else {
 
-                $stage = Stage::create([
+                $profession = Profession::create([
                     'name' => $this->name,
                 ]);
 
-                $this->dispatch('stage-created', id: $stage->id);
+                $this->dispatch('profession-created', id: $profession->id);
 
                 Flux::toast(
-                    text: __('Stage created successfully.'),
+                    text: __('Profession created successfully.'),
                     heading: __('Success.'),
                     variant: 'success'
                 );
             }
 
         } catch (\Throwable $e) {
+            // Validierungsfehler direkt weiterwerfen
             if ($e instanceof ValidationException) {
                 throw $e;
             }
 
             Flux::toast(
-                text: __('An error occurred while saving the Stage.'),
+                text: __('An error occurred while saving the Profession.'),
                 heading: __('Error.'),
                 variant: 'error'
             );
@@ -81,20 +82,20 @@ class StageForm extends Component
     /**
      * Lädt einen Datensatz zur Bearbeitung.
      */
-    public function editStage(int $id): void
+    public function editProfession(int $id): void
     {
         try {
-            $stage = Stage::where('created_by', Auth::id())
+            $profession = Profession::where('created_by', Auth::id())
                 ->findOrFail($id);
 
-            $this->stageId = $stage->id;
-            $this->name = $stage->name;
+            $this->professionId = $profession->id;
+            $this->name = $profession->name;
             $this->editing = true;
 
         } catch (\Throwable $e) {
 
             Flux::toast(
-                text: __('Cannot edit this stage.'),
+                text: __('Cannot edit this profession.'),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -102,22 +103,21 @@ class StageForm extends Component
     }
 
     /**
-     * Löscht eine Stage.
+     * Löscht eine Profession.
      */
-    public function deleteStage($id): void
+    public function deleteProfession($id): void
     {
         try {
-            $stage = Stage::where('created_by', Auth::id())
+            $profession = Profession::where('created_by', Auth::id())
                 ->findOrFail($id);
 
-            $stage->delete();
+            $profession->delete();
             $this->finish();
 
-
-            $this->dispatch('stage-deleted');
+            $this->dispatch('profession-deleted');
 
             Flux::toast(
-                text: __('Stage deleted successfully.'),
+                text: __('Profession deleted successfully.'),
                 heading: __('Success.'),
                 variant: 'success'
             );
@@ -125,7 +125,7 @@ class StageForm extends Component
         } catch (\Throwable $e) {
 
             Flux::toast(
-                text: __('Cannot delete this stage.'),
+                text: __('Cannot delete this profession.'),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -137,8 +137,8 @@ class StageForm extends Component
      */
     public function finish(): void
     {
-        $this->modal('create-stage')->close();
-        $this->reset(['stageId', 'name', 'editing']);
+        $this->modal('create-profession')->close();
+        $this->reset(['professionId', 'name', 'editing']);
         $this->resetValidation();
     }
 
@@ -152,13 +152,13 @@ class StageForm extends Component
 
     public function render(): View
     {
-        $query = Stage::where('created_by',
+        $query = Profession::where('created_by',
             Auth::id())->orderBy('id');
 
-        $stages = $this->applySimplePagination($query);
+        $professions = $this->applySimplePagination($query);
 
-        return view('livewire.alem.employee.setting.profession.stage-form', [
-            'stages' => $stages,
+        return view('livewire.alem.quick-crud.profession.profession-form', [
+            'professions' => $professions,
         ]);
     }
 }

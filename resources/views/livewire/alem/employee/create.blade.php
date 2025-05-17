@@ -244,8 +244,9 @@
                                 @endforelse
                                 <!-- Trigger zum Öffnen des Profession-Modals -->
                                 <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.profession-form
-                                        lazy/>
+                                    <livewire:alem.quick-crud.profession.profession-form
+                                        lazy
+                                    />
                                 </x-slot>
                             </flux:select>
                         </x-pupi.input.group>
@@ -276,10 +277,9 @@
                                 @empty
                                     <flux:option value="">{{ __('No stages found') }}</flux:option>
                                 @endforelse
-
                                 <!-- Trigger zum Öffnen des Stage-Modals -->
                                 <x-slot name="add">
-                                    <livewire:alem.employee.setting.profession.stage-form
+                                    <livewire:alem.quick-crud.stage.stage-form
                                         lazy
                                     />
                                 </x-slot>
