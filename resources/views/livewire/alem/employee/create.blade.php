@@ -1,6 +1,11 @@
 <div wire:ignore.self>
 
-    <flux:modal name="create-employee" variant="flyout" position="left" class="space-y-6 lg:min-w-3xl">
+    <flux:modal
+        name="create-employee"
+        variant="flyout"
+        position="left"
+        class="space-y-6 lg:min-w-3xl"
+    >
         <div>
             <flux:heading size="lg">{{ __('Create Employee') }}</flux:heading>
             <flux:subheading>{{ __('Fill out the details to create a new employee') }}</flux:subheading>

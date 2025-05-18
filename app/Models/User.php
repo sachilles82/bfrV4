@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Model\ModelStatus;
+use App\Enums\User\Gender;
 use App\Models\Address\State;
 use App\Models\Alem\Company;
 use App\Models\Alem\Department;
@@ -112,6 +113,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'joined_at' => 'date',
         'model_status' => ModelStatus::class,
+        'gender' => Gender::class,
         'department_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'

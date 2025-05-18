@@ -8,6 +8,7 @@ use App\Enums\User\Gender;
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
+use App\Models\Alem\Employee;
 use App\Models\Alem\QuickCrud\Profession;
 use App\Models\Alem\QuickCrud\Stage;
 use App\Models\Spatie\Role;
@@ -19,6 +20,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -35,32 +37,32 @@ class CreateEmployee extends Component
     public bool $showCreateModal = false;
     private bool $dataLoaded = false;
 
-    public ?int $userId = null;
-    public array $selectedRoles = [];
-    public $model_status;
-    public $employee_status;
-    public $invitations = true;
-
     // Eigenschaften für vorgeladene Daten - werden von Livewire automatisch befüllt
     public ?int $authUserId = null;
     public ?int $currentTeamId = null;
     public ?int $companyId = null;
 
+    public ?int $userId = null;
+
     // Benutzer-Felder
-    public $gender;
-    public $name;
-    public $last_name;
-    public $email;
-    public $email_verified_at;
-    public $password;
+    public ?Gender $gender = null;
+    public ?string $name = null;
+    public ?string $last_name = null;
+    public ?string $email = null;
+    public ?ModelStatus $model_status = null;
     public ?Carbon $joined_at = null;
-    public $department = null;
+    public ?int $department = null;
     public array $selectedTeams = [];
+    public array $selectedRoles = [];
 
     // Mitarbeiter-Felder
+    public ?EmployeeStatus $employee_status = null;
     public $profession;
     public $stage;
-    public $supervisor = null;
+    public ?int $supervisor = null;
+
+    // Einladungs-Einstellungen **Ändere es in invitation
+    public bool $invitations = false;
 
     // Cache-Eigenschaften - privat und initialisieren bei Bedarf
     private ?Collection $teams = null;
@@ -77,9 +79,9 @@ class CreateEmployee extends Component
     #[On('create-employee-modal')]
     public function openCreateEmployeeModal(): void
     {
-        $this->gender = Gender::Male->value;
-        $this->model_status = ModelStatus::ACTIVE->value;
-        $this->employee_status = EmployeeStatus::PROBATION->value;
+        $this->gender = Gender::Male;
+        $this->model_status = ModelStatus::ACTIVE;
+        $this->employee_status = EmployeeStatus::PROBATION;
         $this->invitations = true;
 
         $this->loadRelationForDropDowns();
@@ -378,9 +380,7 @@ class CreateEmployee extends Component
             $this->loadRelationForDropDowns();
         }
 
-        $this->password = Str::password();
-
-        $this->showCreateModal = false;
+        $generatedPassword  = Str::password();
 
         $this->validate();
 
@@ -392,10 +392,10 @@ class CreateEmployee extends Component
                 'name' => $this->name,
                 'last_name' => $this->last_name,
                 'email' => $this->email,
-                'password' => Hash::make($this->password),
+                'password' => Hash::make($generatedPassword ),
                 'email_verified_at' => now(),
                 'department_id' => $this->department,
-                'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at) : null,
+                'joined_at' => $this->joined_at?->toDateString(),
                 'model_status' => $this->model_status,
                 'user_type' => UserType::Employee,
                 'company_id' => auth()->user()->company_id,
@@ -406,7 +406,7 @@ class CreateEmployee extends Component
                 $user->roles()->sync($this->selectedRoles);
             }
 
-            \App\Models\Alem\Employee::create([
+            Employee::create([
                 'user_id' => $user->id,
                 'profession_id' => $this->profession,
                 'stage_id' => $this->stage,
@@ -445,6 +445,28 @@ class CreateEmployee extends Component
 
         } catch (\Throwable $e) {
 
+            DB::rollBack();
+            Log::error("Fehler beim Erstellen des Mitarbeiters: " . $e->getMessage(), [
+                'exception' => $e,
+                'acting_user_id' => $this->authUserId ?? auth()->id(),
+                'formData' => collect($this->only([
+                    'gender',
+                    'name',
+                    'last_name',
+                    'email',
+                    'model_status',
+                    'joined_at',
+                    'department',
+                    'selectedTeams',
+                    'selectedRoles',
+                    'employee_status',
+                    'profession',
+                    'stage',
+                    'supervisor',
+                    'invitations'
+                ]))->toArray()
+            ]);
+
             Flux::toast(
                 text: __('An error occurred while saving the employee.'),
                 heading: __('Error.'),
@@ -462,7 +484,7 @@ class CreateEmployee extends Component
             'gender', 'name', 'last_name', 'email', 'selectedTeams',
             'department', 'supervisor', 'selectedRoles', 'profession',
             'stage', 'joined_at', 'employee_status', 'model_status',
-            'invitations', 'password'
+            'invitations',
         ]);
 
         $this->resetErrorBag();

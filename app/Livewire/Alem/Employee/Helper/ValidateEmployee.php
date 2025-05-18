@@ -15,7 +15,7 @@ trait ValidateEmployee
     {
         return [
             // User fields
-            'gender' => ['required', Rule::in(array_column(Gender::cases(), 'value'))],
+            'gender' => ['required', Rule::enum(Gender::class)],
             'name' => 'required|string|min:3',
             'last_name' => 'required|string|min:3',
             'email' => [
@@ -42,9 +42,6 @@ trait ValidateEmployee
                     }
                 },
             ],
-
-            // Supervisor
-//            'supervisor' => ['required', 'exists:users,id', 'different:userId'],
 
             // --- Supervisor Regeln ---
             'supervisor' => [
@@ -118,7 +115,7 @@ trait ValidateEmployee
             // Model status messages
             'model_status.required' => __('Account status is required.'),
             'model_status.string' => __('Account status must be a string.'),
-            'model_status.enum' => __('Der Status need to be a valid value from the ModelStatus enum.'),
+            'model_status.enum' => __('The Status need to be a valid value from the ModelStatus enum.'),
         ];
     }
 }

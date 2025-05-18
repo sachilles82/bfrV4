@@ -4,6 +4,7 @@ namespace App\Livewire\Alem\Employee;
 
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
+use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee;
@@ -17,6 +18,7 @@ use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
@@ -44,21 +46,21 @@ class EditEmployee extends Component
     public ?int $companyId = null;
 
     // User form fields
+    public ?Gender $gender = null;
     public ?string $name = null;
     public ?string $last_name = null;
     public ?string $email = null;
-    public ?string $gender = null;
     public ?ModelStatus $model_status = null;
-    public $joined_at = null;
-    public $department = null;
+    public ?Carbon $joined_at = null;
+    public ?int $department = null;
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
     // Employee fields
     public ?EmployeeStatus $employee_status = null;
-    public $profession = null;
-    public $stage = null;
-    public $supervisor = null;
+    public $profession; // check Profession mit integer
+    public $stage;// check Stage mit integer
+    public ?int $supervisor = null;
 
     // Optimierung: Cache-Eigenschaften privat lassen und initialisieren
     private ?Collection $teams = null;
@@ -169,7 +171,7 @@ class EditEmployee extends Component
             $this->dataLoaded = true;
 
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error("Fehler beim Laden der Relationen: " . $e->getMessage());
+            Log::error("Fehler beim Laden der Relationen: " . $e->getMessage());
             Flux::toast(
                 text: __('An error occurred while loading the Relation Data.'),
                 heading: __('Error.'),
@@ -196,7 +198,7 @@ class EditEmployee extends Component
                 'email' => $this->email,
                 'gender' => $this->gender,
                 'model_status' => $this->model_status,
-                'joined_at' => $this->joined_at ? Carbon::parse($this->joined_at)->format('Y-m-d') : null,
+                'joined_at' => $this->joined_at?->toDateString(),
                 'department_id' => $this->department,
             ]);
 
@@ -233,6 +235,28 @@ class EditEmployee extends Component
 
         } catch (\Throwable $e) {
 
+            DB::rollBack();
+            Log::error("Fehler beim Aktualisieren des Mitarbeiters: " . $e->getMessage(), [
+                'exception' => $e,
+                'acting_user_id' => $this->authUserId ?? auth()->id(),
+                'editing_user_id' => $this->userId,
+                'formData' => collect($this->only([
+                    'gender',
+                    'name',
+                    'last_name',
+                    'email',
+                    'model_status',
+                    'joined_at',
+                    'department',
+                    'selectedTeams',
+                    'selectedRoles',
+                    'employee_status',
+                    'profession',
+                    'stage',
+                    'supervisor'
+                ]))->toArray()
+            ]);
+
             Flux::toast(
                 text: __('An error occurred while editing the employee.'),
                 heading: __('Error.'),
@@ -251,8 +275,6 @@ class EditEmployee extends Component
 
         $this->modal('edit-employee')->close();
 
-        $this->showEditModal = false;
-
         // Setzt verzögert 1ms die Formularfelder zurück
         $this->js("
         setTimeout(() => {
@@ -268,6 +290,7 @@ class EditEmployee extends Component
         $this->supervisors = null;
 
         $this->dataLoaded = false;
+        $this->showEditModal = false;
     }
 
     public function resetFormFields(): void
