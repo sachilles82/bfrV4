@@ -22,101 +22,57 @@
                     <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                         <!-- Gender -->
                         <div class="sm:col-span-4">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- First Name -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Last Name -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Email -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Teams -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Department -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Supervisor -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Roles -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Profession -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Stage -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Joined Date -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
                     </div>
                 </div>
@@ -126,28 +82,19 @@
                     <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                         <!-- Employee Status -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-32 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
 
                         <!-- Account Status -->
                         <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded-md w-32 animate-pulse"></div>
-                                <div
-                                    class="w-full py-1.5 px-3 h-10 bg-gray-100 dark:bg-gray-700 rounded-md animate-pulse"></div>
-                            </div>
+                            <x-pupi.placeholder.input/>
                         </div>
                     </div>
                 </div>
 
                 <!-- Form Buttons -->
                 <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                    <div class="h-9 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
-                    <div class="h-9 bg-gray-100 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
+                    <x-pupi.placeholder.buttons/>
                 </div>
             </div>
 
