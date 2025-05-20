@@ -73,7 +73,6 @@ class EditEmployee extends Component
     #[On('edit-employee-modal')]
     public function openEditEmployeeModal($userId): void
     {
-
         // $this->authorize('update', User::class);
 
         $this->userId = $userId;
@@ -96,7 +95,7 @@ class EditEmployee extends Component
     }
 
     /**
-     * Fill form with user data
+     * Befülle die Form mit User Employee Daten
      */
     protected function loadEmployeeData(): void
     {
@@ -127,7 +126,9 @@ class EditEmployee extends Component
         }
     }
 
-
+    /**
+     * Lädt alle erforderlichen Daten für Dropdowns aus dem Cache
+     */
     protected function loadRelationForDropDowns(): void
     {
         if (!$this->showEditModal || $this->dataLoaded) {
@@ -182,7 +183,7 @@ class EditEmployee extends Component
 
 
     /**
-     * Update employee in database
+     * Update User Employee in die Datenbank
      */
     public function updateEmployee(): void
     {
@@ -471,7 +472,6 @@ class EditEmployee extends Component
         // Null-Safety-Check nach dem Laden
         return $this->departments ?? collect();
     }
-
 
     /**
      * Gibt die Liste der Rollen zurück

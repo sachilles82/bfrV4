@@ -155,7 +155,6 @@ class CreateEmployee extends Component
         }
     }
 
-
     /**
      * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt.
      * Wird aufgerufen, wenn Professionen erstellt, aktualisiert oder gelöscht werden.
@@ -192,7 +191,6 @@ class CreateEmployee extends Component
             }
         }
     }
-
 
     /**
      * Gibt die Liste der Berufe (Professionen) zurück.
@@ -315,7 +313,6 @@ class CreateEmployee extends Component
         // Null-Safety-Check nach dem Laden
         return $this->departments ?? collect();
     }
-
 
     /**
      * Gibt die Liste der Rollen zurück
@@ -500,7 +497,7 @@ class CreateEmployee extends Component
 
         $this->modal('create-employee')->close();
 
-        // HINZUGEFÜGT: Cache-Properties bereinigen, um Speicher freizugeben
+        // Cache-Properties bereinigen, um Speicher freizugeben
         $this->teams = null;
         $this->departments = null;
         $this->roles = null;
