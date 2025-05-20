@@ -15,8 +15,8 @@
 
             <div wire:loading
                  wire:target.except="updateEmployee"
-                 class="space-y-4 relative w-full inset-0 backdrop-blur-sm z-10 overflow-auto"
-            >
+                 class="space-y-4 relative w-full inset-0 backdrop-blur-sm z-10 overflow-auto">
+
                 <!-- Personal Information Skeleton -->
                 <div class="py-4">
                     <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -74,6 +74,7 @@
                         <div class="sm:col-span-3">
                             <x-pupi.placeholder.input/>
                         </div>
+
                     </div>
                 </div>
 
@@ -89,6 +90,7 @@
                         <div class="sm:col-span-3">
                             <x-pupi.placeholder.input/>
                         </div>
+
                     </div>
                 </div>
 
@@ -96,6 +98,7 @@
                 <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
                     <x-pupi.placeholder.buttons/>
                 </div>
+
             </div>
 
             <!-- Personal Information Section -->
@@ -115,18 +118,24 @@
                                 model="gender"
                                 help-text="{{ __('') }}">
                                 <div class="relative">
+
                                     <flux:select
                                         class="mt-2"
                                         wire:model="gender"
                                         id="gender"
                                         variant="listbox"
                                         placeholder="{{ __('Select gender') }}">
-                                        @foreach(\App\Enums\User\Gender::cases() as $genderStatus)
-                                            <flux:option value="{{ $genderStatus->value }}">
-                                                {{ $genderStatus->label() }}
+
+                                        @foreach($this->genderOptions() as $genderOption)
+                                            <flux:option
+                                                wire:key="gender-option-{{ $genderOption['value'] }}"
+                                                value="{{ $genderOption['value'] }}">
+                                                <span>{{ $genderOption['label'] }}</span>
                                             </flux:option>
                                         @endforeach
+
                                     </flux:select>
+
                                 </div>
                             </x-pupi.input.group>
                         </div>
@@ -140,10 +149,15 @@
                                 :error="$errors->first('name')"
                                 help-text="{{ __('') }}"
                                 model="name">
+
                                 <div class="relative">
-                                    <x-pupi.input.text wire:model="name" id="name"
-                                                       placeholder="{{ __('Enter name') }}"/>
+                                    <x-pupi.input.text
+                                        wire:model="name"
+                                        id="name"
+                                        placeholder="{{ __('Enter name') }}"
+                                    />
                                 </div>
+
                             </x-pupi.input.group>
                         </div>
 
@@ -156,8 +170,13 @@
                                 :error="$errors->first('last_name')"
                                 help-text="{{ __('') }}"
                                 model="last_name">
-                                <x-pupi.input.text wire:model="last_name" id="last_name"
-                                                   placeholder="{{ __('Enter last name') }}"/>
+
+                                <x-pupi.input.text
+                                    wire:model="last_name"
+                                    id="last_name"
+                                    placeholder="{{ __('Enter last name') }}"
+                                />
+
                             </x-pupi.input.group>
                         </div>
 
@@ -170,12 +189,15 @@
                                 :error="$errors->first('email')"
                                 help-text="{{ __('') }}"
                                 model="email">
+
                                 <x-pupi.input.text
                                     wire:model="email"
                                     type="email"
                                     name="email"
                                     id="email"
-                                    placeholder="{{ __('meine@email.ch') }}"/>
+                                    placeholder="{{ __('meine@email.ch') }}"
+                                />
+
                             </x-pupi.input.group>
                         </div>
 
@@ -188,6 +210,7 @@
                                 :error="$errors->first('selectedTeams')"
                                 model="selectedTeams"
                                 help-text="{{ __('') }}">
+
                                 <flux:select
                                     class="mt-2"
                                     wire:model="selectedTeams"
@@ -195,6 +218,7 @@
                                     variant="listbox"
                                     multiple
                                     placeholder="{{ __('Teams auswählen') }}">
+
                                     @forelse($this->teams() as $team)
                                         <flux:option
                                             wire:key="team-option-{{ $team->id }}"
@@ -204,7 +228,9 @@
                                     @empty
                                         <flux:option value="">{{ __('No teams found') }}</flux:option>
                                     @endforelse
+
                                 </flux:select>
+
                             </x-pupi.input.group>
                         </div>
 
@@ -217,6 +243,7 @@
                                 :error="$errors->first('department')"
                                 model="department"
                                 help-text="{{ __('') }}">
+
                                 <flux:select
                                     class="mt-2"
                                     wire:model="department"
@@ -224,6 +251,7 @@
                                     variant="listbox"
                                     searchable
                                     placeholder="{{ __('Select Department') }}">
+
                                     @forelse($this->departments() as $dept)
                                         <flux:option
                                             wire:key="department-option-{{ $dept->id }}"
@@ -240,6 +268,7 @@
                                         />
                                     </x-slot>
                                 </flux:select>
+
                             </x-pupi.input.group>
                         </div>
 
@@ -252,6 +281,7 @@
                                 :error="$errors->first('supervisor')"
                                 model="supervisor"
                                 help-text="{{ __('') }}">
+
                                 <flux:select
                                     class="mt-2"
                                     wire:model="supervisor"
@@ -259,14 +289,14 @@
                                     variant="listbox"
                                     searchable
                                     placeholder="{{ __('Select Supervisor') }}">
+
                                     @forelse($this->supervisors() as $supervisor)
                                         <flux:option wire:key="supervisor-option-{{ $supervisor->id }}"
                                                      value="{{ $supervisor->id }}">
                                             <div class="flex items-center gap-2 whitespace-nowrap">
                                                 <flux:avatar
                                                     name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
-                                                    circle
-                                                    size="xs"
+                                                    circle size="xs"
                                                     src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
                                                     alt="{{ $supervisor->name }}"
                                                 />
@@ -276,6 +306,7 @@
                                     @empty
                                         <flux:option value="">{{ __('No supervisors found') }}</flux:option>
                                     @endforelse
+
                                 </flux:select>
                             </x-pupi.input.group>
                         </div>
@@ -288,6 +319,7 @@
                                 badge="{{ __('Required') }}"
                                 :error="$errors->first('selectedRoles')"
                                 model="selectedRoles">
+
                                 <flux:select
                                     class="mt-2"
                                     wire:model="selectedRoles"
@@ -295,6 +327,7 @@
                                     variant="listbox"
                                     multiple
                                     placeholder="{{ __('Select roles') }}">
+
                                     @forelse($this->roles() as $roleOption)
                                         <flux:option
                                             wire:key="role-option-{{ $roleOption->id }}"
@@ -310,6 +343,7 @@
                                     @empty
                                         <flux:option value="">{{ __('No roles found') }}</flux:option>
                                     @endforelse
+
                                 </flux:select>
                             </x-pupi.input.group>
                         </div>
@@ -323,6 +357,7 @@
                                 :error="$errors->first('profession')"
                                 model="profession"
                                 help-text="{{ __('') }}">
+
                                 <flux:select
                                     class="mt-2"
                                     wire:model="profession"
@@ -330,6 +365,7 @@
                                     variant="listbox"
                                     searchable
                                     placeholder="{{ __('Select Profession') }}">
+
                                     @forelse($this->professions() as $prof)
                                         <flux:option
                                             wire:key="profession-option-{{ $prof->id }}"
@@ -346,6 +382,7 @@
                                         />
                                     </x-slot>
                                 </flux:select>
+
                             </x-pupi.input.group>
                         </div>
 
@@ -358,6 +395,7 @@
                                 :error="$errors->first('stage')"
                                 model="stage"
                                 help-text="{{ __('') }}">
+
                                 <flux:select
                                     class="mt-2"
                                     wire:model="stage"
@@ -365,6 +403,7 @@
                                     variant="listbox"
                                     searchable
                                     placeholder="{{ __('Select Stage') }}">
+
                                     @forelse($this->stages() as $st)
                                         <flux:option
                                             wire:key="stage-option-{{ $st->id }}"
@@ -381,6 +420,7 @@
                                         />
                                     </x-slot>
                                 </flux:select>
+
                             </x-pupi.input.group>
                         </div>
 
@@ -391,8 +431,8 @@
                                 for="joined_at"
                                 badge="{{ __('Required') }}"
                                 model="joined_at"
-                                :error="$errors->first('joined_at')"
-                            >
+                                :error="$errors->first('joined_at')">
+
                                 <flux:date-picker
                                     wire:model="joined_at"
                                     with-today
@@ -403,6 +443,7 @@
                                         <flux:date-picker.input class="mt-2"/>
                                     </x-slot>
                                 </flux:date-picker>
+
                             </x-pupi.input.group>
                         </div>
                     </div>
@@ -420,11 +461,13 @@
                                 :error="$errors->first('employee_status')"
                                 model="employee_status"
                                 help-text="{{ __('') }}">
+
                                 <flux:select
                                     class="mt-2"
                                     wire:model="employee_status"
                                     id="employee_status"
                                     variant="listbox">
+
                                     @foreach($this->employeeStatusOptions() as $statusOption)
                                         <flux:option
                                             wire:key="employee-status-option-{{ $statusOption['value'] }}"
@@ -439,6 +482,7 @@
                                             </div>
                                         </flux:option>
                                     @endforeach
+
                                 </flux:select>
                             </x-pupi.input.group>
                         </div>
@@ -450,13 +494,14 @@
                                 for="model_status"
                                 badge="{{ __('Required') }}"
                                 :error="$errors->first('model_status')"
-                                model="model_status"
-                            >
+                                model="model_status">
+
                                 <flux:select
                                     class="mt-2"
                                     wire:model="model_status"
                                     id="model_status"
                                     variant="listbox">
+
                                     @foreach($this->modelStatusOptions() as $statusOption)
                                         <flux:option
                                             wire:key="model-status-option-{{ $statusOption['value'] }}"
@@ -472,6 +517,7 @@
                                         </flux:option>
                                     @endforeach
                                 </flux:select>
+
                             </x-pupi.input.group>
                         </div>
                     </div>
@@ -479,35 +525,13 @@
 
                 <!-- Form Buttons -->
                 <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                    <flux:button
-                        wire:click="closeEditEmployeeModal"
-                        type="button"
-                        variant="ghost"
-                        wire:loading.attr="disabled"
-                        wire:target="updateEmployee"
-                    >
+                    <flux:button wire:click="closeEditEmployeeModal" type="button" variant="ghost">
                         {{ __('Cancel') }}
                     </flux:button>
-                    <flux:button
-                        type="submit"
-                        variant="primary"
-                        wire:loading.attr="disabled"
-                        wire:target="updateEmployee"
-                    >
-                        <div wire:loading.flex wire:target="updateEmployee" class="items-center">
-                            <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                 viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            {{ __('Saving...') }}
-                        </div>
-                        <span wire:loading.remove wire:target="updateEmployee">{{ __('Update') }}</span>
+                    <flux:button type="submit">
+                        {{ __('Update') }}
                     </flux:button>
                 </div>
-            </div>
         </form>
     </flux:modal>
 </div>

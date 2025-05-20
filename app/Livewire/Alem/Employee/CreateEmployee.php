@@ -354,6 +354,22 @@ class CreateEmployee extends Component
     }
 
     /**
+     * Gibt die Optionen für das Geschlecht zurück
+     */
+    #[Computed]
+    public function genderOptions(): array
+    {
+        return collect(Gender::cases())
+            ->map(function (Gender $gender) {
+                return [
+                    'value' => $gender->value,
+                    'label' => $gender->label(),
+                ];
+            })
+            ->toArray();
+    }
+
+    /**
      * Gibt die Optionen für den Mitarbeiterstatus zurück
      */
     #[Computed]
