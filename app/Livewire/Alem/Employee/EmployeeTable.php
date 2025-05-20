@@ -64,7 +64,6 @@ class EmployeeTable extends Component
         if (in_array($property, ['statusFilter', 'employeeStatusFilter'])) {
             $this->selectedIds = [];
             $this->reset('search', 'sortCol', 'sortAsc', 'perPage');
-//            $this->dispatch('update-table');
         }
     }
 
@@ -162,7 +161,7 @@ class EmployeeTable extends Component
 
         return view('livewire.alem.employee.table', [
             'users' => $users,
-            'modelStatuses' => $this->modelStatusOptions, //brauch ich, weil ich die in der Blade brauche
+            'modelStatuses' => $this->modelStatusOptions, //brauch ich, weil ich es in der blade an ein component übergebe
         ]);
     }
 

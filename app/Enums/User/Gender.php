@@ -22,4 +22,16 @@ enum Gender: string
             self::Female => __('Female'),
         };
     }
+
+    public static function getGenderOptions(): array
+    {
+        return collect(Gender::cases())
+            ->map(function (Gender $gender) {
+                return [
+                    'value' => $gender->value,
+                    'label' => $gender->label(),
+                ];
+            })
+            ->toArray();
+    }
 }

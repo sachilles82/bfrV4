@@ -359,14 +359,7 @@ class CreateEmployee extends Component
     #[Computed]
     public function genderOptions(): array
     {
-        return collect(Gender::cases())
-            ->map(function (Gender $gender) {
-                return [
-                    'value' => $gender->value,
-                    'label' => $gender->label(),
-                ];
-            })
-            ->toArray();
+        return Gender::getGenderOptions();
     }
 
     /**
