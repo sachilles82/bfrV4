@@ -7,7 +7,6 @@ use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use App\Models\Alem\Department;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
 
 trait ValidateEmployee
 {

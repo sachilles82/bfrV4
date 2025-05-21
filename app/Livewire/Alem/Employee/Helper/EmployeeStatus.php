@@ -2,14 +2,12 @@
 
 namespace App\Livewire\Alem\Employee\Helper;
 
-use App\Models\User;
-use App\Traits\Model\ModelStatusAction;
 use App\Traits\Table\WithStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Url;
 
 /**
- * Trait für ModelStatus-Integration
+ * Trait für EmployeeStatus-Integration
  */
 trait EmployeeStatus
 {

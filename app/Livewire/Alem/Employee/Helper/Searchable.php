@@ -2,8 +2,6 @@
 
 namespace App\Livewire\Alem\Employee\Helper;
 
-// In app/Livewire/Alem/Employee/Helper/Searchable.php
-
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Config;
 
