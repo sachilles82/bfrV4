@@ -2,20 +2,20 @@
 
 namespace App\Livewire\Alem\Employee;
 
-use App\Enums\Employee\EmployeeStatus;
-use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
 use App\Enums\User\UserType;
 use App\Livewire\Alem\Employee\Helper\Searchable;
-use App\Livewire\Alem\Employee\Helper\WithEmployeeModelStatus;
+use App\Livewire\Alem\Employee\Helper\EmployeeModelStatus;
 use App\Livewire\Alem\Employee\Helper\WithEmployeeSorting;
-use App\Livewire\Alem\Employee\Helper\WithEmployeeStatus;
+use App\Livewire\Alem\Employee\Helper\EmployeeStatus;
 use App\Models\User;
+use App\Traits\Employee\EmployeeStatusOptions;
+use App\Traits\Model\ModelStatusOptions;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -23,9 +23,10 @@ use Livewire\Component;
 #[Lazy(isolate: false)]
 class EmployeeTable extends Component
 {
-    use Searchable, WithEmployeeModelStatus, WithEmployeeSorting,
-        WithEmployeeStatus,
-        WithPerPagePagination;
+    use AuthorizesRequests;
+    use Searchable, WithPerPagePagination, WithEmployeeSorting;
+    use EmployeeModelStatus, EmployeeStatus;
+    use ModelStatusOptions, EmployeeStatusOptions;
 
     // Eigenschaften für vorgeladene Daten
     public int $authUserId;
@@ -75,24 +76,6 @@ class EmployeeTable extends Component
         $this->resetPage();
         $this->reset('search', 'sortCol', 'sortAsc', 'statusFilter', 'employeeStatusFilter');
         $this->selectedIds = [];
-    }
-
-    /**
-     * Gibt die Optionen für den Mitarbeiterstatus zurück
-     */
-    #[Computed]
-    public function employeeStatusOptions(): array
-    {
-        return EmployeeStatus::getEmployeeOptions();
-    }
-
-    /**
-     * Gibt die Optionen für den Modelstatus zurück
-     */
-    #[Computed]
-    public function modelStatusOptions(): array
-    {
-        return ModelStatus::getModelOptions();
     }
 
     /**

@@ -8,7 +8,7 @@ use App\Traits\Model\ModelStatusAction;
 /**
  * Trait für ModelStatus-Integration
  */
-trait WithEmployeeModelStatus
+trait EmployeeModelStatus
 {
     use ModelStatusAction;
 

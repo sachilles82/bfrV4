@@ -2,6 +2,8 @@
 
 namespace App\Traits\Employee;
 
+use App\Models\Alem\Department;
+
 /**
  * Trait um die User in verschiedenen Tables anzuzeigen
  *
@@ -12,7 +14,7 @@ trait WithUserAvatars
     /**
      * Bereitet die Benutzerdaten für die Anzeige der Avatare vor
      *
-     * @param  \App\Models\Alem\Department  $department
+     * @param  Department  $department
      */
     public function prepareUserAvatars($department): array
     {

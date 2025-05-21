@@ -2,11 +2,16 @@
 
 namespace App\Livewire\Alem\Employee\Helper;
 
+use App\Models\User;
+use App\Traits\Model\ModelStatusAction;
 use App\Traits\Table\WithStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Url;
 
-trait WithEmployeeStatus
+/**
+ * Trait für ModelStatus-Integration
+ */
+trait EmployeeStatus
 {
     use WithStatus;
 
@@ -64,4 +69,5 @@ trait WithEmployeeStatus
     {
         $this->resetModelSpecificStatusFilter();
     }
+
 }

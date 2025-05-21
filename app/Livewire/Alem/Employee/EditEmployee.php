@@ -13,6 +13,9 @@ use App\Models\Alem\QuickCrud\Stage;
 use App\Models\Spatie\Role;
 use App\Models\Team;
 use App\Models\User;
+use App\Traits\Employee\EmployeeStatusOptions;
+use App\Traits\Enum\GenderOptions;
+use App\Traits\Model\ModelStatusOptions;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -30,6 +33,7 @@ use Livewire\Component;
 class EditEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee;
+    use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
     // Modal state
     public bool $showEditModal = false;
@@ -583,33 +587,6 @@ class EditEmployee extends Component
 
             return $supervisor && isset($supervisor->id) && $supervisor->id === $currentUserId;
         });
-    }
-
-    /**
-     * Gibt die Optionen für das Geschlecht zurück
-     */
-    #[Computed]
-    public function genderOptions(): array
-    {
-        return Gender::getGenderOptions();
-    }
-
-    /**
-     * Gibt die Optionen für den Mitarbeiterstatus zurück
-     */
-    #[Computed]
-    public function employeeStatusOptions(): array
-    {
-        return EmployeeStatus::getEmployeeOptions();
-    }
-
-    /**
-     * Gibt die Optionen für den Modelstatus zurück
-     */
-    #[Computed]
-    public function modelStatusOptions(): array
-    {
-        return ModelStatus::getModelOptions();
     }
 
     public function render(): View

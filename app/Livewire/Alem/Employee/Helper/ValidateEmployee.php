@@ -13,7 +13,7 @@ trait ValidateEmployee
 {
     public function rules(): array
     {
-        return [
+        $rules = [
             // User-Felder
             'gender' => ['required', Rule::enum(Gender::class)],
             'name' => 'required|string|min:3',
@@ -55,14 +55,21 @@ trait ValidateEmployee
                     }
                 },
             ],
-
-            'invitations' => ['nullable', 'boolean'],
         ];
+        // Füge Validierungsregeln für 'invitations' nur hinzu, wenn:
+        // 1. Es sich um eine "Create"-Aktion handelt (angenommen durch $this->userId === null)
+        // 2. Die Komponente tatsächlich eine 'invitations'-Eigenschaft hat.
+        if (property_exists($this, 'userId') && $this->userId === null && property_exists($this, 'invitations')) {
+            // Validierung für die Option, ob der Benutzer eine Einladung erhalten soll.
+            $rules['invitations'] = ['required', 'boolean'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
     {
-        return [
+        $messages = [
             // User field messages
             'gender.required' => __('Gender is required.'),
             'gender.enum' => __('The selected gender is invalid.'),
@@ -113,7 +120,16 @@ trait ValidateEmployee
             'supervisor.integer' => __('Supervisor ID must be an integer.'),
             'supervisor.exists' => __('The selected supervisor is invalid.'),
 
-            'invitations.boolean' => __('The invitation setting, if provided, must be true or false.'),
         ];
+
+        // Füge Validierungsnachrichten für 'invitations' nur hinzu, wenn:
+        // 1. Es sich um eine "Create"-Aktion handelt.
+        // 2. Die Komponente tatsächlich eine 'invitations'-Eigenschaft hat.
+        if (property_exists($this, 'userId') && $this->userId === null && property_exists($this, 'invitations')) {
+            $messages['invitations.required'] = 'The invitation setting is required.';
+            $messages['invitations.boolean'] = 'The invitation setting must be true or false.';
+        }
+
+        return $messages;
     }
 }
