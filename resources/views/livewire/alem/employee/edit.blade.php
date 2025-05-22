@@ -502,7 +502,7 @@
                                     id="model_status"
                                     variant="listbox">
 
-                                    @foreach($this->modelStatusOptions() as $statusOption)
+                                    @foreach($this->modelStatusOptionsForForms() as $statusOption)
                                         <flux:option
                                             wire:key="model-status-option-{{ $statusOption['value'] }}"
                                             value="{{ $statusOption['value'] }}">
@@ -532,6 +532,7 @@
                         {{ __('Update') }}
                     </flux:button>
                 </div>
+            </div>
         </form>
     </flux:modal>
 </div>

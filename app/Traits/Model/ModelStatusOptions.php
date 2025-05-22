@@ -8,12 +8,22 @@ use Livewire\Attributes\Computed;
 trait ModelStatusOptions
 {
     /**
-     * Gibt die Optionen für den Modelstatus zurück
+     * Gibt alle Optionen für den Modelstatus zurück (inkl. TRASHED).
+     * Wird typischerweise für Filter in Tabellen verwendet.
      */
     #[Computed]
     public function modelStatusOptions(): array
     {
-        return ModelStatus::getModelOptions();
+        return ModelStatus::getModelOptions(false); // explizit false für alle Optionen
+    }
+
+    /**
+     * Gibt die Optionen für den Modelstatus zurück, die in Formularen verwendet werden sollen (exkl. TRASHED).
+     */
+    #[Computed]
+    public function modelStatusOptionsForForms(): array
+    {
+        return ModelStatus::getModelOptions(true); // true, um TRASHED auszuschließen
     }
 
 }

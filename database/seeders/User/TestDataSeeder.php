@@ -46,12 +46,12 @@ class TestDataSeeder extends Seeder
 
         try {
             // Parameter für das Seeden
-            $employeeCount = 100000; // Anzahl der zu erstellenden Mitarbeiter für Team 1 (Betrieb 48)
-            $managerCount = 10;    // Anzahl der Manager für Team 1
-            $chunkSize = 50;      // Größere Chunks für bessere Performance
+            $employeeCount = 10; // Anzahl der zu erstellenden Mitarbeiter für Team 1 (Betrieb 48)
+            $managerCount = 2;    // Anzahl der Manager für Team 1
+            $chunkSize = 5;      // Größere Chunks für bessere Performance
 
             // Parameter für Betrieb 55 (Team 2)
-            $team2EmployeeCount = 6500; // Anzahl der Mitarbeiter für Team 2 (Betrieb 55)
+            $team2EmployeeCount = 60; // Anzahl der Mitarbeiter für Team 2 (Betrieb 55)
             $team2ManagerCount = 2;   // Anzahl der Manager für Team 2
             $team2DepartmentCount = 4; // Anzahl der Abteilungen für Team 2
             $team2ProfessionCount = 4; // Anzahl der Berufe für Team 2

@@ -401,13 +401,14 @@
                             badge="{{ __('Required') }}"
                             :error="$errors->first('model_status')"
                             model="model_status">
+
                             <flux:select
                                 class="mt-2"
                                 wire:model="model_status"
                                 id="model_status"
                                 variant="listbox">
 
-                                @foreach($this->modelStatusOptions() as $statusOption)
+                                @foreach($this->modelStatusOptionsForForms() as $statusOption)
                                     <flux:option
                                         wire:key="model-status-option-{{ $statusOption['value'] }}"
                                         value="{{ $statusOption['value'] }}">

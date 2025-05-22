@@ -23,15 +23,11 @@ trait ValidateEmployee
 
             'department' => ['required', 'exists:departments,id',
                 function ($attribute, $value, $fail) {
-                    if (!empty($this->selectedTeams)) {
-                        $departmentExistsInTeam = Department::where('id', $value)
-                            ->whereIn('team_id', $this->selectedTeams)
-                            ->exists();
-                        if (!$departmentExistsInTeam) {
-                            $fail(__('The selected department must belong to one of the selected teams.'));
-                        }
-                    } elseif (Department::where('id', $value)->doesntExist()) {
-                        $fail(__('The selected department is invalid.'));
+                    $departmentExistsInTeam = Department::where('id', $value)
+                        ->whereIn('team_id', $this->selectedTeams)
+                        ->exists();
+                    if (!$departmentExistsInTeam) {
+                        $fail(__('The selected department must belong to one of the selected teams.'));
                     }
                 },
             ],
@@ -49,7 +45,7 @@ trait ValidateEmployee
 
             'supervisor' => ['required', 'integer', 'exists:users,id',
                 function (string $attribute, mixed $value, \Closure $fail) {
-                    if (isset($this->userId) && $value == $this->userId) {
+                    if ($value == $this->userId) {
                         $fail(__('You cannot be your own supervisor.'));
                     }
                 },

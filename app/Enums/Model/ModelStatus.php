@@ -35,9 +35,21 @@ enum ModelStatus: string
         };
     }
 
-    public static function getModelOptions(): array
+    /**
+     * Gibt die Optionen für den Modelstatus zurück.
+     *
+     * @param bool $excludeTrashed Ob der Status 'trashed' ausgeschlossen werden soll.
+     * @return array
+     */
+    public static function getModelOptions(bool $excludeTrashed = false): array
     {
-        return collect(self::cases())
+        $cases = collect(self::cases());
+
+        if ($excludeTrashed) {
+            $cases = $cases->filter(fn(self $status) => $status !== self::TRASHED);
+        }
+
+        return $cases
             ->map(function (self $status) {
                 return [
                     'value' => $status->value,
@@ -46,6 +58,7 @@ enum ModelStatus: string
                     'icon' => $status->icon(),
                 ];
             })
+            ->values()
             ->toArray();
     }
 }

@@ -42,7 +42,7 @@ return new class extends Migration {
                 $table->foreignId('department_id')->nullable();
                 $table->string('user_type')->default(UserType::Employee);
                 $table->string('model_status')->default(ModelStatus::ACTIVE);
-                $table->timestamp('joined_at')->nullable();
+                $table->date('joined_at')->nullable();
                 $table->foreignId('created_by')->nullable();
 
                 $table->string('email')->unique();
