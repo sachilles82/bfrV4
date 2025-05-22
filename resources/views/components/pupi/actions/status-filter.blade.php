@@ -7,6 +7,7 @@
         {{-- Beispiel für Active - passe die Logik für die anderen ggf. an oder mache es dynamischer --}}
         @if($status['value'] === 'active')
             <a href="#"
+               wire:key="status-{{ $status['value'] }}"
                wire:click.prevent="$set('statusFilter', '{{ $status['value'] }}')"
                class="{{ $statusFilter === $status['value'] ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
 
@@ -15,6 +16,7 @@
             </a>
         @elseif($status['value'] === 'archived')
             <a href="#"
+               wire:key="status-{{ $status['value'] }}"
                wire:click.prevent="$set('statusFilter', '{{ $status['value'] }}')"
                class="{{ $statusFilter === $status['value'] ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
 
@@ -23,6 +25,7 @@
             </a>
         @elseif($status['value'] === 'trashed')
             <a href="#"
+               wire:key="status-{{ $status['value'] }}"
                wire:click.prevent="$set('statusFilter', '{{ $status['value'] }}')"
                class="{{ $statusFilter === $status['value'] ? 'dark:text-indigo-400 text-indigo-600' : 'hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-400 text-gray-700' }}">
 
