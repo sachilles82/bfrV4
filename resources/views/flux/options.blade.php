@@ -21,17 +21,20 @@
     if (is_object($searchable)) $search = $searchable;
 @endphp
 
-<?php if (! $searchable): ?>
+<?php if (!$searchable): ?>
 <ui-options popover="manual" {{ $attributes->class($classes) }} data-flux-options>
     {{ $slot }}
 </ui-options>
 <?php else: ?>
-<div popover="manual" class="rounded-lg shadow-xs border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-800 p-[.3125rem]" data-flux-options>
+<div popover="manual"
+     class="rounded-lg shadow-xs border border-zinc-300 dark:border-white/10 bg-white dark:bg-zinc-800 p-[.3125rem]"
+     data-flux-options>
         <?php if ($search): ?> {{ $search }} <?php else: ?>
-    <flux:select.search />
+    <flux:select.search/>
     <?php endif; ?>
 
-    <ui-options class="max-h-[20rem] overflow-y-auto -mr-[.3125rem] -mt-[.3125rem] pt-[.3125rem] pr-[.3125rem] -mb-[.3125rem] pb-[.3125rem]">
+    <ui-options
+        class="max-h-[20rem] overflow-y-auto -mr-[.3125rem] -mt-[.3125rem] pt-[.3125rem] pr-[.3125rem] -mb-[.3125rem] pb-[.3125rem]">
         {{ $slot }}
 
             <?php if ($empty): ?>
@@ -44,7 +47,9 @@
     </ui-options>
 
     @isset($add)
-        {{ $add }}
+        <div @click.stop @input.stop @keydown.stop @focusin.stop @focusout.stop>
+            {{ $add }}
+        </div>
     @endisset
 </div>
 <?php endif; ?>
