@@ -150,6 +150,138 @@ class CreateEmployee extends Component
     }
 
     /**
+     * Führt alle notwendigen DB-Operationen in einer Transaktion aus und speichert den Mitarbeiter
+     */
+    public function saveEmployee(): void
+    {
+        if (!$this->dataLoaded) {
+            $this->loadRelationForDropDowns();
+        }
+
+        $generatedPassword  = Str::password();
+
+        $this->validate();
+
+        try {
+            DB::beginTransaction();
+
+            $user = User::create([
+                'gender' => $this->gender,
+                'name' => $this->name,
+                'last_name' => $this->last_name,
+                'email' => $this->email,
+                'password' => Hash::make($generatedPassword ),
+                'email_verified_at' => now(),
+                'department_id' => $this->department,
+                'joined_at' => $this->joined_at?->toDateString(),
+                'model_status' => $this->model_status,
+                'user_type' => UserType::Employee,
+                'company_id' => auth()->user()->company_id,
+                'created_by' => auth()->id(),
+            ]);
+
+            if (!empty($this->selectedRoles)) {
+                $user->roles()->sync($this->selectedRoles);
+            }
+
+            Employee::create([
+                'user_id' => $user->id,
+                'profession_id' => $this->profession,
+                'stage_id' => $this->stage,
+                'employee_status' => $this->employee_status,
+                'supervisor_id' => $this->supervisor,
+            ]);
+
+            if (!empty($this->selectedTeams)) {
+                $teamsWithRole = [];
+                foreach ($this->selectedTeams as $teamId) {
+                    $teamsWithRole[$teamId] = ['role' => 'member'];
+                }
+
+                if (!empty($teamsWithRole)) {
+                    $user->teams()->attach($teamsWithRole);
+                }
+            } else {
+                $user->teams()->attach(auth()->user()->currentTeam, ['role' => 'member']);
+            }
+
+            if ($this->invitations) {
+                // TODO: E-Mail-Benachrichtigung implementieren
+            }
+
+            DB::commit();
+
+            $this->closeCreateEmployeeModal();
+
+            $this->dispatch('employee-created');
+
+            Flux::toast(
+                text: __('Employee created successfully.'),
+                heading: __('Success.'),
+                variant: 'success'
+            );
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+            Log::error("Fehler beim Erstellen des Mitarbeiters: " . $e->getMessage(), [
+                'exception' => $e,
+                'acting_user_id' => $this->authUserId ?? auth()->id(),
+                'formData' => collect($this->only([
+                    'gender',
+                    'name',
+                    'last_name',
+                    'email',
+                    'model_status',
+                    'joined_at',
+                    'department',
+                    'selectedTeams',
+                    'selectedRoles',
+                    'employee_status',
+                    'profession',
+                    'stage',
+                    'supervisor',
+                    'invitations'
+                ]))->toArray()
+            ]);
+
+            Flux::toast(
+                text: __('An error occurred while saving the employee.'),
+                heading: __('Error.'),
+                variant: 'danger'
+            );
+        }
+    }
+
+    /**
+     * Setzt das Formular zurück und schließt das Modal
+     */
+    public function closeCreateEmployeeModal(): void
+    {
+        $this->resetErrorBag();
+
+        $this->modal('create-employee')->close();
+
+        $this->reset([
+            'gender', 'name', 'last_name', 'email', 'selectedTeams',
+            'department', 'supervisor', 'selectedRoles', 'profession',
+            'stage', 'joined_at', 'employee_status', 'model_status',
+            'invitations',
+        ]);
+
+        // Cache-Properties bereinigen, um Speicher freizugeben
+        $this->teams = null;
+        $this->departments = null;
+        $this->roles = null;
+        $this->professions = null;
+        $this->stages = null;
+        $this->supervisors = null;
+
+        $this->dataLoaded = false;
+        $this->showCreateModal = false;
+    }
+
+    /**
      * Lebenszyklusmethode um sicherzustellen, dass Daten auch nach Validierungsfehlern geladen sind
      */
     public function hydrate(): void
@@ -352,138 +484,6 @@ class CreateEmployee extends Component
             $this->loadRelationForDropDowns();
         }
         return $this->supervisors ?? collect();
-    }
-
-    /**
-     * Führt alle notwendigen DB-Operationen in einer Transaktion aus und speichert den Mitarbeiter
-     */
-    public function saveEmployee(): void
-    {
-        if (!$this->dataLoaded) {
-            $this->loadRelationForDropDowns();
-        }
-
-        $generatedPassword  = Str::password();
-
-        $this->validate();
-
-        try {
-            DB::beginTransaction();
-
-            $user = User::create([
-                'gender' => $this->gender,
-                'name' => $this->name,
-                'last_name' => $this->last_name,
-                'email' => $this->email,
-                'password' => Hash::make($generatedPassword ),
-                'email_verified_at' => now(),
-                'department_id' => $this->department,
-                'joined_at' => $this->joined_at?->toDateString(),
-                'model_status' => $this->model_status,
-                'user_type' => UserType::Employee,
-                'company_id' => auth()->user()->company_id,
-                'created_by' => auth()->id(),
-            ]);
-
-            if (!empty($this->selectedRoles)) {
-                $user->roles()->sync($this->selectedRoles);
-            }
-
-            Employee::create([
-                'user_id' => $user->id,
-                'profession_id' => $this->profession,
-                'stage_id' => $this->stage,
-                'employee_status' => $this->employee_status,
-                'supervisor_id' => $this->supervisor,
-            ]);
-
-            if (!empty($this->selectedTeams)) {
-                $teamsWithRole = [];
-                foreach ($this->selectedTeams as $teamId) {
-                    $teamsWithRole[$teamId] = ['role' => 'member'];
-                }
-
-                if (!empty($teamsWithRole)) {
-                    $user->teams()->attach($teamsWithRole);
-                }
-            } else {
-                $user->teams()->attach(auth()->user()->currentTeam, ['role' => 'member']);
-            }
-
-            if ($this->invitations) {
-                // TODO: E-Mail-Benachrichtigung implementieren
-            }
-
-            DB::commit();
-
-            $this->closeCreateEmployeeModal();
-
-            $this->dispatch('employee-created');
-
-            Flux::toast(
-                text: __('Employee created successfully.'),
-                heading: __('Success.'),
-                variant: 'success'
-            );
-
-        } catch (\Throwable $e) {
-
-            DB::rollBack();
-            Log::error("Fehler beim Erstellen des Mitarbeiters: " . $e->getMessage(), [
-                'exception' => $e,
-                'acting_user_id' => $this->authUserId ?? auth()->id(),
-                'formData' => collect($this->only([
-                    'gender',
-                    'name',
-                    'last_name',
-                    'email',
-                    'model_status',
-                    'joined_at',
-                    'department',
-                    'selectedTeams',
-                    'selectedRoles',
-                    'employee_status',
-                    'profession',
-                    'stage',
-                    'supervisor',
-                    'invitations'
-                ]))->toArray()
-            ]);
-
-            Flux::toast(
-                text: __('An error occurred while saving the employee.'),
-                heading: __('Error.'),
-                variant: 'danger'
-            );
-        }
-    }
-
-    /**
-     * Setzt das Formular zurück und schließt das Modal
-     */
-    public function closeCreateEmployeeModal(): void
-    {
-        $this->reset([
-            'gender', 'name', 'last_name', 'email', 'selectedTeams',
-            'department', 'supervisor', 'selectedRoles', 'profession',
-            'stage', 'joined_at', 'employee_status', 'model_status',
-            'invitations',
-        ]);
-
-        $this->resetErrorBag();
-
-        $this->modal('create-employee')->close();
-
-        // Cache-Properties bereinigen, um Speicher freizugeben
-        $this->teams = null;
-        $this->departments = null;
-        $this->roles = null;
-        $this->professions = null;
-        $this->stages = null;
-        $this->supervisors = null;
-
-        $this->dataLoaded = false;
-        $this->showCreateModal = false;
     }
 
     public function render(): View
