@@ -53,6 +53,16 @@
                         <flux:cell>
                             <span class="text-sm font-medium">{{ $stage->name }}</span>
                         </flux:cell>
+                        <x-pupi.table.tr.cell>
+
+                            <flux:tooltip content="{{ optional($stage->creator)->name }}">
+                                <div>
+                                    <flux:button variant="ghost"><img
+                                            src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                            alt="" class="size-6 flex-none rounded-full bg-gray-800"></flux:button>
+                                </div>
+                            </flux:tooltip>
+                        </x-pupi.table.tr.cell>
                         <flux:cell>
                             <flux:dropdown align="end" offset="-15">
                                 <flux:button

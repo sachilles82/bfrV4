@@ -320,9 +320,9 @@
                                 @endforelse
 
                                 <x-slot name="add">
-                                    <livewire:alem.quick-crud.stage.stage-form
-                                        lazy
-                                    />
+{{--                                    <livewire:alem.quick-crud.stage.stage-form--}}
+{{--                                        lazy--}}
+{{--                                    />--}}
                                 </x-slot>
                             </flux:select>
 

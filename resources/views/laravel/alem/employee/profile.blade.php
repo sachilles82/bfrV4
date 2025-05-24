@@ -15,9 +15,12 @@
 {{--        </x-slot:header>--}}
 
         {{--Hier werden die livewire Componenten gerendert--}}
-        <livewire:setting.theme
-        />
+{{--        <livewire:setting.theme--}}
+{{--        />--}}
 
+        <livewire:alem.quick-crud.stage.stage-form
+            lazy
+        />
     </x-pupi.layout.container>
 
 </x-app-layout>
