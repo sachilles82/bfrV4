@@ -10,10 +10,10 @@ trait WithPerPagePagination
 {
     use WithPagination;
 
-    public int $perPage = 5;
+    public int $perPage = 7;
 
-//    protected string $paginationTheme = 'custom';
-    protected string $paginationTheme = 'tailwind';
+    protected string $paginationTheme = 'custom';
+//    protected string $paginationTheme = 'tailwind';
 
     /**
      * @throws ContainerExceptionInterface
