@@ -100,7 +100,7 @@
 
             <!-- Pagination Links -->
             <div class="mt-4 px-4">
-{{--                {{ $stages->links() }}--}}
+                {{ $stages->links() }}
             </div>
         </div>
 

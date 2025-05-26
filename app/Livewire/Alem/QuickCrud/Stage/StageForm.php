@@ -7,7 +7,8 @@ use App\Models\Alem\QuickCrud\Stage;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -22,57 +23,41 @@ class StageForm extends Component
     #[Locked]
     public ?int $stageId = null;
 
-    public ?string $name = null;
-
-    public bool $editing = false;
-
-    public Collection $stages;
+    public ?string $name   = null;
+    public bool   $editing = false;
 
     /**
-     * Initialisiert die Komponente.
+     * Flag, ob das Modal (und damit die Daten) bereits geladen wurden
      */
-    public function mount(): void
-    {
-        $this->stages = new Collection();
-    }
+    public bool $loaded = false;
 
     /**
      * Speichert oder aktualisiert eine Stage.
      */
     public function saveStage(): void
     {
-        try {
-            $this->validate();
+        $this->validate();
 
+        try {
             if ($this->editing && $this->stageId) {
-                // Erweiterte Berechtigungsprüfung für Edit
                 $user = Auth::user();
                 $stage = Stage::query()
-                    ->where(function ($query) use ($user) {
-                        $query->where('created_by', $user->id);
-                        if ($user->company_id) {
-                            $query->orWhereHas('creator', function ($q) use ($user) {
-                                $q->where('company_id', $user->company_id);
-                            });
-                        }
-                    })
+                    ->where(fn($q) => $q
+                        ->where('created_by', $user->id)
+                        ->when($user->company_id, fn($q2) => $q2
+                            ->orWhereHas('creator', fn($q3) => $q3->where('company_id', $user->company_id))
+                        )
+                    )
                     ->findOrFail($this->stageId);
 
-                $stage->update([
-                    'name' => $this->name,
-                ]);
-
+                $stage->update(['name' => $this->name]);
                 $this->dispatch('stage-updated');
                 Flux::toast(text: __('Stage updated successfully.'), heading: __('Success.'), variant: 'success');
             } else {
-                $stage = Stage::create([
-                    'name' => $this->name,
-                ]);
-
-                $this->dispatch('stage-created', id: $stage->id);
+                $created = Stage::create(['name' => $this->name]);
+                $this->dispatch('stage-created', id: $created->id);
                 Flux::toast(text: __('Stage created successfully.'), heading: __('Success.'), variant: 'success');
             }
-
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Throwable $e) {
@@ -80,7 +65,8 @@ class StageForm extends Component
         }
 
         $this->finish();
-        $this->loadStages();
+        $this->resetPage();
+        $this->loaded = true; // nach dem Speichern beim nächsten render() Daten holen
     }
 
     /**
@@ -89,52 +75,36 @@ class StageForm extends Component
     public function editStage(int $id): void
     {
         try {
-            $stage = Stage::where('created_by', Auth::id())
-                ->findOrFail($id);
-
+            $stage = Stage::where('created_by', Auth::id())->findOrFail($id);
             $this->stageId = $stage->id;
-            $this->name = $stage->name;
+            $this->name    = $stage->name;
             $this->editing = true;
-
-            // Wichtig: Stages neu laden, damit die Beziehungen geladen sind
-            $this->loadStages();
-
+            $this->resetValidation();
         } catch (\Throwable $e) {
-            Flux::toast(
-                text: __('Cannot edit this stage.'),
-                heading: __('Error'),
-                variant: 'danger'
-            );
+            Flux::toast(text: __('Cannot edit this stage.'), heading: __('Error'), variant: 'danger');
         }
     }
 
     /**
      * Löscht eine Stage.
      */
-    public function deleteStage($id): void
+    public function deleteStage(int $id): void
     {
         try {
-            $stage = Stage::where('created_by', Auth::id())
-                ->findOrFail($id);
-
+            $stage = Stage::where('created_by', Auth::id())->findOrFail($id);
             $stage->delete();
-            $this->finish();
-
-            $this->dispatch('stage-deleted');
             Flux::toast(text: __('Stage deleted successfully.'), heading: __('Success.'), variant: 'success');
-            $this->loadStages();
-
         } catch (\Throwable $e) {
-            Flux::toast(
-                text: __('Cannot delete this stage.'),
-                heading: __('Error'),
-                variant: 'danger'
-            );
+            Flux::toast(text: __('Cannot delete this stage.'), heading: __('Error'), variant: 'danger');
         }
+
+        $this->finish();
+        $this->resetPage();
+        $this->loaded = true;
     }
 
     /**
-     * Setzt den Formularstatus zurück und schließt das Modal.
+     * Schließt das Modal und setzt Formular zurück.
      */
     public function finish(): void
     {
@@ -144,52 +114,56 @@ class StageForm extends Component
     }
 
     /**
-     * Wird vom "Cancel"-Button aufgerufen.
+     * Event-Handler: Modal öffnen
      */
-    public function resetForm(): void
+    #[On('open-modal-manager')]
+    public function openModal(): void
     {
-        $this->finish();
+        $this->loaded = true;
+        $this->resetPage();
+        $this->reset(['stageId', 'name', 'editing']);
+        $this->resetValidation();
     }
 
     /**
-     * Lädt die Stage-Daten für die Tabelle.
-     * Diese Methode wird durch das Event 'open-modal-manager' aufgerufen.
+     * Render-Methode: Erzeugt hier IMMER einen LengthAwarePaginator,
+     * entweder mit realen Daten oder leer.
      */
-    #[On('open-modal-manager')]
-    public function loadStages(): void
+    public function render(Request $request): View
     {
-        $authUser = Auth::user();
+        if ($this->loaded) {
+            $user = Auth::user();
 
-        if (!$authUser) {
-            $this->stages = new Collection();
-            return;
+            $query = Stage::query()
+                ->select('id', 'name', 'created_by')
+                ->with('creator:id,name,company_id')
+                ->where(fn($q) => $q
+                    ->where('created_by', optional($user)->id)
+                    ->orWhere('created_by', 1)
+                    ->when(optional($user)->company_id, fn($q2) => $q2
+                        ->orWhereHas('creator', fn($q3) => $q3->where('company_id', $user->company_id))
+                    )
+                )
+                ->orderBy('id');
+
+            // simplePaginate liefert einen SimplePaginator mit links()
+            $stagesPaginator = $this->applySimplePagination($query);
+        } else {
+            // Noch nicht geladen: leerer LengthAwarePaginator, damit ->links() geht
+            $stagesPaginator = new LengthAwarePaginator(
+                items: [],
+                total: 0,
+                perPage: $this->perPage,
+                currentPage: 1,
+                options: [
+                    'path' => $request->url(),
+                    'pageName' => 'page',
+                ]
+            );
         }
 
-        $authUserId = $authUser->id;
-        $authUserCompanyId = $authUser->company_id;
-
-        $query = Stage::query()
-            ->select('id', 'name', 'created_by')
-            ->with('creator:id,name,company_id') // company_id hinzugefügt für vollständige Daten
-            ->where(function ($subQuery) use ($authUserId, $authUserCompanyId) {
-                $subQuery->where('created_by', $authUserId)
-                    ->orWhere('created_by', 1);
-
-                if ($authUserCompanyId) {
-                    $subQuery->orWhereHas('creator', function ($userQuery) use ($authUserCompanyId) {
-                        $userQuery->where('company_id', $authUserCompanyId);
-                    });
-                }
-            })
-            ->orderBy('id');
-
-        // Korrekte Pagination ohne doppelte Aufrufe
-        $paginator = $this->applySimplePagination($query);
-        $this->stages = $paginator->getCollection();
-    }
-
-    public function render(): View
-    {
-        return view('livewire.alem.quick-crud.stage.stage-form');
+        return view('livewire.alem.quick-crud.stage.stage-form', [
+            'stages' => $stagesPaginator,
+        ]);
     }
 }

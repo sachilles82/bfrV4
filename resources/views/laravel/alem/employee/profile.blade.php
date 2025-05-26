@@ -17,7 +17,9 @@
         {{--Hier werden die livewire Componenten gerendert--}}
 {{--        <livewire:setting.theme--}}
 {{--        />--}}
-        <livewire:alem.quick-crud.stage.stage-form/>
+        <livewire:alem.quick-crud.stage.stage-form
+        lazy
+        />
 
     </x-pupi.layout.container>
 
