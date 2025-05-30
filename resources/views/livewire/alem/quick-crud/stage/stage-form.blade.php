@@ -115,7 +115,7 @@
                                         {{ __('Name') }}
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">
-                                        {{ __('Created By') }}
+                                        {{ __('Updated') }}
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">
                                         {{ __('Action') }}
@@ -129,7 +129,16 @@
                                             {{ $stage->name }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">
-                                            {{ optional($stage->creator)->name }}
+                                            <div class="text-gray-500 dark:text-gray-400">
+                                                <flux:tooltip class="cursor-default"
+                                                              content="{{ __('Updated: ') }}
+                                                          {{ $stage->updated_at ? $stage->updated_at->format('d.m.Y') : __('Not set') }}"
+                                                              position="top">
+                                                    <div class="text-gray-500 dark:text-gray-400">
+                                                        {{ $stage->updated_at ? $stage->updated_at->diffForHumans() : __('Not available') }}
+                                                    </div>
+                                                </flux:tooltip>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                             <div class="flex justify-end items-center gap-2">

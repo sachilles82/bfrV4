@@ -3,7 +3,8 @@
 namespace App\Models\Alem\QuickCrud;
 
 use App\Models\Alem\Employee;
-use App\Traits\BelongsToCompany;
+use App\Scopes\UserScope;
+use App\Traits\BelongsToUser;
 use App\Traits\Cache\WithRedisCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,27 +12,32 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Stage extends Model
 {
-    use BelongsToCompany, HasFactory, WithRedisCache;
+    use BelongsToUser, HasFactory, WithRedisCache;
+
+    /**
+     * Der globale Scope für dieses Model
+     */
+    protected static string $scopeClass = UserScope::class;
 
     /**
      * The key used for caching this model
      *
      * @var string
      */
-    protected $cacheKey = 'stages_cache';
+    protected string $cacheKey = 'stages_cache';
 
     /**
      * Cache duration in seconds (-1 for forever)
      *
      * @var int
      */
-    protected $cacheDuration = 43200; // 12 hours
+    protected int $cacheDuration = 43200; // 12 hours
 
     protected $fillable = [
         'name',
-        'company_id',
-        'team_id',
-        'created_by',
+        'company_id', // Wird durch ManagesContextAndOwnership befüllt
+        'team_id',    // Wird durch ManagesContextAndOwnership befüllt
+        'created_by', // Wird durch ManagesContextAndOwnership befüllt
     ];
 
     /**

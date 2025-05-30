@@ -12,11 +12,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('team_id')->index()->constrained()->cascadeOnDelete();
+            $table->foreignId('team_id')->constrained()->cascadeOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->cascadeOnDelete(); // Wenn User gelöscht wird, werden zugehörige Stages ebenfalls gelöscht
             $table->timestamps();
 
+            // Performance-Indizes
             $table->index('company_id');
+            $table->index('team_id');
             $table->index('created_by');
 
             $table->index(['company_id', 'name'], 'stages_company_id_name_index');

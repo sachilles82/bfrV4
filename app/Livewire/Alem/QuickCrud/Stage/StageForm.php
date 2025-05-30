@@ -7,6 +7,7 @@ use App\Models\Alem\QuickCrud\Stage;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -20,25 +21,19 @@ class StageForm extends Component
 
     #[Locked]
     public ?int $stageId = null;
-
     public ?string $name = null;
-    public bool $editing = false;
 
-    /**
-     * Flag, ob das Modal (und damit die Daten) bereits geladen wurden
-     */
+    public bool $editing = false;
     public bool $dataLoaded = false;
 
     /**
      * Event-Handler: Modal öffnen
      */
     #[On('open-modal-manager')]
-    public function openModal(): void
+    public function openStageFormModal(): void
     {
         $this->dataLoaded = true;
-        $this->resetPage();
-        $this->reset(['stageId', 'name', 'editing']);
-        $this->resetValidation();
+        $this->resetFormFields();
     }
 
     /**
@@ -50,30 +45,31 @@ class StageForm extends Component
 
         try {
             if ($this->editing && $this->stageId) {
-                $user = Auth::user();
-                $stage = Stage::query()
-                    ->where(function ($q) use ($user) {
-                        $q->where('created_by', $user->id)
-                            ->orWhere('created_by', 1);
 
-                        if ($user->company_id) {
-                            $q->orWhereHas('creator', fn($q2) =>
-                            $q2->where('company_id', $user->company_id)
-                            );
-                        }
-                    })
+                $stage = Stage::query()
                     ->findOrFail($this->stageId);
 
-                $stage->update(['name' => $this->name]);
+                $stage->update([
+                    'name' => $this->name
+                ]);
+
                 $this->dispatch('stage-updated');
+//                $this->dispatch('stage-updated', id: $stage->id);
+
                 Flux::toast(
                     text: __('Stage updated successfully.'),
                     heading: __('Success.'),
                     variant: 'success'
                 );
+
             } else {
-                $created = Stage::create(['name' => $this->name]);
+
+                $created = Stage::create([
+                    'name' => $this->name
+                ]);
+
                 $this->dispatch('stage-created', id: $created->id);
+
                 Flux::toast(
                     text: __('Stage created successfully.'),
                     heading: __('Success.'),
@@ -81,14 +77,14 @@ class StageForm extends Component
                 );
             }
 
-            $this->resetForm();
-            $this->resetPage();
+            $this->closeEditEmployeeModal();
 
         } catch (ValidationException $e) {
             throw $e;
+
         } catch (\Throwable $e) {
             Flux::toast(
-                text: __('An error occurred while saving the Stage.'),
+                text: __('Fehler beim speichern der Stage.'),
                 heading: __('Error.'),
                 variant: 'error'
             );
@@ -101,52 +97,43 @@ class StageForm extends Component
     public function editStage(int $id): void
     {
         try {
-            $user = Auth::user();
-            $stage = Stage::query()
-                ->where(function ($q) use ($user) {
-                    $q->where('created_by', $user->id)
-                        ->orWhere('created_by', 1);
 
-                    if ($user->company_id) {
-                        $q->orWhereHas('creator', fn($q2) =>
-                        $q2->where('company_id', $user->company_id)
-                        );
-                    }
-                })
+            $stage = Stage::query()
                 ->findOrFail($id);
 
             $this->stageId = $stage->id;
             $this->name = $stage->name;
             $this->editing = true;
-            $this->resetValidation();
+            $this->resetErrorBag();
+
+        } catch (ModelNotFoundException $e) {
+
+            Flux::toast(
+                text: __('Stage not found or you do not have permission to edit it.'),
+                heading: __('Error'),
+                variant: 'danger'
+            );
 
         } catch (\Throwable $e) {
+
             Flux::toast(
                 text: __('Cannot edit this stage.'),
                 heading: __('Error'),
                 variant: 'danger'
             );
+
         }
     }
 
     /**
      * Löscht eine Stage.
+     * Nur Stages, die vom authentifizierten Benutzer erstellt wurden, können gelöscht werden.
      */
     public function deleteStage(int $id): void
     {
         try {
-            $user = Auth::user();
-            $stage = Stage::query()
-                ->where(function ($q) use ($user) {
-                    $q->where('created_by', $user->id)
-                        ->orWhere('created_by', 1);
 
-                    if ($user->company_id) {
-                        $q->orWhereHas('creator', fn($q2) =>
-                        $q2->where('company_id', $user->company_id)
-                        );
-                    }
-                })
+            $stage = Stage::query()
                 ->findOrFail($id);
 
             $stage->delete();
@@ -157,34 +144,55 @@ class StageForm extends Component
                 variant: 'success'
             );
 
-            $this->resetPage();
+            $this->closeEditEmployeeModal();
+
             $this->dispatch('stage-deleted');
 
+        } catch (ModelNotFoundException $e) {
+
+            Flux::toast(
+                text: __('Stage not found or you do not have permission to delete it.'),
+                heading: __('Error'),
+                variant: 'danger'
+            );
+
         } catch (\Throwable $e) {
+
             Flux::toast(
                 text: __('Cannot delete this stage.'),
                 heading: __('Error'),
                 variant: 'danger'
             );
+
         }
     }
 
     /**
-     * Setzt das Formular zurück
+     * Setzt Formular zurück und löscht alle Error-Bags.
      */
-    public function resetForm(): void
+    public function resetFormFields(): void
     {
         $this->reset(['stageId', 'name', 'editing']);
-        $this->resetValidation();
+        $this->resetErrorBag();
+        $this->resetPage();
     }
 
+
     /**
-     * Schließt das Modal und setzt Formular zurück.
+     * Setzt das Formular zurück und schließt das Modal.
      */
-    public function finish(): void
+    public function closeEditEmployeeModal(): void
     {
         $this->modal('create-stage')->close();
-        $this->resetForm();
+
+        // Setzt verzögert 1ms die Formularfelder zurück
+        $this->js("
+        setTimeout(() => {
+            \$wire.resetFormFields();
+        }, 1);
+    ");
+
+        $this->dataLoaded = false;
     }
 
     /**
@@ -194,22 +202,10 @@ class StageForm extends Component
     {
         $stages = collect();
 
-        if ($this->dataLoaded) {
-            $user = Auth::user();
+        if ($this->dataLoaded && Auth::check()) {
 
             $query = Stage::query()
-                ->select('id', 'name', 'created_by')
-                ->with('creator:id,name')
-                ->where(function ($q) use ($user) {
-                    $q->where('created_by', $user->id ?? 0)
-                        ->orWhere('created_by', 1);
-
-                    if ($user && $user->company_id) {
-                        $q->orWhereHas('creator', fn($q2) =>
-                        $q2->where('company_id', $user->company_id)
-                        );
-                    }
-                })
+                ->select('id', 'name', 'updated_at')
                 ->orderBy('updated_at', 'desc');
 
             $stages = $this->applySimplePagination($query);

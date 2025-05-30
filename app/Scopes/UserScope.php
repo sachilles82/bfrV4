@@ -7,24 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\Auth;
 
-class TeamScope implements Scope
+class UserScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $user = Auth::user();
+        $userId = Auth::id();
 
-        if (!$user) {
+        if (!$userId) {
             $builder->whereRaw('0 = 1');
             return;
         }
 
         $table = $model->getTable();
 
-        if ($user->current_team_id) {
-            $builder->where("{$table}.team_id", $user->current_team_id);
-        } else {
-            // Fallback auf created_by für User ohne Team
-            $builder->where("{$table}.created_by", $user->id);
-        }
+        $builder->where("{$table}.created_by", $userId);
     }
 }
