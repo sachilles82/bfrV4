@@ -16,6 +16,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+//#[Lazy(isolate: false)]// Lazy loading isolate führt zusätzliche query aus, deswegen brauch ich es nicht
 class StageForm extends Component
 {
     use ValidateStageForm, WithPerPagePagination, WithPlaceholder;
@@ -31,7 +32,7 @@ class StageForm extends Component
      * Event-Handler: Modal öffnen
      */
     #[On('open-modal-manager')]
-    public function opencloseStageFormModal(): void
+    public function openStageFormModal(): void
     {
         $this->dataLoaded = true;
         $this->resetFormFields();
@@ -116,6 +117,7 @@ class StageForm extends Component
 
             $this->stageId = $stage->id;
             $this->name = $stage->name;
+
             $this->editing = true;
             $this->resetErrorBag();
 
