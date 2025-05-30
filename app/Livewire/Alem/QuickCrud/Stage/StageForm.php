@@ -219,6 +219,8 @@ class StageForm extends Component
 
         if ($this->dataLoaded && Auth::check()) {
 
+            // wenn du dataloaded hast, dann brauchst du lazy loading nicht mehr, es würde nur eine zusätzliche Query ausführen
+
             $query = Stage::query()
                 ->select('id', 'name', 'updated_at')
                 ->orderBy('updated_at', 'desc');
