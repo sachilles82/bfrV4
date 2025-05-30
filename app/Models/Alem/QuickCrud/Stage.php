@@ -48,7 +48,6 @@ class Stage extends Model
         return $this->hasMany(Employee::class, 'stage_id');
     }
 
-
     /**
      * Get stages for a specific company with caching
      */

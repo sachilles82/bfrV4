@@ -36,7 +36,7 @@
                 <flux:spacer/>
                 <flux:modal.close>
                     <flux:button
-                        wire:click="resetForm"
+                        wire:click="closeStageFormModal"
                         variant="ghost"
                         :disabled="!$dataLoaded"
                     >

@@ -9,7 +9,8 @@ use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -30,7 +31,7 @@ class StageForm extends Component
      * Event-Handler: Modal öffnen
      */
     #[On('open-modal-manager')]
-    public function openStageFormModal(): void
+    public function opencloseStageFormModal(): void
     {
         $this->dataLoaded = true;
         $this->resetFormFields();
@@ -44,6 +45,8 @@ class StageForm extends Component
         $this->validate();
 
         try {
+            DB::beginTransaction();
+
             if ($this->editing && $this->stageId) {
 
                 $stage = Stage::query()
@@ -77,16 +80,26 @@ class StageForm extends Component
                 );
             }
 
-            $this->closeEditEmployeeModal();
+            DB::commit();
 
-        } catch (ValidationException $e) {
-            throw $e;
+            $this->closeStageFormModal();
 
         } catch (\Throwable $e) {
+
+            DB::rollBack();
+            Log::error("Fehler beim Erstellen der Stage: " . $e->getMessage(), [
+                'exception' => $e,
+                'acting_user_id' => $this->authUserId ?? auth()->id(),
+                'stage_id' => $this->stageId,
+                'formData' => collect($this->only([
+                    'name'
+                ]))->toArray()
+            ]);
+
             Flux::toast(
-                text: __('Fehler beim speichern der Stage.'),
+                text: __('An error occurred while saving the stage.'),
                 heading: __('Error.'),
-                variant: 'error'
+                variant: 'danger'
             );
         }
     }
@@ -144,7 +157,7 @@ class StageForm extends Component
                 variant: 'success'
             );
 
-            $this->closeEditEmployeeModal();
+            $this->closeStageFormModal();
 
             $this->dispatch('stage-deleted');
 
@@ -181,7 +194,7 @@ class StageForm extends Component
     /**
      * Setzt das Formular zurück und schließt das Modal.
      */
-    public function closeEditEmployeeModal(): void
+    public function closeStageFormModal(): void
     {
         $this->modal('create-stage')->close();
 
