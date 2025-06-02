@@ -32,8 +32,6 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    //    use BelongsToCompany
-    //    use TraitForUserModel;
     use HasAddress;
     use HasApiTokens;
     use HasFactory;

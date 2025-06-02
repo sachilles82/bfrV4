@@ -1,10 +1,10 @@
 <div>
-    <flux:modal.trigger
-        name="create-stage"
-        @click="$dispatch('open-stage-manager')"
-    >
-        <x-pupi.button.open-manager/>
-    </flux:modal.trigger>
+{{--    <flux:modal.trigger--}}
+{{--        name="create-stage"--}}
+{{--        @click="$dispatch('open-stage-manager')"--}}
+{{--    >--}}
+{{--        <x-pupi.button.open-manager/>--}}
+{{--    </flux:modal.trigger>--}}
 
     <flux:modal name="create-stage" variant="flyout" class="w-1/3">
         <!-- Modal-Header -->

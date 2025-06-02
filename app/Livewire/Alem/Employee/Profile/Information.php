@@ -5,6 +5,7 @@ namespace App\Livewire\Alem\Employee\Profile;
 use App\Enums\Model\ModelStatus;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
+use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Profile\Helper\ValidateInformation;
 use App\Models\Alem\Department;
 use App\Models\User;
@@ -24,8 +25,8 @@ class Information extends Component
     // Der User-Datensatz
     public User $user;
 
-    // Lokale Properties für User-Daten
-    public ?string $gender = '';
+    // User form fields
+    public ?Gender $gender = null;
 
     public string $name;
 
