@@ -210,16 +210,15 @@
                                 @endforelse
                                 </tbody>
                             </table>
+                            <!-- Pagination Links -->
+                            @if($professions->hasPages())
+                                <div class="border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+                                    {{ $professions->links() }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
-
-                <!-- Pagination Links -->
-                @if($professions->hasPages())
-                    <div class="mt-4 px-4">
-                        {{ $professions->links() }}
-                    </div>
-                @endif
             </div>
         @endif
     </flux:modal>

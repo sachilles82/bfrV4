@@ -22,6 +22,7 @@ return new class extends Migration
             $table->index('created_by');
 
             $table->index(['company_id', 'name'], 'stages_company_id_name_index');
+            $table->index(['created_by', 'updated_at']);
         });
     }
 };
