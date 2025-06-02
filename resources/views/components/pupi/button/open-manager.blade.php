@@ -3,9 +3,7 @@
     <flux:button
         icon="plus"
         class="w-full rounded-b-lg rounded-t-none"
-        variant="filled"
-        @click="$dispatch('open-modal-manager')"
-    >
+        variant="filled">
         {{ __('Open Manager') }}
     </flux:button>
 </div>

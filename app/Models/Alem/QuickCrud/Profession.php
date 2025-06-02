@@ -3,30 +3,38 @@
 namespace App\Models\Alem\QuickCrud;
 
 use App\Models\Alem\Employee;
-use App\Traits\BelongsToCompany;
 use App\Traits\Cache\WithRedisCache;
+use App\Traits\Model\DataFilter;
+use App\Traits\Model\ManagesContextAndOwnership;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Profession extends Model
 {
-    use BelongsToCompany, HasFactory, WithRedisCache;
+    use DataFilter, ManagesContextAndOwnership, WithRedisCache;
+    use HasFactory;
 
     /**
-     * The key used for caching this model
+     * Cache-Schlüssel für dieses Model
      *
      * @var string
      */
     protected $cacheKey = 'professions_cache';
 
     /**
-     * Cache duration in seconds (-1 for forever)
+     * Cache-Dauer in Sekunden (-1 for forever)
      *
      * @var int
      */
     protected $cacheDuration = 43200; // 12 hours
 
+    /**
+     * Mass assignable attributes
+     *
+     * @var array<string>
+     */
     protected $fillable = [
         'name',
         'company_id',
@@ -35,7 +43,9 @@ class Profession extends Model
     ];
 
     /**
-     * Gibt die Mitarbeiter die zu dieser Berufsbezeichnung/ Position zugeorndet sind.
+     * Relation zu Mitarbeitern
+     *
+     * @return HasMany
      */
     public function employees(): HasMany
     {
@@ -43,7 +53,11 @@ class Profession extends Model
     }
 
     /**
-     * Get professions for a specific company with caching
+     * Holt alle Professions einer Company mit Caching
+     * Wir in den Dropdowns verwendet
+     *
+     * @param int $companyId
+     * @return Collection
      */
     public static function getCompanyProfessions(int $companyId)
     {

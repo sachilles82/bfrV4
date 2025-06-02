@@ -20,6 +20,9 @@
         <livewire:alem.quick-crud.stage.stage-form
         />
 
+        <livewire:alem.quick-crud.profession.profession-form
+        />
+
     </x-pupi.layout.container>
 
 </x-app-layout>

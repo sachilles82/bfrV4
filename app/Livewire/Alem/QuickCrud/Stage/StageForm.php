@@ -46,7 +46,7 @@ class StageForm extends Component
     /**
      * Event-Handler: Modal öffnen
      */
-    #[On('open-modal-manager')]
+    #[On('open-stage-manager')]
     public function openStageFormModal(): void
     {
         $this->dataLoaded = true;

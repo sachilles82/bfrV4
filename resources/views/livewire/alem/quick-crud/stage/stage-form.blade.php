@@ -1,5 +1,8 @@
 <div>
-    <flux:modal.trigger name="create-stage">
+    <flux:modal.trigger
+        name="create-stage"
+        @click="$dispatch('open-stage-manager')"
+    >
         <x-pupi.button.open-manager/>
     </flux:modal.trigger>
 
@@ -60,18 +63,22 @@
             <div class="flex flex-col pt-6" role="status">
                 <div class="-m-1.5 overflow-x-auto">
                     <div class="p-1.5 min-w-full inline-block align-middle">
-                        <div class="border border-gray-200 rounded-lg shadow-xs overflow-hidden dark:border-neutral-700 dark:shadow-gray-900">
+                        <div
+                            class="border border-gray-200 rounded-lg shadow-xs overflow-hidden dark:border-neutral-700 dark:shadow-gray-900">
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
                                 <thead class="bg-gray-50 dark:bg-neutral-700">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-start">
-                                        <div class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-20 animate-pulse"></div>
+                                        <div
+                                            class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-20 animate-pulse"></div>
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-start">
-                                        <div class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-24 animate-pulse"></div>
+                                        <div
+                                            class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-24 animate-pulse"></div>
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-end">
-                                        <div class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-16 ml-auto animate-pulse"></div>
+                                        <div
+                                            class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-16 ml-auto animate-pulse"></div>
                                     </th>
                                 </tr>
                                 </thead>
@@ -79,15 +86,19 @@
                                 @for($i = 0; $i < 5; $i++)
                                     <tr>
                                         <td class="px-6 py-4">
-                                            <div class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-32 animate-pulse"></div>
+                                            <div
+                                                class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-32 animate-pulse"></div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <div class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-28 animate-pulse"></div>
+                                            <div
+                                                class="h-4 bg-gray-200 rounded-full dark:bg-gray-700 w-28 animate-pulse"></div>
                                         </td>
                                         <td class="px-6 py-4 text-end">
                                             <div class="flex justify-end items-center gap-2">
-                                                <div class="h-4 bg-gray-200 rounded dark:bg-gray-700 w-12 animate-pulse"></div>
-                                                <div class="h-4 bg-gray-200 rounded dark:bg-gray-700 w-14 animate-pulse"></div>
+                                                <div
+                                                    class="h-4 bg-gray-200 rounded dark:bg-gray-700 w-12 animate-pulse"></div>
+                                                <div
+                                                    class="h-4 bg-gray-200 rounded dark:bg-gray-700 w-14 animate-pulse"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -103,48 +114,53 @@
                 <span class="sr-only">Loading...</span>
             </div>
         @else
-{{--            <div class="flex gap-2 mb-4">--}}
-{{--                <button--}}
-{{--                    wire:click="setFilterMode('user')"--}}
-{{--                    class="px-3 py-1 rounded {{ $filterMode === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
-{{--                >--}}
-{{--                    {{ __('My Stages') }}--}}
-{{--                </button>--}}
-{{--                <button--}}
-{{--                    wire:click="setFilterMode('team')"--}}
-{{--                    class="px-3 py-1 rounded {{ $filterMode === 'team' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
-{{--                >--}}
-{{--                    {{ __('Team Stages') }}--}}
-{{--                </button>--}}
-{{--                <button--}}
-{{--                    wire:click="setFilterMode('company')"--}}
-{{--                    class="px-3 py-1 rounded {{ $filterMode === 'company' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
-{{--                >--}}
-{{--                    {{ __('Company Stages') }}--}}
-{{--                </button>--}}
-{{--            </div>--}}
+            {{--            <div class="flex gap-2 mb-4">--}}
+            {{--                <button--}}
+            {{--                    wire:click="setFilterMode('user')"--}}
+            {{--                    class="px-3 py-1 rounded {{ $filterMode === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
+            {{--                >--}}
+            {{--                    {{ __('My Stages') }}--}}
+            {{--                </button>--}}
+            {{--                <button--}}
+            {{--                    wire:click="setFilterMode('team')"--}}
+            {{--                    class="px-3 py-1 rounded {{ $filterMode === 'team' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
+            {{--                >--}}
+            {{--                    {{ __('Team Stages') }}--}}
+            {{--                </button>--}}
+            {{--                <button--}}
+            {{--                    wire:click="setFilterMode('company')"--}}
+            {{--                    class="px-3 py-1 rounded {{ $filterMode === 'company' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
+            {{--                >--}}
+            {{--                    {{ __('Company Stages') }}--}}
+            {{--                </button>--}}
+            {{--            </div>--}}
             <!-- Daten-Tabelle -->
             <div class="flex flex-col pt-6" wire:key="stages-table-{{ $dataLoaded ? 'dataLoaded' : 'empty' }}">
                 <div class="-m-1.5 overflow-x-auto">
                     <div class="p-1.5 min-w-full inline-block align-middle">
-                        <div class="border border-gray-200 rounded-lg shadow-xs overflow-hidden dark:border-neutral-700 dark:shadow-gray-900">
+                        <div
+                            class="border border-gray-200 rounded-lg shadow-xs overflow-hidden dark:border-neutral-700 dark:shadow-gray-900">
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
                                 <thead class="bg-gray-50 dark:bg-neutral-700">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">
                                         {{ __('Name') }}
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">
                                         {{ __('Updated') }}
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">
+                                    <th scope="col"
+                                        class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase dark:text-neutral-400">
                                         {{ __('Action') }}
                                     </th>
                                 </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
                                 @forelse($stages as $stage)
-                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-800" wire:key="stage-{{ $stage->id }}">
+                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-800"
+                                        wire:key="stage-{{ $stage->id }}">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                                             {{ $stage->name }}
                                         </td>
