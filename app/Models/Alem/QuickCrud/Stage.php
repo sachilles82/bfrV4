@@ -3,45 +3,49 @@
 namespace App\Models\Alem\QuickCrud;
 
 use App\Models\Alem\Employee;
-use App\Scopes\UserScope;
-use App\Traits\BelongsToUser;
 use App\Traits\Cache\WithRedisCache;
+use App\Traits\Model\DataFilter;
+use App\Traits\Model\ManagesContextAndOwnership;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Stage extends Model
 {
-    use BelongsToUser, HasFactory, WithRedisCache;
+    use DataFilter, ManagesContextAndOwnership, WithRedisCache;
+    use HasFactory;
 
     /**
-     * Der globale Scope für dieses Model
-     */
-    protected static string $scopeClass = UserScope::class;
-
-    /**
-     * The key used for caching this model
+     * Cache-Schlüssel für dieses Model
      *
      * @var string
      */
     protected string $cacheKey = 'stages_cache';
 
     /**
-     * Cache duration in seconds (-1 for forever)
+     * Cache-Dauer in Sekunden
      *
      * @var int
      */
     protected int $cacheDuration = 43200; // 12 hours
 
+    /**
+     * Mass assignable attributes
+     *
+     * @var array<string>
+     */
     protected $fillable = [
         'name',
-        'company_id', // Wird durch ManagesContextAndOwnership befüllt
-        'team_id',    // Wird durch ManagesContextAndOwnership befüllt
-        'created_by', // Wird durch ManagesContextAndOwnership befüllt
+        'company_id',
+        'team_id',
+        'created_by',
     ];
 
     /**
-     * Gibt die Mitarbeiter die zu dieser Karrierestufe zugeorndet sind.
+     * Relation zu Mitarbeitern
+     *
+     * @return HasMany
      */
     public function employees(): HasMany
     {
@@ -49,9 +53,13 @@ class Stage extends Model
     }
 
     /**
-     * Get stages for a specific company with caching
+     * Holt alle Stages einer Company mit Caching
+     * Wir in den Dropdowns verwendet
+     *
+     * @param int $companyId
+     * @return Collection
      */
-    public static function getCompanyStages(int $companyId)
+    public static function getCompanyStages(int $companyId): Collection
     {
         return self::cacheCompanyResult($companyId, function() use ($companyId) {
             return self::where('company_id', $companyId)

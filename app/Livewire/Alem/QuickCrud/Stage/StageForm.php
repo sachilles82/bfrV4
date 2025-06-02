@@ -7,6 +7,7 @@ use App\Models\Alem\QuickCrud\Stage;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,12 +22,26 @@ class StageForm extends Component
 {
     use ValidateStageForm, WithPerPagePagination, WithPlaceholder;
 
+    /**
+     * Datenfilter-Modus: 'user', 'team' oder 'company'
+     *
+     * @var string
+     */
+    public string $filterMode = 'user';
+
+    /**
+     * Stage ID (gesperrt für Sicherheit)
+     *
+     * @var int|null
+     */
     #[Locked]
     public ?int $stageId = null;
+
     public ?string $name = null;
 
     public bool $editing = false;
     public bool $dataLoaded = false;
+
 
     /**
      * Event-Handler: Modal öffnen
@@ -50,7 +65,7 @@ class StageForm extends Component
 
             if ($this->editing && $this->stageId) {
 
-                $stage = Stage::query()
+                $stage = $this->getFilteredQuery()
                     ->findOrFail($this->stageId);
 
                 $stage->update([
@@ -112,7 +127,7 @@ class StageForm extends Component
     {
         try {
 
-            $stage = Stage::query()
+            $stage = $this->getFilteredQuery()
                 ->findOrFail($id);
 
             $this->stageId = $stage->id;
@@ -148,7 +163,7 @@ class StageForm extends Component
     {
         try {
 
-            $stage = Stage::query()
+            $stage = $this->getFilteredQuery()
                 ->findOrFail($id);
 
             $stage->delete();
@@ -180,6 +195,34 @@ class StageForm extends Component
             );
 
         }
+    }
+
+    /**
+     * Setzt den Filter-Modus
+     *
+     * @param string $mode
+     * @return void
+     */
+    public function setFilterMode(string $mode): void
+    {
+        if (in_array($mode, ['user', 'team', 'company'])) {
+            $this->filterMode = $mode;
+            $this->resetPage();
+        }
+    }
+
+    /**
+     * Gibt die gefilterte Query zurück basierend auf dem aktuellen Modus
+     *
+     * @return Builder
+     */
+    private function getFilteredQuery()
+    {
+        return match ($this->filterMode) {
+            'team' => Stage::teamData(),
+            'company' => Stage::companyData(),
+            default => Stage::userData(),
+        };
     }
 
     /**
@@ -218,10 +261,7 @@ class StageForm extends Component
         $stages = collect();
 
         if ($this->dataLoaded && Auth::check()) {
-
-            // wenn du dataloaded hast, dann brauchst du lazy loading nicht mehr, es würde nur eine zusätzliche Query ausführen
-
-            $query = Stage::query()
+            $query = $this->getFilteredQuery()
                 ->select('id', 'name', 'updated_at')
                 ->orderBy('updated_at', 'desc');
 
@@ -230,6 +270,7 @@ class StageForm extends Component
 
         return view('livewire.alem.quick-crud.stage.stage-form', [
             'stages' => $stages,
+            'filterMode' => $this->filterMode,
         ]);
     }
 }

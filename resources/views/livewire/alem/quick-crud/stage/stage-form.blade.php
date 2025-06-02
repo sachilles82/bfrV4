@@ -103,6 +103,26 @@
                 <span class="sr-only">Loading...</span>
             </div>
         @else
+{{--            <div class="flex gap-2 mb-4">--}}
+{{--                <button--}}
+{{--                    wire:click="setFilterMode('user')"--}}
+{{--                    class="px-3 py-1 rounded {{ $filterMode === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
+{{--                >--}}
+{{--                    {{ __('My Stages') }}--}}
+{{--                </button>--}}
+{{--                <button--}}
+{{--                    wire:click="setFilterMode('team')"--}}
+{{--                    class="px-3 py-1 rounded {{ $filterMode === 'team' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
+{{--                >--}}
+{{--                    {{ __('Team Stages') }}--}}
+{{--                </button>--}}
+{{--                <button--}}
+{{--                    wire:click="setFilterMode('company')"--}}
+{{--                    class="px-3 py-1 rounded {{ $filterMode === 'company' ? 'bg-blue-500 text-white' : 'bg-gray-200' }}"--}}
+{{--                >--}}
+{{--                    {{ __('Company Stages') }}--}}
+{{--                </button>--}}
+{{--            </div>--}}
             <!-- Daten-Tabelle -->
             <div class="flex flex-col pt-6" wire:key="stages-table-{{ $dataLoaded ? 'dataLoaded' : 'empty' }}">
                 <div class="-m-1.5 overflow-x-auto">
