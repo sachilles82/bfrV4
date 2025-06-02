@@ -6,6 +6,8 @@ use App\Enums\Model\ModelStatus;
 use App\Models\User;
 use App\Traits\BelongsToTeam;
 use App\Traits\Cache\WithRedisCache;
+use App\Traits\Model\DataFilter;
+use App\Traits\Model\ManagesContextAndOwnership;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +18,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Department extends Model
 {
     use HasFactory;
-    use BelongsToTeam;
     use ModelPermanentDeletion;
     use ModelStatusManagement {
         ModelStatusManagement::restore insteadof SoftDeletes;
@@ -25,6 +26,7 @@ class Department extends Model
     }
     use SoftDeletes;
     use WithRedisCache;
+    use DataFilter, ManagesContextAndOwnership;
 
     /**
      * The key used for caching this model
