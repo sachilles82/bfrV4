@@ -8,7 +8,6 @@ use App\Models\Alem\QuickCrud\Stage;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +34,24 @@ class StageForm extends Component
 
     public bool $editing = false;
     public bool $dataLoaded = false;
+
+    /**
+     * ID des authentifizierten Benutzers.
+     * Wird von der übergeordneten View übergeben.
+     */
+    // Properties für die übergebenen Daten
+    public ?int $authUserId = null;
+    public ?int $currentTeamId = null;
+    public ?int $companyId = null;
+
+    public function mount(?int $authUserId = null, ?int $currentTeamId = null, ?int $companyId = null): void
+    {
+        // Wenn keine authUserId übergeben wird, versuche, sie vom aktuellen Benutzer zu holen
+        // Dies dient als Fallback, falls die Komponente an anderer Stelle ohne Übergabe verwendet wird.
+        $this->authUserId = $authUserId ?? auth()->id();
+        $this->currentTeamId = $currentTeamId;
+        $this->companyId = $companyId;
+    }
 
     /**
      * Event-Handler: Modal öffnen
@@ -98,7 +115,7 @@ class StageForm extends Component
             DB::rollBack();
             Log::error("Fehler beim Erstellen der Stage: " . $e->getMessage(), [
                 'exception' => $e,
-                'acting_user_id' => $this->authUserId ?? auth()->id(),
+                'acting_user_id' => $this->authUserId,
                 'stage_id' => $this->stageId,
                 'formData' => collect($this->only([
                     'name'
@@ -226,7 +243,7 @@ class StageForm extends Component
     {
         $stages = collect();
 
-        if ($this->dataLoaded && Auth::check()) {
+        if ($this->dataLoaded && $this->authUserId) {
             $query = $this->getFilteredQuery()
                 ->select('id', 'name', 'updated_at')
                 ->orderBy('updated_at', 'desc');

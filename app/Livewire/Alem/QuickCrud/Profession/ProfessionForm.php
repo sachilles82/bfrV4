@@ -21,15 +21,6 @@ class ProfessionForm extends Component
     use ValidateProfessionForm, DataFilter, WithPerPagePagination, WithPlaceholder;
 
     /**
-     * ID des authentifizierten Benutzers.
-     * Wird von der übergeordneten View übergeben.
-     */
-    // Properties für die übergebenen Daten
-    public ?int $authUserId = null;
-    public ?int $currentTeamId = null;
-    public ?int $companyId = null;
-
-    /**
      * Profession ID (gesperrt für Sicherheit)
      *
      * @var int|null
@@ -42,16 +33,21 @@ class ProfessionForm extends Component
     public bool $editing = false;
     public bool $dataLoaded = false;
 
+    /**
+     * ID des authentifizierten Benutzers.
+     * Wird von der übergeordneten View übergeben.
+     */
+    // Properties für die übergebenen Daten
+    public ?int $authUserId = null;
+    public ?int $currentTeamId = null;
+    public ?int $companyId = null;
 
     public function mount(?int $authUserId = null, ?int $currentTeamId = null, ?int $companyId = null): void
     {
-        // Wenn keine authUserId übergeben wird, versuche, sie vom aktuellen Benutzer zu holen
-        // Dies dient als Fallback, falls die Komponente an anderer Stelle ohne Übergabe verwendet wird.
         $this->authUserId = $authUserId ?? auth()->id();
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
     }
-
 
     /**
      * Event-Handler: Modal öffnen

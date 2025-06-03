@@ -302,8 +302,8 @@ class CreateEmployee extends Component
     public function refreshProfessions(?int $id = null): void
     {
         // Cache in der Datenbank leeren
-        Profession::flushCompanyCache($this->companyId);
-
+//        Profession::flushCompanyCache($this->companyId);
+//
         // Lokale Cache-Variable zurücksetzen
         $this->professions = null;
 
@@ -357,7 +357,7 @@ class CreateEmployee extends Component
     public function refreshStages(?int $id = null): void
     {
         // Cache in der Datenbank leeren
-        Stage::flushCompanyCache($this->companyId);
+//        Stage::flushCompanyCache($this->companyId);
 
         // Lokale Cache-Variable zurücksetzen
         $this->stages = null;

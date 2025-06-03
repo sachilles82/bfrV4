@@ -327,9 +327,9 @@ class EditEmployee extends Component
     #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
     public function refreshProfessions(?int $id = null): void
     {
-        // Cache in der Datenbank leeren
-        Profession::flushCompanyCache($this->companyId);
-
+//        // Cache in der Datenbank leeren
+//        Profession::flushCompanyCache($this->companyId);
+//
         // Lokale Cache-Variable zurücksetzen
         $this->professions = null;
 
@@ -383,8 +383,8 @@ class EditEmployee extends Component
     #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
     public function refreshStages(?int $id = null): void
     {
-        // Cache in der Datenbank leeren
-        Stage::flushCompanyCache($this->companyId);
+//        // Cache in der Datenbank leeren
+//        Stage::flushCompanyCache($this->companyId);
 
         // Lokale Cache-Variable zurücksetzen
         $this->stages = null;
