@@ -43,33 +43,37 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Status Selection -->
-                    <div class="sm:col-span-6">
+                    <!-- Model Status -->
+                    <div class="sm:col-span-3">
                         <x-pupi.input.group
-                            label="{{ __('Status') }}"
+                            label="{{ __('Account Status') }}"
                             for="model_status"
                             badge="{{ __('Required') }}"
                             :error="$errors->first('model_status')"
-                            model="model_status"
-                        >
+                            model="model_status">
+
                             <flux:select
                                 class="mt-2"
                                 wire:model="model_status"
                                 id="model_status"
                                 variant="listbox">
-                                @foreach($modelStatusOptions as $statusOption)
-                                    <flux:option value="{{ $statusOption['value'] }}">
+
+                                @foreach($this->modelStatusOptionsForForms() as $statusOption)
+                                    <flux:option
+                                        wire:key="model-status-option-{{ $statusOption['value'] }}"
+                                        value="{{ $statusOption['value'] }}">
                                         <div class="flex items-center">
-                                            <span class="mr-2">
-                                                <x-dynamic-component
-                                                    :component="$statusOption['icon']"
-                                                    class="{{ $statusOption['colors'] ?? '' }}"/>
-                                            </span>
+                                                <span class="mr-2">
+                                                    <x-dynamic-component
+                                                        :component="$statusOption['icon']"
+                                                        class="h-4 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
+                                                </span>
                                             <span>{{ $statusOption['label'] }}</span>
                                         </div>
                                     </flux:option>
                                 @endforeach
                             </flux:select>
+
                         </x-pupi.input.group>
                     </div>
                 </div>

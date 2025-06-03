@@ -4,7 +4,6 @@ namespace App\Models\Alem;
 
 use App\Enums\Model\ModelStatus;
 use App\Models\User;
-use App\Traits\BelongsToTeam;
 use App\Traits\Cache\WithRedisCache;
 use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;

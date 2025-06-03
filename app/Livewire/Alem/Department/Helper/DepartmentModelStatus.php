@@ -5,7 +5,7 @@ namespace App\Livewire\Alem\Department\Helper;
 use App\Models\Alem\Department;
 use App\Traits\Model\ModelStatusAction;
 
-trait WithDepartmentModelStatus
+trait DepartmentModelStatus
 {
     use ModelStatusAction;
 

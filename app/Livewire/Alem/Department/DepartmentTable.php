@@ -4,19 +4,23 @@ namespace App\Livewire\Alem\Department;
 
 use App\Enums\Model\ModelStatus;
 use App\Livewire\Alem\Department\Helper\Searchable;
-use App\Livewire\Alem\Department\Helper\WithDepartmentModelStatus;
+use App\Livewire\Alem\Department\Helper\DepartmentModelStatus;
 use App\Livewire\Alem\Department\Helper\WithDepartmentSorting;
 use App\Models\Alem\Department;
 use App\Traits\Employee\WithUserAvatars;
+use App\Traits\Model\ModelStatusOptions;
 use App\Traits\Table\WithPerPagePagination;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class DepartmentTable extends Component
 {
-    use Searchable, WithDepartmentModelStatus, WithDepartmentSorting,
-        WithPerPagePagination,
+    use AuthorizesRequests;
+    use Searchable, WithPerPagePagination, WithDepartmentSorting;
+    use DepartmentModelStatus;
+    use ModelStatusOptions,
         WithUserAvatars;
 
     public $departmentId; // Wird benötigt damit ich die Daten in der EditDepartment Komponente laden kann
@@ -80,11 +84,11 @@ class DepartmentTable extends Component
         $this->applyStatusFilter($query);
 
         $departments = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
-        $this->idsOnPage = $departments->pluck('id')->map(fn ($id) => (string) $id)->toArray();
+        $this->idsOnPage = $departments->pluck('id')->map(fn($id) => (string)$id)->toArray();
 
         return view('livewire.alem.department.table', [
             'departments' => $departments,
-            'statuses' => ModelStatus::cases(),
+            'modelStatuses' => $this->modelStatusOptions,
         ]);
     }
 }

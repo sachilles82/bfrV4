@@ -6,6 +6,7 @@
 
         <x-pupi.actions.status-filter
             :statusFilter="$statusFilter"
+            :options="$modelStatuses"
         />
         <!-- Create Button für die Componente-->
         <flux:modal.trigger name="create-department">

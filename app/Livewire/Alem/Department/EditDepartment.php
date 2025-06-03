@@ -5,7 +5,7 @@ namespace App\Livewire\Alem\Department;
 use App\Livewire\Alem\Department\Helper\ValidateDepartment;
 use App\Livewire\Alem\Department\Helper\WithDepartmentSorting;
 use App\Models\Alem\Department;
-use App\Traits\Model\WithModelStatusOptions;
+use App\Traits\Model\ModelStatusOptions;
 use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
@@ -17,7 +17,7 @@ use Livewire\Component;
 class EditDepartment extends Component
 {
     use AuthorizesRequests, ValidateDepartment, WithDepartmentSorting,
-        WithModelStatusOptions;
+        ModelStatusOptions;
 
     #[Locked]
     public ?int $departmentId = null; // !Muss in jeder Komponente sein
