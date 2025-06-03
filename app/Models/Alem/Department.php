@@ -6,7 +6,7 @@ use App\Enums\Model\ModelStatus;
 use App\Models\User;
 use App\Traits\BelongsToTeam;
 use App\Traits\Cache\WithRedisCache;
-use App\Traits\Model\DataFilter;
+use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
@@ -26,7 +26,7 @@ class Department extends Model
     }
     use SoftDeletes;
     use WithRedisCache;
-    use DataFilter, ManagesContextAndOwnership;
+    use ManageDataFilter, ManagesContextAndOwnership;
 
     /**
      * The key used for caching this model

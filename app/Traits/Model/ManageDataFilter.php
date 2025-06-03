@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
  * - teamData(): Filtert nur Daten des aktuellen Teams
  * - companyData(): Filtert nur Daten der aktuellen Company
  */
-trait DataFilter
+trait ManageDataFilter
 {
     /**
      * Filtert Query nach Daten des authentifizierten Benutzers

@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Alem\QuickCrud\Profession;
 
+use App\Livewire\Alem\QuickCrud\Profession\Helper\DataFilter;
 use App\Livewire\Alem\QuickCrud\Profession\Helper\ValidateProfessionForm;
 use App\Models\Alem\QuickCrud\Profession;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,14 +19,7 @@ use Livewire\Component;
 
 class ProfessionForm extends Component
 {
-    use ValidateProfessionForm, WithPerPagePagination, WithPlaceholder;
-
-    /**
-     * Datenfilter-Modus: 'user', 'team' oder 'company'
-     *
-     * @var string
-     */
-    public string $filterMode = 'user';
+    use ValidateProfessionForm, DataFilter, WithPerPagePagination, WithPlaceholder;
 
     /**
      * Profession ID (gesperrt für Sicherheit)
@@ -144,7 +137,7 @@ class ProfessionForm extends Component
         } catch (\Throwable $e) {
 
             Flux::toast(
-                text: __('Cannot edit this Profession.'),
+                text: __('You cannot edit this Profession.'),
                 heading: __('Error'),
                 variant: 'danger'
             );
@@ -186,40 +179,12 @@ class ProfessionForm extends Component
         } catch (\Throwable $e) {
 
             Flux::toast(
-                text: __('Cannot delete this Profession.'),
+                text: __('You cannot delete this Profession.'),
                 heading: __('Error'),
                 variant: 'danger'
             );
 
         }
-    }
-
-    /**
-     * Setzt den Filter-Modus
-     *
-     * @param string $mode
-     * @return void
-     */
-    public function setFilterMode(string $mode): void
-    {
-        if (in_array($mode, ['user', 'team', 'company'])) {
-            $this->filterMode = $mode;
-            $this->resetPage();
-        }
-    }
-
-    /**
-     * Gibt die gefilterte Query zurück basierend auf dem aktuellen Modus
-     *
-     * @return Builder
-     */
-    private function getFilteredQuery()
-    {
-        return match ($this->filterMode) {
-            'team' => Profession::teamData(),
-            'company' => Profession::companyData(),
-            default => Profession::userData(),
-        };
     }
 
     /**

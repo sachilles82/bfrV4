@@ -4,7 +4,7 @@ namespace App\Models\Alem\QuickCrud;
 
 use App\Models\Alem\Employee;
 use App\Traits\Cache\WithRedisCache;
-use App\Traits\Model\DataFilter;
+use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Profession extends Model
 {
-    use DataFilter, ManagesContextAndOwnership, WithRedisCache;
+    use ManageDataFilter, ManagesContextAndOwnership, WithRedisCache;
     use HasFactory;
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Alem\QuickCrud\Stage;
 
+use App\Livewire\Alem\QuickCrud\Stage\Helper\DataFilter;
 use App\Livewire\Alem\QuickCrud\Stage\Helper\ValidateStageForm;
 use App\Models\Alem\QuickCrud\Stage;
 use App\Traits\Modal\WithPlaceholder;
@@ -20,14 +21,7 @@ use Livewire\Component;
 //#[Lazy(isolate: false)]// Lazy loading isolate führt zusätzliche query aus, deswegen brauch ich es nicht
 class StageForm extends Component
 {
-    use ValidateStageForm, WithPerPagePagination, WithPlaceholder;
-
-    /**
-     * Datenfilter-Modus: 'user', 'team' oder 'company'
-     *
-     * @var string
-     */
-    public string $filterMode = 'user';
+    use ValidateStageForm, DataFilter, WithPerPagePagination, WithPlaceholder;
 
     /**
      * Stage ID (gesperrt für Sicherheit)
@@ -197,33 +191,6 @@ class StageForm extends Component
         }
     }
 
-    /**
-     * Setzt den Filter-Modus
-     *
-     * @param string $mode
-     * @return void
-     */
-    public function setFilterMode(string $mode): void
-    {
-        if (in_array($mode, ['user', 'team', 'company'])) {
-            $this->filterMode = $mode;
-            $this->resetPage();
-        }
-    }
-
-    /**
-     * Gibt die gefilterte Query zurück basierend auf dem aktuellen Modus
-     *
-     * @return Builder
-     */
-    private function getFilteredQuery()
-    {
-        return match ($this->filterMode) {
-            'team' => Stage::teamData(),
-            'company' => Stage::companyData(),
-            default => Stage::userData(),
-        };
-    }
 
     /**
      * Setzt Formular zurück und löscht alle Error-Bags.
