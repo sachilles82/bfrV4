@@ -167,9 +167,9 @@
 
 
                                 <x-slot name="add">
-                                    <livewire:alem.department.create-department
-                                        lazy
-                                    />
+{{--                                    <livewire:alem.department.create-department--}}
+{{--                                        lazy--}}
+{{--                                    />--}}
                                 </x-slot>
                             </flux:select>
 
@@ -282,10 +282,16 @@
                                 @endforelse
 
                                 <x-slot name="add">
-                                    <livewire:alem.quick-crud.profession.profession-form
-                                        lazy
-                                    />
+
+                                    <flux:modal.trigger
+                                        name="create-profession"
+                                        @click="$dispatch('open-profession-manager')"
+                                    >
+                                        <x-pupi.button.open-manager/>
+                                    </flux:modal.trigger>
+
                                 </x-slot>
+
                             </flux:select>
 
                         </x-pupi.input.group>
@@ -319,11 +325,17 @@
                                     <flux:option value="">{{ __('No stages found') }}</flux:option>
                                 @endforelse
 
-                                <x-slot name="add">
-                                    <livewire:alem.quick-crud.stage.stage-form
-                                        lazy
-                                    />
-                                </x-slot>
+                                    <x-slot name="add">
+
+                                        <flux:modal.trigger
+                                            name="create-stage"
+                                            @click="$dispatch('open-stage-manager')"
+                                        >
+                                            <x-pupi.button.open-manager/>
+                                        </flux:modal.trigger>
+
+                                    </x-slot>
+
                             </flux:select>
 
                         </x-pupi.input.group>

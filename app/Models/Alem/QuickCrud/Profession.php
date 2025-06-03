@@ -52,20 +52,47 @@ class Profession extends Model
         return $this->hasMany(Employee::class, 'profession_id');
     }
 
-    /**
-     * Holt alle Professions einer Company mit Caching
-     * Wir in den Dropdowns verwendet
-     *
-     * @param int $companyId
-     * @return Collection
-     */
-    public static function getCompanyProfessions(int $companyId)
+//    /**
+//     * Holt alle Professions einer Company mit Caching
+//     * Wir in den Dropdowns verwendet
+//     *
+//     * @param int $companyId
+//     * @return Collection
+//     */
+//    public static function getCompanyProfessions(int $companyId)
+//    {
+//        return self::cacheCompanyResult($companyId, function() use ($companyId) {
+//            return self::where('company_id', $companyId)
+//                ->select(['id', 'name'])
+//                ->orderBy('name')
+//                ->get();
+//        });
+//    }
+
+// app/Models/Alem/QuickCrud/Profession.php
+    public static function getCompanyProfessions(int $companyId): EloquentCollection
     {
-        return self::cacheCompanyResult($companyId, function() use ($companyId) {
+        $staticCacheKey = 'company_professions_for_company_' . $companyId;
+        // Log::debug("ProfessionModel: Attempting to getCompanyProfessions for company {$companyId}. Static cache key: {$staticCacheKey}");
+
+        if (isset(self::$requestCacheForCompanyProfessions[$staticCacheKey])) {
+            // Log::debug("ProfessionModel: Serving getCompanyProfessions for company {$companyId} from STATIC request cache.");
+            return self::$requestCacheForCompanyProfessions[$staticCacheKey];
+        }
+
+        // Log::debug("ProfessionModel: STATIC request cache miss for getCompanyProfessions (company {$companyId}). Proceeding to Redis/DB.");
+
+        $professions = self::cacheCompanyResult($companyId, function () use ($companyId) {
+            // Log::info("ProfessionModel: Cache CALLBACK RUNNING for getCompanyProfessions (company {$companyId}) - DB query will occur.");
             return self::where('company_id', $companyId)
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
         });
+
+        self::$requestCacheForCompanyProfessions[$staticCacheKey] = $professions;
+        // Log::debug("ProfessionModel: Stored getCompanyProfessions for company {$companyId} in STATIC request cache. Count: " . $professions->count());
+
+        return $professions;
     }
 }

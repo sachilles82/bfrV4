@@ -36,7 +36,6 @@ class StageForm extends Component
     public bool $editing = false;
     public bool $dataLoaded = false;
 
-
     /**
      * Event-Handler: Modal öffnen
      */

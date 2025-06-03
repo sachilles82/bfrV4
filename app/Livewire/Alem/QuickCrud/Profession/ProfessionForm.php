@@ -9,7 +9,6 @@ use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -20,6 +19,15 @@ use Livewire\Component;
 class ProfessionForm extends Component
 {
     use ValidateProfessionForm, DataFilter, WithPerPagePagination, WithPlaceholder;
+
+    /**
+     * ID des authentifizierten Benutzers.
+     * Wird von der übergeordneten View übergeben.
+     */
+    // Properties für die übergebenen Daten
+    public ?int $authUserId = null;
+    public ?int $currentTeamId = null;
+    public ?int $companyId = null;
 
     /**
      * Profession ID (gesperrt für Sicherheit)
@@ -33,6 +41,16 @@ class ProfessionForm extends Component
 
     public bool $editing = false;
     public bool $dataLoaded = false;
+
+
+    public function mount(?int $authUserId = null, ?int $currentTeamId = null, ?int $companyId = null): void
+    {
+        // Wenn keine authUserId übergeben wird, versuche, sie vom aktuellen Benutzer zu holen
+        // Dies dient als Fallback, falls die Komponente an anderer Stelle ohne Übergabe verwendet wird.
+        $this->authUserId = $authUserId ?? auth()->id();
+        $this->currentTeamId = $currentTeamId;
+        $this->companyId = $companyId;
+    }
 
 
     /**
@@ -96,7 +114,7 @@ class ProfessionForm extends Component
             DB::rollBack();
             Log::error("Fehler beim Erstellen der Profession: " . $e->getMessage(), [
                 'exception' => $e,
-                'acting_user_id' => $this->authUserId ?? auth()->id(),
+                'acting_user_id' => $this->authUserId,
                 'profession_id' => $this->professionId,
                 'formData' => collect($this->only([
                     'name'
@@ -218,7 +236,7 @@ class ProfessionForm extends Component
     {
         $professions = collect();
 
-        if ($this->dataLoaded && Auth::check()) {
+        if ($this->dataLoaded && $this->authUserId) {
             $query = $this->getFilteredQuery()
                 ->select('id', 'name', 'updated_at')
                 ->orderBy('updated_at', 'desc');

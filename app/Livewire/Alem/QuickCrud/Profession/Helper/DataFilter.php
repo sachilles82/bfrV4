@@ -7,19 +7,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait DataFilter
 {
-    /**
-     * Datenfilter-Modus: 'user', 'team' oder 'company'
-     *
-     * @var string
-     */
     public string $filterMode = 'user';
 
-    /**
-     * Setzt den Filter-Modus
-     *
-     * @param string $mode
-     * @return void
-     */
     public function setFilterMode(string $mode): void
     {
         if (in_array($mode, ['user', 'team', 'company'])) {
@@ -30,16 +19,41 @@ trait DataFilter
 
     /**
      * Gibt die gefilterte Query zurück basierend auf dem aktuellen Modus
-     *
-     * @return Builder
+     * Nutzt die übergebenen Properties statt Auth::user()
      */
     private function getFilteredQuery(): Builder
     {
         return match ($this->filterMode) {
-            'team' => Profession::teamData(),
-            'company' => Profession::companyData(),
-            default => Profession::userData(),
+            'team' => $this->getTeamQuery(),
+            'company' => $this->getCompanyQuery(),
+            default => $this->getUserQuery(),
         };
     }
 
+    private function getUserQuery(): Builder
+    {
+        if (!$this->authUserId) {
+            return Profession::whereRaw('0 = 1');
+        }
+
+        return Profession::where('created_by', $this->authUserId);
+    }
+
+    private function getTeamQuery(): Builder
+    {
+        if (!$this->currentTeamId) {
+            return Profession::whereRaw('0 = 1');
+        }
+
+        return Profession::where('team_id', $this->currentTeamId);
+    }
+
+    private function getCompanyQuery(): Builder
+    {
+        if (!$this->companyId) {
+            return Profession::whereRaw('0 = 1');
+        }
+
+        return Profession::where('company_id', $this->companyId);
+    }
 }

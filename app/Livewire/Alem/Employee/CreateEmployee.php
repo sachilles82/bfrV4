@@ -31,7 +31,7 @@ use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy(isolate: false)]
+//#[Lazy(isolate: false)]
 class CreateEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee;

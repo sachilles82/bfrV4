@@ -1,12 +1,9 @@
 <div>
-    <flux:modal.trigger
+    <flux:modal
         name="create-stage"
-        @click="$dispatch('open-stage-manager')"
-    >
-        <x-pupi.button.open-manager/>
-    </flux:modal.trigger>
-
-    <flux:modal name="create-stage" variant="flyout" class="w-1/3">
+        variant="flyout"
+        position="left"
+        class="space-y-6 lg:min-w-3xl">
         <!-- Modal-Header -->
         <div>
             <flux:heading size="lg">
