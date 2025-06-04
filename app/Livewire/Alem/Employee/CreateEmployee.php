@@ -465,4 +465,41 @@ class CreateEmployee extends Component
     {
         return view('livewire.alem.employee.create');
     }
+
+    /**
+     * Lädt alle Dropdown-Daten neu
+     * Pragmatische Lösung für Cache-Refresh
+     */
+    public function refreshDropdownData(): void
+    {
+        // Leere alle relevanten Caches
+        if ($this->companyId) {
+            Profession::flushCompanyCache($this->companyId);
+            Stage::flushCompanyCache($this->companyId);
+            Department::flushTeamCache($this->currentTeamId);
+            User::flushManagerCache($this->companyId);
+            Role::flushCompanyCache($this->companyId);
+        }
+
+        // Setze alle lokalen Cache-Variablen zurück
+        $this->professions = null;
+        $this->stages = null;
+        $this->departments = null;
+        $this->supervisors = null;
+        $this->roles = null;
+        $this->teams = null;
+
+        // Lade-Status zurücksetzen
+        $this->dataLoaded = false;
+
+        // Daten neu laden
+        $this->loadRelationForDropDowns();
+
+        // Optional: Erfolgsmeldung
+        Flux::toast(
+            text: __('Dropdown data refreshed successfully.'),
+            heading: __('Success'),
+            variant: 'success'
+        );
+    }
 }

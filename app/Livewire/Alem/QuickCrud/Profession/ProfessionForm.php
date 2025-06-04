@@ -101,7 +101,7 @@ class ProfessionForm extends Component
                 ]);
 
                 // Manuell den Company-Cache leeren
-                Profession::flushCompanyCache($this->companyId);
+//                Profession::flushCompanyCache($this->companyId);
 
                 $this->dispatch('profession-created', id: $profession->id);
 
