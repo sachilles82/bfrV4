@@ -37,18 +37,17 @@ class CreateEmployee extends Component
     use AuthorizesRequests, ValidateEmployee;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
-    // Modal-Status
+    /** Modal-Status */
     public bool $showCreateModal = false;
     private bool $dataLoaded = false;
 
-    // Eigenschaften für vorgeladene Daten - werden von Livewire automatisch befüllt
+    /** Eigenschaften für vorgeladene Daten */
     public ?int $authUserId = null;
     public ?int $currentTeamId = null;
     public ?int $companyId = null;
 
+    /** Benutzer-Felder */
     public ?int $userId = null;
-
-    // Benutzer-Felder
     public ?Gender $gender = null;
     public ?string $name = null;
     public ?string $last_name = null;
@@ -59,16 +58,18 @@ class CreateEmployee extends Component
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    // Mitarbeiter-Felder
+    /** Mitarbeiter-Felder */
     public ?EmployeeStatus $employee_status = null;
     public $profession;
     public $stage;
     public ?int $supervisor = null;
-
-    // Einladungs-Einstellungen **Ändere es in invitation
+    // Einladungs-Einstellungen **Ändere es in invitation ohne s
     public bool $invitations = false;
 
-    // Cache-Eigenschaften - privat und initialisieren bei Bedarf
+    /**
+     * Cache-Eigenschaften - Verwenden jetzt die neuen generischen Cache-Methoden
+     * Diese werden bei Bedarf geladen und automatisch invalidiert
+     */
     private ?Collection $teams = null;
     private ?Collection $departments = null;
     private ?Collection $roles = null;
@@ -96,6 +97,8 @@ class CreateEmployee extends Component
 
     /**
      * Lädt alle erforderlichen Daten für Dropdowns aus dem Cache
+     *
+     * Nutzt jetzt die neuen generischen Cache-Methoden aus dem WithRedisCache Trait
      */
     private function loadRelationForDropDowns(): void
     {
@@ -107,32 +110,38 @@ class CreateEmployee extends Component
             $companyId = $this->companyId;
             $teamId = $this->currentTeamId;
 
-            // Teams laden mit Caching
+            /** Teams laden mit neuer generischer Cache-Methode */
             if ($this->teams === null) {
                 $this->teams = Team::getCompanyTeams($companyId);
             }
 
-            // Departments laden mit Caching
+            /** Departments laden mit neuer generischer Cache-Methode */
             if ($this->departments === null) {
                 $this->departments = Department::getDepartmentsForTeam($teamId);
             }
 
-            // Supervisors laden mit Caching
+            /** Supervisors laden mit bestehender Cache-Methode */
             if ($this->supervisors === null) {
                 $this->supervisors = User::getCompanyManagers($companyId);
             }
 
-            // Roles laden mit Caching
+            /** Roles laden mit bestehender Cache-Methode */
             if ($this->roles === null) {
                 $this->roles = Role::getEmployeePanelRoles($companyId);
             }
 
-            // Professions laden mit Caching
+            /**
+             * Professions laden mit neuer generischer Cache-Methode
+             * Nutzt automatisch dreistufigen Cache (Request->Redis->DB)
+             */
             if ($this->professions === null) {
                 $this->professions = Profession::getCompanyProfessions($companyId);
             }
 
-            // Stages laden mit Caching
+            /**
+             * Stages laden mit neuer generischer Cache-Methode
+             * Nutzt automatisch dreistufigen Cache (Request->Redis->DB)
+             */
             if ($this->stages === null) {
                 $this->stages = Stage::getCompanyStages($companyId);
             }
@@ -159,7 +168,6 @@ class CreateEmployee extends Component
         }
 
         $generatedPassword  = Str::password();
-
         $this->validate();
 
         try {
@@ -254,12 +262,157 @@ class CreateEmployee extends Component
     }
 
     /**
-     * Setzt das Formular zurück und schließt das Modal
+     * Event-Handler: Aktualisiert Professions-Cache automatisch
+     *
+     * Der Cache wird automatisch durch das WithRedisCache Trait geleert,
+     * aber wir müssen die lokalen Component-Properties aktualisieren
+     */
+    #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
+    public function refreshProfessions(?int $id = null): void
+    {
+        /**
+         * Lokale Cache-Variable zurücksetzen
+         * Der Model-Cache wurde bereits automatisch durch das Trait geleert
+         */
+        $this->professions = null;
+        $this->dataLoaded = false;
+
+        /** Daten neu laden */
+        $this->loadRelationForDropDowns();
+
+        /** Falls eine neue Profession erstellt wurde, diese automatisch auswählen */
+        if ($id) {
+            $this->profession = $id;
+        }
+
+        /** Prüfe, ob die aktuell ausgewählte Profession noch existiert */
+        if ($this->profession) {
+            $professionExists = $this->professions?->contains('id', $this->profession);
+            if (!$professionExists) {
+                $this->profession = null;
+            }
+        }
+    }
+
+    /**
+     * Event-Handler: Aktualisiert Stages-Cache automatisch
+     */
+    #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
+    public function refreshStages(?int $id = null): void
+    {
+        /** Lokale Cache-Variable zurücksetzen */
+        $this->stages = null;
+        $this->dataLoaded = false;
+
+        /** Daten neu laden */
+        $this->loadRelationForDropDowns();
+
+        /** Falls eine neue Stage erstellt wurde, diese automatisch auswählen */
+        if ($id) {
+            $this->stage = $id;
+        }
+
+        /** Prüfe, ob die aktuell ausgewählte Stage noch existiert */
+        if ($this->stage) {
+            $stageExists = $this->stages?->contains('id', $this->stage);
+            if (!$stageExists) {
+                $this->stage = null;
+            }
+        }
+    }
+
+    /**
+     * Event-Handler: Aktualisiert Departments-Cache automatisch
+     */
+    #[On(['department-updated', 'department-created', 'department-deleted'])]
+    public function refreshDepartments(?int $id = null): void
+    {
+        /** Cache wird automatisch durch das Trait geleert */
+        $this->departments = null;
+        $this->dataLoaded = false;
+
+        /** Daten neu laden */
+        $this->loadRelationForDropDowns();
+
+        /** Falls ein neues Department erstellt wurde, dieses automatisch auswählen */
+        if ($id) {
+            $this->department = $id;
+        }
+
+        /** Prüfe, ob das aktuell ausgewählte Department noch existiert */
+        if ($this->department) {
+            $departmentExists = $this->departments?->contains('id', $this->department);
+            if (!$departmentExists) {
+                $this->department = null;
+            }
+        }
+    }
+
+    /**
+     * Computed Properties mit Null-Safety
+     */
+    #[Computed]
+    public function professions(): Collection
+    {
+        if ($this->professions === null && $this->showCreateModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->professions ?? collect();
+    }
+
+    #[Computed]
+    public function stages(): Collection
+    {
+        if ($this->stages === null && $this->showCreateModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->stages ?? collect();
+    }
+
+    #[Computed]
+    public function departments(): Collection
+    {
+        if ($this->departments === null && $this->showCreateModal) {
+            $this->loadRelationForDropDowns();
+        }
+
+        // Null-Safety-Check nach dem Laden
+        return $this->departments ?? collect();
+    }
+
+    #[Computed]
+    public function roles(): Collection
+    {
+        if ($this->roles === null && $this->showCreateModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->roles ?? collect();
+    }
+
+    #[Computed]
+    public function teams(): Collection
+    {
+        if ($this->teams === null && $this->showCreateModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->teams ?? collect();
+    }
+
+    #[Computed]
+    public function supervisors(): Collection
+    {
+        if ($this->supervisors === null && $this->showCreateModal) {
+            $this->loadRelationForDropDowns();
+        }
+        return $this->supervisors ?? collect();
+    }
+
+    /**
+     * Schließt das Modal und bereinigt alle Daten
      */
     public function closeCreateEmployeeModal(): void
     {
         $this->resetErrorBag();
-
         $this->modal('create-employee')->close();
 
         $this->reset([
@@ -269,7 +422,7 @@ class CreateEmployee extends Component
             'invitations',
         ]);
 
-        // Cache-Properties bereinigen, um Speicher freizugeben
+        /** Cache-Properties bereinigen */
         $this->teams = null;
         $this->departments = null;
         $this->roles = null;
@@ -282,208 +435,13 @@ class CreateEmployee extends Component
     }
 
     /**
-     * Lebenszyklusmethode um sicherzustellen, dass Daten auch nach Validierungsfehlern geladen sind
+     * Hydrate-Hook um sicherzustellen, dass Daten auch nach Validierungsfehlern geladen sind
      */
     public function hydrate(): void
     {
         if ($this->showCreateModal && !$this->dataLoaded) {
             $this->loadRelationForDropDowns();
         }
-    }
-
-    /**
-     * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt.
-     * Wird aufgerufen, wenn Professionen erstellt, aktualisiert oder gelöscht werden.
-     *
-     * @param int|null $id Die ID der neuen/aktualisierten Profession, falls vorhanden
-     * @return void
-     */
-    #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
-    public function refreshProfessions(?int $id = null): void
-    {
-        // Cache in der Datenbank leeren
-//        Profession::flushCompanyCache($this->companyId);
-//
-        // Lokale Cache-Variable zurücksetzen
-        $this->professions = null;
-
-        // Laden-Status zurücksetzen
-        $this->dataLoaded = false;
-
-        // Daten neu laden
-        $this->loadRelationForDropDowns();
-
-        // Falls eine neue Profession erstellt wurde, diese automatisch auswählen
-        if ($id) {
-            $this->profession = $id;
-        }
-
-        // Prüfe, ob die aktuell ausgewählte Profession noch existiert
-        if ($this->profession) {
-            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
-            $professionExists = $this->professions?->contains('id', $this->profession);
-            if (!$professionExists) {
-                $this->profession = null;
-            }
-        }
-    }
-
-    /**
-     * Gibt die Liste der Berufe (Professionen) zurück.
-     * Enthält zusätzliche Null-Safety-Checks.
-     *
-     * @return Collection
-     */
-    #[Computed]
-    public function professions(): Collection
-    {
-        // Prüfe, ob Daten geladen werden müssen
-        if ($this->professions === null && $this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-        }
-
-        // Null-Safety-Check nach dem Laden
-        return $this->professions ?? collect();
-    }
-
-    /**
-     * Aktualisiert die Cache-Daten für Stages.
-     * Wird aufgerufen, wenn Stages erstellt, aktualisiert oder gelöscht werden.
-     *
-     * @param int|null $id Die ID der neuen/aktualisierten Stage, falls vorhanden
-     * @return void
-     */
-    #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
-    public function refreshStages(?int $id = null): void
-    {
-        // Cache in der Datenbank leeren
-//        Stage::flushCompanyCache($this->companyId);
-
-        // Lokale Cache-Variable zurücksetzen
-        $this->stages = null;
-
-        // Laden-Status zurücksetzen
-        $this->dataLoaded = false;
-
-        // Daten neu laden
-        $this->loadRelationForDropDowns();
-
-        // Falls eine neue Stage erstellt wurde, diese automatisch auswählen
-        if ($id) {
-            $this->stage = $id;
-        }
-
-        // Prüfe, ob die aktuell ausgewählte Stage noch existiert
-        if ($this->stage) {
-            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
-            $stageExists = $this->stages?->contains('id', $this->stage);
-            if (!$stageExists) {
-                $this->stage = null;
-            }
-        }
-    }
-
-    /**
-     * Gibt die Liste der Karrierestufen zurück
-     */
-    #[Computed]
-    public function stages(): Collection
-    {
-        if ($this->stages === null && $this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-        }
-        return $this->stages ?? collect();
-    }
-
-    /**
-     * Aktualisiert die Cache-Daten für Departments.
-     * Wird aufgerufen, wenn Departments erstellt, aktualisiert oder gelöscht werden.
-     *
-     * @param int|null $id Die ID des neuen/aktualisierten Departments, falls vorhanden
-     * @return void
-     */
-    #[On(['department-updated', 'department-created', 'department-deleted'])]
-    public function refreshDepartments(?int $id = null): void
-    {
-        // Cache in der Datenbank leeren
-        Department::flushTeamCache($this->currentTeamId);
-
-        // Lokale Cache-Variable zurücksetzen
-        $this->departments = null;
-
-        // Laden-Status zurücksetzen
-        $this->dataLoaded = false;
-
-        // Daten neu laden
-        $this->loadRelationForDropDowns();
-
-        // Falls ein neues Department erstellt wurde, dieses automatisch auswählen
-        if ($id) {
-            $this->department = $id;
-        }
-
-        // Prüfe, ob das aktuell ausgewählte Department noch existiert
-        if ($this->department) {
-            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
-            $departmentExists = $this->departments?->contains('id', $this->department);
-            if (!$departmentExists) {
-                $this->department = null;
-            }
-        }
-    }
-
-    /**
-     * Gibt die Liste der Abteilungen (Departments) zurück.
-     * Enthält Null-Safety-Checks und lädt Daten bei Bedarf nach.
-     *
-     * @return Collection
-     */
-    #[Computed]
-    public function departments(): Collection
-    {
-        // Prüfe, ob Daten geladen werden müssen
-        if ($this->departments === null && $this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-        }
-
-        // Null-Safety-Check nach dem Laden
-        return $this->departments ?? collect();
-    }
-
-    /**
-     * Gibt die Liste der Rollen zurück
-     */
-    #[Computed]
-    public function roles(): Collection
-    {
-        if ($this->roles === null && $this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-        }
-        return $this->roles ?? collect();
-    }
-
-    /**
-     * Gibt die Liste der Teams zurück
-     */
-    #[Computed]
-    public function teams(): Collection
-    {
-        if ($this->teams === null && $this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-        }
-        return $this->teams ?? collect();
-    }
-
-    /**
-     * Gibt die Liste der Supervisoren zurück
-     */
-    #[Computed]
-    public function supervisors(): Collection
-    {
-        if ($this->supervisors === null && $this->showCreateModal) {
-            $this->loadRelationForDropDowns();
-        }
-        return $this->supervisors ?? collect();
     }
 
     public function render(): View

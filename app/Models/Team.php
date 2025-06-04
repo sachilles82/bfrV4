@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Alem\Company;
 use App\Traits\Cache\WithRedisCache;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Jetstream\Events\TeamCreated;
@@ -72,35 +73,47 @@ class Team extends JetstreamTeam
     }
 
     /**
-     * Get teams for a specific company with caching
+     * Hauptmethode: Holt alle Teams für eine Company mit dreistufigem Cache
+     *
+     * Nutzt die neue generische getCachedCompanyData() Methode
+     *
+     * @param int $companyId Company ID
+     * @return Collection
      */
     public static function getCompanyTeams(int $companyId)
     {
-        return self::cacheCompanyResult($companyId, function() use ($companyId) {
-            return self::where('company_id', $companyId)
-                ->select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-        });
+        return static::getCachedCompanyData($companyId, 'getQueryForCompany');
+    }
+
+    /**
+     * Spezifische Query-Logik für Teams einer Company
+     *
+     * @param int $companyId Company ID
+     * @return Collection
+     */
+    public static function getQueryForCompany(int $companyId)
+    {
+        return static::query()
+            ->where('company_id', $companyId)
+            ->select(['id', 'name'])
+            ->orderBy('name')
+            ->get();
     }
 
     protected static function booted(): void
     {
         static::creating(function (Team $team) {
-            // Wenn keine company_id explizit gesetzt wurde und ein Benutzer eingeloggt ist
+            /** Automatische company_id Zuweisung */
             if (!$team->company_id && auth()->check()) {
-                // Setze die company_id des authentifizierten Benutzers
                 $team->company_id = auth()->user()->company_id;
             }
         });
 
-        // Event-Hooks für Cache-Invalidierung
-        static::saved(function($role) {
-            self::flushCompanyCache($role->company_id);
-        });
-
-        static::deleted(function($role) {
-            self::flushCompanyCache($role->company_id);
-        });
+        /**
+         * Cache-Events werden jetzt automatisch vom WithRedisCache Trait gehandhabt
+         * Keine manuellen Event-Hooks mehr nötig:
+         * - static::saved() -> automatisch durch clearRelatedCaches()
+         * - static::deleted() -> automatisch durch clearRelatedCaches()
+         */
     }
 }

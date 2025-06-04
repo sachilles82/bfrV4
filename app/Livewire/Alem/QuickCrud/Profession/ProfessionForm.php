@@ -61,6 +61,8 @@ class ProfessionForm extends Component
 
     /**
      * Speichert oder aktualisiert eine Profession.
+     * Wichtiger Hinweis: Cache wird automatisch durch das WithRedisCache Trait geleert!
+     * Bei save/update Events werden automatisch alle relevanten Caches invalidiert:
      */
     public function saveProfession(): void
     {
@@ -71,12 +73,16 @@ class ProfessionForm extends Component
 
             if ($this->editing && $this->professionId) {
 
-                $profession =$this->getFilteredQuery()
+                $profession = $this->getFilteredQuery()
                     ->findOrFail($this->professionId);
 
                 $profession->update([
                     'name' => $this->name,
                 ]);
+
+                /**
+                 * Cache wird automatisch durch Model Events geleert!
+                 */
 
                 $this->dispatch('profession-updated');
 
@@ -90,6 +96,11 @@ class ProfessionForm extends Component
 
                 $profession = Profession::create([
                     'name' => $this->name,
+
+                    /**
+                     * company_id, team_id, created_by werden automatisch
+                     * durch ManagesContextAndOwnership Trait gesetzt
+                     */
                 ]);
 
                 $this->dispatch('profession-created', id: $profession->id);
@@ -160,16 +171,21 @@ class ProfessionForm extends Component
     }
 
     /**
-     * Löscht eine Profession.
-     *  Nur Profession, die vom authentifizierten Benutzer erstellt wurden, können gelöscht werden.
+     * Löscht eine Profession
+     *
+     * Cache wird automatisch durch Model Delete Event geleert!
      */
     public function deleteProfession($id): void
     {
         try {
 
-            $profession =$this->getFilteredQuery()
+            $profession = $this->getFilteredQuery()
                 ->findOrFail($id);
 
+            /**
+             * Delete Operation - Cache wird automatisch geleert!
+             * Das WithRedisCache Trait fängt das 'deleted' Event ab
+             */
             $profession->delete();
 
             Flux::toast(
@@ -180,7 +196,9 @@ class ProfessionForm extends Component
 
             $this->closeProfessionFormModal();
 
-            $this->dispatch('profession-deleted');
+//            $this->dispatch('profession-deleted');
+            /** Event für Livewire Components */
+            $this->dispatch('profession-deleted', id: $id);
 
         } catch (ModelNotFoundException $e) {
 

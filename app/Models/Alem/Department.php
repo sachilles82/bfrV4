@@ -9,6 +9,7 @@ use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -82,16 +83,41 @@ class Department extends Model
     }
 
     /**
-     * Get departments for a specific company with caching
+     * Hauptmethode: Holt alle Departments für ein Team mit dreistufigem Cache
+     *
+     * Nutzt die neue generische getCachedTeamData() Methode aus dem WithRedisCache Trait
+     *
+     * @param int $teamId Team ID
+     * @return Collection
      */
-    public static function getDepartmentsForTeam(int $teamId)
+    public static function getDepartmentsForTeam(int $teamId): Collection
     {
-        return self::cacheTeamResult($teamId, function () use ($teamId) {
-            return self::where('team_id', $teamId)
-                ->where('model_status', ModelStatus::ACTIVE->value)
-                ->select(['id', 'name'])
-                ->orderBy('name')
-                ->get();
-        });
+        return static::getCachedTeamData($teamId, 'getQueryForTeam');
     }
+
+    /**
+     * Spezifische Query-Logik für Departments eines Teams
+     *
+     * Diese Methode wird von getCachedTeamData() aufgerufen wenn der Cache leer ist
+     *
+     * @param int $teamId Team ID
+     * @return Collection
+     */
+    public static function getQueryForTeam(int $teamId): Collection
+    {
+        return static::query()
+            ->where('team_id', $teamId)
+            ->where('model_status', ModelStatus::ACTIVE->value)
+            ->select(['id', 'name'])
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Alle vorherigen manuellen Cache-Event-Hooks entfernt
+     * Das WithRedisCache Trait kümmert sich automatisch um:
+     * - Cache-Invalidierung bei created/updated/deleted Events
+     * - Request-Level und persistenter Cache
+     * - Company- und Team-basierte Cache-Verwaltung
+     */
 }
