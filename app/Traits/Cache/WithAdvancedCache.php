@@ -5,7 +5,6 @@ namespace App\Traits\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Advanced Generic Cache Trait für Laravel Eloquent Models

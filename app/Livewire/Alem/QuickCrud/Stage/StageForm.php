@@ -2,14 +2,15 @@
 
 namespace App\Livewire\Alem\QuickCrud\Stage;
 
+use App\Livewire\Alem\Employee\CreateEmployee;
 use App\Livewire\Alem\QuickCrud\Stage\Helper\DataFilter;
 use App\Livewire\Alem\QuickCrud\Stage\Helper\ValidateStageForm;
+use App\Models\Alem\Employee;
 use App\Models\Alem\QuickCrud\Stage;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -82,8 +83,10 @@ class StageForm extends Component
                     'name' => $this->name
                 ]);
 
-                $this->dispatch('stage-updated');
-//                $this->dispatch('stage-updated', id: $stage->id);
+                // Manuell den Company-Cache leeren
+                Stage::flushCompanyCache($this->companyId);
+
+                $this->dispatch('stage-updated', id: $stage->id);
 
                 Flux::toast(
                     text: __('Stage updated successfully.'),
@@ -93,11 +96,14 @@ class StageForm extends Component
 
             } else {
 
-                $created = Stage::create([
+                $stage = Stage::create([
                     'name' => $this->name
                 ]);
 
-                $this->dispatch('stage-created', id: $created->id);
+                // Manuell den Company-Cache leeren
+                Stage::flushCompanyCache($this->companyId);
+
+                $this->dispatch('stage-created', id: $stage->id)->to(CreateEmployee::class);;;
 
                 Flux::toast(
                     text: __('Stage created successfully.'),
@@ -177,6 +183,9 @@ class StageForm extends Component
                 ->findOrFail($id);
 
             $stage->delete();
+
+            // Manuell den Company-Cache leeren
+            Stage::flushCompanyCache($this->companyId);
 
             Flux::toast(
                 text: __('Stage deleted successfully.'),

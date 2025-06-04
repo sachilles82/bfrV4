@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Profession extends Model
 {
-    use ManageDataFilter, ManagesContextAndOwnership, WithAdvancedCache;
     use HasFactory;
+    use ManageDataFilter, ManagesContextAndOwnership, WithAdvancedCache;
 
     /**
      * Cache-Konfiguration für dieses Model
@@ -59,6 +59,18 @@ class Profession extends Model
                 ->orderBy('name')
                 ->get();
         });
+    }
+
+    /**
+     * Leert den Company-Cache manuell
+     * Wird von anderen Components aufgerufen nach Create/Update/Delete
+     */
+    public static function flushCompanyCache(?int $companyId): void
+    {
+        if (!$companyId) return;
+
+        $instance = new static;
+        $instance->flushCacheContext('company', $companyId);
     }
 
 //    /**

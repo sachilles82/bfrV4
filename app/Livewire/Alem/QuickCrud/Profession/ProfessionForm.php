@@ -61,8 +61,6 @@ class ProfessionForm extends Component
 
     /**
      * Speichert oder aktualisiert eine Profession.
-     * Wichtiger Hinweis: Cache wird automatisch durch das WithRedisCache Trait geleert!
-     * Bei save/update Events werden automatisch alle relevanten Caches invalidiert:
      */
     public function saveProfession(): void
     {
@@ -79,6 +77,9 @@ class ProfessionForm extends Component
                 $profession->update([
                     'name' => $this->name,
                 ]);
+
+                // Manuell den Company-Cache leeren
+                Profession::flushCompanyCache($this->companyId);
 
                 $this->dispatch('profession-updated', id: $profession->id);
 
@@ -98,6 +99,9 @@ class ProfessionForm extends Component
                      * durch ManagesContextAndOwnership Trait gesetzt
                      */
                 ]);
+
+                // Manuell den Company-Cache leeren
+                Profession::flushCompanyCache($this->companyId);
 
                 $this->dispatch('profession-created', id: $profession->id);
 
@@ -178,11 +182,10 @@ class ProfessionForm extends Component
             $profession = $this->getFilteredQuery()
                 ->findOrFail($id);
 
-            /**
-             * Delete Operation - Cache wird automatisch geleert!
-             * Das WithRedisCache Trait fängt das 'deleted' Event ab
-             */
             $profession->delete();
+
+            // Manuell den Company-Cache leeren
+            Profession::flushCompanyCache($this->companyId);
 
             Flux::toast(
                 text: __('Profession deleted successfully.'),

@@ -3,34 +3,26 @@
 namespace App\Models\Alem\QuickCrud;
 
 use App\Models\Alem\Employee;
-use App\Traits\Cache\WithRedisCache;
+use App\Traits\Cache\WithAdvancedCache;
 use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Cache;
 
 class Stage extends Model
 {
-    use ManageDataFilter, ManagesContextAndOwnership;
-    use WithRedisCache;
     use HasFactory;
+    use ManageDataFilter, ManagesContextAndOwnership, WithAdvancedCache;
 
     /**
-     * Cache-Schlüssel für dieses Model
-     *
+     * Cache-Konfiguration für dieses Model
+     * @var int
      * @var string
      */
-    protected string $cacheKey = 'stages_cache';
-
-    /**
-     * Cache-Dauer in Sekunden
-     *
-     * @var int
-     */
-    protected int $cacheDuration = 43200; // 12 hours
+    protected int $cacheDuration = 43200; // 12 Stunden, Cache-Dauer in Sekunden (-1 for forever)
+    protected string $cachePrefix = 'stages';
 
     /**
      * Mass assignable attributes
@@ -61,29 +53,29 @@ class Stage extends Model
      * und delegiert die eigentliche Query-Logik an getQueryForCompany()
      *
      * @param int|null $companyId Company ID
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
-    public static function getCompanyStages(?int $companyId): Collection
+    public static function getCompanyStages(?int $companyId): \Illuminate\Support\Collection
     {
-        return static::getCachedCompanyData($companyId, 'getQueryForCompany');
+        return static::getCachedByCompany($companyId, function() use ($companyId) {
+            return static::query()
+                ->where('company_id', $companyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+        });
     }
 
     /**
-     * Spezifische Query-Logik für Stages einer Company
-     *
-     * Diese Methode wird von getCachedCompanyData() aufgerufen wenn der Cache leer ist
-     * Kann einfach angepasst werden ohne die Cache-Logik zu beeinflussen
-     *
-     * @param int $companyId Company ID
-     * @return Collection
+     * Leert den Company-Cache manuell
+     * Wird von anderen Components aufgerufen nach Create/Update/Delete
      */
-    public static function getQueryForCompany(int $companyId): Collection
+    public static function flushCompanyCache(?int $companyId): void
     {
-        return static::query()
-            ->where('company_id', $companyId)
-            ->select(['id', 'name'])
-            ->orderBy('name')
-            ->get();
+        if (!$companyId) return;
+
+        $instance = new static;
+        $instance->flushCacheContext('company', $companyId);
     }
 
 }
