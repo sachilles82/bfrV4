@@ -29,7 +29,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy(isolate: false)]
+//#[Lazy(isolate: false)]
 class EditEmployee extends Component
 {
     use AuthorizesRequests, ValidateEmployee;
