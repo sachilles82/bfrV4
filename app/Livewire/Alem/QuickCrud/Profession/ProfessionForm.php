@@ -80,11 +80,7 @@ class ProfessionForm extends Component
                     'name' => $this->name,
                 ]);
 
-                /**
-                 * Cache wird automatisch durch Model Events geleert!
-                 */
-
-                $this->dispatch('profession-updated');
+                $this->dispatch('profession-updated', id: $profession->id);
 
                 Flux::toast(
                     text: __('Profession updated successfully.'),
