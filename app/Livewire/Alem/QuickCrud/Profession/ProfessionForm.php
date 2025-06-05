@@ -12,10 +12,12 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+#[Lazy]
 class ProfessionForm extends Component
 {
     use ValidateProfessionForm, DataFilter, WithPerPagePagination, WithPlaceholder;
