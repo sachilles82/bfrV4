@@ -43,12 +43,12 @@
                 wire:key="profession-form-component"
             />
 
-{{--            <livewire:alem.quick-crud.stage.stage-form--}}
-{{--                :auth-user-id="$authUserId"--}}
-{{--                :current-team-id="$currentTeamId"--}}
-{{--                :company-id="$companyId"--}}
-{{--                wire:key="stage-form-component"--}}
-{{--            />--}}
+            <livewire:alem.quick-crud.stage.stage-form
+                :auth-user-id="$authUserId"
+                :current-team-id="$currentTeamId"
+                :company-id="$companyId"
+                wire:key="stage-form-component"
+            />
 
         </x-pupi.layout.form-index>
 

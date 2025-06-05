@@ -67,10 +67,6 @@ class ProfessionForm extends Component
         $this->validate();
 
         try {
-            // Cache VOR der Transaktion leeren!
-//            \Log::info('Cache wird VOR dem Speichern geleert');
-//            Profession::flushCompanyCache($this->companyId);
-
             DB::beginTransaction();
 
             if ($this->editing && $this->professionId) {
@@ -81,9 +77,6 @@ class ProfessionForm extends Component
                 $profession->update([
                     'name' => $this->name,
                 ]);
-
-                // Manuell den Company-Cache leeren
-//                Profession::flushCompanyCache($this->companyId);
 
                 $this->dispatch('profession-updated', id: $profession->id);
 
@@ -104,9 +97,6 @@ class ProfessionForm extends Component
                      */
                 ]);
 
-                // Manuell den Company-Cache leeren
-//                Profession::flushCompanyCache($this->companyId);
-
                 $this->dispatch('profession-created', id: $profession->id);
 
                 Flux::toast(
@@ -117,6 +107,9 @@ class ProfessionForm extends Component
             }
 
             DB::commit();
+
+//            \Log::info('🔥 Cache Warming...');
+            Profession::getCompanyProfessions($this->companyId); // Befüllt den Cache
 
             $this->closeProfessionFormModal();
 
@@ -188,9 +181,6 @@ class ProfessionForm extends Component
 
             $profession->delete();
 
-            // Manuell den Company-Cache leeren
-            Profession::flushCompanyCache($this->companyId);
-
             Flux::toast(
                 text: __('Profession deleted successfully.'),
                 heading: __('Success.'),
@@ -199,9 +189,7 @@ class ProfessionForm extends Component
 
             $this->closeProfessionFormModal();
 
-//            $this->dispatch('profession-deleted');
-            /** Event für Livewire Components */
-            $this->dispatch('profession-deleted', id: $id);
+            $this->dispatch('profession-deleted');
 
         } catch (ModelNotFoundException $e) {
 

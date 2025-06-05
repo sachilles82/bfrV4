@@ -46,6 +46,29 @@ class Stage extends Model
         return $this->hasMany(Employee::class, 'stage_id');
     }
 
+
+    /**
+     * Boot-Methode um sicherzustellen, dass Events gefeuert werden
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Zusätzliche Sicherheit: Manuell Cache leeren bei Events
+        static::created(function ($model) {
+            static::flushCompanyCache($model->company_id);
+        });
+
+        static::updated(function ($model) {
+            static::flushCompanyCache($model->company_id);
+        });
+
+        static::deleted(function ($model) {
+            static::flushCompanyCache($model->company_id);
+        });
+    }
+
+
     /**
      * Hauptmethode: Holt alle Stages für eine Company mit dreistufigem Cache
      *
@@ -55,16 +78,35 @@ class Stage extends Model
      * @param int|null $companyId Company ID
      * @return \Illuminate\Support\Collection
      */
-    // app/Models/Alem/QuickCrud/Stage.php
 
-    public static function getCompanyStages(?int $companyId): \Illuminate\Support\Collection
+    public static function getCompanyStages(?int $companyId): Collection
     {
+        \Log::info('🟢 [Stage] getCompanyStages aufgerufen', [
+            'company_id' => $companyId,
+            'caller' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'unknown',
+            'timestamp' => now()->toTimeString()
+        ]);
+
         return static::getCachedByCompany($companyId, function() use ($companyId) {
-            return static::query()
+            \Log::warning('⚠️ [Stage] DATENBANK-ABFRAGE wird ausgeführt!', [
+                'company_id' => $companyId,
+                'info' => 'Cache war leer - Lade aus DB',
+                'timestamp' => now()->toTimeString()
+            ]);
+
+            $result = static::query()
                 ->where('company_id', $companyId)
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
+
+            \Log::info('✅ [Stage] Datenbank-Abfrage abgeschlossen', [
+                'company_id' => $companyId,
+                'anzahl_records' => $result->count(),
+                'timestamp' => now()->toTimeString()
+            ]);
+
+            return $result;
         });
     }
 
@@ -78,6 +120,9 @@ class Stage extends Model
 
         $instance = new static;
         $instance->flushCacheContext('company', $companyId);
+
+        // Auch Request-Cache leeren
+        static::flushRequestCache();
     }
 
 }

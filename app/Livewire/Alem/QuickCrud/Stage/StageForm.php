@@ -83,8 +83,8 @@ class StageForm extends Component
                     'name' => $this->name
                 ]);
 
-                // Manuell den Company-Cache leeren
-                Stage::flushCompanyCache($this->companyId);
+//                // Manuell den Company-Cache leeren
+//                Stage::flushCompanyCache($this->companyId);
 
                 $this->dispatch('stage-updated', id: $stage->id);
 
@@ -101,7 +101,7 @@ class StageForm extends Component
                 ]);
 
                 // Manuell den Company-Cache leeren
-                Stage::flushCompanyCache($this->companyId);
+//                Stage::flushCompanyCache($this->companyId);
 
                 $this->dispatch('stage-created', id: $stage->id)->to(CreateEmployee::class);;;
 
@@ -113,6 +113,8 @@ class StageForm extends Component
             }
 
             DB::commit();
+            //            \Log::info('🔥 Cache Warming...');
+            Stage::getCompanyStages($this->companyId); // Befüllt den Cache
 
             $this->closeStageFormModal();
 

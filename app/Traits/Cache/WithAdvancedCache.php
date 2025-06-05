@@ -2,7 +2,6 @@
 
 namespace App\Traits\Cache;
 
-use Illuminate\Cache\RedisStore;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -68,6 +67,8 @@ trait WithAdvancedCache
      * @param array $options Zusätzliche Optionen
      * @return Collection
      */
+    // app/Traits/Cache/WithAdvancedCache.php
+
     public static function getCached(
         string $context,
                $contextId,
@@ -84,17 +85,52 @@ trait WithAdvancedCache
         $requestKey = $instance->generateRequestCacheKey($context, $contextId, $options);
         $persistentKey = $instance->generatePersistentCacheKey($context, $contextId, $options);
 
+        // DEBUG: Zeige welche Keys verwendet werden
+        \Log::info('🔑 Cache-Keys', [
+            'model' => static::class,
+            'request_key' => $requestKey,
+            'persistent_key' => $persistentKey,
+            'context' => $context,
+            'context_id' => $contextId
+        ]);
+
         // 1. Check Request-Level Cache
         if (isset(self::$requestCache[$requestKey])) {
+            \Log::info('Aus Request-Cache geladen', [
+                'key' => $requestKey
+            ]);
             return self::$requestCache[$requestKey];
         }
 
         // 2. Check Persistent Cache (Redis)
         $duration = $options['duration'] ?? $config['duration'];
 
+        // DEBUG: Log vor Cache-Abfrage
+        \Log::info('📊 Prüfe Redis-Cache', [
+            'key' => $persistentKey,
+            'exists' => Cache::has($persistentKey)
+        ]);
+
+        $loadedFromDb = false;
+
         $data = $duration === -1
-            ? Cache::rememberForever($persistentKey, $dataCallback)
-            : Cache::remember($persistentKey, $duration, $dataCallback);
+            ? Cache::rememberForever($persistentKey, function() use ($dataCallback, &$loadedFromDb, $persistentKey) {
+                \Log::info('🔴 Cache::rememberForever Callback ausgeführt', ['key' => $persistentKey]);
+                $loadedFromDb = true;
+                return $dataCallback();
+            })
+            : Cache::remember($persistentKey, $duration, function() use ($dataCallback, &$loadedFromDb, $persistentKey) {
+                \Log::info('🔴 Cache::remember Callback ausgeführt', ['key' => $persistentKey]);
+                $loadedFromDb = true;
+                return $dataCallback();
+            });
+
+        // In WithAdvancedCache trait
+        if ($loadedFromDb) {
+            \Log::info("Aus Datenbank geladen: {$config['prefix']} (Company: {$contextId})");
+        } else {
+            \Log::info("Aus Redis-Cache geladen: {$config['prefix']} (Company: {$contextId})");
+        }
 
         // 3. Store in Request Cache
         self::$requestCache[$requestKey] = $data;
@@ -105,9 +141,18 @@ trait WithAdvancedCache
     /**
      * Shortcut-Methoden für häufige Kontexte
      */
+    // Alternative Implementation in WithAdvancedCache
+
     public static function getCachedByCompany(?int $companyId, callable $dataCallback, array $options = []): Collection
     {
         if (!$companyId) return collect();
+
+        // Einmal loggen beim Eintritt
+        \Log::info('🎯 getCachedByCompany aufgerufen', [
+            'model' => static::class,
+            'company_id' => $companyId,
+            'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'Unknown'
+        ]);
 
         return static::getCached('company', $companyId, $dataCallback, $options);
     }
@@ -190,7 +235,7 @@ trait WithAdvancedCache
         }
 
         // Clear with wildcards if Redis is available
-        if (Cache::getStore() instanceof RedisStore) {
+        if (Cache::getStore() instanceof \Illuminate\Cache\RedisStore) {
             $pattern = $this->generatePersistentCacheKey($context, $contextId, ['suffix' => '*']);
             $keys = Cache::getStore()->connection()->keys($pattern);
             foreach ($keys as $key) {
@@ -208,7 +253,7 @@ trait WithAdvancedCache
         $config = $instance->getCacheConfig();
 
         // Clear all persistent caches for this model
-        if (Cache::getStore() instanceof RedisStore) {
+        if (Cache::getStore() instanceof \Illuminate\Cache\RedisStore) {
             $pattern = "{$config['prefix']}:*";
             $keys = Cache::getStore()->connection()->keys($pattern);
             foreach ($keys as $key) {

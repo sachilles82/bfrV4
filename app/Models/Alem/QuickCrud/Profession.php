@@ -6,7 +6,7 @@ use App\Models\Alem\Employee;
 use App\Traits\Cache\WithAdvancedCache;
 use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -69,12 +69,32 @@ class Profession extends Model
 
     public static function getCompanyProfessions(?int $companyId): Collection
     {
+        \Log::info('🔵 [Profession] getCompanyProfessions aufgerufen', [
+            'company_id' => $companyId,
+            'caller' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'unknown',
+            'timestamp' => now()->toTimeString()
+        ]);
+
         return static::getCachedByCompany($companyId, function() use ($companyId) {
-            return static::query()
+            \Log::warning('⚠️ [Profession] DATENBANK-ABFRAGE wird ausgeführt!', [
+                'company_id' => $companyId,
+                'info' => 'Cache war leer - Lade aus DB',
+                'timestamp' => now()->toTimeString()
+            ]);
+
+            $result = static::query()
                 ->where('company_id', $companyId)
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
+
+            \Log::info('✅ [Profession] Datenbank-Abfrage abgeschlossen', [
+                'company_id' => $companyId,
+                'anzahl_records' => $result->count(),
+                'timestamp' => now()->toTimeString()
+            ]);
+
+            return $result;
         });
     }
 
