@@ -55,6 +55,8 @@ class Stage extends Model
      * @param int|null $companyId Company ID
      * @return \Illuminate\Support\Collection
      */
+    // app/Models/Alem/QuickCrud/Stage.php
+
     public static function getCompanyStages(?int $companyId): \Illuminate\Support\Collection
     {
         return static::getCachedByCompany($companyId, function() use ($companyId) {

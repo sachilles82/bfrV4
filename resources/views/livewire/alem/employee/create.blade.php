@@ -290,19 +290,6 @@
                                         <x-pupi.button.open-manager/>
                                     </flux:modal.trigger>
 
-                                    <!-- Refresh Button -->
-                                    <flux:button
-                                        wire:click="refreshDropdownData"
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        wire:loading.attr="disabled"
-                                    >
-                                        <flux:icon.arrow-path class="w-4 h-4" wire:loading.class="animate-spin" />
-                                        <span wire:loading.remove>{{ __('Refresh') }}</span>
-                                        <span wire:loading>{{ __('Loading...') }}</span>
-                                    </flux:button>
-
                                 </x-slot>
 
                             </flux:select>

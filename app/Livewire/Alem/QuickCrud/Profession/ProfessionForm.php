@@ -67,6 +67,10 @@ class ProfessionForm extends Component
         $this->validate();
 
         try {
+            // Cache VOR der Transaktion leeren!
+//            \Log::info('Cache wird VOR dem Speichern geleert');
+//            Profession::flushCompanyCache($this->companyId);
+
             DB::beginTransaction();
 
             if ($this->editing && $this->professionId) {
@@ -79,7 +83,7 @@ class ProfessionForm extends Component
                 ]);
 
                 // Manuell den Company-Cache leeren
-                Profession::flushCompanyCache($this->companyId);
+//                Profession::flushCompanyCache($this->companyId);
 
                 $this->dispatch('profession-updated', id: $profession->id);
 

@@ -27,7 +27,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -106,7 +105,7 @@ class CreateEmployee extends Component
             return;
         }
 
-//        try {
+        try {
             $companyId = $this->companyId;
             $teamId = $this->currentTeamId;
 
@@ -148,15 +147,15 @@ class CreateEmployee extends Component
 
             $this->dataLoaded = true;
 
-//        }
-//        catch (\Throwable $e) {
-//
-//            Flux::toast(
-//                text: __('An error occurred while loading the Relation Data.'),
-//                heading: __('Error.'),
-//                variant: 'danger'
-//            );
-//        }
+        }
+        catch (\Throwable $e) {
+
+            Flux::toast(
+                text: __('An error occurred while loading the Relation Data.'),
+                heading: __('Error.'),
+                variant: 'danger'
+            );
+        }
     }
 
     /**
@@ -268,14 +267,6 @@ class CreateEmployee extends Component
     #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
     public function refreshProfessions(?int $id = null): void
     {
-        /** Manuell den Company-Cache leeren für absolute Sicherheit */
-        if ($this->companyId) {
-            Profession::flushCompanyCache($this->companyId);
-        }
-
-        /** Lokale Cache-Variable zurücksetzen */
-        $this->professions = null;
-
         /** Wichtig: dataLoaded auf false setzen */
         $this->dataLoaded = false;
 
@@ -288,53 +279,24 @@ class CreateEmployee extends Component
         }
 
         /** Prüfe, ob die aktuell ausgewählte Profession noch existiert */
-        if ($this->profession && $this->professions) {
-            $professionExists = $this->professions->contains('id', $this->profession);
-            if (!$professionExists) {
-                $this->profession = null;
-            }
+        if ($this->profession && !$this->professions?->contains('id', $this->profession)) {
+            $this->profession = null;
         }
     }
 
     #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
     public function refreshStages(?int $id = null): void
     {
-        /** Manuell den Company-Cache leeren für absolute Sicherheit */
-        if ($this->companyId) {
-            Stage::flushCompanyCache($this->companyId);
-        }
-
-        /** Lokale Cache-Variable zurücksetzen */
-        $this->stages = null;
-
-        /** Wichtig: dataLoaded auf false setzen */
         $this->dataLoaded = false;
 
-        /** Daten neu laden - dies holt die aktuellen Daten aus der DB */
         $this->loadRelationForDropDowns();
 
-        /** Falls eine neue Stage erstellt wurde, diese automatisch auswählen */
-        $this->loadRelationForDropDowns();
-
-        /** Falls eine neue Stage erstellt wurde, diese automatisch auswählen */
         if ($id) {
             $this->stage = $id;
-
-            /** Prüfe, ob die aktuell ausgewählte Stage noch existiert */
-            if ($this->stages && !$this->stages->contains('id', $id)) {
-                // Falls nicht vorhanden, nochmals Cache leeren und neu laden
-                Stage::flushCompanyCache($this->companyId);
-                $this->stages = null;
-                $this->loadRelationForDropDowns();
-            }
         }
 
-        /** Prüfe, ob die aktuell ausgewählte Stage noch existiert */
-        if ($this->stage && $this->stages) {
-            $stageExists = $this->stages->contains('id', $this->stage);
-            if (!$stageExists) {
-                $this->stage = null;
-            }
+        if ($this->stage && !$this->stages?->contains('id', $this->stage)) {
+            $this->stage = null;
         }
     }
 
@@ -344,24 +306,16 @@ class CreateEmployee extends Component
     #[On(['department-updated', 'department-created', 'department-deleted'])]
     public function refreshDepartments(?int $id = null): void
     {
-        /** Cache wird automatisch durch das Trait geleert */
-        $this->departments = null;
         $this->dataLoaded = false;
 
-        /** Daten neu laden */
         $this->loadRelationForDropDowns();
 
-        /** Falls ein neues Department erstellt wurde, dieses automatisch auswählen */
         if ($id) {
             $this->department = $id;
         }
 
-        /** Prüfe, ob das aktuell ausgewählte Department noch existiert */
-        if ($this->department) {
-            $departmentExists = $this->departments?->contains('id', $this->department);
-            if (!$departmentExists) {
-                $this->department = null;
-            }
+        if ($this->department && !$this->departments?->contains('id', $this->department)) {
+            $this->department = null;
         }
     }
 
@@ -374,6 +328,7 @@ class CreateEmployee extends Component
         if ($this->professions === null && $this->showCreateModal) {
             $this->loadRelationForDropDowns();
         }
+        // Null-Safety-Check nach dem Laden
         return $this->professions ?? collect();
     }
 
@@ -393,7 +348,6 @@ class CreateEmployee extends Component
             $this->loadRelationForDropDowns();
         }
 
-        // Null-Safety-Check nach dem Laden
         return $this->departments ?? collect();
     }
 
@@ -466,40 +420,4 @@ class CreateEmployee extends Component
         return view('livewire.alem.employee.create');
     }
 
-    /**
-     * Lädt alle Dropdown-Daten neu
-     * Pragmatische Lösung für Cache-Refresh
-     */
-    public function refreshDropdownData(): void
-    {
-        // Leere alle relevanten Caches
-        if ($this->companyId) {
-            Profession::flushCompanyCache($this->companyId);
-            Stage::flushCompanyCache($this->companyId);
-            Department::flushTeamCache($this->currentTeamId);
-            User::flushManagerCache($this->companyId);
-            Role::flushCompanyCache($this->companyId);
-        }
-
-        // Setze alle lokalen Cache-Variablen zurück
-        $this->professions = null;
-        $this->stages = null;
-        $this->departments = null;
-        $this->supervisors = null;
-        $this->roles = null;
-        $this->teams = null;
-
-        // Lade-Status zurücksetzen
-        $this->dataLoaded = false;
-
-        // Daten neu laden
-        $this->loadRelationForDropDowns();
-
-        // Optional: Erfolgsmeldung
-        Flux::toast(
-            text: __('Dropdown data refreshed successfully.'),
-            heading: __('Success'),
-            variant: 'success'
-        );
-    }
 }

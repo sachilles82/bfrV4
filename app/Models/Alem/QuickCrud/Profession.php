@@ -47,9 +47,26 @@ class Profession extends Model
     }
 
     /**
-     * Holt alle Professions einer Company mit Cache
-     * Nutzt den neuen generischen Cache-Trait
+     * Boot-Methode um sicherzustellen, dass Events gefeuert werden
      */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Zusätzliche Sicherheit: Manuell Cache leeren bei Events
+        static::created(function ($model) {
+            static::flushCompanyCache($model->company_id);
+        });
+
+        static::updated(function ($model) {
+            static::flushCompanyCache($model->company_id);
+        });
+
+        static::deleted(function ($model) {
+            static::flushCompanyCache($model->company_id);
+        });
+    }
+
     public static function getCompanyProfessions(?int $companyId): Collection
     {
         return static::getCachedByCompany($companyId, function() use ($companyId) {
@@ -63,7 +80,6 @@ class Profession extends Model
 
     /**
      * Leert den Company-Cache manuell
-     * Wird von anderen Components aufgerufen nach Create/Update/Delete
      */
     public static function flushCompanyCache(?int $companyId): void
     {
@@ -71,6 +87,9 @@ class Profession extends Model
 
         $instance = new static;
         $instance->flushCacheContext('company', $companyId);
+
+        // Auch Request-Cache leeren
+        static::flushRequestCache();
     }
 
 //    /**

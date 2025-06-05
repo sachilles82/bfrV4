@@ -2,6 +2,7 @@
 
 namespace App\Traits\Cache;
 
+use Illuminate\Cache\RedisStore;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -80,7 +81,6 @@ trait WithAdvancedCache
             return $dataCallback();
         }
 
-        // Generate cache keys
         $requestKey = $instance->generateRequestCacheKey($context, $contextId, $options);
         $persistentKey = $instance->generatePersistentCacheKey($context, $contextId, $options);
 
@@ -89,7 +89,7 @@ trait WithAdvancedCache
             return self::$requestCache[$requestKey];
         }
 
-        // 2. Check Persistent Cache
+        // 2. Check Persistent Cache (Redis)
         $duration = $options['duration'] ?? $config['duration'];
 
         $data = $duration === -1
@@ -108,6 +108,7 @@ trait WithAdvancedCache
     public static function getCachedByCompany(?int $companyId, callable $dataCallback, array $options = []): Collection
     {
         if (!$companyId) return collect();
+
         return static::getCached('company', $companyId, $dataCallback, $options);
     }
 
@@ -189,7 +190,7 @@ trait WithAdvancedCache
         }
 
         // Clear with wildcards if Redis is available
-        if (Cache::getStore() instanceof \Illuminate\Cache\RedisStore) {
+        if (Cache::getStore() instanceof RedisStore) {
             $pattern = $this->generatePersistentCacheKey($context, $contextId, ['suffix' => '*']);
             $keys = Cache::getStore()->connection()->keys($pattern);
             foreach ($keys as $key) {
@@ -207,7 +208,7 @@ trait WithAdvancedCache
         $config = $instance->getCacheConfig();
 
         // Clear all persistent caches for this model
-        if (Cache::getStore() instanceof \Illuminate\Cache\RedisStore) {
+        if (Cache::getStore() instanceof RedisStore) {
             $pattern = "{$config['prefix']}:*";
             $keys = Cache::getStore()->connection()->keys($pattern);
             foreach ($keys as $key) {
@@ -230,5 +231,27 @@ trait WithAdvancedCache
             "{$config['prefix']}:{$context}",
             "{$config['prefix']}:{$context}:{$contextId}"
         ];
+    }
+
+    /**
+     * Leert den Request-Level Cache komplett
+     * Wichtig für Livewire-Components die mehrere Requests in einer Session haben
+     */
+    public static function flushRequestCache(): void
+    {
+        self::$requestCache = [];
+    }
+
+    /**
+     * Leert Request-Cache für einen spezifischen Kontext
+     */
+    public static function flushRequestCacheForContext(string $context, $contextId): void
+    {
+        $instance = new static;
+        $requestKey = $instance->generateRequestCacheKey($context, $contextId);
+
+        if (isset(self::$requestCache[$requestKey])) {
+            unset(self::$requestCache[$requestKey]);
+        }
     }
 }
