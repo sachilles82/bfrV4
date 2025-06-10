@@ -228,9 +228,9 @@ class TestDataSeeder extends Seeder
             DB::commit();
 
             // 6. Erstelle Abteilungen für Team 1 (Betrieb 48)
-            $this->command->info('Erstelle 100 Abteilungen für Betrieb 48...');
-            $departmentChunks = array_chunk(range(1, 100), min(100, $chunkSize));
-            $this->command->getOutput()->progressStart(100);
+            $this->command->info('Erstelle 10 Abteilungen für Betrieb 48...');
+            $departmentChunks = array_chunk(range(1, 10), min(10, $chunkSize));
+            $this->command->getOutput()->progressStart(10);
 
             foreach ($departmentChunks as $chunk) {
                 DB::beginTransaction();
@@ -285,8 +285,8 @@ class TestDataSeeder extends Seeder
 
             // 7. Erstelle Berufe für Team 1 (Betrieb 48)
             $this->command->info('Erstelle 50 Berufe für Betrieb 48...');
-            $professionChunks = array_chunk(range(1, 50), min(50, $chunkSize));
-            $this->command->getOutput()->progressStart(50);
+            $professionChunks = array_chunk(range(1, 5), min(5, $chunkSize));
+            $this->command->getOutput()->progressStart(5);
 
             foreach ($professionChunks as $chunk) {
                 DB::beginTransaction();

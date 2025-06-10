@@ -123,7 +123,7 @@
                                 multiple
                                 placeholder="{{ __('Select Teams') }}">
 
-                                @forelse($this->teams() as $team)
+                                @forelse($this->teams as $team)
                                     <flux:option
                                         wire:key="team-option-{{ $team->id }}"
                                         value="{{ $team->id }}">
@@ -155,7 +155,7 @@
                                 searchable
                                 placeholder="{{ __('Select Department') }}">
 
-                                @forelse($this->departments() as $dept)
+                                @forelse($this->departments as $dept)
                                     <flux:option
                                         wire:key="department-option-{{ $dept->id }}"
                                         value="{{ $dept->id }}">
@@ -194,7 +194,7 @@
                                 searchable
                                 placeholder="{{ __('Select Supervisor') }}">
 
-                                @forelse($this->supervisors() as $supervisor)
+                                @forelse($this->supervisors as $supervisor)
                                     <flux:option wire:key="supervisor-option-{{ $supervisor->id }}"
                                                  value="{{ $supervisor->id }}">
                                         <div class="flex items-center gap-2 whitespace-nowrap">
@@ -233,7 +233,7 @@
                                 multiple
                                 placeholder="{{ __('Select roles') }}">
 
-                                @forelse($this->roles() as $roleOption)
+                                @forelse($this->roles as $roleOption)
                                     <flux:option
                                         wire:key="role-option-{{ $roleOption->id }}"
                                         value="{{ $roleOption->id }}">
@@ -271,7 +271,7 @@
                                 searchable
                                 placeholder="{{ __('Select Profession') }}">
 
-                                @forelse($this->professions() as $prof)
+                                @forelse($this->professions as $prof)
                                     <flux:option
                                         wire:key="profession-option-{{ $prof->id }}"
                                         value="{{ $prof->id }}">
@@ -315,7 +315,7 @@
                                 searchable
                                 placeholder="{{ __('Select Stage') }}">
 
-                                @forelse($this->stages() as $st)
+                                @forelse($this->stages as $st)
                                     <flux:option
                                         wire:key="stage-option-{{ $st->id }}"
                                         value="{{ $st->id }}">

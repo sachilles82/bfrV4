@@ -51,12 +51,12 @@ trait ValidateEmployee
                 },
             ],
         ];
-        // Füge Validierungsregeln für 'invitations' nur hinzu, wenn:
+        // Füge Validierungsregeln für 'invitation' nur hinzu, wenn:
         // 1. Es sich um eine "Create"-Aktion handelt (angenommen durch $this->userId === null)
-        // 2. Die Komponente tatsächlich eine 'invitations'-Eigenschaft hat.
-        if (property_exists($this, 'userId') && $this->userId === null && property_exists($this, 'invitations')) {
+        // 2. Die Komponente tatsächlich eine 'invitation'-Eigenschaft hat.
+        if (property_exists($this, 'userId') && $this->userId === null && property_exists($this, 'invitation')) {
             // Validierung für die Option, ob der Benutzer eine Einladung erhalten soll.
-            $rules['invitations'] = ['required', 'boolean'];
+            $rules['invitation'] = ['required', 'boolean'];
         }
 
         return $rules;
@@ -117,12 +117,12 @@ trait ValidateEmployee
 
         ];
 
-        // Füge Validierungsnachrichten für 'invitations' nur hinzu, wenn:
+        // Füge Validierungsnachrichten für 'invitation' nur hinzu, wenn:
         // 1. Es sich um eine "Create"-Aktion handelt.
-        // 2. Die Komponente tatsächlich eine 'invitations'-Eigenschaft hat.
-        if (property_exists($this, 'userId') && $this->userId === null && property_exists($this, 'invitations')) {
-            $messages['invitations.required'] = 'The invitation setting is required.';
-            $messages['invitations.boolean'] = 'The invitation setting must be true or false.';
+        // 2. Die Komponente tatsächlich eine 'invitation'-Eigenschaft hat.
+        if (property_exists($this, 'userId') && $this->userId === null && property_exists($this, 'invitation')) {
+            $messages['invitation.required'] = 'The invitation setting is required.';
+            $messages['invitation.boolean'] = 'The invitation setting must be true or false.';
         }
 
         return $messages;

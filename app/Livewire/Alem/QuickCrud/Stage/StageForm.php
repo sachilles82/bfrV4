@@ -20,7 +20,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 
 //#[Lazy(isolate: false)]// Lazy loading isolate führt zusätzliche query aus, deswegen brauch ich es nicht
-#[Lazy]
+//#[Lazy]
 class StageForm extends Component
 {
     use ValidateStageForm, DataFilter, WithPerPagePagination, WithPlaceholder;

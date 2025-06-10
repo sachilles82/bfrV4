@@ -6,6 +6,7 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use App\Enums\User\UserType;
+use App\Livewire\Alem\Employee\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee;
@@ -23,16 +24,15 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CreateEmployee extends Component
 {
-    use AuthorizesRequests, ValidateEmployee;
+    use AuthorizesRequests;
+    use ValidateEmployee, HandleCatchError;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
     /** Modal-Status */
@@ -60,17 +60,7 @@ class CreateEmployee extends Component
     public $profession;
     public $stage;
     public ?int $supervisor = null;
-    public bool $invitations = false;
-
-    /**
-     * PRIVATE Cache-Properties - werden NICHT von Livewire serialisiert
-     */
-    private ?Collection $cachedTeams = null;
-    private ?Collection $cachedDepartments = null;
-    private ?Collection $cachedRoles = null;
-    private ?Collection $cachedProfessions = null;
-    private ?Collection $cachedStages = null;
-    private ?Collection $cachedSupervisors = null;
+    public bool $invitation = false;
 
     /**
      * Lebenszyklusmethode: Wird aufgerufen, wenn das Modal geöffnet wird
@@ -78,10 +68,11 @@ class CreateEmployee extends Component
     #[On('create-employee-modal')]
     public function openCreateEmployeeModal(): void
     {
+        $this->resetFormData();
         $this->gender = Gender::Male;
         $this->model_status = ModelStatus::ACTIVE;
         $this->employee_status = EmployeeStatus::PROBATION;
-        $this->invitations = true;
+        $this->invitation = true;
         $this->showCreateModal = true;
     }
 
@@ -90,54 +81,35 @@ class CreateEmployee extends Component
      */
     public function saveEmployee(): void
     {
-        $generatedPassword = Str::password();
         $this->validate();
 
         try {
-            DB::beginTransaction();
+            DB::transaction(function () {
 
-            $user = User::create([
-                'gender' => $this->gender,
-                'name' => $this->name,
-                'last_name' => $this->last_name,
-                'email' => $this->email,
-                'password' => Hash::make($generatedPassword),
-                'email_verified_at' => now(),
-                'department_id' => $this->department,
-                'joined_at' => $this->joined_at?->toDateString(),
-                'model_status' => $this->model_status,
-                'user_type' => UserType::Employee,
-                'company_id' => auth()->user()->company_id,
-                'created_by' => auth()->id(),
-            ]);
+                $user = User::create([
+                    'gender' => $this->gender,
+                    'name' => $this->name,
+                    'last_name' => $this->last_name,
+                    'email' => $this->email,
+                    'password' => Hash::make(Str::password()),
+                    'email_verified_at' => now(),
+                    'department_id' => $this->department,
+                    'joined_at' => $this->joined_at?->toDateString(),
+                    'model_status' => $this->model_status,
+                    'user_type' => UserType::Employee,
+                    'company_id' => auth()->user()->company_id,
+                    'created_by' => auth()->id(),
+                ]);
 
-            if (!empty($this->selectedRoles)) {
-                $user->roles()->sync($this->selectedRoles);
-            }
+                $this->createEmployee($user);
+                $this->assignTeams($user);
+                $this->assignRoles($user);
 
-            Employee::create([
-                'user_id' => $user->id,
-                'profession_id' => $this->profession,
-                'stage_id' => $this->stage,
-                'employee_status' => $this->employee_status,
-                'supervisor_id' => $this->supervisor,
-            ]);
-
-            if (!empty($this->selectedTeams)) {
-                $teamsWithRole = [];
-                foreach ($this->selectedTeams as $teamId) {
-                    $teamsWithRole[$teamId] = ['role' => 'member'];
+                if ($this->invitation) {
+                    // TODO: E-Mail-Benachrichtigung implementieren
                 }
-                $user->teams()->attach($teamsWithRole);
-            } else {
-                $user->teams()->attach(auth()->user()->currentTeam, ['role' => 'member']);
-            }
+            });
 
-            if ($this->invitations) {
-                // TODO: E-Mail-Benachrichtigung implementieren
-            }
-
-            DB::commit();
 
             $this->closeCreateEmployeeModal();
             $this->dispatch('employee-created');
@@ -149,164 +121,148 @@ class CreateEmployee extends Component
             );
 
         } catch (\Throwable $e) {
-            DB::rollBack();
-
-            Log::error("Fehler beim Erstellen des Mitarbeiters: " . $e->getMessage(), [
-                'exception' => $e,
-                'acting_user_id' => $this->authUserId ?? auth()->id(),
-                'formData' => collect($this->only([
-                    'gender', 'name', 'last_name', 'email', 'model_status',
-                    'joined_at', 'department', 'selectedTeams', 'selectedRoles',
-                    'employee_status', 'profession', 'stage', 'supervisor', 'invitations'
-                ]))->toArray()
-            ]);
-
-            Flux::toast(
-                text: __('An error occurred while saving the employee.'),
-                heading: __('Error.'),
-                variant: 'danger'
-            );
+            $this->handleError($e);
         }
     }
 
     /**
-     * Event-Handler: Aktualisiert Professions-Cache
+     * Private Save Helper-Methoden
+     */
+    private function createEmployee(User $user): void
+    {
+        Employee::create([
+            'user_id' => $user->id,
+            'profession_id' => $this->profession,
+            'stage_id' => $this->stage,
+            'employee_status' => $this->employee_status,
+            'supervisor_id' => $this->supervisor,
+        ]);
+    }
+
+    private function assignTeams(User $user): void
+    {
+        if (!empty($this->selectedTeams)) {
+            $teamsWithRole = collect($this->selectedTeams)
+                ->mapWithKeys(fn($teamId) => [$teamId => ['role' => 'member']])
+                ->toArray();
+
+            $user->teams()->attach($teamsWithRole);
+        } else {
+            $user->teams()->attach(auth()->user()->currentTeam, ['role' => 'member']);
+        }
+    }
+
+    private function assignRoles(User $user): void
+    {
+        if (!empty($this->selectedRoles)) {
+            $user->roles()->sync($this->selectedRoles);
+        }
+    }
+
+    /**
+     * Event-Handler: Aktualisiert Profession-Auswahl
      */
     #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
     public function refreshProfessions(?int $id = null): void
     {
-        $this->cachedProfessions = null;
-
         if ($id) {
             $this->profession = $id;
         }
 
-        if ($this->profession && $this->professions() && !$this->professions()->contains('id', $this->profession)) {
+        // Prüfe ob ausgewählte Profession noch existiert
+        if ($this->profession && !$this->professions->contains('id', $this->profession)) {
             $this->profession = null;
         }
     }
 
     /**
-     * Event-Handler: Aktualisiert Stages-Cache
+     * Event-Handler: Aktualisiert Stage-Auswahl
      */
     #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
     public function refreshStages(?int $id = null): void
     {
-        $this->cachedStages = null;
-
         if ($id) {
             $this->stage = $id;
         }
 
-        if ($this->stage && $this->stages() && !$this->stages()->contains('id', $this->stage)) {
+        // Prüfe ob ausgewählte Stage noch existiert
+        if ($this->stage && !$this->stages->contains('id', $this->stage)) {
             $this->stage = null;
         }
     }
 
     /**
-     * Event-Handler: Aktualisiert Departments-Cache
+     * Event-Handler: Aktualisiert Department-Auswahl
      */
     #[On(['department-updated', 'department-created', 'department-deleted'])]
     public function refreshDepartments(?int $id = null): void
     {
-        $this->cachedDepartments = null;
-
         if ($id) {
             $this->department = $id;
         }
 
-        if ($this->department && $this->departments() && !$this->departments()->contains('id', $this->department)) {
+        // Prüfe ob ausgewähltes Department noch existiert
+        if ($this->department && !$this->departments->contains('id', $this->department)) {
             $this->department = null;
         }
     }
 
-    /**
-     * Computed Properties - laden Daten nur bei Bedarf
-     */
-    #[Computed]
-    public function teams(): Collection
+    public function getTeamsProperty(): Collection
     {
         if (!$this->showCreateModal || !$this->companyId) {
             return collect();
         }
 
-        if ($this->cachedTeams === null) {
-            $this->cachedTeams = Team::getCompanyTeams($this->companyId);
-        }
-
-        return $this->cachedTeams;
+        return Team::getCompanyTeams($this->companyId);
     }
 
-    #[Computed]
-    public function departments(): Collection
-    {
-        if (!$this->showCreateModal || !$this->currentTeamId) {
-            return collect();
-        }
-
-        if ($this->cachedDepartments === null) {
-            $this->cachedDepartments = Department::getDepartmentsForTeam($this->currentTeamId);
-        }
-
-        return $this->cachedDepartments;
-    }
-
-    #[Computed]
-    public function roles(): Collection
+    public function getDepartmentsProperty(): Collection
     {
         if (!$this->showCreateModal || !$this->companyId) {
             return collect();
         }
 
-        if ($this->cachedRoles === null) {
-            $this->cachedRoles = Role::getEmployeePanelRoles($this->companyId);
-        }
-
-        return $this->cachedRoles;
+        return Department::getDepartmentsForTeam($this->currentTeamId);
     }
 
-    #[Computed]
-    public function professions(): Collection
+    public function getRolesProperty(): Collection
     {
         if (!$this->showCreateModal || !$this->companyId) {
             return collect();
         }
 
-        if ($this->cachedProfessions === null) {
-            $this->cachedProfessions = Profession::getCompanyProfessions($this->companyId);
-        }
-
-        return $this->cachedProfessions;
+        return Role::getEmployeePanelRoles($this->companyId);
     }
 
-    #[Computed]
-    public function stages(): Collection
+    public function getProfessionsProperty(): Collection
     {
         if (!$this->showCreateModal || !$this->companyId) {
             return collect();
         }
 
-        if ($this->cachedStages === null) {
-            $this->cachedStages = Stage::getCompanyStages($this->companyId);
-        }
-
-        return $this->cachedStages;
+        return Profession::getCompanyProfessions($this->companyId);
     }
 
-    #[Computed]
-    public function supervisors(): Collection
+    public function getStagesProperty(): Collection
     {
         if (!$this->showCreateModal || !$this->companyId) {
             return collect();
         }
 
-        if ($this->cachedSupervisors === null) {
-            $this->cachedSupervisors = User::getCompanyManagers($this->companyId);
+        return Stage::getCompanyStages($this->companyId);
+    }
+
+    public function getSupervisorsProperty(): Collection
+    {
+        if (!$this->showCreateModal || !$this->companyId) {
+            return collect();
         }
+
+        $supervisors = User::getCompanyManagers($this->companyId);
 
         // Filter aktuellen User raus
         $currentUserId = $this->userId ?? 0;
-        return $this->cachedSupervisors->reject(function ($supervisor) use ($currentUserId) {
+        return $supervisors->reject(function ($supervisor) use ($currentUserId) {
             return $supervisor && isset($supervisor->id) && $supervisor->id === $currentUserId;
         });
     }
@@ -316,25 +272,20 @@ class CreateEmployee extends Component
      */
     public function closeCreateEmployeeModal(): void
     {
-        $this->resetErrorBag();
         $this->modal('create-employee')->close();
+        $this->resetFormData();
+        $this->showCreateModal = false;
+    }
 
+    private function resetFormData(): void
+    {
+        $this->resetErrorBag();
         $this->reset([
             'gender', 'name', 'last_name', 'email', 'selectedTeams',
             'department', 'supervisor', 'selectedRoles', 'profession',
             'stage', 'joined_at', 'employee_status', 'model_status',
-            'invitations',
+            'invitation',
         ]);
-
-        // Private Cache-Properties zurücksetzen
-        $this->cachedTeams = null;
-        $this->cachedDepartments = null;
-        $this->cachedRoles = null;
-        $this->cachedProfessions = null;
-        $this->cachedStages = null;
-        $this->cachedSupervisors = null;
-
-        $this->showCreateModal = false;
     }
 
     public function render(): View
