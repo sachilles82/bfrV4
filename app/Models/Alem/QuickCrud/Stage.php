@@ -81,32 +81,12 @@ class Stage extends Model
 
     public static function getCompanyStages(?int $companyId): Collection
     {
-        \Log::info('🟢 [Stage] getCompanyStages aufgerufen', [
-            'company_id' => $companyId,
-            'caller' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'unknown',
-            'timestamp' => now()->toTimeString()
-        ]);
-
         return static::getCachedByCompany($companyId, function() use ($companyId) {
-            \Log::warning('⚠️ [Stage] DATENBANK-ABFRAGE wird ausgeführt!', [
-                'company_id' => $companyId,
-                'info' => 'Cache war leer - Lade aus DB',
-                'timestamp' => now()->toTimeString()
-            ]);
-
-            $result = static::query()
+            return static::query()
                 ->where('company_id', $companyId)
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
-
-            \Log::info('✅ [Stage] Datenbank-Abfrage abgeschlossen', [
-                'company_id' => $companyId,
-                'anzahl_records' => $result->count(),
-                'timestamp' => now()->toTimeString()
-            ]);
-
-            return $result;
         });
     }
 

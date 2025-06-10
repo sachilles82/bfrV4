@@ -10,14 +10,12 @@ use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy]
+//#[Lazy]
 class ProfessionForm extends Component
 {
     use ValidateProfessionForm, DataFilter, WithPerPagePagination, WithPlaceholder;
@@ -57,8 +55,8 @@ class ProfessionForm extends Component
     #[On('open-profession-manager')]
     public function openProfessionFormModal(): void
     {
+        $this->resetFormData();
         $this->dataLoaded = true;
-        $this->resetFormFields();
     }
 
     /**
@@ -69,63 +67,63 @@ class ProfessionForm extends Component
         $this->validate();
 
         try {
-            DB::beginTransaction();
+            DB::transaction(function () {
 
-            if ($this->editing && $this->professionId) {
+                if ($this->editing && $this->professionId) {
 
-                $profession = $this->getFilteredQuery()
-                    ->findOrFail($this->professionId);
+                    $profession = $this->getFilteredQuery()
+                        ->findOrFail($this->professionId);
 
-                $profession->update([
-                    'name' => $this->name,
-                ]);
+                    $profession->update([
+                        'name' => $this->name,
+                    ]);
 
-                $this->dispatch('profession-updated', id: $profession->id);
+                    $this->dispatch('profession-updated', id: $profession->id);
 
-                Flux::toast(
-                    text: __('Profession updated successfully.'),
-                    heading: __('Success.'),
-                    variant: 'success'
-                );
+                    Flux::toast(
+                        text: __('Profession updated successfully.'),
+                        heading: __('Success.'),
+                        variant: 'success'
+                    );
 
-            } else {
+                } else {
 
-                $profession = Profession::create([
-                    'name' => $this->name,
+                    $profession = Profession::create([
+                        'name' => $this->name,
 
-                    /**
-                     * company_id, team_id, created_by werden automatisch
-                     * durch ManagesContextAndOwnership Trait gesetzt
-                     */
-                ]);
+                        /**
+                         * company_id, team_id, created_by werden automatisch
+                         * durch ManagesContextAndOwnership Trait gesetzt
+                         */
+                    ]);
 
-                $this->dispatch('profession-created', id: $profession->id);
+                    $this->dispatch('profession-created', id: $profession->id);
 
-                Flux::toast(
-                    text: __('Profession created successfully.'),
-                    heading: __('Success.'),
-                    variant: 'success'
-                );
-            }
+                    Flux::toast(
+                        text: __('Profession created successfully.'),
+                        heading: __('Success.'),
+                        variant: 'success'
+                    );
+                }
+            });
 
-            DB::commit();
+            $this->closeProfessionFormModal();
 
 //            \Log::info('🔥 Cache Warming...');
             Profession::getCompanyProfessions($this->companyId); // Befüllt den Cache
 
-            $this->closeProfessionFormModal();
 
         } catch (\Throwable $e) {
 
             DB::rollBack();
-            Log::error("Fehler beim Erstellen der Profession: " . $e->getMessage(), [
-                'exception' => $e,
-                'acting_user_id' => $this->authUserId,
-                'profession_id' => $this->professionId,
-                'formData' => collect($this->only([
-                    'name'
-                ]))->toArray()
-            ]);
+//            Log::error("Fehler beim Erstellen der Profession: " . $e->getMessage(), [
+//                'exception' => $e,
+//                'acting_user_id' => $this->authUserId,
+//                'profession_id' => $this->professionId,
+//                'formData' => collect($this->only([
+//                    'name'
+//                ]))->toArray()
+//            ]);
 
             Flux::toast(
                 text: __('An error occurred while saving the Profession.'),
@@ -213,12 +211,14 @@ class ProfessionForm extends Component
     }
 
     /**
-     * Setzt Formular zurück und löscht alle Error-Bags.
+     * Schließt das Modal und bereinigt alle Daten
      */
-    public function resetFormFields(): void
+    public function resetFormData(): void
     {
-        $this->reset(['professionId', 'name', 'editing']);
         $this->resetErrorBag();
+        $this->reset([
+            'professionId', 'name', 'editing'
+        ]);
         $this->resetPage();
     }
 
@@ -232,7 +232,7 @@ class ProfessionForm extends Component
         // Setzt verzögert 1ms die Formularfelder zurück
         $this->js("
         setTimeout(() => {
-            \$wire.resetFormFields();
+            \$wire.resetFormData();
         }, 1);
     ");
 

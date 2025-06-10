@@ -105,7 +105,7 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Teams -->
+                    <!-- Teams - KORRIGIERT: Array-Syntax -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Teams') }}"
@@ -123,11 +123,11 @@
                                 multiple
                                 placeholder="{{ __('Select Teams') }}">
 
-                                @forelse($this->teams as $team)
+                                @forelse($teams as $team)
                                     <flux:option
-                                        wire:key="team-option-{{ $team->id }}"
-                                        value="{{ $team->id }}">
-                                        <span class="truncate">{{ $team->name }}</span>
+                                        wire:key="team-option-{{ $team['id'] }}"
+                                        value="{{ $team['id'] }}">
+                                        <span class="truncate">{{ $team['name'] }}</span>
                                     </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No teams found') }}</flux:option>
@@ -137,7 +137,7 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Department -->
+                    <!-- Department - KORRIGIERT: Array-Syntax -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Department') }}"
@@ -155,11 +155,11 @@
                                 searchable
                                 placeholder="{{ __('Select Department') }}">
 
-                                @forelse($this->departments as $dept)
+                                @forelse($departments as $dept)
                                     <flux:option
-                                        wire:key="department-option-{{ $dept->id }}"
-                                        value="{{ $dept->id }}">
-                                        <span class="truncate">{{ $dept->name }}</span>
+                                        wire:key="department-option-{{ $dept['id'] }}"
+                                        value="{{ $dept['id'] }}">
+                                        <span class="truncate">{{ $dept['name'] }}</span>
                                     </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No departments found') }}</flux:option>
@@ -167,16 +167,16 @@
 
 
                                 <x-slot name="add">
-{{--                                    <livewire:alem.department.create-department--}}
-{{--                                        lazy--}}
-{{--                                    />--}}
+                                    {{--                                    <livewire:alem.department.create-department--}}
+                                    {{--                                        lazy--}}
+                                    {{--                                    />--}}
                                 </x-slot>
                             </flux:select>
 
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Supervisor -->
+                    <!-- Supervisor - KORRIGIERT: Array-Syntax -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Supervisor') }}"
@@ -194,18 +194,19 @@
                                 searchable
                                 placeholder="{{ __('Select Supervisor') }}">
 
-                                @forelse($this->supervisors as $supervisor)
-                                    <flux:option wire:key="supervisor-option-{{ $supervisor->id }}"
-                                                 value="{{ $supervisor->id }}">
+                                @forelse($supervisors as $supervisor)
+                                    <flux:option
+                                        wire:key="supervisor-option-{{ $supervisor['id'] }}"
+                                        value="{{ $supervisor['id'] }}">
                                         <div class="flex items-center gap-2 whitespace-nowrap">
                                             <flux:avatar
-                                                name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
+                                                name="{{ $supervisor['full_name'] }}"
                                                 circle
                                                 size="xs"
-                                                src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
-                                                alt="{{ $supervisor->name }}"
+                                                src="{{ isset($supervisor['profile_photo_path']) && $supervisor['profile_photo_path'] ? asset('storage/' . $supervisor['profile_photo_path']) : null }}"
+                                                alt="{{ $supervisor['name'] }}"
                                             />
-                                            {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                            {{ $supervisor['full_name'] }}
                                         </div>
                                     </flux:option>
                                 @empty
@@ -216,7 +217,7 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Roles -->
+                    <!-- Roles - KORRIGIERT: Array-Syntax -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Roles') }}"
@@ -233,12 +234,12 @@
                                 multiple
                                 placeholder="{{ __('Select roles') }}">
 
-                                @forelse($this->roles as $roleOption)
+                                @forelse($roles as $roleOption)
                                     <flux:option
-                                        wire:key="role-option-{{ $roleOption->id }}"
-                                        value="{{ $roleOption->id }}">
-                                        {{ __($roleOption->name) }}
-                                        @if($roleOption->is_manager)
+                                        wire:key="role-option-{{ $roleOption['id'] }}"
+                                        value="{{ $roleOption['id'] }}">
+                                        {{ __($roleOption['name']) }}
+                                        @if(isset($roleOption['is_manager']) && $roleOption['is_manager'])
                                             <span
                                                 class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
                                                 {{ __('Manager') }}
@@ -253,7 +254,7 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Profession -->
+                    <!-- Profession - KORRIGIERT: Array-Syntax -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Profession') }}"
@@ -271,11 +272,11 @@
                                 searchable
                                 placeholder="{{ __('Select Profession') }}">
 
-                                @forelse($this->professions as $prof)
+                                @forelse($professions as $prof)
                                     <flux:option
-                                        wire:key="profession-option-{{ $prof->id }}"
-                                        value="{{ $prof->id }}">
-                                        <span class="truncate">{{ $prof->name }}</span>
+                                        wire:key="profession-option-{{ $prof['id'] }}"
+                                        value="{{ $prof['id'] }}">
+                                        <span class="truncate">{{ $prof['name'] }}</span>
                                     </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No professions found') }}</flux:option>
@@ -297,7 +298,7 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Stage -->
+                    <!-- Stage - KORRIGIERT: Array-Syntax -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Stage') }}"
@@ -315,26 +316,26 @@
                                 searchable
                                 placeholder="{{ __('Select Stage') }}">
 
-                                @forelse($this->stages as $st)
+                                @forelse($stages as $st)
                                     <flux:option
-                                        wire:key="stage-option-{{ $st->id }}"
-                                        value="{{ $st->id }}">
-                                        <span class="truncate">{{ $st->name }}</span>
+                                        wire:key="stage-option-{{ $st['id'] }}"
+                                        value="{{ $st['id'] }}">
+                                        <span class="truncate">{{ $st['name'] }}</span>
                                     </flux:option>
                                 @empty
                                     <flux:option value="">{{ __('No stages found') }}</flux:option>
                                 @endforelse
 
-                                    <x-slot name="add">
+                                <x-slot name="add">
 
-                                        <flux:modal.trigger
-                                            name="create-stage"
-                                            @click="$dispatch('open-stage-manager')"
-                                        >
-                                            <x-pupi.button.open-manager/>
-                                        </flux:modal.trigger>
+                                    <flux:modal.trigger
+                                        name="create-stage"
+                                        @click="$dispatch('open-stage-manager')"
+                                    >
+                                        <x-pupi.button.open-manager/>
+                                    </flux:modal.trigger>
 
-                                    </x-slot>
+                                </x-slot>
 
                             </flux:select>
 
@@ -442,7 +443,7 @@
                     <!-- Email Invitation Toggle -->
                     <div class="col-span-full"
                          x-data="{
-                            invitationsEnabled: @entangle('invitations').defer,
+                            invitationEnabled: @entangle('invitation').defer,
                             modelStatus: @entangle('model_status'),
 
                             isActive() {
@@ -459,10 +460,10 @@
                                     </span>
                                     <!-- Text based on toggle state -->
                                     <span class="text-sm"
-                                          :class="invitationsEnabled ? 'text-indigo-600 dark:text-indigo-500' : 'text-gray-500 dark:text-gray-400'">
+                                          :class="invitationEnabled ? 'text-indigo-600 dark:text-indigo-500' : 'text-gray-500 dark:text-gray-400'">
                                         <span
-                                            x-show="!invitationsEnabled">{{ __('Don\'t send the user an invitation email.') }}</span>
-                                        <span x-show="invitationsEnabled"
+                                            x-show="!invitationEnabled">{{ __('Don\'t send the user an invitation email.') }}</span>
+                                        <span x-show="invitationEnabled"
                                               x-cloak>{{ __('Send the user an invitation email.') }}</span>
                                     </span>
                                 </span>
@@ -470,21 +471,21 @@
                                 <div class="flex items-center">
                                     <!-- Toggle Button -->
                                     <button
-                                        @click="isActive() && (invitationsEnabled = !invitationsEnabled)"
+                                        @click="isActive() && (invitationEnabled = !invitationEnabled)"
                                         type="button"
                                         class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
                                         :class="{
-                                            'bg-indigo-600 dark:bg-indigo-500 cursor-pointer': invitationsEnabled && isActive(),
-                                            'bg-gray-200 dark:bg-gray-700 cursor-pointer': !invitationsEnabled && isActive(),
+                                            'bg-indigo-600 dark:bg-indigo-500 cursor-pointer': invitationEnabled && isActive(),
+                                            'bg-gray-200 dark:bg-gray-700 cursor-pointer': !invitationEnabled && isActive(),
                                             'bg-gray-200 dark:bg-gray-700 opacity-50 cursor-not-allowed': !isActive()
                                         }"
                                         role="switch"
                                         :disabled="!isActive()"
-                                        :aria-checked="invitationsEnabled"
+                                        :aria-checked="invitationEnabled"
                                     >
                                         <span
                                             class="pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
-                                            :class="invitationsEnabled ? 'translate-x-5' : 'translate-x-0'"
+                                            :class="invitationEnabled ? 'translate-x-5' : 'translate-x-0'"
                                         ></span>
                                     </button>
                                 </div>

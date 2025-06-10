@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -32,4 +33,13 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('Super Admin') ? true : null;
         });
     }
+
+//    protected function cacheAuthUser()
+//    {
+//        if (auth()->check()) {
+//            return Cache::remember('user:' . auth()->id(), 300, function() {
+//                return auth()->user();
+//            });
+//        }
+//    }
 }

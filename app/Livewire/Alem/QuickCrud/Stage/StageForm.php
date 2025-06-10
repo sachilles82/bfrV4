@@ -14,43 +14,38 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-//#[Lazy(isolate: false)]// Lazy loading isolate führt zusätzliche query aus, deswegen brauch ich es nicht
-//#[Lazy]
 class StageForm extends Component
 {
     use ValidateStageForm, DataFilter, WithPerPagePagination, WithPlaceholder;
 
     /**
-     * Stage ID (gesperrt für Sicherheit)
-     *
+     * SICHERHEIT: Locked Properties können nicht von außen manipuliert werden
      * @var int|null
+     *  ID des authentifizierten Benutzers. Wird von der übergeordneten View übergeben.
      */
     #[Locked]
-    public ?int $stageId = null;
+    public ?int $authUserId = null;
 
+    #[Locked]
+    public ?int $currentTeamId = null;
+
+    #[Locked]
+    public ?int $companyId = null;
+
+    /** Stage-Felder */
+    #[Locked]
+    public ?int $stageId = null;
     public ?string $name = null;
 
     public bool $editing = false;
     public bool $dataLoaded = false;
 
-    /**
-     * ID des authentifizierten Benutzers.
-     * Wird von der übergeordneten View übergeben.
-     */
-    // Properties für die übergebenen Daten
-    public ?int $authUserId = null;
-    public ?int $currentTeamId = null;
-    public ?int $companyId = null;
-
     public function mount(?int $authUserId = null, ?int $currentTeamId = null, ?int $companyId = null): void
     {
-        // Wenn keine authUserId übergeben wird, versuche, sie vom aktuellen Benutzer zu holen
-        // Dies dient als Fallback, falls die Komponente an anderer Stelle ohne Übergabe verwendet wird.
         $this->authUserId = $authUserId ?? auth()->id();
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
@@ -74,66 +69,59 @@ class StageForm extends Component
         $this->validate();
 
         try {
-            DB::beginTransaction();
+            DB::transaction(function () {
+                if ($this->editing && $this->stageId) {
+                    // Update
+                    $stage = $this->getFilteredQuery()
+                        ->findOrFail($this->stageId);
 
-            if ($this->editing && $this->stageId) {
+                    $stage->update([
+                        'name' => $this->name,
+                    ]);
 
-                $stage = $this->getFilteredQuery()
-                    ->findOrFail($this->stageId);
+                    // Dispatch Event mit ID
+                    $this->dispatch('stage-updated', id: $stage->id);
 
-                $stage->update([
-                    'name' => $this->name
-                ]);
+                    Flux::toast(
+                        text: __('Stage updated successfully.'),
+                        heading: __('Success.'),
+                        variant: 'success'
+                    );
 
-//                // Manuell den Company-Cache leeren
-//                Stage::flushCompanyCache($this->companyId);
+                } else {
+                    // Create
+                    $stage = Stage::create([
+                        'name' => $this->name,
+                        'created_by' => $this->authUserId,
+                        'team_id' => $this->currentTeamId,
+                        'company_id' => $this->companyId,
+                    ]);
 
-                $this->dispatch('stage-updated', id: $stage->id);
+                    // Dispatch Event mit ID
+                    $this->dispatch('stage-created', id: $stage->id);
 
-                Flux::toast(
-                    text: __('Stage updated successfully.'),
-                    heading: __('Success.'),
-                    variant: 'success'
-                );
-
-            } else {
-
-                $stage = Stage::create([
-                    'name' => $this->name
-                ]);
-
-                // Manuell den Company-Cache leeren
-//                Stage::flushCompanyCache($this->companyId);
-
-                $this->dispatch('stage-created', id: $stage->id)->to(CreateEmployee::class);;;
-
-                Flux::toast(
-                    text: __('Stage created successfully.'),
-                    heading: __('Success.'),
-                    variant: 'success'
-                );
-            }
-
-            DB::commit();
-            //            \Log::info('🔥 Cache Warming...');
-            Stage::getCompanyStages($this->companyId); // Befüllt den Cache
+                    Flux::toast(
+                        text: __('Stage created successfully.'),
+                        heading: __('Success.'),
+                        variant: 'success'
+                    );
+                }
+            });
 
             $this->closeStageFormModal();
 
         } catch (\Throwable $e) {
-
             DB::rollBack();
+
             Log::error("Fehler beim Erstellen der Stage: " . $e->getMessage(), [
                 'exception' => $e,
                 'acting_user_id' => $this->authUserId,
                 'stage_id' => $this->stageId,
-                'formData' => collect($this->only([
-                    'name'
-                ]))->toArray()
+                'formData' => ['name' => $this->name]
             ]);
 
             Flux::toast(
-                text: __('An error occurred while saving the stage.'),
+                text: __('An error occurred while saving the Stage.'),
                 heading: __('Error.'),
                 variant: 'danger'
             );
@@ -187,9 +175,6 @@ class StageForm extends Component
                 ->findOrFail($id);
 
             $stage->delete();
-
-            // Manuell den Company-Cache leeren
-            Stage::flushCompanyCache($this->companyId);
 
             Flux::toast(
                 text: __('Stage deleted successfully.'),

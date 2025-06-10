@@ -253,30 +253,4 @@ class User extends Authenticatable
                 ->get();
         }, 'user');
     }
-
-
-    /**
-     * Definiert, welche Daten des Models an den Suchindex gesendet werden sollen.
-     *
-     * @return array<string, mixed>
-     */
-    public function toSearchableArray(): array
-    {
-        return [
-            'id'          => $this->getKey(), // ID ist oft nützlich
-            'name'        => $this->name,
-            'last_name'   => $this->last_name,
-            'email'       => $this->email,
-            'phone_1'     => $this->phone_1,
-
-            'joined_at_timestamp' => $this->joined_at?->timestamp,
-            'created_at_timestamp' => $this->created_at?->timestamp,
-
-            // Status direkt vom User-Model
-            'model_status' => $this->model_status,
-            'user_type'    => $this->user_type,
-
-            // Füge weitere relevante Felder hinzu...
-        ];
-    }
 }
