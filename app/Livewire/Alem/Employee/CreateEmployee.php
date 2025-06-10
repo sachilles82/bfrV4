@@ -280,6 +280,7 @@ class CreateEmployee extends Component
             ])
             ->toArray();
     }
+
     /**
      * Schließt das Modal und bereinigt alle Daten
      */
@@ -288,12 +289,11 @@ class CreateEmployee extends Component
         $this->modal('create-employee')->close();
         $this->resetFormData();
 
-        // Setzt verzögert 1ms die Formularfelder zurück
         $this->js("
         setTimeout(() => {
-            \$wire.resetFormData();
-        }, 1);
-    ");
+              \$wire.resetFormData();
+            }, 1);
+        ");
 
         $this->showCreateModal = false;
     }
