@@ -63,7 +63,8 @@ class CreateEmployee extends Component
     public bool $invitation = false;
 
     /**
-     * Lebenszyklusmethode: Wird aufgerufen, wenn das Modal geöffnet wird
+     * Event Handler: Wird aufgerufen, wenn das Modal geöffnet werden soll
+     * Lädt User-Daten nur bei Bedarf (Lazy Loading)
      */
     #[On('create-employee-modal')]
     public function openCreateEmployeeModal(): void
@@ -97,8 +98,8 @@ class CreateEmployee extends Component
                     'joined_at' => $this->joined_at?->toDateString(),
                     'model_status' => $this->model_status,
                     'user_type' => UserType::Employee,
-                    'company_id' => auth()->user()->company_id,
-                    'created_by' => auth()->id(),
+                    'company_id' => $this->companyId,
+                    'created_by' => $this->authUserId,
                 ]);
 
                 $this->createEmployee($user);
@@ -148,7 +149,8 @@ class CreateEmployee extends Component
 
             $user->teams()->attach($teamsWithRole);
         } else {
-            $user->teams()->attach(auth()->user()->currentTeam, ['role' => 'member']);
+            // Nutze die übergebene $currentTeamId Property
+            $user->teams()->attach($this->currentTeamId, ['role' => 'member']);
         }
     }
 

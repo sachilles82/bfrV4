@@ -14,7 +14,7 @@ trait HandleCatchError
     {
         Log::error("Fehler beim Erstellen des Mitarbeiters: {$e->getMessage()}", [
             'exception' => $e,
-            'acting_user_id' => auth()->id(),
+            'acting_user_id' => $this->authUserId,
             'formData' => $this->only
             ([
                 'gender',
