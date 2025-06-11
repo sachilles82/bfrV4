@@ -198,7 +198,7 @@ class CreateEmployee extends Component
             'invitation',
         ]);
 
-        $this->resetDropdownRelations();
+        $this->resetDropdownRelationsData();
     }
 
     public function render(): View

@@ -67,7 +67,6 @@ trait WithAdvancedCache
      * @param array $options Zusätzliche Optionen
      * @return Collection
      */
-    // app/Traits/Cache/WithAdvancedCache.php
 
     public static function getCached(
         string $context,

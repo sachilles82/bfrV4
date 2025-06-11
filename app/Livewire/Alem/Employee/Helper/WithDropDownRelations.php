@@ -126,7 +126,7 @@ trait WithDropDownRelations
             }
         } catch (\Throwable $e) {
             $this->handleLoadingError($e);
-            $this->resetDropdownRelations();
+            $this->resetDropdownRelationsData();
         }
     }
 
@@ -252,7 +252,7 @@ trait WithDropDownRelations
     /**
      * Erweiterte Reset-Funktion
      */
-    protected function resetDropdownRelations(): void
+    protected function resetDropdownRelationsData(): void
     {
         $collections = array_column($this->getCollectionConfig(), 'collection');
         $this->reset($collections);

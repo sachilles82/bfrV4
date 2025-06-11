@@ -226,7 +226,7 @@ class EditEmployee extends Component
             'stage', 'joined_at', 'employee_status', 'model_status',
         ]);
 
-        $this->resetDropdownRelations();
+        $this->resetDropdownRelationsData();
     }
 
     /**
