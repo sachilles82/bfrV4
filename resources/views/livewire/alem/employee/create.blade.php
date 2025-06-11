@@ -132,6 +132,7 @@
                                 @empty
                                     <flux:option value="">{{ __('No teams found') }}</flux:option>
                                 @endforelse
+
                             </flux:select>
 
                         </x-pupi.input.group>
@@ -212,6 +213,7 @@
                                 @empty
                                     <flux:option value="">{{ __('No supervisors found') }}</flux:option>
                                 @endforelse
+
                             </flux:select>
 
                         </x-pupi.input.group>
@@ -249,6 +251,7 @@
                                 @empty
                                     <flux:option value="">{{ __('No roles found') }}</flux:option>
                                 @endforelse
+
                             </flux:select>
 
                         </x-pupi.input.group>

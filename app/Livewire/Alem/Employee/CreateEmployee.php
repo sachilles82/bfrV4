@@ -24,6 +24,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
@@ -86,6 +87,8 @@ class CreateEmployee extends Component
     #[On('create-employee-modal')]
     public function openCreateEmployeeModal(): void
     {
+        // $this->authorize('create', User::class);
+
         $this->resetFormData();
 
         // Setze Standardwerte
@@ -150,6 +153,8 @@ class CreateEmployee extends Component
 
         } catch (\Exception $e) {
             // Collections bleiben leer bei Fehler
+        } catch (\Throwable $e) {
+            $this->handleLoadingError($e);
         }
     }
 
@@ -198,7 +203,7 @@ class CreateEmployee extends Component
             );
 
         } catch (\Throwable $e) {
-            $this->handleError($e);
+            $this->handleSavingError($e);
         }
     }
 
@@ -224,8 +229,9 @@ class CreateEmployee extends Component
                 ->toArray();
 
             $user->teams()->attach($teamsWithRole);
+
         } else {
-            // Nutze die übergebene $currentTeamId Property
+            // Es braucht eine Jetstream Rolle
             $user->teams()->attach($this->currentTeamId, ['role' => 'member']);
         }
     }
@@ -267,10 +273,9 @@ class CreateEmployee extends Component
     private function loadSupervisors(): array
     {
         $supervisors = User::getCompanyManagers($this->companyId);
-        $currentUserId = $this->userId ?? 0;
 
         return $supervisors
-            ->reject(fn($sup) => $sup->id === $currentUserId)
+            ->reject(fn($sup) => $sup->id === $this->authUserId)
             ->map(fn($sup) => [
                 'id' => $sup->id,
                 'name' => $sup->name,
@@ -287,7 +292,6 @@ class CreateEmployee extends Component
     public function closeCreateEmployeeModal(): void
     {
         $this->modal('create-employee')->close();
-        $this->resetFormData();
 
         $this->js("
         setTimeout(() => {
@@ -298,7 +302,7 @@ class CreateEmployee extends Component
         $this->showCreateModal = false;
     }
 
-    private function resetFormData(): void
+    public function resetFormData(): void
     {
         $this->resetErrorBag();
 
@@ -316,4 +320,5 @@ class CreateEmployee extends Component
     {
         return view('livewire.alem.employee.create');
     }
+
 }

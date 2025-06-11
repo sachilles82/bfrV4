@@ -219,11 +219,11 @@
                                     multiple
                                     placeholder="{{ __('Teams auswählen') }}">
 
-                                    @forelse($this->teams() as $team)
+                                    @forelse($teams as $team)
                                         <flux:option
-                                            wire:key="team-option-{{ $team->id }}"
-                                            value="{{ $team->id }}">
-                                            <span class="truncate">{{ $team->name }}</span>
+                                            wire:key="team-option-{{ $team['id'] }}"
+                                            value="{{ $team['id'] }}">
+                                            <span class="truncate">{{ $team['name'] }}</span>
                                         </flux:option>
                                     @empty
                                         <flux:option value="">{{ __('No teams found') }}</flux:option>
@@ -252,20 +252,21 @@
                                     searchable
                                     placeholder="{{ __('Select Department') }}">
 
-                                    @forelse($this->departments() as $dept)
+                                    @forelse($departments as $dept)
                                         <flux:option
-                                            wire:key="department-option-{{ $dept->id }}"
-                                            value="{{ $dept->id }}">
-                                            <span class="truncate">{{ $dept->name }}</span>
+                                            wire:key="department-option-{{ $dept['id'] }}"
+                                            value="{{ $dept['id'] }}">
+                                            <span class="truncate">{{ $dept['name'] }}</span>
                                         </flux:option>
                                     @empty
                                         <flux:option value="">{{ __('No departments found') }}</flux:option>
                                     @endforelse
+
                                     <!-- Trigger zum Öffnen des Profession-Modals -->
                                     <x-slot name="add">
-{{--                                        <livewire:alem.department.create-department--}}
-{{--                                            lazy--}}
-{{--                                        />--}}
+                                        {{--                                        <livewire:alem.department.create-department--}}
+                                        {{--                                            lazy--}}
+                                        {{--                                        />--}}
                                     </x-slot>
                                 </flux:select>
 
@@ -290,17 +291,19 @@
                                     searchable
                                     placeholder="{{ __('Select Supervisor') }}">
 
-                                    @forelse($this->supervisors() as $supervisor)
-                                        <flux:option wire:key="supervisor-option-{{ $supervisor->id }}"
-                                                     value="{{ $supervisor->id }}">
+                                    @forelse($supervisors as $supervisor)
+                                        <flux:option
+                                            wire:key="supervisor-option-{{ $supervisor['id'] }}"
+                                            value="{{ $supervisor['id'] }}">
                                             <div class="flex items-center gap-2 whitespace-nowrap">
                                                 <flux:avatar
-                                                    name="{{ $supervisor->name }} {{ $supervisor->last_name }}"
-                                                    circle size="xs"
-                                                    src="{{ $supervisor->profile_photo_path ? asset('storage/' . $supervisor->profile_photo_path) : null }}"
-                                                    alt="{{ $supervisor->name }}"
+                                                    name="{{ $supervisor['full_name'] }}"
+                                                    circle
+                                                    size="xs"
+                                                    src="{{ isset($supervisor['profile_photo_path']) && $supervisor['profile_photo_path'] ? asset('storage/' . $supervisor['profile_photo_path']) : null }}"
+                                                    alt="{{ $supervisor['name'] }}"
                                                 />
-                                                {{ $supervisor->name }} {{ $supervisor->last_name }}
+                                                {{ $supervisor['full_name'] }}
                                             </div>
                                         </flux:option>
                                     @empty
@@ -328,12 +331,12 @@
                                     multiple
                                     placeholder="{{ __('Select roles') }}">
 
-                                    @forelse($this->roles() as $roleOption)
+                                    @forelse($roles as $roleOption)
                                         <flux:option
-                                            wire:key="role-option-{{ $roleOption->id }}"
-                                            value="{{ $roleOption->id }}">
-                                            {{ __($roleOption->name) }}
-                                            @if($roleOption->is_manager)
+                                            wire:key="role-option-{{ $roleOption['id'] }}"
+                                            value="{{ $roleOption['id'] }}">
+                                            {{ __($roleOption['name']) }}
+                                            @if(isset($roleOption['is_manager']) && $roleOption['is_manager'])
                                                 <span
                                                     class="ml-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
                                                 {{ __('Manager') }}
@@ -366,26 +369,26 @@
                                     searchable
                                     placeholder="{{ __('Select Profession') }}">
 
-                                    @forelse($this->professions() as $prof)
+                                    @forelse($professions as $prof)
                                         <flux:option
-                                            wire:key="profession-option-{{ $prof->id }}"
-                                            value="{{ $prof->id }}">
-                                            <span class="truncate">{{ $prof->name }}</span>
+                                            wire:key="profession-option-{{ $prof['id'] }}"
+                                            value="{{ $prof['id'] }}">
+                                            <span class="truncate">{{ $prof['name'] }}</span>
                                         </flux:option>
                                     @empty
                                         <flux:option value="">{{ __('No professions found') }}</flux:option>
                                     @endforelse
 
-                                        <x-slot name="add">
+                                    <x-slot name="add">
 
-                                            <flux:modal.trigger
-                                                name="create-profession"
-                                                @click="$dispatch('open-profession-manager')"
-                                            >
-                                                <x-pupi.button.open-manager/>
-                                            </flux:modal.trigger>
+                                        <flux:modal.trigger
+                                            name="create-profession"
+                                            @click="$dispatch('open-profession-manager')"
+                                        >
+                                            <x-pupi.button.open-manager/>
+                                        </flux:modal.trigger>
 
-                                        </x-slot>
+                                    </x-slot>
 
                                 </flux:select>
 
@@ -410,26 +413,26 @@
                                     searchable
                                     placeholder="{{ __('Select Stage') }}">
 
-                                    @forelse($this->stages() as $st)
+                                    @forelse($stages as $st)
                                         <flux:option
-                                            wire:key="stage-option-{{ $st->id }}"
-                                            value="{{ $st->id }}">
-                                            <span class="truncate">{{ $st->name }}</span>
+                                            wire:key="stage-option-{{ $st['id'] }}"
+                                            value="{{ $st['id'] }}">
+                                            <span class="truncate">{{ $st['name'] }}</span>
                                         </flux:option>
                                     @empty
                                         <flux:option value="">{{ __('No stages found') }}</flux:option>
                                     @endforelse
 
-                                        <x-slot name="add">
+                                    <x-slot name="add">
 
-                                            <flux:modal.trigger
-                                                name="create-stage"
-                                                @click="$dispatch('open-stage-manager')"
-                                            >
-                                                <x-pupi.button.open-manager/>
-                                            </flux:modal.trigger>
+                                        <flux:modal.trigger
+                                            name="create-stage"
+                                            @click="$dispatch('open-stage-manager')"
+                                        >
+                                            <x-pupi.button.open-manager/>
+                                        </flux:modal.trigger>
 
-                                        </x-slot>
+                                    </x-slot>
 
                                 </flux:select>
 

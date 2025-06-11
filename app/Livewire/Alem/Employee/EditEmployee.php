@@ -5,7 +5,9 @@ namespace App\Livewire\Alem\Employee;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
+use App\Livewire\Alem\Employee\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
+use App\Livewire\Alem\Employee\Helper\WithDropDownsCollections;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee;
 use App\Models\Alem\QuickCrud\Profession;
@@ -19,12 +21,8 @@ use App\Traits\Model\ModelStatusOptions;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -32,24 +30,34 @@ use Livewire\Component;
 //#[Lazy(isolate: false)]
 class EditEmployee extends Component
 {
-    use AuthorizesRequests, ValidateEmployee;
+    use AuthorizesRequests;
+    use WithDropDownsCollections, ValidateEmployee, HandleCatchError;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
-    // Modal state
-    public bool $showEditModal = false;
-    private bool $dataLoaded = false;
-
-    // User identification
+    /**
+     * SICHERHEIT: Locked Properties können nicht von außen manipuliert werden
+     * @var int|null
+     *  ID des authentifizierten Benutzers. Wird von der übergeordneten View übergeben.
+     */
     #[Locked]
-    public ?int $userId = null;
-    public ?User $user = null;
-
-    // Eigenschaften für vorgeladene Daten - diese werden automatisch von Livewire befüllt
     public ?int $authUserId = null;
+
+    #[Locked]
     public ?int $currentTeamId = null;
+
+    #[Locked]
     public ?int $companyId = null;
 
-    // User form fields
+    #[Locked]
+    public ?int $userId = null;
+
+    /** Modal-Status */
+    public bool $showEditModal = false;
+
+    // User identification
+    public ?User $user = null;
+
+    /** Benutzer-Felder */
     public ?Gender $gender = null;
     public ?string $name = null;
     public ?string $last_name = null;
@@ -60,19 +68,21 @@ class EditEmployee extends Component
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    // Employee fields
+    /** Mitarbeiter-Felder */
     public ?EmployeeStatus $employee_status = null;
     public $profession; // check Profession mit integer
     public $stage;// check Stage mit integer
     public ?int $supervisor = null;
 
-    // Optimierung: Cache-Eigenschaften privat lassen und initialisieren
-    private ?Collection $teams = null;
-    private ?Collection $departments = null;
-    private ?Collection $roles = null;
-    private ?Collection $professions = null;
-    private ?Collection $stages = null;
-    private ?Collection $supervisors = null;
+    /**
+     * Arrays statt Collections für bessere Performance
+     */
+    public array $teams = [];
+    public array $departments = [];
+    public array $roles = [];
+    public array $professions = [];
+    public array $stages = [];
+    public array $supervisors = [];
 
     #[On('edit-employee-modal')]
     public function openEditEmployeeModal($userId): void
@@ -80,8 +90,6 @@ class EditEmployee extends Component
         // $this->authorize('update', User::class);
 
         $this->userId = $userId;
-
-        $this->loadRelationForDropDowns();
 
         // Kein Join in der Edit und Create verwenden. Nur in der Table ist es sinnvoll
         $this->user = User::with([
@@ -93,8 +101,9 @@ class EditEmployee extends Component
 
         $this->loadEmployeeData();
 
+        $this->loadRelationForDropDowns();
+
         $this->showEditModal = true;
-        $this->dataLoaded = false;
 
     }
 
@@ -135,101 +144,85 @@ class EditEmployee extends Component
      */
     protected function loadRelationForDropDowns(): void
     {
-        if (!$this->showEditModal || $this->dataLoaded) {
+//        if (!$this->showEditModal || $this->dataLoaded) {
+//            return;
+//        }
+        if (!$this->companyId) {
             return;
         }
 
         try {
-            $companyId = $this->companyId;
-            $teamId = $this->currentTeamId;
+            $this->teams = Team::getCompanyTeams($this->companyId)
+                ->map(fn($team) => [
+                    'id' => $team->id,
+                    'name' => $team->name
+                ])
+                ->toArray();
 
-            // Teams laden mit Caching
-            if ($this->teams === null) {
-                $this->teams = Team::getCompanyTeams($companyId);
-            }
+            $this->departments = Department::getDepartmentsForTeam($this->currentTeamId)
+                ->map(fn($dept) => [
+                    'id' => $dept->id,
+                    'name' => $dept->name
+                ])
+                ->toArray();
 
-            // Departments laden mit Caching
-            if ($this->departments === null) {
-                $this->departments = Department::getDepartmentsForTeam($teamId);
-            }
+            $this->roles = Role::getEmployeePanelRoles($this->companyId)
+                ->map(fn($role) => [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'is_manager' => $role->is_manager ?? false
+                ])
+                ->toArray();
 
-            // Supervisors laden mit Caching
-            if ($this->supervisors === null) {
-                $this->supervisors = User::getCompanyManagers($companyId);
-            }
+            $this->professions = Profession::getCompanyProfessions($this->companyId)
+                ->map(fn($prof) => [
+                    'id' => $prof->id,
+                    'name' => $prof->name
+                ])
+                ->toArray();
 
-            // Roles laden mit Caching
-            if ($this->roles === null) {
-                $this->roles = Role::getEmployeePanelRoles($companyId);
-            }
+            $this->stages = Stage::getCompanyStages($this->companyId)
+                ->map(fn($stage) => [
+                    'id' => $stage->id,
+                    'name' => $stage->name
+                ])
+                ->toArray();
 
-            // Professions laden mit Caching
-            if ($this->professions === null) {
-                $this->professions = Profession::getCompanyProfessions($companyId);
-            }
+            $this->supervisors = $this->loadSupervisors();
 
-            // Stages laden mit Caching
-            if ($this->stages === null) {
-                $this->stages = Stage::getCompanyStages($companyId);
-            }
-
-            $this->dataLoaded = true;
-
+        } catch (\Exception $e) {
+            // Collections bleiben leer bei Fehler
         } catch (\Throwable $e) {
-            Log::error("Fehler beim Laden der Relationen: " . $e->getMessage());
-            Flux::toast(
-                text: __('An error occurred while loading the Relation Data.'),
-                heading: __('Error.'),
-                variant: 'danger'
-            );
+            $this->handleLoadingError($e);
         }
     }
 
-
     /**
-     * Update User Employee in die Datenbank
+     * Aktualisiert die Benutzer- und Mitarbeiterdaten in der Datenbank.
      */
     public function updateEmployee(): void
     {
         $this->validate();
 
         try {
+            DB::transaction(function () {
 
-            DB::beginTransaction();
+                User::where('id', $this->userId)->update([
+                    'name' => $this->name,
+                    'last_name' => $this->last_name,
+                    'email' => $this->email,
+                    'gender' => $this->gender,
+                    'model_status' => $this->model_status,
+                    'joined_at' => $this->joined_at?->toDateString(),
+                    'department_id' => $this->department,
+                ]);
 
-            User::where('id', $this->userId)->update([
-                'name' => $this->name,
-                'last_name' => $this->last_name,
-                'email' => $this->email,
-                'gender' => $this->gender,
-                'model_status' => $this->model_status,
-                'joined_at' => $this->joined_at?->toDateString(),
-                'department_id' => $this->department,
-            ]);
+                $this->updateEmployeeData();
+                $this->syncRelations();
 
-            Employee::updateOrCreate(
-                ['user_id' => $this->userId],
-                [
-                    'employee_status' => $this->employee_status,
-                    'profession_id' => $this->profession,
-                    'stage_id' => $this->stage,
-                    'supervisor_id' => $this->supervisor,
-                ]
-            );
-
-            $this->user->loadMissing('roles:id,name,is_manager');
-
-            if ($this->user->relationLoaded('roles')) {
-                $this->checkRoleChangesForManager($this->user);
-            }
-
-            $this->user->roles()->sync($this->selectedRoles);
-            $this->user->teams()->sync($this->selectedTeams);
-
-            DB::commit();
+            });
 
             $this->closeEditEmployeeModal();
-
             $this->dispatch('employee-updated');
 
             Flux::toast(
@@ -239,35 +232,42 @@ class EditEmployee extends Component
             );
 
         } catch (\Throwable $e) {
-
-            DB::rollBack();
-            Log::error("Fehler beim Aktualisieren des Mitarbeiters: " . $e->getMessage(), [
-                'exception' => $e,
-                'acting_user_id' => $this->authUserId ?? auth()->id(),
-                'editing_user_id' => $this->userId,
-                'formData' => collect($this->only([
-                    'gender',
-                    'name',
-                    'last_name',
-                    'email',
-                    'model_status',
-                    'joined_at',
-                    'department',
-                    'selectedTeams',
-                    'selectedRoles',
-                    'employee_status',
-                    'profession',
-                    'stage',
-                    'supervisor'
-                ]))->toArray()
-            ]);
-
-            Flux::toast(
-                text: __('An error occurred while editing the employee.'),
-                heading: __('Error.'),
-                variant: 'danger'
-            );
+            $this->handleEditingError($e);
         }
+    }
+
+    /**
+     * Erstellt oder aktualisiert die zugehörigen Mitarbeiterdaten.
+     */
+    private function updateEmployeeData(): void
+    {
+        Employee::updateOrCreate(
+            ['user_id' => $this->userId],
+            [
+                'employee_status' => $this->employee_status,
+                'profession_id' => $this->profession,
+                'stage_id' => $this->stage,
+                'supervisor_id' => $this->supervisor,
+            ]
+        );
+    }
+
+    /**
+     * Synchronisiert die Rollen und Teams des Benutzers.
+     */
+    private function syncRelations(): void
+    {
+        // Lade die Rollen-Relation, falls sie noch nicht geladen ist
+        $this->user->loadMissing('roles:id,name,is_manager');
+
+        // Prüfe auf Änderungen bei den Manager-Rollen, bevor synchronisiert wird
+        if ($this->user->relationLoaded('roles')) {
+            $this->checkRoleChangesForManager($this->user);
+        }
+
+        // Synchronisiere die Rollen und Teams
+        $this->user->roles()->sync($this->selectedRoles);
+        $this->user->teams()->sync($this->selectedTeams);
     }
 
     /**
@@ -276,229 +276,52 @@ class EditEmployee extends Component
      */
     public function closeEditEmployeeModal(): void
     {
-        $this->resetErrorBag();
-
         $this->modal('edit-employee')->close();
 
-        // Setzt verzögert 1ms die Formularfelder zurück
         $this->js("
         setTimeout(() => {
-            \$wire.resetFormFields();
-        }, 1);
-    ");
+              \$wire.resetFormData();
+            }, 1);
+        ");
 
-        $this->teams = null;
-        $this->departments = null;
-        $this->roles = null;
-        $this->professions = null;
-        $this->stages = null;
-        $this->supervisors = null;
-
-        $this->dataLoaded = false;
         $this->showEditModal = false;
     }
 
-    public function resetFormFields(): void
+    public function resetFormData(): void
     {
+        $this->resetErrorBag();
+
         $this->reset([
-            'name', 'last_name', 'email', 'gender', 'model_status', 'joined_at', 'department',
-            'employee_status', 'profession', 'stage', 'supervisor',
-            'selectedRoles', 'selectedTeams',
+            'gender', 'name', 'last_name', 'email', 'selectedTeams',
+            'department', 'supervisor', 'selectedRoles', 'profession',
+            'stage', 'joined_at', 'employee_status', 'model_status',
+            'teams', 'departments', 'roles',
+            'professions', 'stages', 'supervisors'
         ]);
     }
 
-    /**
-     * Lebenszyklusmethode um sicherzustellen, dass Daten auch nach Validierungsfehlern geladen sind
-     */
-    public function hydrate(): void
-    {
-        if ($this->showEditModal && !$this->dataLoaded) {
-            $this->loadRelationForDropDowns();
-        }
-    }
-
-    /**
-     * Aktualisiert die Cache-Daten für Professionen und setzt die neue Profession als ausgewählt.
-     * Wird aufgerufen, wenn Professionen erstellt, aktualisiert oder gelöscht werden.
-     *
-     * @param int|null $id Die ID der neuen/aktualisierten Profession, falls vorhanden
-     * @return void
-     */
     #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
     public function refreshProfessions(?int $id = null): void
     {
-//        // Cache in der Datenbank leeren
-//        Profession::flushCompanyCache($this->companyId);
-//
-        // Lokale Cache-Variable zurücksetzen
-        $this->professions = null;
-
-        // Laden-Status zurücksetzen
-        $this->dataLoaded = false;
-
-        // Daten neu laden
-        $this->loadRelationForDropDowns();
-
-        // Falls eine neue Profession erstellt wurde, diese automatisch auswählen
-        if ($id) {
-            $this->profession = $id;
-        }
-
-        // Prüfe, ob die aktuell ausgewählte Profession noch existiert
-        if ($this->profession) {
-            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
-            $professionExists = $this->professions?->contains('id', $this->profession);
-            if (!$professionExists) {
-                $this->profession = null;
-            }
-        }
+        $this->refreshCollectionData('professions', $id, [
+            'companyId' => true
+        ]);
     }
 
-
-    /**
-     * Gibt die Liste der Berufe (Professionen) zurück.
-     * Enthält zusätzliche Null-Safety-Checks.
-     *
-     * @return Collection
-     */
-    #[Computed]
-    public function professions(): Collection
-    {
-        // Prüfe, ob Daten geladen werden müssen
-        if ($this->professions === null && $this->showEditModal) {
-            $this->loadRelationForDropDowns();
-        }
-
-        // Null-Safety-Check nach dem Laden
-        return $this->professions ?? collect();
-    }
-
-    /**
-     * Aktualisiert die Cache-Daten für Stages.
-     * Wird aufgerufen, wenn Stages erstellt, aktualisiert oder gelöscht werden.
-     *
-     * @param int|null $id Die ID der neuen/aktualisierten Stage, falls vorhanden
-     * @return void
-     */
     #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
     public function refreshStages(?int $id = null): void
     {
-//        // Cache in der Datenbank leeren
-//        Stage::flushCompanyCache($this->companyId);
-
-        // Lokale Cache-Variable zurücksetzen
-        $this->stages = null;
-
-        // Laden-Status zurücksetzen
-        $this->dataLoaded = false;
-
-        // Daten neu laden
-        $this->loadRelationForDropDowns();
-
-        // Falls eine neue Stage erstellt wurde, diese automatisch auswählen
-        if ($id) {
-            $this->stage = $id;
-        }
-
-        // Prüfe, ob die aktuell ausgewählte Stage noch existiert
-        if ($this->stage) {
-            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
-            $stageExists = $this->stages?->contains('id', $this->stage);
-            if (!$stageExists) {
-                $this->stage = null;
-            }
-        }
+        $this->refreshCollectionData('stages', $id, [
+            'companyId' => true
+        ]);
     }
 
-    /**
-     * Gibt die Liste der Karrierestufen zurück
-     */
-    #[Computed]
-    public function stages(): Collection
-    {
-        if ($this->stages === null && $this->showEditModal) {
-            $this->loadRelationForDropDowns();
-        }
-        return $this->stages ?? collect();
-    }
-
-    /**
-     * Aktualisiert die Cache-Daten für Departments.
-     * Wird aufgerufen, wenn Departments erstellt, aktualisiert oder gelöscht werden.
-     *
-     * @param int|null $id Die ID des neuen/aktualisierten Departments, falls vorhanden
-     * @return void
-     */
     #[On(['department-updated', 'department-created', 'department-deleted'])]
     public function refreshDepartments(?int $id = null): void
     {
-        // Cache in der Datenbank leeren
-        Department::flushTeamCache($this->currentTeamId);
-
-        // Lokale Cache-Variable zurücksetzen
-        $this->departments = null;
-
-        // Laden-Status zurücksetzen
-        $this->dataLoaded = false;
-
-        // Daten neu laden
-        $this->loadRelationForDropDowns();
-
-        // Falls ein neues Department erstellt wurde, dieses automatisch auswählen
-        if ($id) {
-            $this->department = $id;
-        }
-
-        // Prüfe, ob das aktuell ausgewählte Department noch existiert
-        if ($this->department) {
-            // Null-Safety-Check mit dem Optional-Chaining-Operator (?->)
-            $departmentExists = $this->departments?->contains('id', $this->department);
-            if (!$departmentExists) {
-                $this->department = null;
-            }
-        }
-    }
-
-    /**
-     * Gibt die Liste der Abteilungen (Departments) zurück.
-     * Enthält Null-Safety-Checks und lädt Daten bei Bedarf nach.
-     *
-     * @return Collection
-     */
-    #[Computed]
-    public function departments(): Collection
-    {
-        // Prüfe, ob Daten geladen werden müssen
-        if ($this->departments === null && $this->showEditModal) {
-            $this->loadRelationForDropDowns();
-        }
-
-        // Null-Safety-Check nach dem Laden
-        return $this->departments ?? collect();
-    }
-
-    /**
-     * Gibt die Liste der Rollen zurück
-     */
-    #[Computed]
-    public function roles(): Collection
-    {
-        if ($this->roles === null && $this->showEditModal) {
-            $this->loadRelationForDropDowns();
-        }
-        return $this->roles ?? collect();
-    }
-
-    /**
-     * Gibt die Liste der Teams zurück
-     */
-    #[Computed]
-    public function teams(): Collection
-    {
-        if ($this->teams === null && $this->showEditModal) {
-            $this->loadRelationForDropDowns();
-        }
-        return $this->teams ?? collect();
+        $this->refreshCollectionData('departments', $id, [
+            'currentTeamId' => true
+        ]);
     }
 
     /**
@@ -556,37 +379,26 @@ class EditEmployee extends Component
             User::flushManagerCache($this->companyId);
             // Setze lokale Caches zurück, um Neuladen zu erzwingen
             $this->supervisors = null;
-            $this->dataLoaded = false;
         }
     }
 
     /**
-     * Gibt die Liste der Supervisoren zurück, exklusive des aktuell bearbeiteten Benutzers.
-     * Enthält zusätzliche Null-Safety-Checks.
-     *
-     * @return Collection
+     * Lädt Supervisors als Array
      */
-    #[Computed]
-    public function supervisors(): Collection
+    private function loadSupervisors(): array
     {
-        // Prüfe, ob Daten geladen werden müssen
-        if ($this->supervisors === null && $this->showEditModal) {
-            $this->loadRelationForDropDowns();
-        }
+        $supervisors = User::getCompanyManagers($this->companyId);
 
-        // Zusätzlicher Null-Safety-Check nach dem Laden
-        if ($this->supervisors === null) {
-            return collect();
-        }
-
-        // Zusätzlicher Null-Safety-Check für userId
-        $currentUserId = $this->userId ?? 0;
-
-        // Filtere den aktuellen Benutzer aus der Liste, prüfe, ob supervisor ein gültiges Objekt mit id ist
-        return $this->supervisors->reject(function ($supervisor) use ($currentUserId) {
-
-            return $supervisor && isset($supervisor->id) && $supervisor->id === $currentUserId;
-        });
+        return $supervisors
+            ->reject(fn($sup) => $sup->id === $this->authUserId)
+            ->map(fn($sup) => [
+                'id' => $sup->id,
+                'name' => $sup->name,
+                'last_name' => $sup->last_name,
+                'full_name' => $sup->name . ' ' . $sup->last_name,
+                'profile_photo_path' => $sup->profile_photo_path
+            ])
+            ->toArray();
     }
 
     public function render(): View
