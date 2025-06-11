@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Helper;
+namespace App\Livewire\Alem\Employee\Helper\Status;
 
 use App\Models\User;
 use App\Traits\Model\ModelStatusAction;

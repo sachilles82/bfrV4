@@ -6,53 +6,44 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use App\Enums\User\UserType;
-use App\Livewire\Alem\Employee\Helper\HandleCatchError;
-use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
-use App\Livewire\Alem\Employee\Helper\WithDropDownsCollections;
-use App\Models\Alem\Department;
+use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
+use App\Livewire\Alem\Employee\Helper\Secure\ValidateEmployee;
+use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Models\Alem\Employee;
-use App\Models\Alem\QuickCrud\Profession;
-use App\Models\Alem\QuickCrud\Stage;
-use App\Models\Spatie\Role;
-use App\Models\Team;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
+use App\Traits\User\UserTeamCompanyIds;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CreateEmployee extends Component
 {
     use AuthorizesRequests;
-    use WithDropDownsCollections, ValidateEmployee, HandleCatchError;
+    use UserTeamCompanyIds, WithDropDownRelations, ValidateEmployee, HandleCatchError;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
-    /**
-     * SICHERHEIT: Locked Properties können nicht von außen manipuliert werden
-     * @var int|null
-     *  ID des authentifizierten Benutzers. Wird von der übergeordneten View übergeben.
-     */
-    #[Locked]
-    public ?int $authUserId = null;
-
-    #[Locked]
-    public ?int $currentTeamId = null;
-
-    #[Locked]
-    public ?int $companyId = null;
-
-    /** Modal-Status */
+    /** Modal-Status mit Funktionen */
     public bool $showCreateModal = false;
+
+    protected function shouldCheckModalState(): bool
+    {
+        return true;
+    }
+
+    protected function isModalOpen(): bool
+    {
+        return $this->showCreateModal;
+    }
+    /** Modal-Status mit Funktionen */
 
     /** Benutzer-Felder */
     public ?int $userId = null;
@@ -73,16 +64,6 @@ class CreateEmployee extends Component
     public ?int $supervisor = null;
     public bool $invitation = false;
 
-    /**
-     * Arrays statt Collections für bessere Performance
-     */
-    public array $teams = [];
-    public array $departments = [];
-    public array $roles = [];
-    public array $professions = [];
-    public array $stages = [];
-    public array $supervisors = [];
-
 
     #[On('create-employee-modal')]
     public function openCreateEmployeeModal(): void
@@ -100,62 +81,7 @@ class CreateEmployee extends Component
         $this->showCreateModal = true;
 
         // Lade ALLE Collections EINMALIG beim Öffnen
-        $this->loadAllCollections();
-    }
-
-    /**
-     * Lädt alle benötigten Daten als Arrays
-     */
-    private function loadAllCollections(): void
-    {
-        if (!$this->companyId) {
-            return;
-        }
-
-        try {
-            $this->teams = Team::getCompanyTeams($this->companyId)
-                ->map(fn($team) => [
-                    'id' => $team->id,
-                    'name' => $team->name
-                ])
-                ->toArray();
-
-            $this->departments = Department::getDepartmentsForTeam($this->currentTeamId)
-                ->map(fn($dept) => [
-                    'id' => $dept->id,
-                    'name' => $dept->name
-                ])
-                ->toArray();
-
-            $this->roles = Role::getEmployeePanelRoles($this->companyId)
-                ->map(fn($role) => [
-                    'id' => $role->id,
-                    'name' => $role->name,
-                    'is_manager' => $role->is_manager ?? false
-                ])
-                ->toArray();
-
-            $this->professions = Profession::getCompanyProfessions($this->companyId)
-                ->map(fn($prof) => [
-                    'id' => $prof->id,
-                    'name' => $prof->name
-                ])
-                ->toArray();
-
-            $this->stages = Stage::getCompanyStages($this->companyId)
-                ->map(fn($stage) => [
-                    'id' => $stage->id,
-                    'name' => $stage->name
-                ])
-                ->toArray();
-
-            $this->supervisors = $this->loadSupervisors();
-
-        } catch (\Exception $e) {
-            // Collections bleiben leer bei Fehler
-        } catch (\Throwable $e) {
-            $this->handleLoadingError($e);
-        }
+        $this->loadRelationsData();
     }
 
     /**
@@ -243,49 +169,6 @@ class CreateEmployee extends Component
         }
     }
 
-    #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
-    public function refreshProfessions(?int $id = null): void
-    {
-        $this->refreshCollectionData('professions', $id, [
-            'companyId' => true
-        ]);
-    }
-
-    #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
-    public function refreshStages(?int $id = null): void
-    {
-        $this->refreshCollectionData('stages', $id, [
-            'companyId' => true
-        ]);
-    }
-
-    #[On(['department-updated', 'department-created', 'department-deleted'])]
-    public function refreshDepartments(?int $id = null): void
-    {
-        $this->refreshCollectionData('departments', $id, [
-            'currentTeamId' => true
-        ]);
-    }
-
-    /**
-     * Lädt Supervisors als Array
-     */
-    private function loadSupervisors(): array
-    {
-        $supervisors = User::getCompanyManagers($this->companyId);
-
-        return $supervisors
-            ->reject(fn($sup) => $sup->id === $this->authUserId)
-            ->map(fn($sup) => [
-                'id' => $sup->id,
-                'name' => $sup->name,
-                'last_name' => $sup->last_name,
-                'full_name' => $sup->name . ' ' . $sup->last_name,
-                'profile_photo_path' => $sup->profile_photo_path
-            ])
-            ->toArray();
-    }
-
     /**
      * Schließt das Modal und bereinigt alle Daten
      */
@@ -311,9 +194,9 @@ class CreateEmployee extends Component
             'department', 'supervisor', 'selectedRoles', 'profession',
             'stage', 'joined_at', 'employee_status', 'model_status',
             'invitation',
-            'teams', 'departments', 'roles',
-            'professions', 'stages', 'supervisors'
         ]);
+
+        $this->resetDropdownCollections();
     }
 
     public function render(): View

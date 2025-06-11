@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Helper;
+namespace App\Livewire\Alem\Employee\Helper\Status;
 
 use App\Traits\Table\WithStatus;
 use Illuminate\Database\Eloquent\Builder;

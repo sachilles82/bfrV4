@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Helper;
+namespace App\Livewire\Alem\Employee\Helper\Secure;
 
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;

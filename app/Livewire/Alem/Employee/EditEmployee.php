@@ -5,19 +5,15 @@ namespace App\Livewire\Alem\Employee;
 use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
-use App\Livewire\Alem\Employee\Helper\HandleCatchError;
-use App\Livewire\Alem\Employee\Helper\ValidateEmployee;
-use App\Livewire\Alem\Employee\Helper\WithDropDownsCollections;
-use App\Models\Alem\Department;
+use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
+use App\Livewire\Alem\Employee\Helper\Secure\ValidateEmployee;
+use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Models\Alem\Employee;
-use App\Models\Alem\QuickCrud\Profession;
-use App\Models\Alem\QuickCrud\Stage;
-use App\Models\Spatie\Role;
-use App\Models\Team;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
+use App\Traits\User\UserTeamCompanyIds;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -31,28 +27,26 @@ use Livewire\Component;
 class EditEmployee extends Component
 {
     use AuthorizesRequests;
-    use WithDropDownsCollections, ValidateEmployee, HandleCatchError;
+    use UserTeamCompanyIds, WithDropDownRelations, ValidateEmployee, HandleCatchError;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
-    /**
-     * SICHERHEIT: Locked Properties können nicht von außen manipuliert werden
-     * @var int|null
-     *  ID des authentifizierten Benutzers. Wird von der übergeordneten View übergeben.
-     */
-    #[Locked]
-    public ?int $authUserId = null;
-
-    #[Locked]
-    public ?int $currentTeamId = null;
-
-    #[Locked]
-    public ?int $companyId = null;
 
     #[Locked]
     public ?int $userId = null;
 
-    /** Modal-Status */
+    /** Modal-Status: Braucht jedes Komponent mit einem Modal */
     public bool $showEditModal = false;
+
+    protected function shouldCheckModalState(): bool
+    {
+        return true;
+    }
+
+    protected function isModalOpen(): bool
+    {
+        return $this->showEditModal;
+    }
+    /** Modal-Status mit Funktionen */
 
     // User identification
     public ?User $user = null;
@@ -74,15 +68,6 @@ class EditEmployee extends Component
     public $stage;// check Stage mit integer
     public ?int $supervisor = null;
 
-    /**
-     * Arrays statt Collections für bessere Performance
-     */
-    public array $teams = [];
-    public array $departments = [];
-    public array $roles = [];
-    public array $professions = [];
-    public array $stages = [];
-    public array $supervisors = [];
 
     #[On('edit-employee-modal')]
     public function openEditEmployeeModal($userId): void
@@ -101,7 +86,7 @@ class EditEmployee extends Component
 
         $this->loadEmployeeData();
 
-        $this->loadRelationForDropDowns();
+        $this->loadRelationsData();
 
         $this->showEditModal = true;
 
@@ -136,64 +121,6 @@ class EditEmployee extends Component
             $this->profession = $employee->profession_id;
             $this->stage = $employee->stage_id;
             $this->supervisor = $employee->supervisor_id;
-        }
-    }
-
-    /**
-     * Lädt alle erforderlichen Daten für Dropdowns aus dem Cache
-     */
-    protected function loadRelationForDropDowns(): void
-    {
-//        if (!$this->showEditModal || $this->dataLoaded) {
-//            return;
-//        }
-        if (!$this->companyId) {
-            return;
-        }
-
-        try {
-            $this->teams = Team::getCompanyTeams($this->companyId)
-                ->map(fn($team) => [
-                    'id' => $team->id,
-                    'name' => $team->name
-                ])
-                ->toArray();
-
-            $this->departments = Department::getDepartmentsForTeam($this->currentTeamId)
-                ->map(fn($dept) => [
-                    'id' => $dept->id,
-                    'name' => $dept->name
-                ])
-                ->toArray();
-
-            $this->roles = Role::getEmployeePanelRoles($this->companyId)
-                ->map(fn($role) => [
-                    'id' => $role->id,
-                    'name' => $role->name,
-                    'is_manager' => $role->is_manager ?? false
-                ])
-                ->toArray();
-
-            $this->professions = Profession::getCompanyProfessions($this->companyId)
-                ->map(fn($prof) => [
-                    'id' => $prof->id,
-                    'name' => $prof->name
-                ])
-                ->toArray();
-
-            $this->stages = Stage::getCompanyStages($this->companyId)
-                ->map(fn($stage) => [
-                    'id' => $stage->id,
-                    'name' => $stage->name
-                ])
-                ->toArray();
-
-            $this->supervisors = $this->loadSupervisors();
-
-        } catch (\Exception $e) {
-            // Collections bleiben leer bei Fehler
-        } catch (\Throwable $e) {
-            $this->handleLoadingError($e);
         }
     }
 
@@ -295,110 +222,65 @@ class EditEmployee extends Component
             'gender', 'name', 'last_name', 'email', 'selectedTeams',
             'department', 'supervisor', 'selectedRoles', 'profession',
             'stage', 'joined_at', 'employee_status', 'model_status',
-            'teams', 'departments', 'roles',
-            'professions', 'stages', 'supervisors'
         ]);
-    }
 
-    #[On(['profession-created', 'profession-updated', 'profession-deleted'])]
-    public function refreshProfessions(?int $id = null): void
-    {
-        $this->refreshCollectionData('professions', $id, [
-            'companyId' => true
-        ]);
-    }
-
-    #[On(['stage-created', 'stage-updated', 'stage-deleted'])]
-    public function refreshStages(?int $id = null): void
-    {
-        $this->refreshCollectionData('stages', $id, [
-            'companyId' => true
-        ]);
-    }
-
-    #[On(['department-updated', 'department-created', 'department-deleted'])]
-    public function refreshDepartments(?int $id = null): void
-    {
-        $this->refreshCollectionData('departments', $id, [
-            'currentTeamId' => true
-        ]);
+        $this->resetDropdownCollections();
     }
 
     /**
      * Prüft auf Änderungen bei Manager-Rollen und leert ggf. den Manager-Cache.
-     * Geht davon aus, dass $user->roles und $this->roles geladen sind.
      *
      * @param User $user Der Benutzer (mit geladenen Rollen).
      * @return void
      */
     private function checkRoleChangesForManager(User $user): void
     {
-        // Sicherstellen, dass benötigte Daten vorhanden sind
-        if (!$user->relationLoaded('roles')) {
-            // Versuche nachzuladen, wenn die Relation fehlt (Fallback)
-            $user->loadMissing('roles:id,is_manager');
-            if (!$user->relationLoaded('roles')) {
-                // Abbruch, wenn Rollen nicht geladen werden konnten
-                return;
-            }
-        }
-
+        // Validierung und Vorbereitung
         if (empty($this->companyId)) {
-            // Abbruch, wenn keine Firmen-ID vorhanden ist
             return;
         }
 
-        // Hole die verfügbaren Rollen (aus dem lokalen Property-Cache)
-        $availableRoles = $this->roles;
-        if ($availableRoles === null) {
-            // Versuche Dropdown-Daten neu zu laden, wenn lokaler Cache leer ist
-            $this->loadRelationForDropDowns();
-            $availableRoles = $this->roles;
-            if ($availableRoles === null) {
-                // Abbruch, wenn verfügbare Rollen nicht geladen werden konnten
+        // Stelle sicher, dass Rollen geladen sind
+        if (!$user->relationLoaded('roles')) {
+            $user->loadMissing('roles:id,is_manager');
+            if (!$user->relationLoaded('roles')) {
                 return;
             }
         }
 
-        // Alte Manager-Rollen-IDs aus der geladenen User-Relation extrahieren
+        // Stelle sicher, dass verfügbare Rollen vorhanden sind
+        if (empty($this->roles)) {
+            $this->loadRelationsData();
+            if (empty($this->roles)) {
+                return;
+            }
+        }
+
+        // Alte Manager-Rollen-IDs
         $oldManagerRoleIds = $user->roles
             ->where('is_manager', true)
             ->pluck('id')
-            ->sort()->values()->all();
+            ->sort()
+            ->values()
+            ->all();
 
-        // Neue Manager-Rollen-IDs aus der aktuellen Auswahl ($this->selectedRoles) bestimmen
-        $newManagerRoleIds = $availableRoles
-            ->whereIn('id', $this->selectedRoles)
-            ->where('is_manager', true)
-            ->pluck('id')
-            ->sort()->values()->all();
+        // Neue Manager-Rollen-IDs (optimiert mit Array-Funktionen)
+        $newManagerRoleIds = array_values(
+            array_filter(
+                array_map(
+                    fn($role) => ($role['is_manager'] ?? false) && in_array($role['id'], $this->selectedRoles, true) ? $role['id'] : null,
+                    $this->roles
+                ),
+                fn($id) => $id !== null
+            )
+        );
+        sort($newManagerRoleIds);
 
-        // Vergleiche alte und neue Manager-Rollen
+        // Cache leeren bei Änderungen
         if ($oldManagerRoleIds !== $newManagerRoleIds) {
-            // Leere den globalen Manager-Cache für die Firma
             User::flushManagerCache($this->companyId);
-            // Setze lokale Caches zurück, um Neuladen zu erzwingen
-            $this->supervisors = null;
+            $this->supervisors = [];
         }
-    }
-
-    /**
-     * Lädt Supervisors als Array
-     */
-    private function loadSupervisors(): array
-    {
-        $supervisors = User::getCompanyManagers($this->companyId);
-
-        return $supervisors
-            ->reject(fn($sup) => $sup->id === $this->authUserId)
-            ->map(fn($sup) => [
-                'id' => $sup->id,
-                'name' => $sup->name,
-                'last_name' => $sup->last_name,
-                'full_name' => $sup->name . ' ' . $sup->last_name,
-                'profile_photo_path' => $sup->profile_photo_path
-            ])
-            ->toArray();
     }
 
     public function render(): View

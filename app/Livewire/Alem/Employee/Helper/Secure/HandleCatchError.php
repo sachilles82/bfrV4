@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Helper;
+namespace App\Livewire\Alem\Employee\Helper\Secure;
 
 use Flux\Flux;
 use Illuminate\Support\Facades\DB;
