@@ -13,7 +13,7 @@ use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
-use App\Traits\User\UserTeamCompanyIds;
+use App\Traits\User\AuthUserTeamCompanyId;
 use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -27,7 +27,7 @@ use Livewire\Component;
 class EditEmployee extends Component
 {
     use AuthorizesRequests;
-    use UserTeamCompanyIds, WithDropDownRelations, ValidateEmployee, HandleCatchError;
+    use AuthUserTeamCompanyId, WithDropDownRelations, ValidateEmployee, HandleCatchError;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
 
@@ -86,10 +86,12 @@ class EditEmployee extends Component
 
         $this->loadEmployeeData();
 
-        $this->loadRelationsData();
+        // Lade nur was initial benötigt wird
+        $this->loadRelationsData([
+            'teams', 'departments', 'roles', 'professions', 'stages', 'supervisors'
+        ]);
 
         $this->showEditModal = true;
-
     }
 
     /**
@@ -236,7 +238,7 @@ class EditEmployee extends Component
     private function checkRoleChangesForManager(User $user): void
     {
         // Validierung und Vorbereitung
-        if (empty($this->companyId)) {
+        if (!$this->companyId) {
             return;
         }
 

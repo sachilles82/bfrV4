@@ -14,7 +14,7 @@ use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
-use App\Traits\User\UserTeamCompanyIds;
+use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
@@ -28,7 +28,7 @@ use Livewire\Component;
 class CreateEmployee extends Component
 {
     use AuthorizesRequests;
-    use UserTeamCompanyIds, WithDropDownRelations, ValidateEmployee, HandleCatchError;
+    use AuthUserTeamCompanyId, WithDropDownRelations, ValidateEmployee, HandleCatchError;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
     /** Modal-Status mit Funktionen */
@@ -80,8 +80,10 @@ class CreateEmployee extends Component
         $this->invitation = true;
         $this->showCreateModal = true;
 
-        // Lade ALLE Collections EINMALIG beim Öffnen
-        $this->loadRelationsData();
+        // Lade nur was initial benötigt wird
+        $this->loadRelationsData([
+            'teams', 'departments', 'roles', 'professions', 'stages', 'supervisors'
+        ]);
     }
 
     /**

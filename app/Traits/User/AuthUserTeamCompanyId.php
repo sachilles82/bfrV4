@@ -4,7 +4,7 @@ namespace App\Traits\User;
 
 use Livewire\Attributes\Locked;
 
-trait UserTeamCompanyIds
+trait AuthUserTeamCompanyId
 {
     /**
      * SICHERHEIT: Locked Properties können nicht von außen manipuliert werden
