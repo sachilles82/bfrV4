@@ -209,14 +209,14 @@ class EditEmployee extends Component
 
         $this->js("
         setTimeout(() => {
-              \$wire.resetFormData();
+              \$wire.resetFormInputs();
             }, 1);
         ");
 
         $this->showEditModal = false;
     }
 
-    public function resetFormData(): void
+    public function resetFormInputs(): void
     {
         $this->resetErrorBag();
 
@@ -226,7 +226,7 @@ class EditEmployee extends Component
             'stage', 'joined_at', 'employee_status', 'model_status',
         ]);
 
-        $this->resetDropdownCollections();
+        $this->resetDropdownRelations();
     }
 
     /**

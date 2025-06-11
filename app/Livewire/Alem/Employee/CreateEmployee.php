@@ -70,7 +70,7 @@ class CreateEmployee extends Component
     {
         // $this->authorize('create', User::class);
 
-        $this->resetFormData();
+        $this->resetFormInputs();
 
         // Setze Standardwerte
         $this->gender = Gender::Male;
@@ -180,14 +180,14 @@ class CreateEmployee extends Component
 
         $this->js("
         setTimeout(() => {
-              \$wire.resetFormData();
+              \$wire.resetFormInputs();
             }, 1);
         ");
 
         $this->showCreateModal = false;
     }
 
-    public function resetFormData(): void
+    public function resetFormInputs(): void
     {
         $this->resetErrorBag();
 
@@ -198,7 +198,7 @@ class CreateEmployee extends Component
             'invitation',
         ]);
 
-        $this->resetDropdownCollections();
+        $this->resetDropdownRelations();
     }
 
     public function render(): View
