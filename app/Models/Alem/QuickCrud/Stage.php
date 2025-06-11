@@ -3,10 +3,10 @@
 namespace App\Models\Alem\QuickCrud;
 
 use App\Models\Alem\Employee;
-use App\Traits\Cache\WithAdvancedCache;
+use App\Traits\Cache\AdvancedCache;
 use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Stage extends Model
 {
     use HasFactory;
-    use ManageDataFilter, ManagesContextAndOwnership, WithAdvancedCache;
+    use ManageDataFilter, ManagesContextAndOwnership, AdvancedCache;
 
     /**
      * Cache-Konfiguration für dieses Model
@@ -48,40 +48,22 @@ class Stage extends Model
 
 
     /**
-     * Boot-Methode um sicherzustellen, dass Events gefeuert werden
+     * Optional: Nur bestimmte Kontexte flushen
+     * Wenn nicht definiert, werden alle geflusht (company, team, user)
      */
-    protected static function boot()
+    protected function getAutoFlushContexts(): array
     {
-        parent::boot();
-
-        // Zusätzliche Sicherheit: Manuell Cache leeren bei Events
-        static::created(function ($model) {
-            static::flushCompanyCache($model->company_id);
-        });
-
-        static::updated(function ($model) {
-            static::flushCompanyCache($model->company_id);
-        });
-
-        static::deleted(function ($model) {
-            static::flushCompanyCache($model->company_id);
-        });
+        return ['company'];
     }
 
 
     /**
-     * Hauptmethode: Holt alle Stages für eine Company mit dreistufigem Cache
-     *
-     * Diese Methode nutzt die generische getCachedCompanyData() aus dem WithRedisCache Trait
-     * und delegiert die eigentliche Query-Logik an getQueryForCompany()
-     *
      * @param int|null $companyId Company ID
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-
     public static function getCompanyStages(?int $companyId): Collection
     {
-        return static::getCachedByCompany($companyId, function() use ($companyId) {
+        return static::getCachedByCompany($companyId, function () use ($companyId) {
             return static::query()
                 ->where('company_id', $companyId)
                 ->select(['id', 'name'])
@@ -89,20 +71,4 @@ class Stage extends Model
                 ->get();
         });
     }
-
-    /**
-     * Leert den Company-Cache manuell
-     * Wird von anderen Components aufgerufen nach Create/Update/Delete
-     */
-    public static function flushCompanyCache(?int $companyId): void
-    {
-        if (!$companyId) return;
-
-        $instance = new static;
-        $instance->flushCacheContext('company', $companyId);
-
-        // Auch Request-Cache leeren
-        static::flushRequestCache();
-    }
-
 }

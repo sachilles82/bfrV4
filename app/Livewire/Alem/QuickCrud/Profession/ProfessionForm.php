@@ -7,9 +7,11 @@ use App\Livewire\Alem\QuickCrud\Profession\Helper\ValidateProfessionForm;
 use App\Models\Alem\QuickCrud\Profession;
 use App\Traits\Modal\WithPlaceholder;
 use App\Traits\Table\WithPerPagePagination;
+use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -19,6 +21,7 @@ use Livewire\Component;
 class ProfessionForm extends Component
 {
     use ValidateProfessionForm, DataFilter, WithPerPagePagination, WithPlaceholder;
+    use AuthUserTeamCompanyId;
 
     /**
      * Profession ID (gesperrt für Sicherheit)
@@ -32,15 +35,6 @@ class ProfessionForm extends Component
 
     public bool $editing = false;
     public bool $dataLoaded = false;
-
-    /**
-     * ID des authentifizierten Benutzers.
-     * Wird von der übergeordneten View übergeben.
-     */
-    // Properties für die übergebenen Daten
-    public ?int $authUserId = null;
-    public ?int $currentTeamId = null;
-    public ?int $companyId = null;
 
     public function mount(?int $authUserId = null, ?int $currentTeamId = null, ?int $companyId = null): void
     {
@@ -90,7 +84,6 @@ class ProfessionForm extends Component
 
                     $profession = Profession::create([
                         'name' => $this->name,
-
                         /**
                          * company_id, team_id, created_by werden automatisch
                          * durch ManagesContextAndOwnership Trait gesetzt
@@ -109,29 +102,39 @@ class ProfessionForm extends Component
 
             $this->closeProfessionFormModal();
 
-//            \Log::info('🔥 Cache Warming...');
-            Profession::getCompanyProfessions($this->companyId); // Befüllt den Cache
-
+            // Cache Warming - lädt die Daten einmal, damit der nächste Request aus dem Cache kommt
+            Profession::getCompanyProfessions($this->companyId);
 
         } catch (\Throwable $e) {
 
             DB::rollBack();
-//            Log::error("Fehler beim Erstellen der Profession: " . $e->getMessage(), [
-//                'exception' => $e,
-//                'acting_user_id' => $this->authUserId,
-//                'profession_id' => $this->professionId,
-//                'formData' => collect($this->only([
-//                    'name'
-//                ]))->toArray()
-//            ]);
 
-            Flux::toast(
-                text: __('An error occurred while saving the Profession.'),
-                heading: __('Error.'),
-                variant: 'danger'
-            );
+            // Besseres Error Logging
+            Log::error("Fehler beim Speichern der Profession", [
+                'error' => $e->getMessage(),
+                'user_id' => $this->authUserId,
+                'profession_id' => $this->professionId ?? null,
+                'name' => $this->name,
+                'action' => $this->editing ? 'update' : 'create'
+            ]);
+
+            // Spezifischere Fehlermeldung für Duplikate
+            if ($e instanceof \Illuminate\Database\UniqueConstraintViolationException) {
+                Flux::toast(
+                    text: __('Eine Profession mit diesem Namen existiert bereits.'),
+                    heading: __('Error.'),
+                    variant: 'danger'
+                );
+            } else {
+                Flux::toast(
+                    text: __('An error occurred while saving the Profession.'),
+                    heading: __('Error.'),
+                    variant: 'danger'
+                );
+            }
         }
     }
+
 
     /**
      * Lädt einen Datensatz zur Bearbeitung.
