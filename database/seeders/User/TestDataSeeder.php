@@ -28,649 +28,775 @@ use Spatie\Permission\Models\Role;
 class TestDataSeeder extends Seeder
 {
     /**
+     * Command Instanz für Output
+     */
+    protected $command;
+
+    /**
+     * Konfigurierbare Parameter mit Standardwerten
+     */
+    protected array $config = [
+        // Owner Konfiguration
+        'owner' => [
+            'name' => 'Daniel',
+            'last_name' => 'Skrbac',
+            'email' => 'daniel@firma.ch',
+            'password' => 'password',
+        ],
+
+        // Firmen Konfiguration
+        'company' => [
+            'name' => 'Dani AG',
+            'email' => 'info@firma.ch',
+            'phone' => '+41 44 401 11 42',
+            'type' => CompanyType::AG,
+            'size' => CompanySize::OneHundredOneToTwoHundred,
+            'industry' => 'IT',
+        ],
+
+        // Team 1 (Betrieb 48) Konfiguration
+        'team1' => [
+            'name' => 'Betrieb 48',
+            'employees' => 10,
+            'managers' => 2,
+            'departments' => 10,
+            'professions' => 5,
+            'stages' => 16,
+        ],
+
+        // Team 2 (Betrieb 55) Konfiguration
+        'team2' => [
+            'name' => 'Betrieb 55',
+            'employees' => 60,
+            'managers' => 2,
+            'departments' => 4,
+            'professions' => 4,
+            'stages' => 4,
+        ],
+
+        // Performance Konfiguration
+        'performance' => [
+            'chunk_size' => 5,
+            'memory_limit' => '2G',
+        ],
+
+        // Sonstige Konfiguration
+        'faker_locale' => 'de_DE',
+        'delete_existing' => true,
+    ];
+
+    protected $faker;
+    protected $passwordHash;
+    protected $stageNames = [
+        'Lehrling', 'Praktikant', 'Angelernt', 'Geselle',
+        'Facharbeiter', 'Meister', 'Experte', 'Leiter',
+        'Direktor', 'CEO', 'CTO', 'CFO', 'COO', 'CIO', 'CSO', 'CMO'
+    ];
+
+    /**
+     * Setze Command Instanz
+     */
+    public function setCommand($command): void
+    {
+        $this->command = $command;
+    }
+
+    /**
+     * Setze Konfiguration
+     */
+    public function setConfiguration(array $config): void
+    {
+        $this->config = array_merge($this->config, $config);
+    }
+
+    /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // Initialisiere Faker für deutsche Namen
-        $faker = Faker::create('de_DE');
+        // Falls kein Command gesetzt wurde, verwende den Standard Laravel Seeder Command
+        if (!$this->command && property_exists($this, 'command')) {
+            $this->command = app('Illuminate\Console\Command');
+        }
 
-        // Erhöhe das PHP Memory Limit für große Datensätze
-        ini_set('memory_limit', '2G');
+        // Konfiguration aus Umgebungsvariablen oder Kommandozeilen-Optionen überschreiben
+        $this->loadConfiguration();
 
-        // Deaktiviere Model Events für schnelleres Seeding
-        Model::unguard();
-
-        // Deaktiviere Query-Logging für bessere Performance
-        DB::disableQueryLog();
+        // Initialisierung
+        $this->initialize();
 
         try {
-            // Parameter für das Seeden
-            $employeeCount = 10; // Anzahl der zu erstellenden Mitarbeiter für Team 1 (Betrieb 48)
-            $managerCount = 2;    // Anzahl der Manager für Team 1
-            $chunkSize = 5;      // Größere Chunks für bessere Performance
-
-            // Parameter für Betrieb 55 (Team 2)
-            $team2EmployeeCount = 60; // Anzahl der Mitarbeiter für Team 2 (Betrieb 55)
-            $team2ManagerCount = 2;   // Anzahl der Manager für Team 2
-            $team2DepartmentCount = 4; // Anzahl der Abteilungen für Team 2
-            $team2ProfessionCount = 4; // Anzahl der Berufe für Team 2
-            $team2StageCount = 4;     // Anzahl der Stufen für Team 2
-
-            $this->command->info('Starte Erstellung der Testdaten...');
-
-            // 1. Lösche alte Testdaten (falls vorhanden)
-            $this->command->info('Entferne alte Testdaten (falls vorhanden)...');
-
-            // Prüfe, ob ein Owner-Benutzer existiert und lösche ihn
-            $ownerUser = User::where('email', 'daniel@firma.ch')->first();
-            if ($ownerUser) {
-                $companyId = $ownerUser->company_id;
-
-                // Beginne eine Transaktion für die Löschvorgänge
-                DB::beginTransaction();
-
-                // Lösche alle abhängigen Datensätze
-                $this->command->info('Lösche vorhandene Mitarbeiter-Datensätze...');
-                Employee::whereHas('user', function ($query) use ($companyId) {
-                    $query->where('company_id', $companyId);
-                })->delete();
-
-                User::where('company_id', $companyId)
-                    ->where('id', '!=', $ownerUser->id)
-                    ->delete();
-
-                // Lösche vorhandene Berufe, Stufen und Abteilungen
-                $this->command->info('Lösche vorhandene Berufe, Stufen und Abteilungen...');
-                Profession::where('company_id', $companyId)->delete();
-                Stage::where('company_id', $companyId)->delete();
-                Department::where('company_id', $companyId)->delete();
-
-                // Lösche den Owner und sein Unternehmen
-                Team::where('user_id', $ownerUser->id)->delete();
-                Company::where('id', $companyId)->delete();
-                $ownerUser->delete();
-
-                // Bestätige die Löschung
-                DB::commit();
-            }
-
-            // 2. Erstelle den Hauptbenutzer (Owner) - Daniel Skrbac
-            $this->command->info('Erstelle Owner-Benutzer Daniel Skrbac...');
-
-            // Starte eine neue Transaktion für die Erstellung
             DB::beginTransaction();
 
-            // Erstelle den Hauptbenutzer
-            $password = Hash::make('password');
-            $owner = User::firstOrCreate(
-                ['email' => 'daniel@firma.ch'],
-                [
-                    'name' => 'Daniel',
-                    'last_name' => 'Skrbac',
-                    'email' => 'daniel@firma.ch',
-                    'email_verified_at' => now(),
-                    'password' => $password,
-                    'remember_token' => Str::random(10),
-                    'user_type' => UserType::Owner,
-                    'model_status' => ModelStatus::ACTIVE,
-                    'slug' => 'daniel-'.Str::random(5), // Eindeutiger Slug mit Zufallszeichen
-                ]
-            );
-
-            // Erstelle eine Industrie (falls noch keine existiert)
-            $this->command->info('Erstelle Industrie...');
-            $industry = Industry::firstOrCreate(
-                ['name' => 'IT'],
-                ['name' => 'IT']
-            );
-
-            // 3. Erstelle ein Unternehmen
-            $this->command->info('Erstelle Unternehmen...');
-            $company = Company::create([
-                'company_name' => 'Dani AG',
-                'email' => 'info@firma.ch',
-                'phone_1' => '+41 44 401 11 42',
-                'is_active' => true,
-                'owner_id' => $owner->id,
-                'created_by' => $owner->id,
-                'company_type' => CompanyType::AG,
-                'company_size' => CompanySize::OneHundredOneToTwoHundred,
-                'registration_type' => CompanyRegistrationType::SELF_REGISTERED,
-                'industry_id' => $industry->id, // Industrie-ID verwenden
-            ]);
-
-            // Verknüpfe den Benutzer mit dem Unternehmen
-            $owner->company_id = $company->id;
-            $owner->save();
-
-            // 4. Erstelle Teams
-            $this->command->info('Erstelle Teams...');
-
-            // Team 1 - Betrieb 48
-            $team1 = Team::create([
-                'name' => 'Betrieb 48',
-                'user_id' => $owner->id,
-                'company_id' => $company->id,
-                'personal_team' => true,
-            ]);
-
-            // Team 2 - Betrieb 55
-            $team2 = Team::create([
-                'name' => 'Betrieb 55',
-                'user_id' => $owner->id,
-                'company_id' => $company->id,
-                'personal_team' => false,
-            ]);
-
-            // Enum für Role Visibility importieren
-            $visibleValue = \App\Enums\Role\RoleVisibility::Visible->value;
-
-            // Enum für Role Access importieren
-            $employeePanelValue = \App\Enums\Role\RoleHasAccessTo::EmployeePanel->value;
-
-            // Rollen-Daten vorbereiten
-            $roleData = [
-                'Worker' => [
-                    'name' => 'Worker',
-                    'guard_name' => 'web',
-                    'created_by' => $owner->id,
-                    'company_id' => $company->id,
-                    'access' => $employeePanelValue,
-                    'visible' => $visibleValue,
-                    'is_manager' => false,
-                ],
-                'Manager' => [
-                    'name' => 'Manager',
-                    'guard_name' => 'web',
-                    'created_by' => $owner->id,
-                    'company_id' => $company->id,
-                    'access' => $employeePanelValue,
-                    'visible' => $visibleValue,
-                    'is_manager' => true,
-                ],
-                'Editor' => [
-                    'name' => 'Editor',
-                    'guard_name' => 'web',
-                    'created_by' => $owner->id,
-                    'company_id' => $company->id,
-                    'access' => $employeePanelValue,
-                    'visible' => $visibleValue,
-                    'is_manager' => false,
-                ],
-                'Temporary' => [
-                    'name' => 'Temporary',
-                    'guard_name' => 'web',
-                    'created_by' => $owner->id,
-                    'company_id' => $company->id,
-                    'access' => $employeePanelValue,
-                    'visible' => $visibleValue,
-                    'is_manager' => false,
-                ],
-            ];
-
-            // Rollen erstellen oder aktualisieren
-            $roles = [];
-            foreach ($roleData as $roleName => $data) {
-                $role = Role::firstOrCreate(['name' => $roleName], $data);
-                $roles[$roleName] = $role->id;
+            // Alte Daten löschen (optional)
+            if ($this->config['delete_existing']) {
+                $this->deleteExistingData();
             }
 
-            // 5. Weise die Rolle zu
-            $this->command->info('Weise Rolle zu...');
-            $owner->assignRole('owner');
+            // Hauptbenutzer (Owner) erstellen
+            $owner = $this->createOwner();
 
-            // Setze das Team als current_team_id für den Owner
-            $owner->current_team_id = $team1->id;
-            $owner->save();
+            // Unternehmen erstellen
+            $company = $this->createCompany($owner);
 
-            // Commit die Transaktion für Basis-Entitäten
-            DB::commit();
+            // Teams erstellen
+            $teams = $this->createTeams($owner, $company);
 
-            // 6. Erstelle Abteilungen für Team 1 (Betrieb 48)
-            $this->command->info('Erstelle 10 Abteilungen für Betrieb 48...');
-            $departmentChunks = array_chunk(range(1, 10), min(10, $chunkSize));
-            $this->command->getOutput()->progressStart(10);
+            // Rollen erstellen
+            $roles = $this->createRoles($owner, $company);
 
-            foreach ($departmentChunks as $chunk) {
-                DB::beginTransaction();
-                $departments = [];
+            // Master-Daten für beide Teams erstellen
+            $this->createMasterDataForTeam($teams['team1'], $company, $owner, 'team1');
+            $this->createMasterDataForTeam($teams['team2'], $company, $owner, 'team2');
 
-                foreach ($chunk as $i) {
-                    $departments[] = [
-                        'name' => 'Abteilung '.$i,
-                        'description' => 'Beschreibung für Abteilung '.$i,
-                        'company_id' => $company->id,
-                        'team_id' => $team1->id,
-                        'created_by' => $owner->id,
-                        'model_status' => ModelStatus::ACTIVE->value,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                    $this->command->getOutput()->progressAdvance();
-                }
-
-                Department::insert($departments);
-                DB::commit();
-            }
-
-            $this->command->getOutput()->progressFinish();
-            $this->command->newLine();
-
-            // Erstelle Abteilungen für Team 2 (Betrieb 55)
-            $this->command->info('Erstelle '.$team2DepartmentCount.' Abteilungen für Betrieb 55...');
-            $departmentsTeam2 = [];
-            $this->command->getOutput()->progressStart($team2DepartmentCount);
-
-            DB::beginTransaction();
-            for ($i = 1; $i <= $team2DepartmentCount; $i++) {
-                $departmentsTeam2[] = [
-                    'name' => 'B55 Abteilung '.$i,
-                    'description' => 'Beschreibung für B55 Abteilung '.$i,
-                    'company_id' => $company->id,
-                    'team_id' => $team2->id,
-                    'created_by' => $owner->id,
-                    'model_status' => ModelStatus::ACTIVE->value,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-                $this->command->getOutput()->progressAdvance();
-            }
-
-            Department::insert($departmentsTeam2);
-            DB::commit();
-
-            $this->command->getOutput()->progressFinish();
-            $this->command->newLine();
-
-            // 7. Erstelle Berufe für Team 1 (Betrieb 48)
-            $this->command->info('Erstelle 50 Berufe für Betrieb 48...');
-            $professionChunks = array_chunk(range(1, 5), min(5, $chunkSize));
-            $this->command->getOutput()->progressStart(5);
-
-            foreach ($professionChunks as $chunk) {
-                DB::beginTransaction();
-                $professions = [];
-
-                foreach ($chunk as $index) {
-                    $professions[] = [
-                        'name' => 'Beruf'.$index,
-                        'company_id' => $company->id,
-                        'team_id' => $team1->id,
-                        'created_by' => $owner->id,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                    $this->command->getOutput()->progressAdvance();
-                }
-                // Ensure unique constraint for faker job titles if faker runs out of unique titles
-                $uniqueProfessions = collect($professions)->unique('name')->toArray();
-                Profession::insert($uniqueProfessions);
-                DB::commit();
-            }
-
-            $this->command->getOutput()->progressFinish();
-            $this->command->newLine();
-
-            // Erstelle Berufe für Team 2 (Betrieb 55)
-            $this->command->info('Erstelle '.$team2ProfessionCount.' Berufe für Betrieb 55...');
-            $professionsTeam2 = [];
-            $this->command->getOutput()->progressStart($team2ProfessionCount);
-
-            DB::beginTransaction();
-            for ($i = 1; $i <= $team2ProfessionCount; $i++) {
-                $professionsTeam2[] = [
-                    'name' => 'B55 Beruf'.$i,
-                    'company_id' => $company->id,
-                    'team_id' => $team2->id,
-                    'created_by' => $owner->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-                $this->command->getOutput()->progressAdvance();
-            }
-
-            Profession::insert($professionsTeam2);
-            DB::commit();
-
-            $this->command->getOutput()->progressFinish();
-            $this->command->newLine();
-
-            // 8. Erstelle definierte Stufen für Team 1 (Betrieb 48)
-            $stageNames = ['Lehrling', 'Praktikant', 'Angelernt', 'Geselle', 'Facharbeiter', 'Meister', 'Experte', 'Leiter', 'Direktor', 'CEO', 'CTO', 'CFO', 'COO', 'CIO', 'CSO', 'CMO'];
-            $this->command->info('Erstelle '.count($stageNames).' definierte Stufen für Betrieb 48...');
-            $this->command->getOutput()->progressStart(count($stageNames));
-
-            DB::beginTransaction();
-            $stages = [];
-            foreach ($stageNames as $stageName) {
-                $stages[] = [
-                    'name' => $stageName,
-                    'company_id' => $company->id,
-                    'team_id' => $team1->id,
-                    'created_by' => $owner->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-                $this->command->getOutput()->progressAdvance();
-            }
-            Stage::insert($stages);
-            DB::commit();
-
-            $this->command->getOutput()->progressFinish();
-            $this->command->newLine();
-
-            // Erstelle Stufen für Team 2 (Betrieb 55)
-            $stageNamesTeam2 = array_slice($stageNames, 0, $team2StageCount);
-            $this->command->info('Erstelle '.$team2StageCount.' Stufen für Betrieb 55...');
-            $this->command->getOutput()->progressStart($team2StageCount);
-
-            DB::beginTransaction();
-            $stagesTeam2 = [];
-            foreach ($stageNamesTeam2 as $stageName) {
-                $stagesTeam2[] = [
-                    'name' => 'B55 '.$stageName,
-                    'company_id' => $company->id,
-                    'team_id' => $team2->id,
-                    'created_by' => $owner->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-                $this->command->getOutput()->progressAdvance();
-            }
-            Stage::insert($stagesTeam2);
-            DB::commit();
-
-            $this->command->getOutput()->progressFinish();
-            $this->command->newLine();
-
-            // Lade IDs für Beziehungen für Team 1 (Betrieb 48)
-            $this->command->info('Lade IDs für Beziehungen...');
-            $departmentIds = Department::where('company_id', $company->id)
-                ->where('team_id', $team1->id)
-                ->pluck('id')
-                ->toArray();
-            $professionIds = Profession::where('company_id', $company->id)
-                ->where('team_id', $team1->id)
-                ->pluck('id')
-                ->toArray();
-            $stageIds = Stage::where('company_id', $company->id)
-                ->where('team_id', $team1->id)
-                ->pluck('id')
-                ->toArray();
-
-            // Lade IDs für Beziehungen für Team 2 (Betrieb 55)
-            $departmentIdsTeam2 = Department::where('company_id', $company->id)
-                ->where('team_id', $team2->id)
-                ->pluck('id')
-                ->toArray();
-            $professionIdsTeam2 = Profession::where('company_id', $company->id)
-                ->where('team_id', $team2->id)
-                ->pluck('id')
-                ->toArray();
-            $stageIdsTeam2 = Stage::where('company_id', $company->id)
-                ->where('team_id', $team2->id)
-                ->pluck('id')
-                ->toArray();
-
-            // Hole die Rollen-IDs
-            $workerRoleId = $roles['Worker'];
-            $managerRoleId = $roles['Manager'];
-            $editorRoleId = $roles['Editor'];
-            $temporaryRoleId = $roles['Temporary'];
-
-            // Rolle-IDs für Nicht-Manager
-            $nonManagerRoleIds = [$workerRoleId, $editorRoleId, $temporaryRoleId];
-
-            // 9. Erstelle Mitarbeiter für Team 1 (Betrieb 48)
-            $this->command->info('Erstelle '.$employeeCount.' Mitarbeiter für Betrieb 48 in Chunks von '.$chunkSize.'...');
-            $this->command->getOutput()->progressStart($employeeCount);
-
-            // Vorgenerierter Passwort-Hash für bessere Performance
-            $passwordHash = Hash::make('password');
-            $teamId = $team1->id;
-
-            // Zähle die erstellten Manager
-            $managersCreated = 0;
-
-            // Mitarbeiter in Chunks erstellen
-            for ($i = 0; $i < $employeeCount; $i += $chunkSize) {
-                // Neue Transaktion für jeden Chunk
-                DB::beginTransaction();
-
-                $employees = [];
-                $roleAssignments = [];
-                $teamAssignments = [];
-
-                $currentTime = now();
-
-                for ($j = 0; $j < $chunkSize && ($i + $j) < $employeeCount; $j++) {
-                    $index = $i + $j + 1;
-
-                    // Ensure unique email
-                    $email = strtolower(Str::slug($faker->firstName)).'.'.strtolower(Str::slug($faker->lastName)).'.'.$index.'@firma.ch';
-
-                    // Zufälliges Eintrittsdatum in den letzten 3 Jahren
-                    $joinedDate = Carbon::now()->subDays(rand(0, 365 * 3));
-
-                    // Namen für den Benutzer
-                    $firstName = $faker->firstName;
-                    $lastName = $faker->lastName;
-
-                    // Erstelle Benutzer-Daten direkt mit DB
-                    $userId = DB::table('users')->insertGetId([
-                        'name' => $firstName,
-                        'last_name' => $lastName,
-                        'email' => $email,
-                        'email_verified_at' => $currentTime,
-                        'password' => $passwordHash,
-                        'remember_token' => Str::random(10),
-                        'company_id' => $company->id,
-                        'user_type' => UserType::Employee->value,
-                        'department_id' => $departmentIds[array_rand($departmentIds)],
-                        'model_status' => ModelStatus::ACTIVE->value,
-                        'phone_1' => '+41'.rand(700000000, 799999999),
-                        // Slug aus Vorname und Nachname mit Index für Eindeutigkeit
-                        'slug' => Str::slug($firstName.'-'.$lastName.'-'.$index),
-                        'created_by' => $owner->id,
-                        'joined_at' => $joinedDate,
-                        'created_at' => $currentTime,
-                        'updated_at' => $currentTime,
-                    ]);
-
-                    // Erstelle Mitarbeiter-Daten
-                    $randomStatus = $this->getRandomEmployeeStatus();
-                    $employees[] = [
-                        'user_id' => $userId,
-                        'profession_id' => $professionIds[array_rand($professionIds)],
-                        'stage_id' => $stageIds[array_rand($stageIds)],
-                        'personal_number' => 'PN'.str_pad($index, 8, '0', STR_PAD_LEFT),
-                        'supervisor_id' => $owner->id,
-                        'employee_status' => $randomStatus->value,
-                        'created_at' => $currentTime,
-                        'updated_at' => $currentTime,
-                    ];
-
-                    // Rollenauswahl: Manager-Rolle nur für die ersten 100 Benutzer
-                    if ($managersCreated < $managerCount) {
-                        $roleId = $managerRoleId;
-                        $managersCreated++;
-                    } else {
-                        // Für alle anderen: zufällige Nicht-Manager-Rolle
-                        $roleId = $nonManagerRoleIds[array_rand($nonManagerRoleIds)];
-                    }
-
-                    $roleAssignments[] = [
-                        'role_id' => $roleId,
-                        'model_type' => 'App\\Models\\User',
-                        'model_id' => $userId,
-                    ];
-
-                    // Team-Zuweisungen für Massen-Zuweisung
-                    $teamAssignments[] = [
-                        'team_id' => $teamId,
-                        'user_id' => $userId,
-                        'role' => 'editor',
-                        'created_at' => $currentTime,
-                        'updated_at' => $currentTime,
-                    ];
-
-                    $this->command->getOutput()->progressAdvance();
-                }
-
-                // Bulk-Insert für Mitarbeiter
-                if (! empty($employees)) {
-                    DB::table('employees')->insert($employees);
-                }
-
-                // Bulk-Insert für Rollen-Zuweisungen
-                if (! empty($roleAssignments)) {
-                    DB::table('model_has_roles')->insert($roleAssignments);
-                }
-
-                // Bulk-Insert für Team-Zuweisungen
-                if (! empty($teamAssignments)) {
-                    DB::table('team_user')->insert($teamAssignments);
-                }
-
-                // Commit den Chunk
-                DB::commit();
-
-                // Speicher freigeben
-                unset($employees, $roleAssignments, $teamAssignments);
-
-                if (function_exists('gc_collect_cycles')) {
-                    gc_collect_cycles();
-                }
-            }
-
-            $this->command->getOutput()->progressFinish();
-            $this->command->newLine();
-
-            // 10. Erstelle Mitarbeiter für Team 2 (Betrieb 55)
-            $this->command->info('Erstelle '.$team2EmployeeCount.' Mitarbeiter für Betrieb 55...');
-            $this->command->getOutput()->progressStart($team2EmployeeCount);
-
-            // Zähle die erstellten Manager für Team 2
-            $managersCreatedTeam2 = 0;
-
-            DB::beginTransaction();
-
-            $employeesTeam2 = [];
-            $roleAssignmentsTeam2 = [];
-            $teamAssignmentsTeam2 = [];
-
-            $currentTime = now();
-
-            for ($i = 0; $i < $team2EmployeeCount; $i++) {
-                $index = $employeeCount + $i + 1; // Fortlaufende Nummerierung nach Team 1
-
-                // Eindeutige E-Mail
-                $email = strtolower(Str::slug($faker->firstName)).'.'.strtolower(Str::slug($faker->lastName)).'.b55.'.$i.'@firma.ch';
-
-                // Zufälliges Eintrittsdatum in den letzten 3 Jahren
-                $joinedDate = Carbon::now()->subDays(rand(0, 365 * 3));
-
-                // Namen für den Benutzer
-                $firstName = $faker->firstName;
-                $lastName = $faker->lastName;
-
-                // Erstelle Benutzer-Daten
-                $userId = DB::table('users')->insertGetId([
-                    'name' => $firstName,
-                    'last_name' => $lastName,
-                    'email' => $email,
-                    'email_verified_at' => $currentTime,
-                    'password' => $passwordHash,
-                    'remember_token' => Str::random(10),
-                    'company_id' => $company->id,
-                    'user_type' => UserType::Employee->value,
-                    'department_id' => $departmentIdsTeam2[array_rand($departmentIdsTeam2)],
-                    'model_status' => ModelStatus::ACTIVE->value,
-                    'phone_1' => '+41'.rand(700000000, 799999999),
-                    'slug' => Str::slug($firstName.'-'.$lastName.'-b55-'.$i),
-                    'created_by' => $owner->id,
-                    'joined_at' => $joinedDate,
-                    'created_at' => $currentTime,
-                    'updated_at' => $currentTime,
-                ]);
-
-                // Erstelle Mitarbeiter-Daten
-                $randomStatus = $this->getRandomEmployeeStatus();
-                $employeesTeam2[] = [
-                    'user_id' => $userId,
-                    'profession_id' => $professionIdsTeam2[array_rand($professionIdsTeam2)],
-                    'stage_id' => $stageIdsTeam2[array_rand($stageIdsTeam2)],
-                    'personal_number' => 'B55-'.str_pad($i, 5, '0', STR_PAD_LEFT),
-                    'supervisor_id' => $owner->id,
-                    'employee_status' => $randomStatus->value,
-                    'created_at' => $currentTime,
-                    'updated_at' => $currentTime,
-                ];
-
-                // Rollenauswahl: Manager-Rolle nur für die ersten N Benutzer
-                if ($managersCreatedTeam2 < $team2ManagerCount) {
-                    $roleId = $managerRoleId;
-                    $managersCreatedTeam2++;
-                } else {
-                    // Für alle anderen: zufällige Nicht-Manager-Rolle
-                    $roleId = $nonManagerRoleIds[array_rand($nonManagerRoleIds)];
-                }
-
-                $roleAssignmentsTeam2[] = [
-                    'role_id' => $roleId,
-                    'model_type' => 'App\\Models\\User',
-                    'model_id' => $userId,
-                ];
-
-                // Team-Zuweisungen für Team 2
-                $teamAssignmentsTeam2[] = [
-                    'team_id' => $team2->id,
-                    'user_id' => $userId,
-                    'role' => 'editor',
-                    'created_at' => $currentTime,
-                    'updated_at' => $currentTime,
-                ];
-
-                $this->command->getOutput()->progressAdvance();
-            }
-
-            // Bulk-Insert für Team 2
-            if (! empty($employeesTeam2)) {
-                DB::table('employees')->insert($employeesTeam2);
-            }
-
-            if (! empty($roleAssignmentsTeam2)) {
-                DB::table('model_has_roles')->insert($roleAssignmentsTeam2);
-            }
-
-            if (! empty($teamAssignmentsTeam2)) {
-                DB::table('team_user')->insert($teamAssignmentsTeam2);
-            }
+            // Mitarbeiter erstellen
+            $this->createEmployeesForTeam($teams['team1'], $company, $owner, $roles, 'team1');
+            $this->createEmployeesForTeam($teams['team2'], $company, $owner, $roles, 'team2');
 
             DB::commit();
 
-            $this->command->getOutput()->progressFinish();
-            $this->command->info('Testdaten wurden erfolgreich erstellt!');
-            $this->command->info("Erstellt für Betrieb 48: $managersCreated Manager und " . ($employeeCount - $managersCreated) . " andere Mitarbeiter");
-            $this->command->info("Erstellt für Betrieb 55: $managersCreatedTeam2 Manager und " . ($team2EmployeeCount - $managersCreatedTeam2) . " andere Mitarbeiter");
+            $this->outputSummary();
 
         } catch (\Exception $e) {
-            // Transaktion rückgängig machen, wenn ein Fehler auftritt
             DB::rollBack();
-
-            $this->command->error('Fehler beim Erstellen der Testdaten: '.$e->getMessage());
-            $this->command->error($e->getTraceAsString());
+            if ($this->command) {
+                $this->command->error('Fehler beim Erstellen der Testdaten: '.$e->getMessage());
+                $this->command->error($e->getTraceAsString());
+            }
             throw $e;
         } finally {
-            // Model Events wieder aktivieren
             Model::reguard();
         }
     }
 
-    protected function getRandomEmployeeStatus()
+    /**
+     * Lade Konfiguration aus verschiedenen Quellen
+     */
+    protected function loadConfiguration(): void
     {
-        // Alle verfügbaren Status
+        // Aus config/seeder.php laden (falls vorhanden)
+        if (config('seeder.test_data')) {
+            $this->config = array_merge($this->config, config('seeder.test_data'));
+        }
+
+        // Aus Umgebungsvariablen laden
+        $this->loadFromEnvironment();
+
+        // Aus Kommandozeilen-Optionen laden (für Artisan Commands)
+        $this->loadFromCommandOptions();
+    }
+
+    /**
+     * Lade Konfiguration aus Umgebungsvariablen
+     */
+    protected function loadFromEnvironment(): void
+    {
+        // Beispiel: SEEDER_TEAM1_EMPLOYEES=100
+        if ($employees = env('SEEDER_TEAM1_EMPLOYEES')) {
+            $this->config['team1']['employees'] = (int) $employees;
+        }
+
+        if ($employees = env('SEEDER_TEAM2_EMPLOYEES')) {
+            $this->config['team2']['employees'] = (int) $employees;
+        }
+
+        if ($chunkSize = env('SEEDER_CHUNK_SIZE')) {
+            $this->config['performance']['chunk_size'] = (int) $chunkSize;
+        }
+    }
+
+    /**
+     * Lade Konfiguration aus Kommandozeilen-Optionen
+     */
+    protected function loadFromCommandOptions(): void
+    {
+        // Nur versuchen, Optionen zu laden, wenn wir über unseren Custom Command aufgerufen werden
+        if (!$this->command || !method_exists($this->command, 'option')) {
+            return;
+        }
+
+        // Prüfe, ob es unser Custom Command ist
+        try {
+            // Versuche eine Option zu lesen, die nur in unserem Command existiert
+            if (!$this->command->hasOption('team1-employees')) {
+                return;
+            }
+
+            // Lade alle Optionen
+            if ($employees = $this->command->option('team1-employees')) {
+                $this->config['team1']['employees'] = (int) $employees;
+            }
+
+            if ($employees = $this->command->option('team2-employees')) {
+                $this->config['team2']['employees'] = (int) $employees;
+            }
+
+            if ($chunkSize = $this->command->option('chunk-size')) {
+                $this->config['performance']['chunk_size'] = (int) $chunkSize;
+            }
+
+            // Weitere Optionen laden...
+            if ($this->command->hasOption('owner-name') && $name = $this->command->option('owner-name')) {
+                $this->config['owner']['name'] = $name;
+            }
+
+            if ($this->command->hasOption('owner-lastname') && $lastname = $this->command->option('owner-lastname')) {
+                $this->config['owner']['last_name'] = $lastname;
+            }
+
+            if ($this->command->hasOption('owner-email') && $email = $this->command->option('owner-email')) {
+                $this->config['owner']['email'] = $email;
+            }
+
+            if ($this->command->hasOption('company-name') && $company = $this->command->option('company-name')) {
+                $this->config['company']['name'] = $company;
+            }
+
+            if ($this->command->hasOption('no-delete')) {
+                $this->config['delete_existing'] = !$this->command->option('no-delete');
+            }
+        } catch (\Exception $e) {
+            // Ignoriere Fehler beim Optionen-Laden
+            return;
+        }
+    }
+
+    /**
+     * Initialisiere Seeder
+     */
+    protected function initialize(): void
+    {
+        $this->faker = Faker::create($this->config['faker_locale']);
+        ini_set('memory_limit', $this->config['performance']['memory_limit']);
+        Model::unguard();
+        DB::disableQueryLog();
+        $this->passwordHash = Hash::make($this->config['owner']['password']);
+
+        // Nur Output zeigen, wenn Command verfügbar ist
+        if ($this->command) {
+            $this->command->info('Starte Erstellung der Testdaten mit folgender Konfiguration:');
+            $this->command->table(
+                ['Parameter', 'Wert'],
+                [
+                    ['Team 1 Mitarbeiter', $this->config['team1']['employees']],
+                    ['Team 1 Manager', $this->config['team1']['managers']],
+                    ['Team 2 Mitarbeiter', $this->config['team2']['employees']],
+                    ['Team 2 Manager', $this->config['team2']['managers']],
+                    ['Chunk Size', $this->config['performance']['chunk_size']],
+                ]
+            );
+        }
+    }
+
+    /**
+     * Lösche existierende Testdaten
+     */
+    protected function deleteExistingData(): void
+    {
+        if ($this->command) {
+            $this->command->info('Entferne alte Testdaten...');
+        }
+
+        $ownerUser = User::where('email', $this->config['owner']['email'])->first();
+        if (!$ownerUser) {
+            return;
+        }
+
+        $companyId = $ownerUser->company_id;
+
+        // Lösche abhängige Datensätze
+        Employee::whereHas('user', function ($query) use ($companyId) {
+            $query->where('company_id', $companyId);
+        })->delete();
+
+        User::where('company_id', $companyId)
+            ->where('id', '!=', $ownerUser->id)
+            ->delete();
+
+        Profession::where('company_id', $companyId)->delete();
+        Stage::where('company_id', $companyId)->delete();
+        Department::where('company_id', $companyId)->delete();
+        Team::where('user_id', $ownerUser->id)->delete();
+        Company::where('id', $companyId)->delete();
+        $ownerUser->delete();
+    }
+
+    /**
+     * Erstelle Owner
+     */
+    protected function createOwner(): User
+    {
+        if ($this->command) {
+            $this->command->info('Erstelle Owner-Benutzer...');
+        }
+
+        $owner = User::create([
+            'name' => $this->config['owner']['name'],
+            'last_name' => $this->config['owner']['last_name'],
+            'email' => $this->config['owner']['email'],
+            'email_verified_at' => now(),
+            'password' => $this->passwordHash,
+            'remember_token' => Str::random(10),
+            'user_type' => UserType::Owner,
+            'model_status' => ModelStatus::ACTIVE,
+            'slug' => Str::slug($this->config['owner']['name'] . '-' . $this->config['owner']['last_name']) . '-' . Str::random(5),
+        ]);
+
+        $owner->assignRole('owner');
+
+        return $owner;
+    }
+
+    /**
+     * Erstelle Unternehmen
+     */
+    protected function createCompany(User $owner): Company
+    {
+        if ($this->command) {
+            $this->command->info('Erstelle Unternehmen...');
+        }
+
+        $industry = Industry::firstOrCreate(['name' => $this->config['company']['industry']]);
+
+        $company = Company::create([
+            'company_name' => $this->config['company']['name'],
+            'email' => $this->config['company']['email'],
+            'phone_1' => $this->config['company']['phone'],
+            'is_active' => true,
+            'owner_id' => $owner->id,
+            'created_by' => $owner->id,
+            'company_type' => $this->config['company']['type'],
+            'company_size' => $this->config['company']['size'],
+            'registration_type' => CompanyRegistrationType::SELF_REGISTERED,
+            'industry_id' => $industry->id,
+        ]);
+
+        $owner->update(['company_id' => $company->id]);
+
+        return $company;
+    }
+
+    /**
+     * Erstelle Teams
+     */
+    protected function createTeams(User $owner, Company $company): array
+    {
+        if ($this->command) {
+            $this->command->info('Erstelle Teams...');
+        }
+
+        $team1 = Team::create([
+            'name' => $this->config['team1']['name'],
+            'user_id' => $owner->id,
+            'company_id' => $company->id,
+            'personal_team' => true,
+        ]);
+
+        $team2 = Team::create([
+            'name' => $this->config['team2']['name'],
+            'user_id' => $owner->id,
+            'company_id' => $company->id,
+            'personal_team' => false,
+        ]);
+
+        $owner->update(['current_team_id' => $team1->id]);
+
+        return compact('team1', 'team2');
+    }
+
+    /**
+     * Erstelle Rollen
+     */
+    protected function createRoles(User $owner, Company $company): array
+    {
+        if ($this->command) {
+            $this->command->info('Erstelle Rollen...');
+        }
+
+        $visibleValue = \App\Enums\Role\RoleVisibility::Visible->value;
+        $employeePanelValue = \App\Enums\Role\RoleHasAccessTo::EmployeePanel->value;
+
+        $roleData = [
+            'Worker' => ['is_manager' => false],
+            'Manager' => ['is_manager' => true],
+            'Editor' => ['is_manager' => false],
+            'Temporary' => ['is_manager' => false],
+        ];
+
+        $roles = [];
+        foreach ($roleData as $roleName => $data) {
+            $role = Role::firstOrCreate(
+                ['name' => $roleName],
+                array_merge($data, [
+                    'guard_name' => 'web',
+                    'created_by' => $owner->id,
+                    'company_id' => $company->id,
+                    'access' => $employeePanelValue,
+                    'visible' => $visibleValue,
+                ])
+            );
+            $roles[$roleName] = $role->id;
+        }
+
+        return $roles;
+    }
+
+    /**
+     * Erstelle Master-Daten für ein Team
+     */
+    protected function createMasterDataForTeam($team, $company, $owner, $configKey): array
+    {
+        $config = $this->config[$configKey];
+        $prefix = $configKey === 'team2' ? 'B55 ' : '';
+
+        // Abteilungen erstellen
+        $departments = $this->createDepartments($team, $company, $owner, $config['departments'], $prefix);
+
+        // Berufe erstellen
+        $professions = $this->createProfessions($team, $company, $owner, $config['professions'], $prefix);
+
+        // Stufen erstellen
+        $stages = $this->createStages($team, $company, $owner, $config['stages'], $prefix);
+
+        return compact('departments', 'professions', 'stages');
+    }
+
+    /**
+     * Erstelle Abteilungen
+     */
+    protected function createDepartments($team, $company, $owner, $count, $prefix = ''): array
+    {
+        if ($this->command) {
+            $this->command->info("Erstelle $count Abteilungen für {$team->name}...");
+            $this->command->getOutput()->progressStart($count);
+        }
+
+        $departments = [];
+        for ($i = 1; $i <= $count; $i++) {
+            $departments[] = [
+                'name' => $prefix . 'Abteilung ' . $i,
+                'description' => 'Beschreibung für ' . $prefix . 'Abteilung ' . $i,
+                'company_id' => $company->id,
+                'team_id' => $team->id,
+                'created_by' => $owner->id,
+                'model_status' => ModelStatus::ACTIVE->value,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            if ($this->command) {
+                $this->command->getOutput()->progressAdvance();
+            }
+        }
+
+        Department::insert($departments);
+
+        if ($this->command) {
+            $this->command->getOutput()->progressFinish();
+        }
+
+        return Department::where('team_id', $team->id)->pluck('id')->toArray();
+    }
+
+    /**
+     * Erstelle Berufe
+     */
+    protected function createProfessions($team, $company, $owner, $count, $prefix = ''): array
+    {
+        if ($this->command) {
+            $this->command->info("Erstelle $count Berufe für {$team->name}...");
+            $this->command->getOutput()->progressStart($count);
+        }
+
+        $professions = [];
+        for ($i = 1; $i <= $count; $i++) {
+            $professions[] = [
+                'name' => $prefix . 'Beruf' . $i,
+                'company_id' => $company->id,
+                'team_id' => $team->id,
+                'created_by' => $owner->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            if ($this->command) {
+                $this->command->getOutput()->progressAdvance();
+            }
+        }
+
+        Profession::insert($professions);
+
+        if ($this->command) {
+            $this->command->getOutput()->progressFinish();
+        }
+
+        return Profession::where('team_id', $team->id)->pluck('id')->toArray();
+    }
+
+    /**
+     * Erstelle Stufen
+     */
+    protected function createStages($team, $company, $owner, $count, $prefix = ''): array
+    {
+        if ($this->command) {
+            $this->command->info("Erstelle $count Stufen für {$team->name}...");
+            $this->command->getOutput()->progressStart($count);
+        }
+
+        $stagesToUse = array_slice($this->stageNames, 0, min($count, count($this->stageNames)));
+        $stages = [];
+
+        foreach ($stagesToUse as $stageName) {
+            $stages[] = [
+                'name' => $prefix . $stageName,
+                'company_id' => $company->id,
+                'team_id' => $team->id,
+                'created_by' => $owner->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            if ($this->command) {
+                $this->command->getOutput()->progressAdvance();
+            }
+        }
+
+        Stage::insert($stages);
+
+        if ($this->command) {
+            $this->command->getOutput()->progressFinish();
+        }
+
+        return Stage::where('team_id', $team->id)->pluck('id')->toArray();
+    }
+
+    /**
+     * Erstelle Mitarbeiter für ein Team
+     */
+    protected function createEmployeesForTeam($team, $company, $owner, $roles, $configKey): void
+    {
+        $config = $this->config[$configKey];
+        $employeeCount = $config['employees'];
+        $managerCount = $config['managers'];
+        $chunkSize = $this->config['performance']['chunk_size'];
+
+        if ($this->command) {
+            $this->command->info("Erstelle $employeeCount Mitarbeiter für {$team->name}...");
+            $this->command->getOutput()->progressStart($employeeCount);
+        }
+
+        // Lade IDs für Beziehungen
+        $departmentIds = Department::where('team_id', $team->id)->pluck('id')->toArray();
+        $professionIds = Profession::where('team_id', $team->id)->pluck('id')->toArray();
+        $stageIds = Stage::where('team_id', $team->id)->pluck('id')->toArray();
+
+        $nonManagerRoleIds = [$roles['Worker'], $roles['Editor'], $roles['Temporary']];
+        $managersCreated = 0;
+        $employeeIndexOffset = $configKey === 'team2' ? $this->config['team1']['employees'] : 0;
+
+        // Erstelle Mitarbeiter in Chunks
+        for ($i = 0; $i < $employeeCount; $i += $chunkSize) {
+            $chunkEmployees = min($chunkSize, $employeeCount - $i);
+            $this->createEmployeeChunk(
+                $team,
+                $company,
+                $owner,
+                $roles,
+                $i,
+                $chunkEmployees,
+                $employeeIndexOffset,
+                $departmentIds,
+                $professionIds,
+                $stageIds,
+                $nonManagerRoleIds,
+                $managersCreated,
+                $managerCount,
+                $configKey
+            );
+        }
+
+        if ($this->command) {
+            $this->command->getOutput()->progressFinish();
+        }
+    }
+
+    /**
+     * Erstelle einen Chunk von Mitarbeitern
+     */
+    protected function createEmployeeChunk(
+        $team,
+        $company,
+        $owner,
+        $roles,
+        $startIndex,
+        $chunkSize,
+        $indexOffset,
+        $departmentIds,
+        $professionIds,
+        $stageIds,
+        $nonManagerRoleIds,
+        &$managersCreated,
+        $managerCount,
+        $configKey
+    ): void {
+        DB::beginTransaction();
+
+        $employees = [];
+        $roleAssignments = [];
+        $teamAssignments = [];
+        $currentTime = now();
+
+        for ($j = 0; $j < $chunkSize; $j++) {
+            $index = $startIndex + $j + $indexOffset + 1;
+
+            // Generiere eindeutige E-Mail
+            $email = $this->generateUniqueEmail($index, $configKey);
+
+            // Erstelle Benutzer
+            $userId = $this->createUser(
+                $email,
+                $company->id,
+                $departmentIds[array_rand($departmentIds)],
+                $owner->id,
+                $index,
+                $configKey
+            );
+
+            // Erstelle Mitarbeiter
+            $employees[] = $this->createEmployeeData(
+                $userId,
+                $professionIds[array_rand($professionIds)],
+                $stageIds[array_rand($stageIds)],
+                $owner->id,
+                $index,
+                $configKey
+            );
+
+            // Weise Rolle zu
+            $roleId = $this->assignRole($managersCreated, $managerCount, $roles['Manager'], $nonManagerRoleIds);
+            $roleAssignments[] = [
+                'role_id' => $roleId,
+                'model_type' => 'App\\Models\\User',
+                'model_id' => $userId,
+            ];
+
+            // Team-Zuweisung
+            $teamAssignments[] = [
+                'team_id' => $team->id,
+                'user_id' => $userId,
+                'role' => 'editor',
+                'created_at' => $currentTime,
+                'updated_at' => $currentTime,
+            ];
+
+            if ($this->command) {
+                $this->command->getOutput()->progressAdvance();
+            }
+        }
+
+        // Bulk-Insert
+        DB::table('employees')->insert($employees);
+        DB::table('model_has_roles')->insert($roleAssignments);
+        DB::table('team_user')->insert($teamAssignments);
+
+        DB::commit();
+
+        // Speicher freigeben
+        unset($employees, $roleAssignments, $teamAssignments);
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
+    }
+
+    /**
+     * Generiere eindeutige E-Mail
+     */
+    protected function generateUniqueEmail($index, $configKey): string
+    {
+        $firstName = $this->faker->firstName;
+        $lastName = $this->faker->lastName;
+        $suffix = $configKey === 'team2' ? '.b55' : '';
+
+        return strtolower(
+            Str::slug($firstName) . '.' .
+            Str::slug($lastName) .
+            $suffix . '.' .
+            $index . '@firma.ch'
+        );
+    }
+
+    /**
+     * Erstelle Benutzer
+     */
+    protected function createUser($email, $companyId, $departmentId, $createdBy, $index, $configKey): int
+    {
+        $firstName = $this->faker->firstName;
+        $lastName = $this->faker->lastName;
+        $suffix = $configKey === 'team2' ? '-b55' : '';
+
+        return DB::table('users')->insertGetId([
+            'name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'email_verified_at' => now(),
+            'password' => $this->passwordHash,
+            'remember_token' => Str::random(10),
+            'company_id' => $companyId,
+            'user_type' => UserType::Employee->value,
+            'department_id' => $departmentId,
+            'model_status' => ModelStatus::ACTIVE->value,
+            'phone_1' => $this->generatePhoneNumber(),
+            'slug' => Str::slug($firstName . '-' . $lastName . $suffix . '-' . $index),
+            'created_by' => $createdBy,
+            'joined_at' => Carbon::now()->subDays(rand(0, 365 * 3)),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    /**
+     * Erstelle Mitarbeiter-Daten
+     */
+    protected function createEmployeeData($userId, $professionId, $stageId, $supervisorId, $index, $configKey): array
+    {
+        $prefix = $configKey === 'team2' ? 'B55-' : 'PN';
+        $padLength = $configKey === 'team2' ? 5 : 8;
+
+        return [
+            'user_id' => $userId,
+            'profession_id' => $professionId,
+            'stage_id' => $stageId,
+            'personal_number' => $prefix . str_pad($index, $padLength, '0', STR_PAD_LEFT),
+            'supervisor_id' => $supervisorId,
+            'employee_status' => $this->getRandomEmployeeStatus()->value,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+
+    /**
+     * Generiere Telefonnummer
+     */
+    protected function generatePhoneNumber(): string
+    {
+        return '+41' . rand(700000000, 799999999);
+    }
+
+    /**
+     * Weise Rolle zu
+     */
+    protected function assignRole(&$managersCreated, $managerCount, $managerRoleId, $nonManagerRoleIds): int
+    {
+        if ($managersCreated < $managerCount) {
+            $managersCreated++;
+            return $managerRoleId;
+        }
+
+        return $nonManagerRoleIds[array_rand($nonManagerRoleIds)];
+    }
+
+    /**
+     * Zufälliger Mitarbeiterstatus mit Gewichtung
+     */
+    protected function getRandomEmployeeStatus(): EmployeeStatus
+    {
         $statuses = [
             EmployeeStatus::ONBOARDING,
             EmployeeStatus::PROBATION,
@@ -679,9 +805,7 @@ class TestDataSeeder extends Seeder
             EmployeeStatus::LEAVE,
         ];
 
-        // Gewichtete Auswahl: EMPLOYED und PROBATION häufiger
-        $weights = [0.10, 0.25, 0.55, 0.05, 0.05]; // 10%, 25%, 55%, 5%, 5%
-
+        $weights = [0.10, 0.25, 0.55, 0.05, 0.05];
         $randomNumber = mt_rand(1, 100) / 100;
         $cumulativeWeight = 0;
 
@@ -692,7 +816,45 @@ class TestDataSeeder extends Seeder
             }
         }
 
-        // Fallback
         return EmployeeStatus::EMPLOYED;
+    }
+
+    /**
+     * Ausgabe der Zusammenfassung
+     */
+    protected function outputSummary(): void
+    {
+        if (!$this->command) {
+            return;
+        }
+
+        $this->command->newLine();
+        $this->command->info('✅ Testdaten wurden erfolgreich erstellt!');
+        $this->command->newLine();
+
+        $team1Config = $this->config['team1'];
+        $team2Config = $this->config['team2'];
+
+        $this->command->table(
+            ['Team', 'Manager', 'Mitarbeiter', 'Abteilungen', 'Berufe', 'Stufen'],
+            [
+                [
+                    $team1Config['name'],
+                    $team1Config['managers'],
+                    $team1Config['employees'] - $team1Config['managers'],
+                    $team1Config['departments'],
+                    $team1Config['professions'],
+                    $team1Config['stages'],
+                ],
+                [
+                    $team2Config['name'],
+                    $team2Config['managers'],
+                    $team2Config['employees'] - $team2Config['managers'],
+                    $team2Config['departments'],
+                    $team2Config['professions'],
+                    $team2Config['stages'],
+                ],
+            ]
+        );
     }
 }
