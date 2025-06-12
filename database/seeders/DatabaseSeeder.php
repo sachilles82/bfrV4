@@ -10,6 +10,7 @@ use Database\Seeders\Spatie\PermissionSeeder;
 use Database\Seeders\Spatie\RoleSeeder;
 use Database\Seeders\User\AdminSeeder;
 use Database\Seeders\User\DummyUserSeeder;
+use Database\Seeders\User\HighPerformanceTestDataSeeder;
 use Database\Seeders\User\TestDataSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
@@ -39,7 +40,8 @@ class DatabaseSeeder extends Seeder
             StateSeeder::class,
             CitySeeder::class,
 
-            TestDataSeeder::class,
+//            TestDataSeeder::class,
+            HighPerformanceTestDataSeeder::class
         ]);
     }
 
