@@ -4,12 +4,12 @@ namespace App\Models\Alem;
 
 use App\Enums\Model\ModelStatus;
 use App\Models\User;
-use App\Traits\Cache\WithRedisCache;
+use App\Traits\Cache\AdvancedCache;
 use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,22 +25,15 @@ class Department extends Model
         SoftDeletes::restore as softRestore;
     }
     use SoftDeletes;
-    use WithRedisCache;
-    use ManageDataFilter, ManagesContextAndOwnership;
+    use ManageDataFilter, ManagesContextAndOwnership, AdvancedCache;
 
     /**
-     * The key used for caching this model
-     *
+     * Cache-Konfiguration für dieses Model
+     * @var int
      * @var string
      */
-    protected $cacheKey = 'departments_cache';
-
-    /**
-     * Cache duration in seconds (-1 for forever)
-     *
-     * @var int
-     */
-    protected $cacheDuration = 86400; // 24 hours
+    protected int $cacheDuration = 43200; // 12 Stunden, Cache-Dauer in Sekunden (-1 for forever)
+    protected string $cachePrefix = 'departments';
 
     /**
      * The attributes that are mass assignable.
@@ -50,10 +43,10 @@ class Department extends Model
     protected $fillable = [
         'name',
         'description',
+        'model_status',
         'company_id',
         'team_id',
         'created_by',
-        'model_status',
     ];
 
     /**
@@ -83,41 +76,30 @@ class Department extends Model
     }
 
     /**
-     * Hauptmethode: Holt alle Departments für ein Team mit dreistufigem Cache
-     *
-     * Nutzt die neue generische getCachedTeamData() Methode aus dem WithRedisCache Trait
-     *
-     * @param int $teamId Team ID
-     * @return Collection
+     * Optional: Nur bestimmte Kontexte flushen
+     * Wenn nicht definiert, werden alle geflusht (company, team, user)
      */
-    public static function getDepartmentsForTeam(int $teamId): Collection
+    protected function getAutoFlushContexts(): array
     {
-        return static::getCachedTeamData($teamId, 'getQueryForTeam');
+        // Beispiele:
+//        return ['company', 'team', 'user']; // Flusht alle drei (default)
+        return ['team'];
     }
 
     /**
-     * Spezifische Query-Logik für Departments eines Teams
-     *
-     * Diese Methode wird von getCachedTeamData() aufgerufen wenn der Cache leer ist
-     *
-     * @param int $teamId Team ID
+     * Holt Departments für das Team des aktuellen Benutzers
+     * @param int|null $teamId Team ID
      * @return Collection
      */
-    public static function getQueryForTeam(int $teamId): Collection
+    public static function getTeamDepartments(?int $teamId): Collection
     {
-        return static::query()
-            ->where('team_id', $teamId)
-            ->where('model_status', ModelStatus::ACTIVE->value)
-            ->select(['id', 'name'])
-            ->orderBy('name')
-            ->get();
+        return static::getCachedByTeam($teamId, function () use ($teamId) {
+            return static::query()
+                ->where('team_id', $teamId)
+                ->where('model_status', ModelStatus::ACTIVE->value)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+        });
     }
-
-    /**
-     * Alle vorherigen manuellen Cache-Event-Hooks entfernt
-     * Das WithRedisCache Trait kümmert sich automatisch um:
-     * - Cache-Invalidierung bei created/updated/deleted Events
-     * - Request-Level und persistenter Cache
-     * - Company- und Team-basierte Cache-Verwaltung
-     */
 }

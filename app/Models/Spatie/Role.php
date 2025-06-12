@@ -5,29 +5,23 @@ namespace App\Models\Spatie;
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
 use App\Models\User;
-use App\Traits\Cache\WithRedisCache;
+use App\Traits\Cache\AdvancedCache;
+use App\Traits\Model\ManageDataFilter;
+use App\Traits\Model\ManagesContextAndOwnership;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
 {
-    use WithRedisCache;
+    use ManageDataFilter, ManagesContextAndOwnership, AdvancedCache;
 
     /**
-     * The key used for caching this model
-     *
+     * Cache-Konfiguration für dieses Model
+     * @var int
      * @var string
      */
-    protected $cacheKey = 'roles_cache';
-
-
-    /**
-     * Cache duration in seconds (-1 for forever)
-     *
-     * @var int
-     */
-    protected $cacheDuration = 86400; // 24 hours
+    protected int $cacheDuration = 43200; // 12 Stunden, Cache-Dauer in Sekunden (-1 for forever)
+    protected string $cachePrefix = 'roles';
 
 
     /**
@@ -56,6 +50,16 @@ class Role extends SpatieRole
     protected $attributes = [
         'guard_name' => 'web',
     ];
+
+    /**
+     * Optional: Nur bestimmte Kontexte flushen
+     * Wenn nicht definiert, werden alle geflusht (company, team, user)
+     */
+    protected function getAutoFlushContexts(): array
+    {
+        // Für Roles nur Company-Cache flushen, da wir hauptsächlich company-basiert cachen
+        return ['company'];
+    }
 
     /**
      * Get employee panel roles for a specific company with caching
