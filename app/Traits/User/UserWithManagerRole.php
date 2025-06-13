@@ -6,13 +6,13 @@ use App\Models\Spatie\Role;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 trait UserWithManagerRole
 {
-
     /**
-     * 1. Hilfsmethode: Hat User eine Manager-Rolle?
+     * 1. Prüft ob der User eine Manager-Rolle hat
+     *
+     * @return bool True wenn User mindestens eine Rolle mit is_manager = true hat
      */
     public function hasManagerRole(): bool
     {
@@ -20,8 +20,11 @@ trait UserWithManagerRole
     }
 
     /**
-     * 2. Leert den Manager-Cache für eine Company mit AdvancedCache
-     * Nutzt die korrekten AdvancedCache-Methoden für konsistentes Cache-Management
+     * 2. Leert den Manager-Cache für eine Company
+     *
+     * Löscht sowohl den persistenten Cache (Redis/File) als auch den Request-Cache
+     *
+     * @param int $companyId Die Company ID für die der Cache geleert werden soll
      */
     public static function clearManagerCache(int $companyId): void
     {
@@ -39,16 +42,15 @@ trait UserWithManagerRole
         if (isset(self::$requestCache[$requestKey])) {
             unset(self::$requestCache[$requestKey]);
         }
-
-        Log::info("Manager cache cleared for company {$companyId}", [
-            'persistent_key' => $persistentKey,
-            'request_key' => $requestKey
-        ]);
     }
 
     /**
-     * 4. Override assignRole - Prüft ob Manager-Rolle zugewiesen wird
-     * Cache wird NUR geleert wenn User zum Manager wird
+     * 3. Override assignRole - Erweitert die Spatie assignRole Methode
+     *
+     * Leert automatisch den Manager-Cache wenn ein User zum Manager wird
+     *
+     * @param mixed ...$roles Ein oder mehrere Rollen (string, id oder Role Model)
+     * @return mixed Das Ergebnis der parent assignRole Methode
      */
     public function assignManagerRole(...$roles)
     {
@@ -74,19 +76,18 @@ trait UserWithManagerRole
         // Cache leeren wenn User zum Manager wird
         if (!$wasManager && $assigningManagerRole && $this->company_id) {
             static::clearManagerCache($this->company_id);
-
-            Log::info("User {$this->id} became a manager via assignRole", [
-                'company_id' => $this->company_id,
-                'roles' => collect($roles)->pluck('name', 'id')->toArray()
-            ]);
         }
 
         return $result;
     }
 
     /**
-     * 5. Override removeRole - Prüft ob Manager-Rolle entfernt wird
-     * Cache wird NUR geleert wenn User Manager-Status verliert
+     * 4. Override removeRole - Erweitert die Spatie removeRole Methode
+     *
+     * Leert automatisch den Manager-Cache wenn ein User den Manager-Status verliert
+     *
+     * @param mixed $role Die zu entfernende Rolle (string, id oder Role Model)
+     * @return mixed Das Ergebnis der parent removeRole Methode
      */
     public function removeManagerRole($role)
     {
@@ -110,37 +111,23 @@ trait UserWithManagerRole
         // Cache leeren wenn User keinen Manager-Status mehr hat
         if ($isRemovingManagerRole && !$otherManagerRoles && $this->company_id) {
             static::clearManagerCache($this->company_id);
-
-            Log::info("User {$this->id} is no longer a manager", [
-                'company_id' => $this->company_id,
-                'removed_role' => $roleModel ? $roleModel->name : 'unknown'
-            ]);
         }
 
         return $result;
     }
 
     /**
-     * Get managers for a specific company with caching
-     * Nutzt AdvancedCache mit suffix für spezifischen Cache-Key
+     * 5. Holt alle Manager einer Company mit Cache
+     *
+     * Verwendet einen separaten Cache-Key mit 'managers' Suffix
+     * um Manager-Daten getrennt von anderen User-Daten zu cachen
+     *
+     * @param int $companyId Die Company ID
+     * @return Collection Collection von User Models die Manager sind
      */
     public static function getCompanyManagers(int $companyId): Collection
     {
-        \Debugbar::startMeasure('manager-cache', 'Loading Company Managers');
-
-        $cacheKey = "users:company:{$companyId}:managers";
-
-        // Check Cache Status
-        if (\Cache::has($cacheKey)) {
-            \Debugbar::info("CACHE HIT - Managers for company {$companyId}");
-        } else {
-            \Debugbar::warning("CACHE MISS - Loading managers from DB for company {$companyId}");
-        }
-
-        $result = static::getCachedByCompany($companyId, function() use ($companyId) {
-            \Log::debug("Loading managers from database for company {$companyId}");
-            \Debugbar::addMessage("DB Query for managers", 'queries');
-
+        return static::getCachedByCompany($companyId, function() use ($companyId) {
             return self::select([
                 'users.id',
                 'users.name',
@@ -161,11 +148,5 @@ trait UserWithManagerRole
                 ->distinct()
                 ->get();
         }, ['suffix' => 'managers']);
-
-        \Debugbar::stopMeasure('manager-cache');
-        \Debugbar::info("Found {$result->count()} managers");
-
-        return $result;
     }
-
 }

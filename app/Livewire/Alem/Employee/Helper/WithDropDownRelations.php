@@ -350,22 +350,4 @@ trait WithDropDownRelations
 
         return $status;
     }
-
-    /**
-     * Force Cache Clear für Tests
-     */
-    public function forceClearAllCaches(): void
-    {
-        if ($this->companyId) {
-            // Clear Roles Cache
-            Role::flushCacheByCompany($this->companyId);
-
-            // Clear Users/Managers Cache
-            User::clearManagerCache($this->companyId);
-
-            // Clear local loaded collections
-            $this->loadedCollections = [];
-            $this->resetDropdownRelationsData();
-        }
-    }
 }

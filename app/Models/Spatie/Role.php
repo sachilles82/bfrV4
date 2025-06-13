@@ -62,57 +62,30 @@ class Role extends SpatieRole
     /**
      * Get employee panel roles for a specific company with caching
      *
-     * @param int $companyId Company ID (kann 0 sein für globale Rollen)
+     * @param int|null $companyId Company ID (kann 0 sein für globale Rollen)
      * @return Collection
      */
     public static function getEmployeePanelRoles(?int $companyId): Collection
     {
-        // Debug mit Debugbar
-        \Debugbar::startMeasure('role-cache', 'Loading Employee Panel Roles');
-
-        // Log für Telescope
-        \Log::channel('telescope')->info('Loading roles', [
-            'company_id' => $companyId,
-            'method' => 'getEmployeePanelRoles'
-        ]);
-
         // Für globale Rollen (companyId = 0 oder null)
         if (!$companyId) {
-            $result = static::getCached('global', 'employee_panel', function() {
-                \Debugbar::info('CACHE MISS - Loading global roles from DB');
-
+            return static::getCached('global', 'employee_panel', function() {
                 return static::query()
-                    ->where('company_id', 0)
-                    ->orWhereNull('company_id')
+                    ->whereIn('company_id', [0, null]) // Schneller als where()->orWhereNull()
                     ->where('access', RoleHasAccessTo::EmployeePanel)
                     ->where('visible', RoleVisibility::Visible)
                     ->select(['id', 'name', 'is_manager'])
                     ->orderBy('name')
                     ->get();
             });
-
-            \Debugbar::stopMeasure('role-cache');
-            return $result;
         }
 
         // Für Company-spezifische Rollen
-        $cacheKey = "roles:company:{$companyId}";
-
-        // Check ob Cache existiert
-        if (\Cache::has($cacheKey)) {
-            \Debugbar::info("CACHE HIT - Key: {$cacheKey}");
-        } else {
-            \Debugbar::warning("CACHE MISS - Key: {$cacheKey}");
-        }
-
-        $result = static::getCachedByCompany($companyId, function() use ($companyId) {
-            \Debugbar::info('Loading roles from DATABASE for company: ' . $companyId);
-
+        return static::getCachedByCompany($companyId, function() use ($companyId) {
             return static::query()
                 ->where(function($query) use ($companyId) {
                     $query->where('company_id', $companyId)
-                        ->orWhere('company_id', 0)
-                        ->orWhereNull('company_id');
+                        ->orWhereIn('company_id', [0, null]); // Optimiert
                 })
                 ->where('access', RoleHasAccessTo::EmployeePanel)
                 ->where('visible', RoleVisibility::Visible)
@@ -120,11 +93,6 @@ class Role extends SpatieRole
                 ->orderBy('name')
                 ->get();
         });
-
-        \Debugbar::stopMeasure('role-cache');
-        \Debugbar::info("Loaded {$result->count()} roles");
-
-        return $result;
     }
 
 

@@ -9,7 +9,6 @@ use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
 use App\Livewire\Alem\Employee\Helper\Secure\ValidateEmployee;
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Models\Alem\Employee;
-use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
@@ -19,7 +18,6 @@ use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -183,20 +181,28 @@ class EditEmployee extends Component
         );
     }
 
-//    /**
-//     * Synchronisiert die Rollen und Teams des Benutzers.
-//     */
-//    private function syncRelations(): void
-//    {
-//        $this->user->roles()->sync($this->selectedRoles);
-//        $this->user->teams()->sync($this->selectedTeams);
-//
-//        // Nach der Synchronisation ggf. Supervisors neu laden
-//        if ($this->hasManagerRoleInList($this->selectedRoles) !== $this->user->hasManagerRole()) {
-//            $this->forceReloadCollection('supervisors');
-//        }
-//    }
+    /**
+     * Synchronisiert Rollen und Teams des Users
+     *
+     * @throws \Throwable
+     */
+    private function syncRelations(): void
+    {
+        DB::transaction(function (): void {
+            // Cache Manager-Status vor Änderung
+            $wasManager = $this->user->hasManagerRole();
 
+            // Batch-Synchronisation
+            $this->user->roles()->sync($this->selectedRoles);
+            $this->user->teams()->sync($this->selectedTeams);
+
+            // Handle Manager-Status-Änderung
+            if ($wasManager !== $this->user->hasManagerRole()) {
+                User::clearManagerCache($this->user->company_id);
+                $this->forceReloadCollection('supervisors');
+            }
+        });
+    }
     /**
      * Setzt das Formular zurück und schließt das Modal.
      * Bereinigt zusätzlich alle Cache-Properties, um Speicher freizugeben.
@@ -232,71 +238,4 @@ class EditEmployee extends Component
         return view('livewire.alem.employee.edit');
     }
 
-    /**
-     * Prüft ob eine Rollenliste Manager-Rollen enthält
-     *
-     * @param array $roleIds Array von Rollen-IDs
-     * @return bool
-     */
-    protected function hasManagerRoleInList(array $roleIds): bool
-    {
-        // Nutze die bereits geladenen Rollen aus $this->roles
-        if (!empty($this->roles)) {
-            return collect($this->roles)
-                ->whereIn('id', $roleIds)
-                ->where('is_manager', true)
-                ->isNotEmpty();
-        }
-
-        // Fallback auf DB-Query nur wenn roles nicht geladen
-        return Role::whereIn('id', $roleIds)
-            ->where('is_manager', true)
-            ->exists();
-    }
-
-    private function syncRelations(): void
-    {
-        // Erfasse Manager-Status VOR der Änderung
-        $wasManager = $this->user->hasManagerRole();
-        $oldManagerRoleIds = $this->user->roles()
-            ->where('is_manager', true)
-            ->pluck('id')
-            ->toArray();
-
-        \Debugbar::info("User was manager: " . ($wasManager ? 'YES' : 'NO'));
-
-        // Sync Roles
-        $this->user->roles()->sync($this->selectedRoles);
-
-        // Lade User neu mit frischen Rollen
-        $this->user->load('roles');
-
-        // Prüfe ob sich Manager-Status geändert hat
-        $isManagerNow = $this->user->hasManagerRole();
-        $newManagerRoleIds = Role::whereIn('id', $this->selectedRoles)
-            ->where('is_manager', true)
-            ->pluck('id')
-            ->toArray();
-
-        \Debugbar::info("User is manager now: " . ($isManagerNow ? 'YES' : 'NO'));
-
-        // Wenn sich Manager-Status geändert hat, Cache manuell leeren
-        if ($wasManager !== $isManagerNow) {
-            \Debugbar::warning("MANAGER STATUS CHANGED! Clearing cache manually...");
-
-            // Direkt Cache leeren
-            $cacheKey = "users:company:{$this->user->company_id}:managers";
-            \Cache::forget($cacheKey);
-
-            // Alternative: Nutze die User Model Methode
-            User::clearManagerCache($this->user->company_id);
-
-            // Force reload supervisors
-            $this->forceReloadCollection('supervisors');
-
-            \Debugbar::info("Cache cleared for company {$this->user->company_id}");
-        }
-        // Sync Teams
-        $this->user->teams()->sync($this->selectedTeams);
-    }
 }
