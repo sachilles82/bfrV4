@@ -4,11 +4,10 @@ namespace App\Models\Spatie;
 
 use App\Enums\Role\RoleHasAccessTo;
 use App\Enums\Role\RoleVisibility;
-use App\Models\User;
 use App\Traits\Cache\AdvancedCache;
 use App\Traits\Model\ManageDataFilter;
 use App\Traits\Model\ManagesContextAndOwnership;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
@@ -57,34 +56,41 @@ class Role extends SpatieRole
      */
     protected function getAutoFlushContexts(): array
     {
-        // Für Roles nur Company-Cache flushen, da wir hauptsächlich company-basiert cachen
         return ['company'];
     }
 
     /**
      * Get employee panel roles for a specific company with caching
+     *
+     * @param int $companyId Company ID (kann 0 sein für globale Rollen)
+     * @return Collection
      */
-    // In app/Models/Spatie/Role.php
-    public static function getEmployeePanelRoles(int $companyId) // companyId kann hier 0 sein für globale
+    public static function getEmployeePanelRoles(int $companyId): Collection
     {
-        // Der dritte Parameter 'role' signalisiert dem Trait die spezielle Rollenlogik
-        return self::cacheCompanyResult($companyId, function() use ($companyId) {
-            // Log::info(" -> Fetching EmployeePanel roles for company {$companyId} from DB..."); // Optional
+        // Für globale Rollen (companyId = 0) nutzen wir getCachedGlobal
+        if ($companyId <= 0) {
+            return static::getCachedGlobal(function() {
+                return self::where('created_by', 1)
+                    ->where('access', RoleHasAccessTo::EmployeePanel->value)
+                    ->where('visible', RoleVisibility::Visible->value)
+                    ->select(['id', 'name', 'is_manager'])
+                    ->orderBy('name')
+                    ->get();
+            }, ['suffix' => 'employee_panel']);
+        }
+
+        // Für firmenspezifische Rollen nutzen wir getCachedByCompany
+        return static::getCachedByCompany($companyId, function() use ($companyId) {
             return self::where(function ($query) use ($companyId) {
-                // Wenn companyId > 0, suche firmenspezifische ODER globale
-                if ($companyId > 0) {
-                    $query->where('created_by', 1)
-                        ->orWhere('company_id', $companyId);
-                } else {
-                    // Wenn companyId <= 0, suche nur globale
-                    $query->where('created_by', 1);
-                }
+                $query->where('created_by', 1)
+                    ->orWhere('company_id', $companyId);
             })
                 ->where('access', RoleHasAccessTo::EmployeePanel->value)
                 ->where('visible', RoleVisibility::Visible->value)
                 ->select(['id', 'name', 'is_manager'])
+                ->orderBy('name')
                 ->get();
-        }, 'role'); // <--- Wichtiger dritter Parameter
+        });
     }
 
 
@@ -92,37 +98,7 @@ class Role extends SpatieRole
     {
         static::creating(function ($role) {
             $role->guard_name = 'web';
-
-            if (! $role->created_by) {
-                $role->created_by = auth()->id();
-            }
-
-            $user = auth()->user();
-
-            if ($user) {
-                if (! $role->company_id) {
-                    $role->company_id = $user->company_id;
-                }
-                if (! $role->team_id) {
-                    $role->team_id = $user->currentTeam?->id;
-                }
-            }
         });
 
-        // Event-Hooks für Cache-Invalidierung
-        static::saved(function($role) {
-            self::flushCompanyCache($role->company_id);
-            self::flushGlobalRoleCache();
-        });
-
-        static::deleted(function($role) {
-            self::flushCompanyCache($role->company_id);
-            self::flushGlobalRoleCache();
-        });
-    }
-
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
     }
 }

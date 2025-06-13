@@ -81,8 +81,6 @@ class Department extends Model
      */
     protected function getAutoFlushContexts(): array
     {
-        // Beispiele:
-//        return ['company', 'team', 'user']; // Flusht alle drei (default)
         return ['team'];
     }
 
