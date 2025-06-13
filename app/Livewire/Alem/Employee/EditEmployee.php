@@ -13,7 +13,6 @@ use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
-use App\Traits\Livewire\WithSupervisorManagement;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Carbon\Carbon;
@@ -32,7 +31,6 @@ class EditEmployee extends Component
     use AuthorizesRequests;
     use AuthUserTeamCompanyId, WithDropDownRelations, ValidateEmployee, HandleCatchError;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
-    use WithSupervisorManagement;
 
 
     #[Locked]
@@ -70,7 +68,7 @@ class EditEmployee extends Component
     public ?EmployeeStatus $employee_status = null;
     public $profession; // check Profession mit integer
     public $stage;// check Stage mit integer
-//    public ?int $supervisor = null;
+    public ?int $supervisor = null;
 
 
     #[On('edit-employee-modal')]
@@ -92,7 +90,7 @@ class EditEmployee extends Component
 
         // Lade nur was initial benötigt wird
         $this->loadRelationsData([
-            'teams', 'departments', 'roles', 'professions', 'stages'
+            'teams', 'departments', 'roles', 'professions', 'stages', 'supervisors'
         ]);
 
         $this->showEditModal = true;
@@ -226,8 +224,6 @@ class EditEmployee extends Component
             'stage', 'joined_at', 'employee_status', 'model_status',
         ]);
 
-        $this->resetSupervisorData();
-
         $this->resetDropdownRelationsData();
     }
 
@@ -260,11 +256,48 @@ class EditEmployee extends Component
 
     private function syncRelations(): void
     {
-        // Nutze die neue Trait-Methode für Rollen-Sync mit Cache
-        $this->syncRolesWithManagerCache();
+        // Erfasse Manager-Status VOR der Änderung
+        $wasManager = $this->user->hasManagerRole();
+        $oldManagerRoleIds = $this->user->roles()
+            ->where('is_manager', true)
+            ->pluck('id')
+            ->toArray();
 
-        // Teams normal synchronisieren
+        \Debugbar::info("User was manager: " . ($wasManager ? 'YES' : 'NO'));
+
+        // Sync Roles
+        $this->user->roles()->sync($this->selectedRoles);
+
+        // Lade User neu mit frischen Rollen
+        $this->user->load('roles');
+
+        // Prüfe ob sich Manager-Status geändert hat
+        $isManagerNow = $this->user->hasManagerRole();
+        $newManagerRoleIds = \App\Models\Spatie\Role::whereIn('id', $this->selectedRoles)
+            ->where('is_manager', true)
+            ->pluck('id')
+            ->toArray();
+
+        \Debugbar::info("User is manager now: " . ($isManagerNow ? 'YES' : 'NO'));
+
+        // Wenn sich Manager-Status geändert hat, Cache manuell leeren
+        if ($wasManager !== $isManagerNow) {
+            \Debugbar::warning("MANAGER STATUS CHANGED! Clearing cache manually...");
+
+            // Direkt Cache leeren
+            $cacheKey = "users:company:{$this->user->company_id}:managers";
+            \Cache::forget($cacheKey);
+
+            // Alternative: Nutze die User Model Methode
+            \App\Models\User::clearManagerCache($this->user->company_id);
+
+            // Force reload supervisors
+            $this->forceReloadCollection('supervisors');
+
+            \Debugbar::info("Cache cleared for company {$this->user->company_id}");
+        }
+
+        // Sync Teams
         $this->user->teams()->sync($this->selectedTeams);
     }
-
 }
