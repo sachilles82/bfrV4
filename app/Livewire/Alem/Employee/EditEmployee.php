@@ -296,7 +296,6 @@ class EditEmployee extends Component
 
             \Debugbar::info("Cache cleared for company {$this->user->company_id}");
         }
-
         // Sync Teams
         $this->user->teams()->sync($this->selectedTeams);
     }
