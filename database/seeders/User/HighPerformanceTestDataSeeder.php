@@ -57,7 +57,7 @@ class HighPerformanceTestDataSeeder extends Seeder
         // Team 1 (Betrieb 48) Konfiguration
         'team1' => [
             'name' => 'Betrieb 48',
-            'employees' => 250000,  // 100k als Standard
+            'employees' => 25000,  // 100k als Standard
             'managers' => 100,
             'departments' => 100,
             'professions' => 100,
@@ -67,7 +67,7 @@ class HighPerformanceTestDataSeeder extends Seeder
         // Team 2 (Betrieb 55) Konfiguration
         'team2' => [
             'name' => 'Betrieb 55',
-            'employees' => 250000,  // 500k als Standard
+            'employees' => 25000,  // 500k als Standard
             'managers' => 500,
             'departments' => 100,
             'professions' => 100,

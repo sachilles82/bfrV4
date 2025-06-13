@@ -56,7 +56,7 @@ trait WithDropDownRelations
             'departments' => [
                 'collection' => 'departments',
                 'selected' => 'department',
-                'loader' => fn() => Department::getDepartmentsForTeam($this->currentTeamId),
+                'loader' => fn() => Department::getTeamDepartments($this->currentTeamId),
                 'mapper' => fn($item) => ['id' => $item->id, 'name' => $item->name],
                 'dependencies' => ['currentTeamId'],
             ],
