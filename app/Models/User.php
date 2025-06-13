@@ -58,7 +58,7 @@ class User extends Authenticatable
      * @var int
      * @var string
      */
-    protected int $cacheDuration = 3200; // 12 Stunden
+    protected int $cacheDuration = 43200; // 12 Stunden
     protected string $cachePrefix = 'users';
 
     /**
@@ -249,37 +249,6 @@ class User extends Authenticatable
     }
 
     /**
-     * 3. Override syncRoles - Intelligentes Cache-Management
-     * Cache wird NUR geleert wenn sich der Manager-Status ändert
-     */
-    public function syncRoles(...$roles)
-    {
-        // Status VOR der Änderung
-        $wasManager = $this->hasManagerRole();
-
-        // Führe die Rollensynchronisation durch
-        $result = parent::syncRoles(...$roles);
-
-        // Status NACH der Änderung
-        $isManager = $this->hasManagerRole();
-
-        // Cache nur leeren wenn sich der Manager-Status geändert hat
-        if ($wasManager !== $isManager && $this->company_id) {
-            static::clearManagerCache($this->company_id);
-
-            Log::info('Manager status changed - cache cleared', [
-                'user_id' => $this->id,
-                'company_id' => $this->company_id,
-                'was_manager' => $wasManager,
-                'is_manager' => $isManager,
-                'action' => $isManager ? 'became_manager' : 'lost_manager_status'
-            ]);
-        }
-
-        return $result;
-    }
-
-    /**
      * 4. Override assignRole - Prüft ob Manager-Rolle zugewiesen wird
      * Cache wird NUR geleert wenn User zum Manager wird
      */
@@ -359,8 +328,20 @@ class User extends Authenticatable
      */
     public static function getCompanyManagers(int $companyId): Collection
     {
-        return static::getCachedByCompany($companyId, function() use ($companyId) {
-            Log::debug("Loading managers from database for company {$companyId}");
+        \Debugbar::startMeasure('manager-cache', 'Loading Company Managers');
+
+        $cacheKey = "users:company:{$companyId}:managers";
+
+        // Check Cache Status
+        if (\Cache::has($cacheKey)) {
+            \Debugbar::info("CACHE HIT - Managers for company {$companyId}");
+        } else {
+            \Debugbar::warning("CACHE MISS - Loading managers from DB for company {$companyId}");
+        }
+
+        $result = static::getCachedByCompany($companyId, function() use ($companyId) {
+            \Log::debug("Loading managers from database for company {$companyId}");
+            \Debugbar::addMessage("DB Query for managers", 'queries');
 
             return self::select([
                 'users.id',
@@ -381,6 +362,11 @@ class User extends Authenticatable
                 ->orderBy('users.name')
                 ->distinct()
                 ->get();
-        }, ['suffix' => 'managers']); // Wichtig: suffix für spezifischen Cache-Key
+        }, ['suffix' => 'managers']);
+
+        \Debugbar::stopMeasure('manager-cache');
+        \Debugbar::info("Found {$result->count()} managers");
+
+        return $result;
     }
 }

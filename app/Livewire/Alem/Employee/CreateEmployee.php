@@ -164,10 +164,23 @@ class CreateEmployee extends Component
         }
     }
 
+//    private function assignRoles(User $user): void
+//    {
+//        if (!empty($this->selectedRoles)) {
+//            $user->roles()->sync($this->selectedRoles);
+//        }
+//    }
+
     private function assignRoles(User $user): void
     {
         if (!empty($this->selectedRoles)) {
             $user->roles()->sync($this->selectedRoles);
+
+            // Prüfe ob neuer User ein Manager ist
+            if ($user->hasManagerRole()) {
+                User::clearManagerCache($user->company_id);
+                $this->dispatch('manager-added', userId: $user->id);
+            }
         }
     }
 

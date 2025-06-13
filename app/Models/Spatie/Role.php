@@ -67,9 +67,20 @@ class Role extends SpatieRole
      */
     public static function getEmployeePanelRoles(?int $companyId): Collection
     {
+        // Debug mit Debugbar
+        \Debugbar::startMeasure('role-cache', 'Loading Employee Panel Roles');
+
+        // Log für Telescope
+        \Log::channel('telescope')->info('Loading roles', [
+            'company_id' => $companyId,
+            'method' => 'getEmployeePanelRoles'
+        ]);
+
         // Für globale Rollen (companyId = 0 oder null)
         if (!$companyId) {
-            return static::getCached('global', 'employee_panel', function() {
+            $result = static::getCached('global', 'employee_panel', function() {
+                \Debugbar::info('CACHE MISS - Loading global roles from DB');
+
                 return static::query()
                     ->where('company_id', 0)
                     ->orWhereNull('company_id')
@@ -79,10 +90,24 @@ class Role extends SpatieRole
                     ->orderBy('name')
                     ->get();
             });
+
+            \Debugbar::stopMeasure('role-cache');
+            return $result;
         }
 
         // Für Company-spezifische Rollen
-        return static::getCachedByCompany($companyId, function() use ($companyId) {
+        $cacheKey = "roles:company:{$companyId}";
+
+        // Check ob Cache existiert
+        if (\Cache::has($cacheKey)) {
+            \Debugbar::info("CACHE HIT - Key: {$cacheKey}");
+        } else {
+            \Debugbar::warning("CACHE MISS - Key: {$cacheKey}");
+        }
+
+        $result = static::getCachedByCompany($companyId, function() use ($companyId) {
+            \Debugbar::info('Loading roles from DATABASE for company: ' . $companyId);
+
             return static::query()
                 ->where(function($query) use ($companyId) {
                     $query->where('company_id', $companyId)
@@ -95,6 +120,11 @@ class Role extends SpatieRole
                 ->orderBy('name')
                 ->get();
         });
+
+        \Debugbar::stopMeasure('role-cache');
+        \Debugbar::info("Loaded {$result->count()} roles");
+
+        return $result;
     }
 
 

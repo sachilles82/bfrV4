@@ -183,19 +183,19 @@ class EditEmployee extends Component
         );
     }
 
-    /**
-     * Synchronisiert die Rollen und Teams des Benutzers.
-     */
-    private function syncRelations(): void
-    {
-        $this->user->roles()->sync($this->selectedRoles);
-        $this->user->teams()->sync($this->selectedTeams);
-
-        // Nach der Synchronisation ggf. Supervisors neu laden
-        if ($this->hasManagerRoleInList($this->selectedRoles) !== $this->user->hasManagerRole()) {
-            $this->forceReloadCollection('supervisors');
-        }
-    }
+//    /**
+//     * Synchronisiert die Rollen und Teams des Benutzers.
+//     */
+//    private function syncRelations(): void
+//    {
+//        $this->user->roles()->sync($this->selectedRoles);
+//        $this->user->teams()->sync($this->selectedTeams);
+//
+//        // Nach der Synchronisation ggf. Supervisors neu laden
+//        if ($this->hasManagerRoleInList($this->selectedRoles) !== $this->user->hasManagerRole()) {
+//            $this->forceReloadCollection('supervisors');
+//        }
+//    }
 
     /**
      * Setzt das Formular zurück und schließt das Modal.
@@ -252,5 +252,52 @@ class EditEmployee extends Component
         return Role::whereIn('id', $roleIds)
             ->where('is_manager', true)
             ->exists();
+    }
+
+    private function syncRelations(): void
+    {
+        // Erfasse Manager-Status VOR der Änderung
+        $wasManager = $this->user->hasManagerRole();
+        $oldManagerRoleIds = $this->user->roles()
+            ->where('is_manager', true)
+            ->pluck('id')
+            ->toArray();
+
+        \Debugbar::info("User was manager: " . ($wasManager ? 'YES' : 'NO'));
+
+        // Sync Roles
+        $this->user->roles()->sync($this->selectedRoles);
+
+        // Lade User neu mit frischen Rollen
+        $this->user->load('roles');
+
+        // Prüfe ob sich Manager-Status geändert hat
+        $isManagerNow = $this->user->hasManagerRole();
+        $newManagerRoleIds = \App\Models\Spatie\Role::whereIn('id', $this->selectedRoles)
+            ->where('is_manager', true)
+            ->pluck('id')
+            ->toArray();
+
+        \Debugbar::info("User is manager now: " . ($isManagerNow ? 'YES' : 'NO'));
+
+        // Wenn sich Manager-Status geändert hat, Cache manuell leeren
+        if ($wasManager !== $isManagerNow) {
+            \Debugbar::warning("MANAGER STATUS CHANGED! Clearing cache manually...");
+
+            // Direkt Cache leeren
+            $cacheKey = "users:company:{$this->user->company_id}:managers";
+            \Cache::forget($cacheKey);
+
+            // Alternative: Nutze die User Model Methode
+            \App\Models\User::clearManagerCache($this->user->company_id);
+
+            // Force reload supervisors
+            $this->forceReloadCollection('supervisors');
+
+            \Debugbar::info("Cache cleared for company {$this->user->company_id}");
+        }
+
+        // Sync Teams
+        $this->user->teams()->sync($this->selectedTeams);
     }
 }
