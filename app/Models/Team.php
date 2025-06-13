@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Models\Alem\Company;
-use App\Traits\Cache\WithRedisCache;
-use Illuminate\Database\Eloquent\Collection;
+use App\Traits\Cache\AdvancedCache;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Jetstream\Events\TeamCreated;
@@ -15,21 +15,15 @@ use Laravel\Jetstream\Team as JetstreamTeam;
 class Team extends JetstreamTeam
 {
     use HasFactory;
-    use WithRedisCache;
+    use AdvancedCache;
 
     /**
-     * The key used for caching this model
-     *
+     * Cache-Konfiguration für dieses Model
+     * @var int
      * @var string
      */
-    protected $cacheKey = 'teams_cache';
-
-    /**
-     * Cache duration in seconds (-1 for forever)
-     *
-     * @var int
-     */
-    protected $cacheDuration = 86400; // 24 hours
+    protected int $cacheDuration = 43200; // 12 Stunden, Cache-Dauer in Sekunden (-1 for forever)
+    protected string $cachePrefix = 'teams';
 
     /**
      * The attributes that are mass assignable.
@@ -73,47 +67,38 @@ class Team extends JetstreamTeam
     }
 
     /**
-     * Hauptmethode: Holt alle Teams für eine Company mit dreistufigem Cache
-     *
-     * Nutzt die neue generische getCachedCompanyData() Methode
-     *
-     * @param int $companyId Company ID
-     * @return Collection
+     * Optional: Nur bestimmte Kontexte flushen
+     * Wenn nicht definiert, werden alle geflusht (company, team, user)
      */
-    public static function getCompanyTeams(int $companyId)
+    protected function getAutoFlushContexts(): array
     {
-        return static::getCachedCompanyData($companyId, 'getQueryForCompany');
+        // Teams gehören zu Companies, also flushen wir den Company-Cache
+        return ['company'];
     }
 
     /**
-     * Spezifische Query-Logik für Teams einer Company
+     * Get all teams for a specific company with caching
      *
      * @param int $companyId Company ID
      * @return Collection
      */
-    public static function getQueryForCompany(int $companyId)
+    public static function getCompanyTeams(int $companyId): Collection
     {
-        return static::query()
-            ->where('company_id', $companyId)
-            ->select(['id', 'name'])
-            ->orderBy('name')
-            ->get();
+        return static::getCachedByCompany($companyId, function() use ($companyId) {
+            return static::query()
+                ->where('company_id', $companyId)
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
+        });
     }
 
     protected static function booted(): void
     {
         static::creating(function (Team $team) {
-            /** Automatische company_id Zuweisung */
             if (!$team->company_id && auth()->check()) {
                 $team->company_id = auth()->user()->company_id;
             }
         });
-
-        /**
-         * Cache-Events werden jetzt automatisch vom WithRedisCache Trait gehandhabt
-         * Keine manuellen Event-Hooks mehr nötig:
-         * - static::saved() -> automatisch durch clearRelatedCaches()
-         * - static::deleted() -> automatisch durch clearRelatedCaches()
-         */
     }
 }
