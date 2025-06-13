@@ -230,7 +230,7 @@ class EditEmployee extends Component
     }
 
     /**
-     * Prüft auf Änderungen bei Manager-Rollen und leert ggf. den Manager-Cache.
+     * Prüft, ob sich die Manager-Rollen des Benutzers geändert haben und leert ggf. den Manager-Cache.
      *
      * @param User $user Der Benutzer (mit geladenen Rollen).
      * @return void
@@ -280,7 +280,7 @@ class EditEmployee extends Component
 
         // Cache leeren bei Änderungen
         if ($oldManagerRoleIds !== $newManagerRoleIds) {
-            User::flushManagerCache($this->companyId);
+            User::clearManagerCache($this->companyId);
             $this->supervisors = [];
         }
     }
