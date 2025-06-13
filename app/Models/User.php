@@ -204,6 +204,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Optional: Nur bestimmte Kontexte flushen
+     * Wenn nicht definiert, werden alle geflusht (company, team, user)
+     */
+    protected function getAutoFlushContexts(): array
+    {
+        // User-Änderungen können Company und Team betreffen
+        return ['company', 'team'];
+    }
+
+    /**
      * 1. Hilfsmethode: Hat User eine Manager-Rolle?
      */
     public function hasManagerRole(): bool
@@ -212,15 +222,15 @@ class User extends Authenticatable
     }
 
     /**
-     * Leert den Manager-Cache für eine Company mit AdvancedCache
+     * 2. Leert den Manager-Cache für eine Company mit AdvancedCache
+     * Nutzt die korrekten AdvancedCache-Methoden für konsistentes Cache-Management
      */
     public static function clearManagerCache(int $companyId): void
     {
-        // Nutze die generateCacheKeys Methode von AdvancedCache
         $instance = new static;
         $config = $instance->getCacheConfig();
 
-        // Generiere die korrekten Cache-Keys
+        // Generiere den korrekten Cache-Key mit suffix
         $persistentKey = "{$config['prefix']}:company:{$companyId}:managers";
         $requestKey = "request_{$config['prefix']}_company_{$companyId}_managers";
 
@@ -228,25 +238,36 @@ class User extends Authenticatable
         Cache::forget($persistentKey);
 
         // Leere request cache
-        unset(self::$requestCache[$requestKey]);
+        if (isset(self::$requestCache[$requestKey])) {
+            unset(self::$requestCache[$requestKey]);
+        }
 
-        Log::info("Manager cache cleared for company {$companyId}");
+        Log::info("Manager cache cleared for company {$companyId}", [
+            'persistent_key' => $persistentKey,
+            'request_key' => $requestKey
+        ]);
     }
 
     /**
-     * 2. Override syncRoles
+     * 3. Override syncRoles - Intelligentes Cache-Management
+     * Cache wird NUR geleert wenn sich der Manager-Status ändert
      */
     public function syncRoles(...$roles)
     {
+        // Status VOR der Änderung
         $wasManager = $this->hasManagerRole();
+
+        // Führe die Rollensynchronisation durch
         $result = parent::syncRoles(...$roles);
+
+        // Status NACH der Änderung
         $isManager = $this->hasManagerRole();
 
+        // Cache nur leeren wenn sich der Manager-Status geändert hat
         if ($wasManager !== $isManager && $this->company_id) {
-            Cache::forget("users:company:{$this->company_id}:managers");
+            static::clearManagerCache($this->company_id);
 
-            // Logging
-            \Log::info('Manager cache cleared', [
+            Log::info('Manager status changed - cache cleared', [
                 'user_id' => $this->id,
                 'company_id' => $this->company_id,
                 'was_manager' => $wasManager,
@@ -259,12 +280,15 @@ class User extends Authenticatable
     }
 
     /**
-     * Override assignRole - Prüft ob Manager-Rolle zugewiesen wird
+     * 4. Override assignRole - Prüft ob Manager-Rolle zugewiesen wird
+     * Cache wird NUR geleert wenn User zum Manager wird
      */
     public function assignRole(...$roles)
     {
+        // Prüfe ob User bereits Manager ist
         $wasManager = $this->hasManagerRole();
 
+        // Prüfe ob eine der neuen Rollen eine Manager-Rolle ist
         $assigningManagerRole = collect($roles)
             ->map(function($role) {
                 if (is_string($role)) {
@@ -275,56 +299,63 @@ class User extends Authenticatable
                 return $role;
             })
             ->filter()
-            ->contains(fn($role) => $role->is_manager);
+            ->contains(fn($role) => $role && $role->is_manager);
 
+        // Führe die Rollenzuweisung durch
         $result = parent::assignRole(...$roles);
 
+        // Cache leeren wenn User zum Manager wird
         if (!$wasManager && $assigningManagerRole && $this->company_id) {
             static::clearManagerCache($this->company_id);
-            Log::info("User {$this->id} became a manager via assignRole");
+
+            Log::info("User {$this->id} became a manager via assignRole", [
+                'company_id' => $this->company_id,
+                'roles' => collect($roles)->pluck('name', 'id')->toArray()
+            ]);
         }
 
         return $result;
     }
 
     /**
-     * Override removeRole - Prüft ob Manager-Rolle entfernt wird
+     * 5. Override removeRole - Prüft ob Manager-Rolle entfernt wird
+     * Cache wird NUR geleert wenn User Manager-Status verliert
      */
     public function removeRole($role)
     {
+        // Konvertiere Rolle zu Model-Objekt
         $roleModel = is_string($role)
             ? Role::where('name', $role)->first()
             : (is_numeric($role) ? Role::find($role) : $role);
 
+        // Prüfe ob es eine Manager-Rolle ist
         $isRemovingManagerRole = $roleModel && $roleModel->is_manager;
 
+        // Prüfe ob User noch andere Manager-Rollen hat
         $otherManagerRoles = $this->roles()
             ->where('is_manager', true)
             ->where('id', '!=', $roleModel->id ?? 0)
             ->exists();
 
+        // Führe die Rollenentfernung durch
         $result = parent::removeRole($role);
 
+        // Cache leeren wenn User keinen Manager-Status mehr hat
         if ($isRemovingManagerRole && !$otherManagerRoles && $this->company_id) {
             static::clearManagerCache($this->company_id);
-            Log::info("User {$this->id} is no longer a manager");
+
+            Log::info("User {$this->id} is no longer a manager", [
+                'company_id' => $this->company_id,
+                'removed_role' => $roleModel ? $roleModel->name : 'unknown'
+            ]);
         }
 
         return $result;
     }
 
     /**
-     * Optional: Nur bestimmte Kontexte flushen
-     * Wenn nicht definiert, werden alle geflusht (company, team, user)
-     */
-    protected function getAutoFlushContexts(): array
-    {
-        // User-Änderungen können Company und Team betreffen
-        return ['company', 'team'];
-    }
-
-    /**
      * Get managers for a specific company with caching
+     * Nutzt AdvancedCache mit suffix für spezifischen Cache-Key
      */
     public static function getCompanyManagers(int $companyId): Collection
     {
@@ -350,6 +381,6 @@ class User extends Authenticatable
                 ->orderBy('users.name')
                 ->distinct()
                 ->get();
-        }, ['suffix' => 'managers']);
+        }, ['suffix' => 'managers']); // Wichtig: suffix für spezifischen Cache-Key
     }
 }

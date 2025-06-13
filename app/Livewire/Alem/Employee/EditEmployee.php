@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -190,8 +191,8 @@ class EditEmployee extends Component
         $this->user->loadMissing('roles:id,name,is_manager');
 
         // Prüfe auf Änderungen bei den Manager-Rollen, bevor synchronisiert wird
-        if ($this->user->relationLoaded('roles')) {
-            $this->checkRoleChangesForManager($this->user);
+        if (!empty($this->selectedRoles)) {
+            $this->handleManagerStatusChange($this->user, $this->selectedRoles);
         }
 
         // Synchronisiere die Rollen und Teams
@@ -288,5 +289,49 @@ class EditEmployee extends Component
     public function render(): View
     {
         return view('livewire.alem.employee.edit');
+    }
+
+    protected function handleManagerStatusChange(User $user, array $newRoleIds): void
+    {
+        // Lade die aktuelle Rollen-Relation wenn nötig
+        if (!$user->relationLoaded('roles')) {
+            $user->loadMissing('roles:id,name,is_manager');
+        }
+
+        // Prüfe aktuellen Manager-Status
+        $wasManager = $user->hasManagerRole();
+
+        // Prüfe ob die neuen Rollen Manager-Rollen enthalten
+        $willBeManager = \App\Models\Spatie\Role::whereIn('id', $newRoleIds)
+            ->where('is_manager', true)
+            ->exists();
+
+        // Log die bevorstehende Änderung
+        if ($wasManager !== $willBeManager) {
+            Log::info('Manager status will change', [
+                'user_id' => $user->id,
+                'company_id' => $user->company_id,
+                'was_manager' => $wasManager,
+                'will_be_manager' => $willBeManager,
+                'old_roles' => $user->roles->pluck('name', 'id')->toArray(),
+                'new_role_ids' => $newRoleIds
+            ]);
+        }
+
+        // Die eigentliche Cache-Leerung erfolgt automatisch durch die
+        // überladenen Methoden in User Model (syncRoles)
+    }
+
+    /**
+     * Prüft ob eine Rollenliste Manager-Rollen enthält
+     *
+     * @param array $roleIds Array von Rollen-IDs
+     * @return bool
+     */
+    protected function hasManagerRoleInList(array $roleIds): bool
+    {
+        return \App\Models\Spatie\Role::whereIn('id', $roleIds)
+            ->where('is_manager', true)
+            ->exists();
     }
 }
