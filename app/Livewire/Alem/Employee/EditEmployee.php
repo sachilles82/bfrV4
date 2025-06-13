@@ -273,7 +273,7 @@ class EditEmployee extends Component
 
         // Prüfe ob sich Manager-Status geändert hat
         $isManagerNow = $this->user->hasManagerRole();
-        $newManagerRoleIds = \App\Models\Spatie\Role::whereIn('id', $this->selectedRoles)
+        $newManagerRoleIds = Role::whereIn('id', $this->selectedRoles)
             ->where('is_manager', true)
             ->pluck('id')
             ->toArray();
@@ -289,7 +289,7 @@ class EditEmployee extends Component
             \Cache::forget($cacheKey);
 
             // Alternative: Nutze die User Model Methode
-            \App\Models\User::clearManagerCache($this->user->company_id);
+            User::clearManagerCache($this->user->company_id);
 
             // Force reload supervisors
             $this->forceReloadCollection('supervisors');
