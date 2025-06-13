@@ -13,6 +13,7 @@ use App\Models\Alem\Employee;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
+use App\Traits\Livewire\WithSupervisorManagement;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
@@ -30,6 +31,7 @@ class CreateEmployee extends Component
     use AuthorizesRequests;
     use AuthUserTeamCompanyId, WithDropDownRelations, ValidateEmployee, HandleCatchError;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
+    use WithSupervisorManagement;
 
     /** Modal-Status mit Funktionen */
     public bool $showCreateModal = false;
@@ -61,7 +63,7 @@ class CreateEmployee extends Component
     public ?EmployeeStatus $employee_status = null;
     public $profession;
     public $stage;
-    public ?int $supervisor = null;
+//    public ?int $supervisor = null;
     public bool $invitation = false;
 
 
@@ -78,12 +80,16 @@ class CreateEmployee extends Component
         $this->model_status = ModelStatus::ACTIVE;
         $this->employee_status = EmployeeStatus::PROBATION;
         $this->invitation = true;
-        $this->showCreateModal = true;
 
         // Lade nur was initial benötigt wird
         $this->loadRelationsData([
-            'teams', 'departments', 'roles', 'professions', 'stages', 'supervisors'
+            'teams', 'departments', 'roles', 'professions', 'stages'
         ]);
+
+        // Supervisor-Management initialisieren
+        $this->initializeSupervisorManagement();
+
+        $this->showCreateModal = true;
     }
 
     /**
@@ -176,9 +182,8 @@ class CreateEmployee extends Component
         if (!empty($this->selectedRoles)) {
             $user->roles()->sync($this->selectedRoles);
 
-            // Prüfe ob neuer User ein Manager ist
+            // Manager-Cache wird automatisch vom User Model Trait verwaltet
             if ($user->hasManagerRole()) {
-                User::clearManagerCache($user->company_id);
                 $this->dispatch('manager-added', userId: $user->id);
             }
         }
@@ -210,6 +215,8 @@ class CreateEmployee extends Component
             'stage', 'joined_at', 'employee_status', 'model_status',
             'invitation',
         ]);
+
+        $this->resetSupervisorData();
 
         $this->resetDropdownRelationsData();
     }

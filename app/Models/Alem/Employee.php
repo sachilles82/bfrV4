@@ -12,6 +12,7 @@ use App\Models\Alem\QuickCrud\Profession;
 use App\Models\Alem\QuickCrud\Stage;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusManagement;
+use App\Traits\Employees\HasSupervisor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,7 @@ class Employee extends Model
 {
     use EmployeeStatusManagement;
     use HasFactory;
+    use HasSupervisor;
 
     /**
      * The attributes that are mass assignable.
@@ -146,13 +148,13 @@ class Employee extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Gibt den Vorgesetzten (Supervisor) als User zurück
-     */
-    public function supervisorUser(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'supervisor_id');
-    }
+//    /**
+//     * Gibt den Vorgesetzten (Supervisor) als User zurück
+//     */
+//    public function supervisorUser(): BelongsTo
+//    {
+//        return $this->belongsTo(User::class, 'supervisor_id');
+//    }
 
     /**
      * Gibt die Berufsbezeichnung/Position des Mitarbeiters zurück.
