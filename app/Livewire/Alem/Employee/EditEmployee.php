@@ -9,6 +9,7 @@ use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
 use App\Livewire\Alem\Employee\Helper\Secure\ValidateEmployee;
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Models\Alem\Employee;
+use App\Models\Spatie\Role;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
@@ -187,17 +188,13 @@ class EditEmployee extends Component
      */
     private function syncRelations(): void
     {
-        // Lade die Rollen-Relation, falls sie noch nicht geladen ist
-        $this->user->loadMissing('roles:id,name,is_manager');
-
-        // Prüfe auf Änderungen bei den Manager-Rollen, bevor synchronisiert wird
-        if (!empty($this->selectedRoles)) {
-            $this->handleManagerStatusChange($this->user, $this->selectedRoles);
-        }
-
-        // Synchronisiere die Rollen und Teams
         $this->user->roles()->sync($this->selectedRoles);
         $this->user->teams()->sync($this->selectedTeams);
+
+        // Nach der Synchronisation ggf. Supervisors neu laden
+        if ($this->hasManagerRoleInList($this->selectedRoles) !== $this->user->hasManagerRole()) {
+            $this->forceReloadCollection('supervisors');
+        }
     }
 
     /**
@@ -230,96 +227,9 @@ class EditEmployee extends Component
         $this->resetDropdownRelationsData();
     }
 
-    /**
-     * Prüft, ob sich die Manager-Rollen des Benutzers geändert haben und leert ggf. den Manager-Cache.
-     *
-     * @param User $user Der Benutzer (mit geladenen Rollen).
-     * @return void
-     */
-    private function checkRoleChangesForManager(User $user): void
-    {
-        // Validierung und Vorbereitung
-        if (!$this->companyId) {
-            return;
-        }
-
-        // Stelle sicher, dass Rollen geladen sind
-        if (!$user->relationLoaded('roles')) {
-            $user->loadMissing('roles:id,is_manager');
-            if (!$user->relationLoaded('roles')) {
-                return;
-            }
-        }
-
-        // Stelle sicher, dass verfügbare Rollen vorhanden sind
-        if (empty($this->roles)) {
-            $this->loadRelationsData();
-            if (empty($this->roles)) {
-                return;
-            }
-        }
-
-        // Alte Manager-Rollen-IDs
-        $oldManagerRoleIds = $user->roles
-            ->where('is_manager', true)
-            ->pluck('id')
-            ->sort()
-            ->values()
-            ->all();
-
-        // Neue Manager-Rollen-IDs (optimiert mit Array-Funktionen)
-        $newManagerRoleIds = array_values(
-            array_filter(
-                array_map(
-                    fn($role) => ($role['is_manager'] ?? false) && in_array($role['id'], $this->selectedRoles, true) ? $role['id'] : null,
-                    $this->roles
-                ),
-                fn($id) => $id !== null
-            )
-        );
-        sort($newManagerRoleIds);
-
-        // Cache leeren bei Änderungen
-        if ($oldManagerRoleIds !== $newManagerRoleIds) {
-            User::clearManagerCache($this->companyId);
-            $this->supervisors = [];
-        }
-    }
-
     public function render(): View
     {
         return view('livewire.alem.employee.edit');
-    }
-
-    protected function handleManagerStatusChange(User $user, array $newRoleIds): void
-    {
-        // Lade die aktuelle Rollen-Relation wenn nötig
-        if (!$user->relationLoaded('roles')) {
-            $user->loadMissing('roles:id,name,is_manager');
-        }
-
-        // Prüfe aktuellen Manager-Status
-        $wasManager = $user->hasManagerRole();
-
-        // Prüfe ob die neuen Rollen Manager-Rollen enthalten
-        $willBeManager = \App\Models\Spatie\Role::whereIn('id', $newRoleIds)
-            ->where('is_manager', true)
-            ->exists();
-
-        // Log die bevorstehende Änderung
-        if ($wasManager !== $willBeManager) {
-            Log::info('Manager status will change', [
-                'user_id' => $user->id,
-                'company_id' => $user->company_id,
-                'was_manager' => $wasManager,
-                'will_be_manager' => $willBeManager,
-                'old_roles' => $user->roles->pluck('name', 'id')->toArray(),
-                'new_role_ids' => $newRoleIds
-            ]);
-        }
-
-        // Die eigentliche Cache-Leerung erfolgt automatisch durch die
-        // überladenen Methoden in User Model (syncRoles)
     }
 
     /**
@@ -330,7 +240,16 @@ class EditEmployee extends Component
      */
     protected function hasManagerRoleInList(array $roleIds): bool
     {
-        return \App\Models\Spatie\Role::whereIn('id', $roleIds)
+        // Nutze die bereits geladenen Rollen aus $this->roles
+        if (!empty($this->roles)) {
+            return collect($this->roles)
+                ->whereIn('id', $roleIds)
+                ->where('is_manager', true)
+                ->isNotEmpty();
+        }
+
+        // Fallback auf DB-Query nur wenn roles nicht geladen
+        return Role::whereIn('id', $roleIds)
             ->where('is_manager', true)
             ->exists();
     }

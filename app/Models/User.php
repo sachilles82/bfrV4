@@ -58,7 +58,7 @@ class User extends Authenticatable
      * @var int
      * @var string
      */
-    protected int $cacheDuration = 0; // 12 Stunden
+    protected int $cacheDuration = 3200; // 12 Stunden
     protected string $cachePrefix = 'users';
 
     /**

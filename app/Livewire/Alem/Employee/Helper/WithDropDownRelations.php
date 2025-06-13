@@ -9,6 +9,7 @@ use App\Models\Spatie\Role;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 
 trait WithDropDownRelations
@@ -320,5 +321,51 @@ trait WithDropDownRelations
     {
         unset($this->loadedCollections[$collection]);
         $this->loadSingleCollection($collection);
+    }
+
+    /**
+     * Debug: Prüfe ob Daten aus Cache kommen
+     */
+    public function debugCacheStatus(): array
+    {
+        $status = [];
+
+        // Prüfe Roles Cache
+        $rolesCacheKey = "roles:company:{$this->companyId}";
+        $status['roles'] = [
+            'cache_exists' => Cache::has($rolesCacheKey),
+            'cache_key' => $rolesCacheKey,
+            'loaded_count' => count($this->roles),
+            'from_cache' => $this->isCollectionLoaded('roles')
+        ];
+
+        // Prüfe Supervisors Cache
+        $supervisorsCacheKey = "users:company:{$this->companyId}:managers";
+        $status['supervisors'] = [
+            'cache_exists' => Cache::has($supervisorsCacheKey),
+            'cache_key' => $supervisorsCacheKey,
+            'loaded_count' => count($this->supervisors),
+            'from_cache' => $this->isCollectionLoaded('supervisors')
+        ];
+
+        return $status;
+    }
+
+    /**
+     * Force Cache Clear für Tests
+     */
+    public function forceClearAllCaches(): void
+    {
+        if ($this->companyId) {
+            // Clear Roles Cache
+            Role::flushCacheByCompany($this->companyId);
+
+            // Clear Users/Managers Cache
+            User::clearManagerCache($this->companyId);
+
+            // Clear local loaded collections
+            $this->loadedCollections = [];
+            $this->resetDropdownRelationsData();
+        }
     }
 }

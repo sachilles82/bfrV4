@@ -65,28 +65,32 @@ class Role extends SpatieRole
      * @param int $companyId Company ID (kann 0 sein für globale Rollen)
      * @return Collection
      */
-    public static function getEmployeePanelRoles(int $companyId): Collection
+    public static function getEmployeePanelRoles(?int $companyId): Collection
     {
-        // Für globale Rollen (companyId = 0) nutzen wir getCachedGlobal
-        if ($companyId <= 0) {
-            return static::getCachedGlobal(function() {
-                return self::where('created_by', 1)
-                    ->where('access', RoleHasAccessTo::EmployeePanel->value)
-                    ->where('visible', RoleVisibility::Visible->value)
+        // Für globale Rollen (companyId = 0 oder null)
+        if (!$companyId) {
+            return static::getCached('global', 'employee_panel', function() {
+                return static::query()
+                    ->where('company_id', 0)
+                    ->orWhereNull('company_id')
+                    ->where('access', RoleHasAccessTo::EmployeePanel)
+                    ->where('visible', RoleVisibility::Visible)
                     ->select(['id', 'name', 'is_manager'])
                     ->orderBy('name')
                     ->get();
-            }, ['suffix' => 'employee_panel']);
+            });
         }
 
-        // Für firmenspezifische Rollen nutzen wir getCachedByCompany
+        // Für Company-spezifische Rollen
         return static::getCachedByCompany($companyId, function() use ($companyId) {
-            return self::where(function ($query) use ($companyId) {
-                $query->where('created_by', 1)
-                    ->orWhere('company_id', $companyId);
-            })
-                ->where('access', RoleHasAccessTo::EmployeePanel->value)
-                ->where('visible', RoleVisibility::Visible->value)
+            return static::query()
+                ->where(function($query) use ($companyId) {
+                    $query->where('company_id', $companyId)
+                        ->orWhere('company_id', 0)
+                        ->orWhereNull('company_id');
+                })
+                ->where('access', RoleHasAccessTo::EmployeePanel)
+                ->where('visible', RoleVisibility::Visible)
                 ->select(['id', 'name', 'is_manager'])
                 ->orderBy('name')
                 ->get();
