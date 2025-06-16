@@ -27,8 +27,7 @@ class EmployeeController extends Controller
         // Cache-Schlüssel enthält den Slug und den aktiven Tab
         $cacheKey = "employee_profile_{$slug}_{$activeTab}";
 
-        $user =
-            Cache::remember($cacheKey, now()->addHours(1), function () use ($slug) {
+        $user = Cache::remember($cacheKey, now()->addHours(1), function () use ($slug) {
             // Nur minimale User-Daten laden (ID und slug)
             return User::select(['id', 'slug', 'user_type'])
                 ->where('slug', $slug)
@@ -40,13 +39,12 @@ class EmployeeController extends Controller
             abort(404, 'Mitarbeiter nicht gefunden.');
         }
 
-        return view('laravel.alem.employee.show',
-            compact('user', 'activeTab')
-            [
+        return view('laravel.alem.employee.show', [
+            'user' => $user,
+            'activeTab' => $activeTab,
             'authUserId' => $authUser->id,
             'currentTeamId' => $currentTeamId,
             'companyId' => $companyId,
-        ]
-        );
+        ]);
     }
 }

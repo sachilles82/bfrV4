@@ -65,13 +65,77 @@ class Role extends SpatieRole
      * @param int|null $companyId Company ID (kann 0 sein für globale Rollen)
      * @return Collection
      */
+//    public static function getEmployeePanelRoles(?int $companyId): Collection
+//    {
+//        // Für globale Rollen (companyId = 0 oder null)
+//        if (!$companyId) {
+//            return static::getCached('global', 'employee_panel', function() {
+//                return static::query()
+//                    ->whereIn('company_id', [0, null]) // Schneller als where()->orWhereNull()
+//                    ->where('access', RoleHasAccessTo::EmployeePanel)
+//                    ->where('visible', RoleVisibility::Visible)
+//                    ->select(['id', 'name', 'is_manager'])
+//                    ->orderBy('name')
+//                    ->get();
+//            });
+//        }
+//
+//        // Für Company-spezifische Rollen
+//        return static::getCachedByCompany($companyId, function() use ($companyId) {
+//            return static::query()
+//                ->where(function($query) use ($companyId) {
+//                    $query->where('company_id', $companyId)
+//                        ->orWhereIn('company_id', [0, null]); // Optimiert
+//                })
+//                ->where('access', RoleHasAccessTo::EmployeePanel)
+//                ->where('visible', RoleVisibility::Visible)
+//                ->select(['id', 'name', 'is_manager'])
+//                ->orderBy('name')
+//                ->get();
+//        });
+//    }
+//    public static function getEmployeePanelRoles(?int $companyId): Collection
+//    {
+//        // Für globale Rollen (companyId = 0 oder null)
+//        if (!$companyId) {
+//            return static::getCached('global', 'employee_panel', function() {
+//                return static::query()
+//                    ->where('company_id', 0)
+//                    ->orWhereNull('company_id')
+//                    ->where('access', RoleHasAccessTo::EmployeePanel)
+//                    ->where('visible', RoleVisibility::Visible)
+//                    ->select(['id', 'name', 'is_manager'])
+//                    ->orderBy('name')
+//                    ->get();
+//            });
+//        }
+//
+//        // Für Company-spezifische Rollen
+//        return static::getCachedByCompany($companyId, function() use ($companyId) {
+//            return static::query()
+//                ->where(function($query) use ($companyId) {
+//                    $query->where('company_id', $companyId)
+//                        ->orWhere('company_id', 0)
+//                        ->orWhereNull('company_id');
+//                })
+//                ->where('access', RoleHasAccessTo::EmployeePanel)
+//                ->where('visible', RoleVisibility::Visible)
+//                ->select(['id', 'name', 'is_manager'])
+//                ->orderBy('name')
+//                ->get();
+//        });
+//    }
+
     public static function getEmployeePanelRoles(?int $companyId): Collection
     {
         // Für globale Rollen (companyId = 0 oder null)
         if (!$companyId) {
             return static::getCached('global', 'employee_panel', function() {
                 return static::query()
-                    ->whereIn('company_id', [0, null]) // Schneller als where()->orWhereNull()
+                    ->where(function($query) {
+                        $query->where('company_id', 0)
+                            ->orWhereNull('company_id');
+                    })
                     ->where('access', RoleHasAccessTo::EmployeePanel)
                     ->where('visible', RoleVisibility::Visible)
                     ->select(['id', 'name', 'is_manager'])
@@ -85,7 +149,8 @@ class Role extends SpatieRole
             return static::query()
                 ->where(function($query) use ($companyId) {
                     $query->where('company_id', $companyId)
-                        ->orWhereIn('company_id', [0, null]); // Optimiert
+                        ->orWhere('company_id', 0)
+                        ->orWhereNull('company_id');
                 })
                 ->where('access', RoleHasAccessTo::EmployeePanel)
                 ->where('visible', RoleVisibility::Visible)
@@ -94,7 +159,6 @@ class Role extends SpatieRole
                 ->get();
         });
     }
-
 
     protected static function booted(): void
     {

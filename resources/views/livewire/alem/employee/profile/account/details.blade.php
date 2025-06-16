@@ -135,25 +135,33 @@
                     <!-- Team Zugehörigkeit -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
-                            label="{{ __('Team`s`') }}"
+                            label="{{ __('Teams') }}"
                             for="selectedTeams"
                             badge="{{ __('Required') }}"
+                            :error="$errors->first('selectedTeams')"
                             model="selectedTeams"
-                            help-text="{{ __('Employee can belong to several teams') }}"
-                            :error="$errors->first('selectedTeams')">
+                            help-text="{{ __('') }}">
+
                             <flux:select
+                                class="mt-2"
                                 wire:model="selectedTeams"
                                 id="selectedTeams"
-                                name="selectedTeams"
                                 variant="listbox"
                                 multiple
-                                placeholder="{{ __('Team') }}">
-                                @foreach($this->availableTeams as $availableTeam)
-                                    <flux:option value="{{ $availableTeam->id }}">
-                                        {{ $availableTeam->name }}
+                                placeholder="{{ __('Teams auswählen') }}">
+
+                                @forelse($teams as $team)
+                                    <flux:option
+                                        wire:key="team-option-{{ $team['id'] }}"
+                                        value="{{ $team['id'] }}">
+                                        <span class="truncate">{{ $team['name'] }}</span>
                                     </flux:option>
-                                @endforeach
+                                @empty
+                                    <flux:option value="">{{ __('No teams found') }}</flux:option>
+                                @endforelse
+
                             </flux:select>
+
                         </x-pupi.input.group>
                     </div>
 
@@ -163,23 +171,30 @@
                             label="{{ __('Department') }}"
                             for="department"
                             badge="{{ __('Required') }}"
+                            :error="$errors->first('department')"
                             model="department"
-                            help-text="{{ __('') }}"
-                            :error="$errors->first('department')">
+                            help-text="{{ __('') }}">
+
                             <flux:select
                                 class="mt-2"
                                 wire:model="department"
                                 id="department"
                                 variant="listbox"
-                                placeholder="{{ __('Department auswählen') }}">
-                                @forelse($this->departments as $department)
-                                    <flux:option value="{{ $department->id }}">
-                                        <span class="truncate">{{ $department->name }}</span>
+                                searchable
+                                placeholder="{{ __('Select Department') }}">
+
+                                @forelse($departments as $dept)
+                                    <flux:option
+                                        wire:key="department-option-{{ $dept['id'] }}"
+                                        value="{{ $dept['id'] }}">
+                                        <span class="truncate">{{ $dept['name'] }}</span>
                                     </flux:option>
                                 @empty
-                                    <flux:option value="">{{ __('No Departments found') }}</flux:option>
+                                    <flux:option value="">{{ __('No departments found') }}</flux:option>
                                 @endforelse
+
                             </flux:select>
+
                         </x-pupi.input.group>
                     </div>
 
