@@ -21,6 +21,14 @@
                     key="employee-update-{{ $user->id }}"
                 />
 
+                <livewire:alem.employee.profile.employment-data
+                    :user="$user"
+                    :auth-user-id="$authUserId"
+                    :current-team-id="$currentTeamId"
+                    :company-id="$companyId"
+                    key="employee-update-{{ $user->id }}"
+                />
+
 {{--                <livewire:alem.employee.profile.employment-data--}}
 {{--                    :user="$user"--}}
 {{--                />--}}
