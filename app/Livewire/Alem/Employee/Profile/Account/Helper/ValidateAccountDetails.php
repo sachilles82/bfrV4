@@ -17,7 +17,12 @@ trait ValidateAccountDetails
             'gender' => ['required', Rule::enum(Gender::class)],
             'name' => 'required|string|min:3',
             'last_name' => 'required|string|min:3',
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->userId ?? null)],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($this->user)
+            ],
             'model_status' => ['required', Rule::enum(ModelStatus::class)],
 
             'department' => ['required', 'exists:departments,id',

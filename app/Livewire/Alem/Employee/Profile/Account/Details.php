@@ -70,7 +70,10 @@ class Details extends Component
             'teams:id,name',
             'roles:id,name,is_manager',
             'department:id,name'
-        ])->findOrFail($this->user->id);
+        ])
+            ->where('id', $this->user->id)
+            ->first();
+
 
         // Befülle die Komponenten-Properties
         $this->gender = $this->user->gender;
@@ -164,25 +167,8 @@ class Details extends Component
         });
     }
 
-    /**
-     * Debug-Methode um die geladenen Rollen zu prüfen
-     */
-    public function debugRoles()
-    {
-        dd([
-            'authUserId' => $this->authUserId,
-            'currentTeamId' => $this->currentTeamId,
-            'companyId' => $this->companyId,
-            'user_roles' => $this->user->roles->toArray(),
-            'selected_roles' => $this->selectedRoles,
-            'available_roles' => $this->roles,
-            'loaded_collections' => $this->loadedCollections ?? []
-        ]);
-    }
-
     public function render(): View
     {
-        // Keine weitere Logik hier - alles bereits in mount() geladen
         return view('livewire.alem.employee.profile.account.details');
     }
 }
