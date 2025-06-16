@@ -11,19 +11,24 @@
         <div class="space-y-10 divide-y dark:divide-white/5 divide-gray-900/5">
             @if($activeTab === 'employee-update')
 
-                <livewire:alem.employee.profile.information
+                {{ $user->id }}{{ $user->user_type }}
+
+                <livewire:alem.employee.profile.account.details
                     :user="$user"
+                    :auth-user-id="$authUserId"
+                    :current-team-id="$currentTeamId"
+                    :company-id="$companyId"
                     key="employee-update-{{ $user->id }}"
                 />
 
-                <livewire:alem.employee.profile.employment-data
-                    :user="$user"
-                />
+{{--                <livewire:alem.employee.profile.employment-data--}}
+{{--                    :user="$user"--}}
+{{--                />--}}
 
 
-                <livewire:alem.employee.profile.personal-data
-                    :user="$user"
-                />
+{{--                <livewire:alem.employee.profile.personal-data--}}
+{{--                    :user="$user"--}}
+{{--                />--}}
 
 
 
@@ -37,6 +42,11 @@
                     key="report-{{ $user->id }}"
                 />
             @elseif($activeTab === 'holiday')
+                <livewire:alem.employee.holiday.holiday-table
+                    :user="$user"
+                    key="holiday-{{ $user->id }}"
+                />
+            @elseif($activeTab === 'attendence')
                 <livewire:alem.employee.holiday.holiday-table
                     :user="$user"
                     key="holiday-{{ $user->id }}"

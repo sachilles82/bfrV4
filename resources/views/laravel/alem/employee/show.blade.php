@@ -9,6 +9,10 @@
         <livewire:alem.employee.dynamic-navigation
             :user="$user"
             :activeTab="$activeTab"
+
+            :auth-user-id="$authUserId"
+            :current-team-id="$currentTeamId"
+            :company-id="$companyId"
         />
 
     </x-pupi.layout.container>

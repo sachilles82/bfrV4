@@ -12,14 +12,14 @@ class ProfileController extends Controller
 
     public function show()
     {
-        $user = Auth::user();
+        $authUser = Auth::user();
 
-        if (! $user) {
+        if (! $authUser) {
             abort(404, 'User not found');
         }
 
         return view('laravel.alem.employee.profile',
-            compact('user')
+            compact('authUser')
         );
     }
 }

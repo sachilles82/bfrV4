@@ -20,4 +20,10 @@
             {{ __('Holiday') }}
         </x-pupi.navigation.header.link>
     </li>
+    <li>
+        <x-pupi.navigation.header.link
+            :href="route('employees.profile', [$user, 'attendence'])"
+            :active="$activeTab === 'attendence'">
+            {{ __('Attendence') }}
+        </x-pupi.navigation.header.link>
 </x-pupi.navigation.header.index>

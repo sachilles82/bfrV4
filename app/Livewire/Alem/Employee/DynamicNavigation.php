@@ -16,6 +16,9 @@ class DynamicNavigation extends Component
     {
         $this->user = $user;
         $this->activeTab = $activeTab;
+        :auth-user-id="$authUserId"
+                    :current-team-id="$currentTeamId"
+                    :company-id="$companyId"
     }
 
     public function render(): View
