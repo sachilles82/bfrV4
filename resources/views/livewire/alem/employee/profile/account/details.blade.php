@@ -1,4 +1,5 @@
 <x-pupi.layout.form>
+
     <x-slot:title>
         {{ __('User Account Details') }}
     </x-slot:title>
@@ -35,7 +36,6 @@
                             :error="$errors->first('gender')"
                             model="gender"
                             help-text="{{ __('') }}">
-                            <div class="relative">
 
                                 <flux:select
                                     class="mt-2"
@@ -54,7 +54,6 @@
 
                                 </flux:select>
 
-                            </div>
                         </x-pupi.input.group>
                     </div>
 
@@ -67,12 +66,14 @@
                             model="name"
                             help-text="{{ __('') }}"
                             :error="$errors->first('name')">
+
                             <x-pupi.input.text
                                 wire:model="name"
                                 name="name"
                                 id="name"
                                 placeholder="{{ __('First Name') }}"
                             />
+
                         </x-pupi.input.group>
                     </div>
 
@@ -85,12 +86,14 @@
                             model="last_name"
                             help-text="{{ __('') }}"
                             :error="$errors->first('last_name')">
+
                             <x-pupi.input.text
                                 wire:model="last_name"
                                 name="last_name"
                                 id="last_name"
                                 placeholder="{{ __('Last Name') }}"
                             />
+
                         </x-pupi.input.group>
                     </div>
 
@@ -103,6 +106,7 @@
                             model="email"
                             help-text="{{ __('') }}"
                             :error="$errors->first('email')">
+
                             <x-pupi.input.text
                                 wire:model="email"
                                 name="email"
@@ -110,6 +114,7 @@
                                 id="email"
                                 placeholder="{{ __('Email') }}"
                             />
+
                         </x-pupi.input.group>
                     </div>
 
@@ -122,6 +127,7 @@
                             model="phone_1"
                             help-text="{{ __('') }}"
                             :error="$errors->first('phone_1')">
+
                             <x-pupi.input.text
                                 wire:model="phone_1"
                                 name="phone_1"
@@ -129,6 +135,7 @@
                                 id="phone_1"
                                 placeholder="{{ __('Phone') }}"
                             />
+
                         </x-pupi.input.group>
                     </div>
 
@@ -278,4 +285,5 @@
             </x-pupi.button.container>
         </form>
     </x-slot>
+
 </x-pupi.layout.form>

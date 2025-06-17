@@ -22,7 +22,7 @@ class EmployeeProfileController extends Controller
             ->firstOrFail();
 
         // Optional: Pre-load für bessere Performance
-        User::getForComponent($employee->id, [], ['id', 'name', 'last_name']);
+//        User::getForComponent($employee->id, [], ['id', 'name', 'last_name']);
 
         return view('laravel.alem.employee.show', [
             'employee' => $employee,

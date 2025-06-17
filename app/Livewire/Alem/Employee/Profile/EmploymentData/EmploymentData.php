@@ -20,7 +20,7 @@ use Livewire\Attributes\Lazy;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-//#[Lazy(isolate: true)]
+#[Lazy(isolate: true)]
 class EmploymentData extends Component
 {
     use AuthorizesRequests;
@@ -71,7 +71,7 @@ class EmploymentData extends Component
         $this->employeeUser = User::getForComponent(
             userId: $this->employeeId,
             relations: ['employee'],
-            select: ['id', 'name', 'last_name']
+//            select: ['id', 'name', 'last_name']
         );
 
         if ($this->employeeUser) {
@@ -158,6 +158,11 @@ class EmploymentData extends Component
                 variant: 'danger'
             );
         }
+    }
+
+    public function placeholder (): string
+    {
+        return view('livewire.placeholders.company.update');
     }
 
     public function render(): View

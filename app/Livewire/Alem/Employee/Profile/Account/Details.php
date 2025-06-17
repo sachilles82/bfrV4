@@ -15,8 +15,10 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Lazy;
 use Livewire\Component;
 
+#[Lazy(isolate: true)]
 class Details extends Component
 {
     use AuthUserTeamCompanyId, WithDropDownRelations;
@@ -136,6 +138,11 @@ class Details extends Component
                 $this->forceReloadCollection('supervisors');
             }
         });
+    }
+
+    public function placeholder (): string
+    {
+        return view('livewire.placeholders.employee.details');
     }
 
     public function render(): View

@@ -14,5 +14,6 @@
             :company-id="$companyId"
         />
 
+
     </x-pupi.layout.container>
 </x-app-layout>
