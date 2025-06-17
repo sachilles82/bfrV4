@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Alem\Employee;
 
 use App\Enums\User\UserType;
 use App\Http\Controllers\Controller;
+use App\Livewire\Alem\Employee\Holiday\HolidayTable;
+use App\Livewire\Alem\Employee\Profile\Account\Details;
+use App\Livewire\Alem\Employee\Profile\EmploymentData;
+use App\Livewire\Alem\Employee\Report\ReportTable;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -11,40 +15,66 @@ use Illuminate\View\View;
 
 class EmployeeController extends Controller
 {
-    /**
-     * Zeigt das Profil eines Mitarbeiters an.
-     *
-     * @param string $slug Der Slug des Mitarbeiters.
-     * @param string $activeTab Der aktive Tab, der standardmäßig 'employee-update' ist.
-     * @return View
-     */
+    private function getComponentsForTab(string $tab): array
+    {
+        return match($tab) {
+            'employee-update' => [
+                Details::class,
+//                EmploymentData::class,
+                // PersonalData::class,
+                // AddressManager::class,
+            ],
+            'report' => [
+                ReportTable::class,
+            ],
+            'holiday' => [
+                HolidayTable::class,
+            ],
+            'attendance' => [
+                // AttendanceTable::class,
+            ],
+            default => []
+        };
+    }
+
     public function show(string $slug, string $activeTab = 'employee-update'): View
     {
         $authUser = Auth::user();
-        $currentTeamId = $authUser->currentTeam->id;
-        $companyId = $authUser->company_id;
 
-        $cacheKey = "employee_profile_{$slug}_{$activeTab}";
+        // 1. Sammle alle benötigten Relations für den Tab
+        $relations = $this->collectRequiredRelations($activeTab);
 
-        $user = Cache::remember($cacheKey, now()->addHours(1), function () use ($slug) {
+        // 2. Ein optimierter Query mit allen Relations
+        $user = User::with($relations)
+            ->where('slug', $slug)
+            ->where('user_type', UserType::Employee->value)
+            ->firstOrFail();
 
-            return User::select(['id', 'slug', 'user_type'])
-                ->where('slug', $slug)
-                ->where('user_type', UserType::Employee->value)
-                ->first();
-        });
-
-        if (!$user) {
-            abort(404, 'Mitarbeiter nicht gefunden.');
-        }
+        // 3. Cache die Daten für die Components
+        $sharedDataKey = "employee:{$user->id}:tab:{$activeTab}";
+        Cache::put($sharedDataKey, $user, now()->addMinutes(10));
 
         return view('laravel.alem.employee.show', [
             'user' => $user,
             'activeTab' => $activeTab,
-
+            'sharedDataKey' => $sharedDataKey,
+            // Auth Daten direkt mitgeben
             'authUserId' => $authUser->id,
-            'currentTeamId' => $currentTeamId,
-            'companyId' => $companyId,
+            'currentTeamId' => $authUser->currentTeam->id,
+            'companyId' => $authUser->company_id,
         ]);
+    }
+
+    private function collectRequiredRelations(string $tab): array
+    {
+        $relations = ['company', 'currentTeam']; // Basis
+
+        foreach ($this->getComponentsForTab($tab) as $componentClass) {
+            if (method_exists($componentClass, 'requiredRelations')) {
+                $relations = array_merge($relations, $componentClass::requiredRelations());
+            }
+        }
+
+        return array_unique($relations);
     }
 }

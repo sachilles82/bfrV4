@@ -13,11 +13,12 @@ use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Lazy;
 use Livewire\Component;
 
-#[Lazy(isolate: true)]
+//#[Lazy(isolate: true)]
 class Details extends Component
 {
     use AuthorizesRequests, ValidateAccountDetails;
@@ -26,6 +27,7 @@ class Details extends Component
 
     // User identification
     public ?User $user = null;
+    protected string $sharedDataKey;
 
     // User form fields
     public ?Gender $gender = null;
@@ -38,83 +40,65 @@ class Details extends Component
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    // Flag ob Daten geladen wurden
-    private bool $dataLoaded = false;
-
-    /**
-     * Mount erhält den minimalen User und die Auth-Properties
-     */
-    public function mount(User $user, int $authUserId, int $currentTeamId, int $companyId): void
+    // Static method für Relations
+    public static function requiredRelations(): array
     {
-        $this->user = $user;
+        return [
+            'teams:id,name',
+            'roles:id,name,is_manager',
+            'department:id,name'
+        ];
+    }
+
+    public function mount(string $sharedDataKey, int $authUserId, int $currentTeamId, int $companyId): void {
+        $this->sharedDataKey = $sharedDataKey;
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Sofort Employee-Daten und Relations laden
-        $this->loadEmployeeData();
+        // Lade User aus Cache
+        $this->loadUserFromCache();
+
+        // Lade nur Dropdown-Daten (nutzt deinen WithDropDownRelations Trait)
         $this->loadRelationsData(['teams', 'departments', 'roles']);
     }
 
-    /**
-     * Lädt alle benötigten Daten für diese Komponente
-     */
-    private function loadEmployeeData(): void
+    private function loadUserFromCache(): void
     {
-        if ($this->dataLoaded) {
-            return;
+        $this->user = Cache::get($this->sharedDataKey);
+
+        if ($this->user) {
+            // Populate properties vom gecachten User
+            $this->gender = $this->user->gender;
+            $this->name = $this->user->name;
+            $this->last_name = $this->user->last_name;
+            $this->email = $this->user->email;
+            $this->phone_1 = $this->user->phone_1 ?? '';
+            $this->model_status = $this->user->model_status;
+            $this->department = $this->user->department_id;
+
+            // Relations sind bereits geladen
+            $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
+            $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
         }
-
-        // Lade den vollständigen User mit Relations - genau wie im EditEmployee
-        $this->user = User::with([
-            'teams:id,name',
-            'roles:id,name,is_manager',
-            'department:id,name'
-        ])
-            ->where('id', $this->user->id)
-            ->first();
-
-
-        // Befülle die Komponenten-Properties
-        $this->gender = $this->user->gender;
-        $this->name = $this->user->name;
-        $this->last_name = $this->user->last_name;
-        $this->email = $this->user->email;
-        $this->phone_1 = $this->user->phone_1 ?? '';
-        $this->model_status = $this->user->model_status;
-        $this->department = $this->user->department_id;
-
-        // Teams und Rollen - genau wie im EditEmployee
-        $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
-        $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
-
-        $this->dataLoaded = true;
     }
 
-    /**
-     * Override der shouldCheckModalState für den WithDropDownRelations Trait
-     */
     protected function shouldCheckModalState(): bool
     {
-        return false; // Kein Modal in diesem Component
+        return false;
     }
 
     protected function isModalOpen(): bool
     {
-        return true; // Immer "offen" da kein Modal
+        return true;
     }
 
-
-    /**
-     * Aktualisiert die User-Daten
-     */
     public function updateEmployee(): void
     {
         $this->validate();
 
         try {
             DB::transaction(function () {
-                // Update der User-Daten - verwende die gleiche Logik wie EditEmployee
                 User::where('id', $this->user->id)->update([
                     'name' => $this->name,
                     'last_name' => $this->last_name,
@@ -125,9 +109,11 @@ class Details extends Component
                     'department_id' => $this->department,
                 ]);
 
-                // Sync Relations
                 $this->syncRelations();
             });
+
+            // Cache invalidieren
+            Cache::forget($this->sharedDataKey);
 
             $this->dispatch('employee-updated');
 
@@ -146,20 +132,14 @@ class Details extends Component
         }
     }
 
-    /**
-     * Synchronisiert Rollen und Teams des Users - identisch zu EditEmployee
-     */
     private function syncRelations(): void
     {
         DB::transaction(function (): void {
-            // Cache Manager-Status vor Änderung
             $wasManager = $this->user->hasManagerRole();
 
-            // Batch-Synchronisation
             $this->user->roles()->sync($this->selectedRoles);
             $this->user->teams()->sync($this->selectedTeams);
 
-            // Handle Manager-Status-Änderung
             if ($wasManager !== $this->user->hasManagerRole()) {
                 User::clearManagerCache($this->user->company_id);
                 $this->forceReloadCollection('supervisors');

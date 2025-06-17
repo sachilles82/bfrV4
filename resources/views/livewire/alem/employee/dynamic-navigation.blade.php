@@ -11,23 +11,21 @@
         <div class="space-y-10 divide-y dark:divide-white/5 divide-gray-900/5">
             @if($activeTab === 'employee-update')
 
-                {{ $user->id }}{{ $user->user_type }}
-
                 <livewire:alem.employee.profile.account.details
-                    :user="$user"
+                    :shared-data-key="$sharedDataKey"
                     :auth-user-id="$authUserId"
                     :current-team-id="$currentTeamId"
                     :company-id="$companyId"
-                    key="employee-update-{{ $user->id }}"
+                    :key="'details-'.$user->id"
                 />
 
-                <livewire:alem.employee.profile.employment-data
-                    :user="$user"
-                    :auth-user-id="$authUserId"
-                    :current-team-id="$currentTeamId"
-                    :company-id="$companyId"
-                    key="employee-update-{{ $user->id }}"
-                />
+{{--                <livewire:alem.employee.profile.employment-data--}}
+{{--                    :shared-data-key="$sharedDataKey"--}}
+{{--                    :auth-user-id="$authUserId"--}}
+{{--                    :current-team-id="$currentTeamId"--}}
+{{--                    :company-id="$companyId"--}}
+{{--                    :key="'employment-'.$user->id"--}}
+{{--                />--}}
 
 {{--                <livewire:alem.employee.profile.employment-data--}}
 {{--                    :user="$user"--}}
