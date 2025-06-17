@@ -6,7 +6,6 @@ use App\Enums\User\UserType;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class EmployeeProfileController extends Controller
@@ -15,14 +14,12 @@ class EmployeeProfileController extends Controller
     {
         $authUser = Auth::user();
 
-        // Lade Employee - wird automatisch gecached
-        $employee = User::with(['currentTeam:id,name'])
+        // Lade nur minimale Daten für Navigation
+        // Der ProfileManager Component lädt alle Details
+        $employee = User::select('id', 'slug', 'name', 'last_name', 'company_id')
             ->where('slug', $slug)
             ->where('user_type', UserType::Employee->value)
             ->firstOrFail();
-
-        // Optional: Pre-load für bessere Performance
-//        User::getForComponent($employee->id, [], ['id', 'name', 'last_name']);
 
         return view('laravel.alem.employee.show', [
             'employee' => $employee,

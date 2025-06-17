@@ -15,8 +15,14 @@ class DynamicNavigation extends Component
     public int $employeeId;
     public string $activeTab;
 
-    public function mount(User $employee, string $activeTab, int $employeeId, int $authUserId, int $currentTeamId, int $companyId): void
-    {
+    public function mount(
+        User $employee,
+        string $activeTab,
+        int $employeeId,
+        int $authUserId,
+        int $currentTeamId,
+        int $companyId
+    ): void {
         $this->employee = $employee;
         $this->employeeId = $employeeId;
         $this->activeTab = $activeTab;

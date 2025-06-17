@@ -7,8 +7,8 @@ use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Livewire\Alem\Employee\Profile\Account\Helper\ValidateAccountDetails;
 use App\Models\User;
+use App\Models\Alem\Employee;
 use App\Traits\Enum\GenderOptions;
-use App\Traits\Livewire\ComponentDataLoader;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
@@ -16,19 +16,24 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Lazy;
+use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Lazy(isolate: true)]
 class Details extends Component
 {
     use AuthUserTeamCompanyId, WithDropDownRelations;
-    use ComponentDataLoader; // NEU: Unser Trait für optimiertes Datenladen
     use AuthorizesRequests, ValidateAccountDetails;
     use ModelStatusOptions, GenderOptions;
 
-    // Employee id holen
-    public ?User $employee = null;
+    // WICHTIG: Verwende nur IDs, keine Models!
+    #[Locked]
     public int $employeeId;
+
+    // Transiente Properties (nicht von Livewire getrackt)
+    protected ?User $employee = null;
+    protected ?Employee $employeeModel = null;
 
     // User form fields
     public ?Gender $gender = null;
@@ -41,21 +46,28 @@ class Details extends Component
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    public function mount(int $employeeId, int $authUserId, int $currentTeamId, int $companyId): void {
+    public function mount(
+        int $employeeId,
+        int $authUserId,
+        int $currentTeamId,
+        int $companyId
+    ): void {
         $this->employeeId = $employeeId;
-
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Nutze den Trait für optimiertes Laden
+        // Lade initial data
         $this->loadEmployeeData();
 
-        // Lade nur benötigte Dropdown-Daten
+        // Lade nur Dropdown-Daten
         $this->loadRelationsData(['teams', 'departments', 'roles']);
     }
 
-    private function loadEmployeeData(): void
+    /**
+     * Zentrale Methode zum Laden der Employee Daten
+     */
+    protected function loadEmployeeData(): void
     {
         $this->employee = User::getForComponent(
             userId: $this->employeeId,
@@ -72,19 +84,70 @@ class Details extends Component
         }
     }
 
+    /**
+     * Lade Employee Model nur wenn nötig
+     */
+    protected function getEmployee(): User
+    {
+        if (!$this->employee) {
+            // Nutze Request-Cache
+            $cacheKey = "request_employee_{$this->employeeId}";
+
+            if (isset($GLOBALS[$cacheKey])) {
+                $this->employee = $GLOBALS[$cacheKey];
+            } else {
+                $this->employee = User::with([
+                    'teams:id,name',
+                    'roles:id,name,is_manager',
+                    'department:id,name'
+                ])->find($this->employeeId);
+
+                $GLOBALS[$cacheKey] = $this->employee;
+            }
+        }
+
+        return $this->employee;
+    }
+
     private function populateFormFields(): void
     {
-        $this->gender = $this->employee->gender;
-        $this->name = $this->employee->name;
-        $this->last_name = $this->employee->last_name;
-        $this->email = $this->employee->email;
-        $this->phone_1 = $this->employee->phone_1 ?? '';
-        $this->model_status = $this->employee->model_status;
-        $this->department = $this->employee->department_id;
+        $employee = $this->getEmployee();
 
-        // Relations
-        $this->selectedTeams = $this->employee->teams->pluck('id')->toArray();
-        $this->selectedRoles = $this->employee->roles->pluck('id')->toArray();
+        $this->gender = $employee->gender;
+        $this->name = $employee->name;
+        $this->last_name = $employee->last_name;
+        $this->email = $employee->email;
+        $this->phone_1 = $employee->phone_1 ?? '';
+        $this->model_status = $employee->model_status;
+        $this->department = $employee->department_id;
+
+        // Relations sollten bereits geladen sein
+        if ($employee->relationLoaded('teams')) {
+            $this->selectedTeams = $employee->teams->pluck('id')->toArray();
+        }
+
+        if ($employee->relationLoaded('roles')) {
+            $this->selectedRoles = $employee->roles->pluck('id')->toArray();
+        }
+    }
+
+    /**
+     * Refresh wenn Parent neue Daten sendet
+     */
+    #[On('employee-data-refreshed')]
+    public function refreshFromParent(int $employeeId): void
+    {
+        if ($employeeId === $this->employeeId) {
+            // Clear transient data
+            $this->employee = null;
+            $this->employeeModel = null;
+
+            // Clear Request-Cache
+            unset($GLOBALS["request_employee_{$this->employeeId}"]);
+
+            // Reload
+            $this->populateFormFields();
+        }
     }
 
     public function updateEmployee(): void
@@ -93,7 +156,9 @@ class Details extends Component
 
         try {
             DB::transaction(function () {
-                $this->employee->update([
+                $employee = $this->getEmployee();
+
+                $employee->update([
                     'name' => $this->name,
                     'last_name' => $this->last_name,
                     'email' => $this->email,
@@ -103,11 +168,10 @@ class Details extends Component
                     'department_id' => $this->department,
                 ]);
 
-                $this->syncRelations();
+                $this->syncRelations($employee);
             });
 
-            // Nutze Trait-Methode zum Cache invalidieren
-            $this->invalidateComponentCache(User::class, $this->employeeId);
+            // Benachrichtige Parent
             $this->dispatch('employee-basic-data-updated', employeeId: $this->employeeId);
 
             Flux::toast(
@@ -125,22 +189,22 @@ class Details extends Component
         }
     }
 
-    private function syncRelations(): void
+    private function syncRelations(User $employee): void
     {
-        DB::transaction(function (): void {
-            $wasManager = $this->employee->hasManagerRole();
+        DB::transaction(function () use ($employee): void {
+            $wasManager = $employee->hasManagerRole();
 
-            $this->employee->roles()->sync($this->selectedRoles);
-            $this->employee->teams()->sync($this->selectedTeams);
+            $employee->roles()->sync($this->selectedRoles);
+            $employee->teams()->sync($this->selectedTeams);
 
-            if ($wasManager !== $this->employee->hasManagerRole()) {
-                User::clearManagerCache($this->employee->company_id);
+            if ($wasManager !== $employee->hasManagerRole()) {
+                User::clearManagerCache($employee->company_id);
                 $this->forceReloadCollection('supervisors');
             }
         });
     }
 
-    public function placeholder (): string
+    public function placeholder(): string
     {
         return view('livewire.placeholders.employee.details');
     }
