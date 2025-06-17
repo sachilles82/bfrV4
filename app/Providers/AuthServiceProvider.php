@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\Alem\Employee\EmployeeController;
+use App\Http\Controllers\Alem\Employee\EmployeeProfileController;
 use App\Models\Address\State;
 use App\Models\Alem\Company;
 use App\Models\Alem\Employee;
@@ -36,7 +36,7 @@ class AuthServiceProvider extends ServiceProvider
 
         //  Address State City
         State::class => StatePolicy::class,
-        EmployeeController::class => EmployeePolicy::class,
+        EmployeeProfileController::class => EmployeePolicy::class,
         Employee::class => EmployeePolicy::class,
         Profession::class => ProfessionPolicy::class,
         Stage::class => StagePolicy::class,

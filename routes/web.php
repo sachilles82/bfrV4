@@ -3,7 +3,7 @@
 use App\Enums\Role\Permission;
 use App\Http\Controllers\Alem\Company\CompanyController;
 use App\Http\Controllers\Alem\Company\DepartmentController;
-use App\Http\Controllers\Alem\Employee\EmployeeController;
+use App\Http\Controllers\Alem\Employee\EmployeeProfileController;
 use App\Http\Controllers\Alem\Employee\EmployeeIndexController;
 use App\Http\Controllers\Alem\Employee\ProfileController;
 use App\Http\Controllers\Setting\Role\RoleController;
@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             ->name('alem.employees');
 
         // Route für das Mitarbeiter-Profil mit Slug aus Vor- und Nachname
-        Route::get('/employees/{slug}/{activeTab?}', [EmployeeController::class, 'show'])
+        Route::get('/employees/{slug}/{activeTab?}', [EmployeeProfileController::class, 'show'])
             ->name('employees.profile')
             ->where('slug', '.*'); // Erlaubt Bindestriche im Parameterwert
 

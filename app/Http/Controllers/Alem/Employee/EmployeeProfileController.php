@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
-class EmployeeController extends Controller
+class EmployeeProfileController extends Controller
 {
 //    private function getComponentsForTab(string $tab): array
 //    {

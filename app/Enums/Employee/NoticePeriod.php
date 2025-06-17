@@ -24,22 +24,22 @@ enum NoticePeriod: string
     public static function options(): array
     {
         return [
-            self::NO_NOTICE->value => 'No notice period',
-            self::ONE_WEEK->value => '1 week',
-            self::TWO_WEEKS->value => '2 weeks',
-            self::THREE_WEEKS->value => '3 weeks',
-            self::ONE_MONTH->value => '1 month',
-            self::TWO_MONTHS->value => '2 months',
-            self::THREE_MONTHS->value => '3 months',
-            self::FOUR_MONTHS->value => '4 months',
-            self::FIVE_MONTHS->value => '5 months',
-            self::SIX_MONTHS->value => '6 months',
-            self::SEVEN_MONTHS->value => '7 months',
-            self::EIGHT_MONTHS->value => '8 months',
-            self::NINE_MONTHS->value => '9 months',
-            self::TEN_MONTHS->value => '10 months',
-            self::ELEVEN_MONTHS->value => '11 months',
-            self::TWELVE_MONTHS->value => '12 months',
+            self::NO_NOTICE->value => __('No notice period'),
+            self::ONE_WEEK->value => __('1 week'),
+            self::TWO_WEEKS->value => __('2 weeks'),
+            self::THREE_WEEKS->value => __('3 weeks'),
+            self::ONE_MONTH->value => __('1 month'),
+            self::TWO_MONTHS->value => __('2 months'),
+            self::THREE_MONTHS->value => __('3 months'),
+            self::FOUR_MONTHS->value => __('4 months'),
+            self::FIVE_MONTHS->value => __('5 months'),
+            self::SIX_MONTHS->value => __('6 months'),
+            self::SEVEN_MONTHS->value => __('7 months'),
+            self::EIGHT_MONTHS->value => __('8 months'),
+            self::NINE_MONTHS->value => __('9 months'),
+            self::TEN_MONTHS->value => __('10 months'),
+            self::ELEVEN_MONTHS->value => __('11 months'),
+            self::TWELVE_MONTHS->value => __('12 months'),
         ];
     }
 
@@ -63,5 +63,17 @@ enum NoticePeriod: string
             self::ELEVEN_MONTHS => __('11 months'),
             self::TWELVE_MONTHS => __('12 months'),
         };
+    }
+
+    public static function getNoticePeriodOptions(): array
+    {
+        return collect(self::cases())
+            ->map(function (NoticePeriod $noticePeriod) {
+                return [
+                    'value' => $noticePeriod->value,
+                    'label' => $noticePeriod->label(),
+                ];
+            })
+            ->toArray();
     }
 }
