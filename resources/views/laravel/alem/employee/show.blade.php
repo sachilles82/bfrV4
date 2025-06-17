@@ -1,4 +1,3 @@
-{{-- laravel.alem.employee.show.blade.php --}}
 <x-app-layout>
     <x-pupi.layout.container>
         <x-slot:sidebar>
@@ -8,11 +7,11 @@
         <livewire:alem.employee.dynamic-navigation
             :user="$user"
             :active-tab="$activeTab"
-            :shared-data-key="$sharedDataKey"
-
+            :user-id="$userId"
             :auth-user-id="$authUserId"
             :current-team-id="$currentTeamId"
             :company-id="$companyId"
         />
+
     </x-pupi.layout.container>
 </x-app-layout>

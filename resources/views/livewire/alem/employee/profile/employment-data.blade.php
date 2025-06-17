@@ -10,7 +10,7 @@
     <x-slot name="form">
         <!-- Loading Overlay for the entire component -->
 
-        <form wire:submit.prevent="updateEmployee">
+        <form wire:submit.prevent="updateEmploymentData">
             <div class="px-4 py-6 sm:p-8 relative">
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
@@ -113,20 +113,25 @@
                             for="religion"
                             model="religion"
                             badge="{{ __('Required') }}"
-                            error="{{ $errors->first('religion') }}"
-                        >
+                            help-text="{{ __('') }}">
+
                             <flux:select
                                 wire:model="religion"
                                 name="religion"
                                 id="religion"
                                 variant="listbox"
-                                placeholder="{{ __('Select Religion') }}"
-                            >
-                                @foreach(\App\Enums\Employee\Religion::cases() as $religionOption)
+                                placeholder="{{ __('Select Religion') }}">
+
+                                @foreach($this->religionOptions() as $religionOption)
                                     <flux:option
-                                        value="{{ $religionOption->value }}">{{ __($religionOption->label()) }}</flux:option>
+                                        wire:key="religion-option-{{ $religionOption['value'] }}"
+                                        value="{{ $religionOption['value'] }}">
+                                        <span>{{ $religionOption['label'] }}</span>
+                                    </flux:option>
                                 @endforeach
+
                             </flux:select>
+
                         </x-pupi.input.group>
                     </div>
 
@@ -135,22 +140,27 @@
                         <x-pupi.input.group
                             label="{{ __('Civil Status') }}"
                             for="civil_status"
-                            model="civil_status"
                             badge="{{ __('Required') }}"
-                            error="{{ $errors->first('civil_status') }}"
-                        >
+                            model="civil_status"
+                            help-text="{{ __('') }}">
+
                             <flux:select
                                 wire:model="civil_status"
                                 name="civil_status"
                                 id="civil_status"
                                 variant="listbox"
-                                placeholder="{{ __('Select Civil Status') }}"
-                            >
-                                @foreach(\App\Enums\Employee\CivilStatus::cases() as $statusOption)
+                                placeholder="{{ __('Select Civil Status') }}">
+
+                                @foreach($this->civilStatusOptions() as $civilStatusOption)
                                     <flux:option
-                                        value="{{ $statusOption->value }}">{{ __($statusOption->label()) }}</flux:option>
+                                        wire:key="civilStatus-option-{{ $civilStatusOption['value'] }}"
+                                        value="{{ $civilStatusOption['value'] }}">
+                                        <span>{{ $civilStatusOption['label'] }}</span>
+                                    </flux:option>
                                 @endforeach
+
                             </flux:select>
+
                         </x-pupi.input.group>
                     </div>
 
@@ -161,22 +171,28 @@
                             for="residence_permit"
                             model="residence_permit"
                             badge="{{ __('Required') }}"
-                            error="{{ $errors->first('residence_permit') }}"
-                        >
+                            help-text="{{ __('') }}">
+
                             <flux:select
                                 wire:model="residence_permit"
                                 name="residence_permit"
                                 id="residence_permit"
                                 variant="listbox"
-                                placeholder="{{ __('Select Residence Permit') }}"
-                            >
-                                @foreach(\App\Enums\Employee\Residence::cases() as $permitOption)
+                                placeholder="{{ __('Select Residence Permit') }}">
+
+                                @foreach($this->residencePermitOptions() as $permitOption)
                                     <flux:option
-                                        value="{{ $permitOption->value }}">{{ __($permitOption->label()) }}</flux:option>
+                                        wire:key="residence-option-{{ $permitOption['value'] }}"
+                                        value="{{ $permitOption['value'] }}">
+                                        <span>{{ $permitOption['label'] }}</span>
+                                    </flux:option>
                                 @endforeach
+
                             </flux:select>
+
                         </x-pupi.input.group>
                     </div>
+
                 </div>
             </div>
             <!-- Button Container -->

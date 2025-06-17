@@ -5,11 +5,11 @@ namespace App\Livewire\Alem\Employee\Profile\EmploymentData;
 use App\Enums\Employee\CivilStatus;
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
-use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
-use App\Livewire\Alem\Employee\Profile\Helper\ValidateEmploymentData;
+use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\ValidateEmploymentData;
 use App\Models\Address\Country;
 use App\Models\Alem\Employee;
 use App\Models\User;
+use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -17,18 +17,20 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Lazy;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy(isolate: true)]
+//#[Lazy(isolate: true)]
 class EmploymentData extends Component
 {
-    use AuthorizesRequests, ValidateEmploymentData;
-    use AuthUserTeamCompanyId, WithDropDownRelations;
+    use AuthorizesRequests;
+    use AuthUserTeamCompanyId, ValidateEmploymentData, EmployeeStatusOptions;
 
     // User identification
-    public User $user;
+    public ?User $user = null;
     public ?Employee $employee = null;
-    protected string $sharedDataKey;
+    public int $userId;
+    protected string $componentCacheKey;
 
     // Employee form fields
     public ?string $ahv_number = '';
@@ -42,57 +44,53 @@ class EmploymentData extends Component
     // Dropdown data
     public array $countries = [];
 
-    // Static method für Relations
-    public static function requiredRelations(): array
-    {
-        return ['employee'];
-    }
-
     public function mount(
-        string $sharedDataKey,
+        int $userId,
         int $authUserId,
         int $currentTeamId,
         int $companyId
     ): void {
-        $this->sharedDataKey = $sharedDataKey;
+        $this->userId = $userId;
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade User aus Cache
-        $this->loadUserFromCache();
+        // Component-spezifischer Cache-Key
+        $this->componentCacheKey = "employee:{$userId}:employment-data";
+
+        // Lade User mit Employee-Daten
+        $this->loadEmploymentData();
 
         // Lade Länder für Dropdown
         $this->loadCountries();
     }
 
-    private function loadUserFromCache(): void
+    private function loadEmploymentData(): void
     {
-        $this->user = Cache::get($this->sharedDataKey);
+        // Cache nur die für diese Component relevanten Daten
+        $userData = Cache::remember($this->componentCacheKey, now()->addMinutes(10), function () {
+            return User::with('employee')
+                ->select('id', 'name', 'last_name') // Nur benötigte User-Felder
+                ->find($this->userId);
+        });
 
-        if ($this->user) {
-            $this->employee = $this->user->employee;
+        if ($userData) {
+            $this->user = $userData;
+            $this->employee = $userData->employee;
 
-            if ($this->employee) {
-                $this->ahv_number = $this->employee->ahv_number ?? '';
-                $this->birthdate = $this->employee->birthdate?->format('Y-m-d') ?? '';
-                $this->nationality = $this->employee->nationality ?? '';
-                $this->hometown = $this->employee->hometown ?? '';
-                $this->religion = $this->employee->religion ?? Religion::NoConfession;
-                $this->civil_status = $this->employee->civil_status ?? CivilStatus::Single;
-                $this->residence_permit = $this->employee->residence_permit ?? Residence::C;
-            } else {
-                // Standardwerte für neue Employees
-                $this->religion = Religion::NoConfession;
-                $this->civil_status = CivilStatus::Single;
-                $this->residence_permit = Residence::C;
-            }
+            $this->ahv_number = $this->employee->ahv_number ?? '';
+            $this->birthdate = $this->employee->birthdate?->format('Y-m-d') ?? '';
+            $this->nationality = $this->employee->nationality ?? '';
+            $this->hometown = $this->employee->hometown ?? '';
+            $this->religion = $this->employee->religion;
+            $this->civil_status = $this->employee->civil_status;
+            $this->residence_permit = $this->employee->residence_permit;
         }
     }
 
     private function loadCountries(): void
     {
-        $this->countries = Cache::rememberForever('countries-all', function () {
+        $this->countries = Cache::rememberForever('countries-dropdown', function () {
             return Country::select(['id', 'name', 'code'])
                 ->orderBy('name')
                 ->get()
@@ -105,14 +103,13 @@ class EmploymentData extends Component
         });
     }
 
-    protected function shouldCheckModalState(): bool
+    #[On('user-basic-data-updated')]
+    public function refreshIfNeeded(int $userId): void
     {
-        return false;
-    }
-
-    protected function isModalOpen(): bool
-    {
-        return true;
+        if ($userId === $this->userId) {
+            // Nur User-Name aktualisieren falls benötigt
+            $this->user = User::select('id', 'name', 'last_name')->find($this->userId);
+        }
     }
 
     public function updateEmploymentData(): void
@@ -143,10 +140,9 @@ class EmploymentData extends Component
             });
 
             // Cache invalidieren
-            Cache::forget($this->sharedDataKey);
-            Cache::forget("employee_employment_data_{$this->user->id}");
+            Cache::forget($this->componentCacheKey);
 
-            $this->dispatch('employment-data-updated');
+            $this->dispatch('employment-data-updated', userId: $this->userId);
 
             Flux::toast(
                 text: __('Employment data updated successfully.'),
@@ -162,6 +158,7 @@ class EmploymentData extends Component
             );
         }
     }
+
 
     public function render(): View
     {

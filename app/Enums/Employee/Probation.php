@@ -17,13 +17,15 @@ enum Probation: string
     public static function options(): array
     {
         return [
-            self::NO_PROBATION->value => 'No probation',
-            self::ONE_WEEK->value => '1 week',
-            self::TWO_WEEKS->value => '2 weeks',
-            self::THREE_WEEKS->value => '3 weeks',
-            self::ONE_MONTH->value => '1 month',
-            self::TWO_MONTHS->value => '2 months',
-            self::THREE_MONTHS->value => '3 months',
+            self::NO_PROBATION->value => __('No probation'),
+            self::ONE_WEEK->value => __('1 week'),
+            self::TWO_WEEKS->value => __('2 weeks'),
+            self::THREE_WEEKS->value => __('3 weeks'),
+            self::ONE_MONTH->value => __('1 month'),
+            self::TWO_MONTHS->value => __('2 months'),
+            self::THREE_MONTHS->value => __('3 months'),
+            self::SIX_MONTHS->value => __('6 months'),
+            self::TWELVE_MONTHS->value => __('12 months'),
         ];
     }
 
@@ -37,6 +39,20 @@ enum Probation: string
             self::ONE_MONTH => __('1 month'),
             self::TWO_MONTHS => __('2 months'),
             self::THREE_MONTHS => __('3 months'),
+            self::SIX_MONTHS => __('6 months'),
+            self::TWELVE_MONTHS => __('12 months'),
         };
+    }
+
+    public static function getProbationOptions(): array
+    {
+        return collect(self::cases())
+            ->map(function (Probation $probation) {
+                return [
+                    'value' => $probation->value,
+                    'label' => $probation->label(),
+                ];
+            })
+            ->toArray();
     }
 }

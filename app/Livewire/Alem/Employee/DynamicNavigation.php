@@ -13,19 +13,14 @@ class DynamicNavigation extends Component
 
     public User $user;
     public string $activeTab;
-    public string $sharedDataKey;
+    public int $userId;
 
-    public function mount(
-        User $user,
-        string $activeTab,
-        string $sharedDataKey,
-        int $authUserId,
-        int $currentTeamId,
-        int $companyId
-    ): void {
+    public function mount(User $user, string $activeTab, int $userId, int $authUserId, int $currentTeamId, int $companyId): void
+    {
         $this->user = $user;
         $this->activeTab = $activeTab;
-        $this->sharedDataKey = $sharedDataKey;
+
+        $this->userId = $userId;
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;

@@ -14,24 +14,36 @@ enum Religion: string
     public static function options(): array
     {
         return [
-            self::Catholic->value => 'Roman Catholic',
-            self::ChristianCatholic->value => 'Christian Catholic',
-            self::Reformed->value => 'Reformed',
-            self::Muslim->value => 'Muslim',
-            self::Other->value => 'Other',
-            self::NoConfession->value => 'No Confession',
+            self::Catholic->value => __('Roman Catholic'),
+            self::ChristianCatholic->value => __('Christian Catholic'),
+            self::Reformed->value => __('Reformed'),
+            self::Muslim->value => __('Muslim'),
+            self::Other->value => __('Other'),
+            self::NoConfession->value => __('No Confession'),
         ];
     }
 
     public function label(): string
     {
         return match ($this) {
-            self::Catholic => 'Roman Catholic',
-            self::ChristianCatholic => 'Christian Catholic',
-            self::Reformed => 'Reformed',
-            self::Muslim => 'Muslim',
-            self::Other => 'Other',
-            self::NoConfession => 'No Confession',
+            self::Catholic => __('Roman Catholic'),
+            self::ChristianCatholic => __('Christian Catholic'),
+            self::Reformed => __('Reformed'),
+            self::Muslim => __('Muslim'),
+            self::Other => __('Other'),
+            self::NoConfession => __('No Confession'),
         };
+    }
+
+    public static function getReligionOptions(): array
+    {
+        return collect(self::cases())
+            ->map(function (Religion $religion) {
+                return [
+                    'value' => $religion->value,
+                    'label' => $religion->label(),
+                ];
+            })
+            ->toArray();
     }
 }

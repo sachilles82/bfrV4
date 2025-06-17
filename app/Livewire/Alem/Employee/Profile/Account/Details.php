@@ -8,26 +8,25 @@ use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Livewire\Alem\Employee\Profile\Account\Helper\ValidateAccountDetails;
 use App\Models\User;
 use App\Traits\Enum\GenderOptions;
+use App\Traits\Livewire\ComponentDataLoader;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Livewire\Attributes\Lazy;
 use Livewire\Component;
 
-//#[Lazy(isolate: true)]
 class Details extends Component
 {
-    use AuthorizesRequests, ValidateAccountDetails;
     use AuthUserTeamCompanyId, WithDropDownRelations;
+    use ComponentDataLoader; // NEU: Unser Trait für optimiertes Datenladen
+    use AuthorizesRequests, ValidateAccountDetails;
     use ModelStatusOptions, GenderOptions;
 
     // User identification
     public ?User $user = null;
-    protected string $sharedDataKey;
+    public int $userId;
 
     // User form fields
     public ?Gender $gender = null;
@@ -40,57 +39,56 @@ class Details extends Component
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    // Static method für Relations
-    public static function requiredRelations(): array
-    {
-        return [
-            'teams:id,name',
-            'roles:id,name,is_manager',
-            'department:id,name'
-        ];
-    }
-
-    public function mount(string $sharedDataKey, int $authUserId, int $currentTeamId, int $companyId): void {
-        $this->sharedDataKey = $sharedDataKey;
+    public function mount(
+        int $userId,
+        int $authUserId,
+        int $currentTeamId,
+        int $companyId
+    ): void {
+        $this->userId = $userId;
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade User aus Cache
-        $this->loadUserFromCache();
+        // Nutze den Trait für optimiertes Laden
+        $this->loadUserData();
 
-        // Lade nur Dropdown-Daten (nutzt deinen WithDropDownRelations Trait)
+        // Lade nur benötigte Dropdown-Daten
         $this->loadRelationsData(['teams', 'departments', 'roles']);
     }
 
-    private function loadUserFromCache(): void
+    private function loadUserData(): void
     {
-        $this->user = Cache::get($this->sharedDataKey);
+        // Nutze den ComponentDataLoader Trait
+        $this->user = $this->loadComponentData(
+            modelClass: User::class,
+            modelId: $this->userId,
+            relations: [
+                'teams:id,name',
+                'roles:id,name,is_manager',
+                'department:id,name'
+            ],
+            select: ['id', 'name', 'last_name', 'email', 'phone_1', 'gender', 'model_status', 'department_id']
+        );
 
         if ($this->user) {
-            // Populate properties vom gecachten User
-            $this->gender = $this->user->gender;
-            $this->name = $this->user->name;
-            $this->last_name = $this->user->last_name;
-            $this->email = $this->user->email;
-            $this->phone_1 = $this->user->phone_1 ?? '';
-            $this->model_status = $this->user->model_status;
-            $this->department = $this->user->department_id;
-
-            // Relations sind bereits geladen
-            $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
-            $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
+            $this->populateFormFields();
         }
     }
 
-    protected function shouldCheckModalState(): bool
+    private function populateFormFields(): void
     {
-        return false;
-    }
+        $this->gender = $this->user->gender;
+        $this->name = $this->user->name;
+        $this->last_name = $this->user->last_name;
+        $this->email = $this->user->email;
+        $this->phone_1 = $this->user->phone_1 ?? '';
+        $this->model_status = $this->user->model_status;
+        $this->department = $this->user->department_id;
 
-    protected function isModalOpen(): bool
-    {
-        return true;
+        // Relations
+        $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
+        $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
     }
 
     public function updateEmployee(): void
@@ -99,7 +97,7 @@ class Details extends Component
 
         try {
             DB::transaction(function () {
-                User::where('id', $this->user->id)->update([
+                $this->user->update([
                     'name' => $this->name,
                     'last_name' => $this->last_name,
                     'email' => $this->email,
@@ -112,10 +110,11 @@ class Details extends Component
                 $this->syncRelations();
             });
 
-            // Cache invalidieren
-            Cache::forget($this->sharedDataKey);
+            // Nutze Trait-Methode zum Cache invalidieren
+            $this->invalidateComponentCache(User::class, $this->userId);
 
-            $this->dispatch('employee-updated');
+            // Event für andere Components
+            $this->dispatch('user-basic-data-updated', userId: $this->userId);
 
             Flux::toast(
                 text: __('Employee Profile updated successfully.'),

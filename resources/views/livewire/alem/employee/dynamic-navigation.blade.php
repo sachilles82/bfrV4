@@ -12,36 +12,36 @@
             @if($activeTab === 'employee-update')
 
                 <livewire:alem.employee.profile.account.details
-                    :shared-data-key="$sharedDataKey"
+                    :user-id="$userId"
                     :auth-user-id="$authUserId"
                     :current-team-id="$currentTeamId"
                     :company-id="$companyId"
-                    :key="'details-'.$user->id"
+                    :key="'details-'.$userId"
                 />
 
-{{--                <livewire:alem.employee.profile.employment-data--}}
-{{--                    :shared-data-key="$sharedDataKey"--}}
-{{--                    :auth-user-id="$authUserId"--}}
-{{--                    :current-team-id="$currentTeamId"--}}
-{{--                    :company-id="$companyId"--}}
-{{--                    :key="'employment-'.$user->id"--}}
-{{--                />--}}
+                <livewire:alem.employee.profile.employment-data.employment-data
+                    :user-id="$userId"
+                    :auth-user-id="$authUserId"
+                    :current-team-id="$currentTeamId"
+                    :company-id="$companyId"
+                    :key="'employment-'.$userId"
+                />
 
-{{--                <livewire:alem.employee.profile.employment-data--}}
-{{--                    :user="$user"--}}
-{{--                />--}}
-
-
-{{--                <livewire:alem.employee.profile.personal-data--}}
-{{--                    :user="$user"--}}
-{{--                />--}}
+                {{--                <livewire:alem.employee.profile.employment-data--}}
+                {{--                    :user="$user"--}}
+                {{--                />--}}
 
 
+                {{--                <livewire:alem.employee.profile.personal-data--}}
+                {{--                    :user="$user"--}}
+                {{--                />--}}
 
 
-{{--                <livewire:address.address-manager--}}
-{{--                    :addressable="$user"--}}
-{{--                />--}}
+
+
+                {{--                <livewire:address.address-manager--}}
+                {{--                    :addressable="$user"--}}
+                {{--                />--}}
             @elseif($activeTab === 'report')
                 <livewire:alem.employee.report.report-table
                     :user="$user"

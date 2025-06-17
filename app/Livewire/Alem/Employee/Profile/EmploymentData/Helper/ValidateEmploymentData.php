@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Profile\Helper;
+namespace App\Livewire\Alem\Employee\Profile\EmploymentData\Helper;
 
 use App\Enums\Employee\CivilStatus;
 use App\Enums\Employee\Religion;
