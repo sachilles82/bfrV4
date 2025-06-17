@@ -1,7 +1,7 @@
 <div>
     <x-slot:header>
         <x-navigation.alem.employee.header
-            :user="$user"
+            :employee="$employee"
             :activeTab="$activeTab"
         />
     </x-slot:header>
@@ -12,19 +12,21 @@
             @if($activeTab === 'employee-update')
 
                 <livewire:alem.employee.profile.account.details
-                    :user-id="$userId"
+                    :employee-id="$employeeId"
+                    :key="'details-'.$employeeId"
+
                     :auth-user-id="$authUserId"
                     :current-team-id="$currentTeamId"
                     :company-id="$companyId"
-                    :key="'details-'.$userId"
                 />
 
                 <livewire:alem.employee.profile.employment-data.employment-data
-                    :user-id="$userId"
+                    :employee-id="$employeeId"
+                    :key="'employment-'.$employeeId"
+
                     :auth-user-id="$authUserId"
                     :current-team-id="$currentTeamId"
                     :company-id="$companyId"
-                    :key="'employment-'.$userId"
                 />
 
                 {{--                <livewire:alem.employee.profile.employment-data--}}

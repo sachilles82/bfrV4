@@ -26,10 +26,10 @@ class EmploymentData extends Component
     use AuthorizesRequests;
     use AuthUserTeamCompanyId, ValidateEmploymentData, EmployeeDataEnums;
 
-    // User identification
-    public ?User $user = null;
+    // Employee identification
+    public ?User $employeeUser = null;
     public ?Employee $employee = null;
-    public int $userId;
+    public int $employeeId;
     protected string $componentCacheKey;
 
     // Employee form fields
@@ -45,18 +45,18 @@ class EmploymentData extends Component
     public array $countries = [];
 
     public function mount(
-        int $userId,
+        int $employeeId,
         int $authUserId,
         int $currentTeamId,
         int $companyId
     ): void {
-        $this->userId = $userId;
+        $this->employeeId = $employeeId;
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
         // Component-spezifischer Cache-Key
-        $this->componentCacheKey = "employee:{$userId}:employment-data";
+        $this->componentCacheKey = "employee:{$employeeId}:employment-data";
 
         // Lade User mit Employee-Daten
         $this->loadEmploymentData();
@@ -71,20 +71,22 @@ class EmploymentData extends Component
         $userData = Cache::remember($this->componentCacheKey, now()->addMinutes(10), function () {
             return User::with('employee')
                 ->select('id', 'name', 'last_name') // Nur benötigte User-Felder
-                ->find($this->userId);
+                ->find($this->employeeId);
         });
 
         if ($userData) {
-            $this->user = $userData;
+            $this->employeeUser = $userData;
             $this->employee = $userData->employee;
 
-            $this->ahv_number = $this->employee->ahv_number ?? '';
-            $this->birthdate = $this->employee->birthdate?->format('Y-m-d') ?? '';
-            $this->nationality = $this->employee->nationality ?? '';
-            $this->hometown = $this->employee->hometown ?? '';
-            $this->religion = $this->employee->religion;
-            $this->civil_status = $this->employee->civil_status;
-            $this->residence_permit = $this->employee->residence_permit;
+            if ($this->employee) {
+                $this->ahv_number = $this->employee->ahv_number ?? '';
+                $this->birthdate = $this->employee->birthdate?->format('Y-m-d') ?? '';
+                $this->nationality = $this->employee->nationality ?? '';
+                $this->hometown = $this->employee->hometown ?? '';
+                $this->religion = $this->employee->religion;
+                $this->civil_status = $this->employee->civil_status;
+                $this->residence_permit = $this->employee->residence_permit;
+            }
         }
     }
 
@@ -103,12 +105,12 @@ class EmploymentData extends Component
         });
     }
 
-    #[On('user-basic-data-updated')]
-    public function refreshIfNeeded(int $userId): void
+    #[On('employee-basic-data-updated')]
+    public function refreshIfNeeded(int $employeeId): void
     {
-        if ($userId === $this->userId) {
+        if ($employeeId === $this->employeeId) {
             // Nur User-Name aktualisieren falls benötigt
-            $this->user = User::select('id', 'name', 'last_name')->find($this->userId);
+            $this->employeeUser = User::select('id', 'name', 'last_name')->find($this->employeeId);
         }
     }
 
@@ -132,7 +134,7 @@ class EmploymentData extends Component
                     $this->employee->update($employmentData);
                 } else {
                     $this->employee = Employee::create([
-                        'user_id' => $this->user->id,
+                        'user_id' => $this->employeeUser->id,
                         'uuid' => (string) \Illuminate\Support\Str::uuid(),
                         ...$employmentData
                     ]);
@@ -142,7 +144,7 @@ class EmploymentData extends Component
             // Cache invalidieren
             Cache::forget($this->componentCacheKey);
 
-            $this->dispatch('employment-data-updated', userId: $this->userId);
+            $this->dispatch('employment-data-updated', employeeId: $this->employeeId);
 
             Flux::toast(
                 text: __('Employment data updated successfully.'),
@@ -158,7 +160,6 @@ class EmploymentData extends Component
             );
         }
     }
-
 
     public function render(): View
     {

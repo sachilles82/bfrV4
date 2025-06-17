@@ -4,7 +4,7 @@
     </x-slot:title>
 
     <x-slot:description>
-        {{ __('Update the employment data for') }} {{ $user->name }} {{ $user->last_name }}.
+        {{ __('Update the employment data for') }} {{ $employee->name }} {{ $employee->last_name }}.
     </x-slot:description>
 
     <x-slot name="form">

@@ -5,9 +5,10 @@
         </x-slot:sidebar>
 
         <livewire:alem.employee.dynamic-navigation
-            :user="$user"
+            :employee="$employee"
+            :employee-id="$employeeId"
             :active-tab="$activeTab"
-            :user-id="$userId"
+
             :auth-user-id="$authUserId"
             :current-team-id="$currentTeamId"
             :company-id="$companyId"

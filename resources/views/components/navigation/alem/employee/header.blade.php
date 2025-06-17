@@ -1,77 +1,77 @@
 <x-pupi.navigation.header.index>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'employee-update'])"
+            :href="route('employees.profile', [$employee, 'employee-update'])"
             :active="$activeTab === 'employee-update'">
             {{ __('Profile Information') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'report'])"
+            :href="route('employees.profile', [$employee, 'report'])"
             :active="$activeTab === 'report'">
             {{ __('Report') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'holiday'])"
+            :href="route('employees.profile', [$employee, 'holiday'])"
             :active="$activeTab === 'holiday'">
             {{ __('Holiday') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'attendence'])"
+            :href="route('employees.profile', [$employee, 'attendence'])"
             :active="$activeTab === 'attendence'">
             {{ __('Attendence') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'salary'])"
+            :href="route('employees.profile', [$employee, 'salary'])"
             :active="$activeTab === 'salary'">
             {{ __('Salary') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'documents'])"
+            :href="route('employees.profile', [$employee, 'documents'])"
             :active="$activeTab === 'documents'">
             {{ __('Documents') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'leave'])"
+            :href="route('employees.profile', [$employee, 'leave'])"
             :active="$activeTab === 'leave'">
             {{ __('Leave') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'performance'])"
+            :href="route('employees.profile', [$employee, 'performance'])"
             :active="$activeTab === 'performance'">
             {{ __('Performance') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'assets'])"
+            :href="route('employees.profile', [$employee, 'assets'])"
             :active="$activeTab === 'assets'">
             {{ __('Assets') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'training'])"
+            :href="route('employees.profile', [$employee, 'training'])"
             :active="$activeTab === 'training'">
             {{ __('Training') }}
         </x-pupi.navigation.header.link>
     </li>
     <li>
         <x-pupi.navigation.header.link
-            :href="route('employees.profile', [$user, 'documents'])"
+            :href="route('employees.profile', [$employee, 'documents'])"
             :active="$activeTab === 'documents'">
             {{ __('Documents') }}
         </x-pupi.navigation.header.link>
