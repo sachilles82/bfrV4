@@ -214,4 +214,44 @@ class User extends Authenticatable
         return ['company', 'team'];
     }
 
+    // In App\Models\User - füge diese Methode hinzu:
+
+    /**
+     * Lädt User mit spezifischen Relations für Components
+     * Nutzt automatisch Request-Cache und persistenten Cache
+     */
+    public static function getForComponent(
+        int $userId,
+        array $relations = [],
+        array $select = []
+    ): ?self {
+        // Erstelle einen eindeutigen Suffix basierend auf Relations und Select
+        $suffix = md5(json_encode(['relations' => $relations, 'select' => $select]));
+
+        $collection = static::getCached(
+            context: 'user',  // Nutzt user context
+            contextId: $userId,
+            dataCallback: function () use ($userId, $relations, $select) {
+                $query = static::query();
+
+                if (!empty($select)) {
+                    $query->select($select);
+                }
+
+                if (!empty($relations)) {
+                    $query->with($relations);
+                }
+
+                $model = $query->find($userId);
+                return collect($model ? [$model] : []);
+            },
+            options: [
+                'suffix' => $suffix,
+                'duration' => 600  // 10 Minuten für Components
+            ]
+        );
+
+        return $collection->first();
+    }
+
 }

@@ -67,16 +67,15 @@ class EmploymentData extends Component
 
     private function loadEmploymentData(): void
     {
-        // Cache nur die für diese Component relevanten Daten
-        $userData = Cache::remember($this->componentCacheKey, now()->addMinutes(10), function () {
-            return User::with('employee')
-                ->select('id', 'name', 'last_name') // Nur benötigte User-Felder
-                ->find($this->employeeId);
-        });
+        // Nutzt automatisch den SELBEN Cache wenn im gleichen Request!
+        $this->employeeUser = User::getForComponent(
+            userId: $this->employeeId,
+            relations: ['employee'],
+            select: ['id', 'name', 'last_name']
+        );
 
-        if ($userData) {
-            $this->employeeUser = $userData;
-            $this->employee = $userData->employee;
+        if ($this->employeeUser) {
+            $this->employee = $this->employeeUser->employee;
 
             if ($this->employee) {
                 $this->ahv_number = $this->employee->ahv_number ?? '';

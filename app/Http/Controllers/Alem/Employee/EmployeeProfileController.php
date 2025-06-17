@@ -15,24 +15,19 @@ class EmployeeProfileController extends Controller
     {
         $authUser = Auth::user();
 
-        // Lade nur die Basis-Daten die ALLE Components brauchen
+        // Lade Employee - wird automatisch gecached
         $employee = User::with(['currentTeam:id,name'])
             ->where('slug', $slug)
             ->where('user_type', UserType::Employee->value)
             ->firstOrFail();
 
-        // Cache nur die Basis-User-Daten
-        $baseDataKey = "employee:{$employee->id}:base";
-
-        Cache::put($baseDataKey, $employee, now()->addMinutes(10));
+        // Optional: Pre-load für bessere Performance
+        User::getForComponent($employee->id, [], ['id', 'name', 'last_name']);
 
         return view('laravel.alem.employee.show', [
-            'employee' => $employee,  // Statt 'user'
-            'employeeId' => $employee->id,  // Statt 'userId'
+            'employee' => $employee,
+            'employeeId' => $employee->id,
             'activeTab' => $activeTab,
-            'baseDataKey' => $baseDataKey,
-
-            // Auth Daten direkt mitgeben
             'authUserId' => $authUser->id,
             'currentTeamId' => $authUser->currentTeam->id,
             'companyId' => $authUser->company_id,

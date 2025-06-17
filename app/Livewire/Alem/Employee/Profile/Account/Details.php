@@ -55,10 +55,8 @@ class Details extends Component
 
     private function loadEmployeeData(): void
     {
-        // Nutze den ComponentDataLoader Trait
-        $this->employee = $this->loadComponentData(
-            modelClass: User::class,
-            modelId: $this->employeeId,
+        $this->employee = User::getForComponent(
+            userId: $this->employeeId,
             relations: [
                 'teams:id,name',
                 'roles:id,name,is_manager',

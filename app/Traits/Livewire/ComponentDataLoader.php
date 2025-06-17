@@ -8,92 +8,130 @@ use Illuminate\Support\Facades\Cache;
 trait ComponentDataLoader
 {
     /**
-     * Lädt Model-Daten mit Component-spezifischen Relations
-     *
-     * @param string $modelClass Die Model-Klasse (z.B. User::class)
-     * @param int $modelId Die ID des Models
-     * @param array $relations Die zu ladenden Relations
-     * @param array $select Optionale select Felder
-     * @return Model|null
+     * Lädt Model-Daten und nutzt AdvancedCache wenn verfügbar
      */
-    protected function loadComponentData(string $modelClass, int $modelId, array $relations = [], array $select = []): ?Model {
+    protected function loadComponentData(
+        string $modelClass,
+        int $modelId,
+        array $relations = [],
+        array $select = []
+    ): ?Model {
+        // Prüfe ob Model den AdvancedCache Trait nutzt
+        $usesAdvancedCache = in_array(
+            'App\Traits\Cache\AdvancedCache',
+            class_uses_recursive($modelClass)
+        );
+
+        if ($usesAdvancedCache) {
+            // Nutze AdvancedCache's getCached Methode
+            $collection = $modelClass::getCached(
+                context: 'component',
+                contextId: $modelId,
+                dataCallback: function () use ($modelClass, $modelId, $relations, $select) {
+                    return $this->loadFromDatabase($modelClass, $modelId, $relations, $select);
+                },
+                options: [
+                    'suffix' => $this->getComponentCacheSuffix($relations),
+                    'duration' => 600 // 10 Minuten
+                ]
+            );
+
+            return $collection->first();
+        }
+
+        // Fallback: Standard Cache wenn Model kein AdvancedCache hat
+        return $this->loadWithStandardCache($modelClass, $modelId, $relations, $select);
+    }
+
+    /**
+     * Lädt Daten aus der Datenbank
+     */
+    private function loadFromDatabase(
+        string $modelClass,
+        int $modelId,
+        array $relations,
+        array $select
+    ): \Illuminate\Support\Collection {
+        $query = $modelClass::query();
+
+        if (!empty($select)) {
+            $query->select($select);
+        }
+
+        if (!empty($relations)) {
+            $query->with($relations);
+        }
+
+        $model = $query->find($modelId);
+
+        return collect($model ? [$model] : []);
+    }
+
+    /**
+     * Standard Cache-Implementierung als Fallback
+     */
+    private function loadWithStandardCache(
+        string $modelClass,
+        int $modelId,
+        array $relations,
+        array $select
+    ): ?Model {
         $componentName = class_basename(static::class);
         $cacheKey = $this->getComponentCacheKey($modelClass, $modelId, $componentName);
 
-        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($modelClass, $modelId, $relations, $select) {
-            $query = $modelClass::query();
-
-            if (!empty($select)) {
-                $query->select($select);
-            }
-
-            if (!empty($relations)) {
-                $query->with($relations);
-            }
-
-            return $query->find($modelId);
+        return Cache::remember($cacheKey, 600, function () use ($modelClass, $modelId, $relations, $select) {
+            return $this->loadFromDatabase($modelClass, $modelId, $relations, $select)->first();
         });
     }
 
     /**
-     * Invalidiert den Component-Cache
-     *
-     * @param string $modelClass
-     * @param int $modelId
-     * @param string|null $componentName
+     * Generiert Cache-Suffix basierend auf Relations
+     */
+    private function getComponentCacheSuffix(array $relations): string
+    {
+        if (empty($relations)) {
+            return 'base';
+        }
+
+        // Sortiere Relations für konsistente Keys
+        sort($relations);
+        return md5(implode('|', $relations));
+    }
+
+    /**
+     * Invalidiert Component Cache
      */
     protected function invalidateComponentCache(
         string $modelClass,
         int $modelId,
         ?string $componentName = null
     ): void {
-        $componentName = $componentName ?? class_basename(static::class);
-        $cacheKey = $this->getComponentCacheKey($modelClass, $modelId, $componentName);
+        $usesAdvancedCache = in_array(
+            'App\Traits\Cache\AdvancedCache',
+            class_uses_recursive($modelClass)
+        );
 
-        Cache::forget($cacheKey);
+        if ($usesAdvancedCache) {
+            // Nutze AdvancedCache's flush Methode
+            $instance = new $modelClass;
+            $instance->flushCacheContext('component', $modelId);
+        } else {
+            // Standard Cache forget
+            $componentName = $componentName ?? class_basename(static::class);
+            $cacheKey = $this->getComponentCacheKey($modelClass, $modelId, $componentName);
+            Cache::forget($cacheKey);
+        }
     }
 
     /**
-     * Generiert einen Component-spezifischen Cache-Key
-     *
-     * @param string $modelClass
-     * @param int $modelId
-     * @param string $componentName
-     * @return string
+     * Standard Cache-Key Generator
      */
     protected function getComponentCacheKey(
         string $modelClass,
         int $modelId,
         string $componentName
     ): string {
-        $modelName = class_basename($modelClass);
-        return strtolower("{$modelName}:{$modelId}:{$componentName}-data");
-    }
-
-    /**
-     * Lädt mehrere Models mit Component-spezifischen Relations
-     *
-     * @param string $modelClass
-     * @param array $modelIds
-     * @param array $relations
-     * @return \Illuminate\Support\Collection
-     */
-    protected function loadMultipleComponentData(
-        string $modelClass,
-        array $modelIds,
-        array $relations = []
-    ): \Illuminate\Support\Collection {
-        $componentName = class_basename(static::class);
-        $cacheKey = $this->getComponentCacheKey($modelClass, md5(implode(',', $modelIds)), $componentName);
-
-        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($modelClass, $modelIds, $relations) {
-            $query = $modelClass::whereIn('id', $modelIds);
-
-            if (!empty($relations)) {
-                $query->with($relations);
-            }
-
-            return $query->get();
-        });
+        $modelName = strtolower(class_basename($modelClass));
+        return "{$modelName}:{$modelId}:{$componentName}-data";
     }
 }
