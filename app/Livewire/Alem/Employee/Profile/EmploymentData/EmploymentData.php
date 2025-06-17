@@ -5,11 +5,11 @@ namespace App\Livewire\Alem\Employee\Profile\EmploymentData;
 use App\Enums\Employee\CivilStatus;
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
+use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\EmployeeDataEnums;
 use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\ValidateEmploymentData;
 use App\Models\Address\Country;
 use App\Models\Alem\Employee;
 use App\Models\User;
-use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -24,7 +24,7 @@ use Livewire\Component;
 class EmploymentData extends Component
 {
     use AuthorizesRequests;
-    use AuthUserTeamCompanyId, ValidateEmploymentData, EmployeeStatusOptions;
+    use AuthUserTeamCompanyId, ValidateEmploymentData, EmployeeDataEnums;
 
     // User identification
     public ?User $user = null;
