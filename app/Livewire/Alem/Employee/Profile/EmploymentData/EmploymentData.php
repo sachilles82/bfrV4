@@ -186,7 +186,7 @@ class EmploymentData extends Component
 
     public function placeholder(): string
     {
-        return view('livewire.placeholders.company.update');
+        return view('livewire.placeholders.employee.employment-data');
     }
 
     public function render(): View

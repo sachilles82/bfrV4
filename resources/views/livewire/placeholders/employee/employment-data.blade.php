@@ -1,10 +1,10 @@
 <x-pupi.layout.form>
     <x-slot:title>
-        {{ __('User Account Details') }}
+        {{ __('Employee Employment Data') }}
     </x-slot:title>
 
     <x-slot:description>
-        {{ __('Update the user information below.') }}
+        {{ __('Update the employment data') }}
     </x-slot:description>
 
     <x-slot name="form">
@@ -13,24 +13,15 @@
                 <div class="px-4 py-6 sm:p-8">
                     <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
-                        <!-- Avatar Section Skeleton -->
-                        <div class="col-span-full flex items-center gap-x-8">
-                            <div class="h-24 w-24 flex-none rounded-lg bg-gray-200 dark:bg-gray-700"></div>
-                            <div>
-                                <div class="h-9 w-32 rounded-md bg-gray-200 dark:bg-gray-700 mb-2"></div>
-                                <div class="h-4 w-40 rounded bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-
-                        <!-- Gender Field Skeleton (col-span-4) -->
+                        <!-- AHV Number Field Skeleton (col-span-4) -->
                         <div class="sm:col-span-4">
                             <div class="space-y-2">
-                                <div class="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                <div class="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
                             </div>
                         </div>
 
-                        <!-- First Name Field Skeleton (col-span-3) -->
+                        <!-- Nationality Field Skeleton (col-span-3) -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -38,7 +29,7 @@
                             </div>
                         </div>
 
-                        <!-- Last Name Field Skeleton (col-span-3) -->
+                        <!-- Hometown Field Skeleton (col-span-3) -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -46,7 +37,15 @@
                             </div>
                         </div>
 
-                        <!-- Email Field Skeleton (col-span-3) -->
+                        <!-- Birthdate Field Skeleton (col-span-3) -->
+                        <div class="sm:col-span-3">
+                            <div class="space-y-2">
+                                <div class="h-4 w-18 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
+                            </div>
+                        </div>
+
+                        <!-- Religion Field Skeleton (col-span-3) -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -54,42 +53,18 @@
                             </div>
                         </div>
 
-                        <!-- Phone Field Skeleton (col-span-3) -->
+                        <!-- Civil Status Field Skeleton (col-span-3) -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                <div class="h-4 w-22 rounded bg-gray-200 dark:bg-gray-700"></div>
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
                             </div>
                         </div>
 
-                        <!-- Teams Field Skeleton (col-span-3) -->
+                        <!-- Residence Permit Field Skeleton (col-span-3) -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
-                                <div class="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-
-                        <!-- Department Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-
-                        <!-- Roles Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-
-                        <!-- Account Status Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 w-25 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                <div class="h-4 w-28 rounded bg-gray-200 dark:bg-gray-700"></div>
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
                             </div>
                         </div>
