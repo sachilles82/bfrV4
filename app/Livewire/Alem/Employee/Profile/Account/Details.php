@@ -14,21 +14,24 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+#[Lazy]
 class Details extends Component
 {
     use AuthUserTeamCompanyId, WithDropDownRelations;
     use AuthorizesRequests, ValidateAccountDetails;
     use ModelStatusOptions, GenderOptions;
 
-    // Empfange User Model direkt
-    public User $employee;
+    // NICHT public User $employee - das verursacht die doppelte Query!
 
     #[Locked]
     public int $employeeId;
+
+    private User $employee; // Private property
 
     // User form fields
     public ?Gender $gender = null;
@@ -42,30 +45,37 @@ class Details extends Component
     public array $selectedRoles = [];
 
     public function mount(
-        User $employee,
+        $employee, // Nicht typisiert!
         int $authUserId,
         int $currentTeamId,
         int $companyId
     ): void {
-        // Empfange User Model direkt vom Controller
-        $this->employee = $employee;
-        $this->employeeId = $employee->id;
+        // Extrahiere nur die ID
+        $this->employeeId = is_object($employee) ? $employee->id : $employee['id'];
 
         // Auth Daten
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Populate form fields direkt vom übergebenen Model
-        $this->populateFormFields();
+        // Lade den Employee einmal mit allen benötigten Daten
+        $this->loadEmployeeData();
 
         // Lade nur Dropdown-Daten
         $this->loadRelationsData(['teams', 'departments', 'roles']);
     }
 
-    /**
-     * Populate form fields vom übergebenen Employee Model
-     */
+    private function loadEmployeeData(): void
+    {
+        $this->employee = User::with([
+            'teams:id,name',
+            'roles:id,name,is_manager',
+            'department:id,name'
+        ])->findOrFail($this->employeeId);
+
+        $this->populateFormFields();
+    }
+
     private function populateFormFields(): void
     {
         $this->gender = $this->employee->gender;
@@ -76,32 +86,15 @@ class Details extends Component
         $this->model_status = $this->employee->model_status;
         $this->department = $this->employee->department_id;
 
-        // Relations sollten bereits vom Controller geladen sein
-        if ($this->employee->relationLoaded('teams')) {
-            $this->selectedTeams = $this->employee->teams->pluck('id')->toArray();
-        }
-
-        if ($this->employee->relationLoaded('roles')) {
-            $this->selectedRoles = $this->employee->roles->pluck('id')->toArray();
-        }
+        $this->selectedTeams = $this->employee->teams->pluck('id')->toArray();
+        $this->selectedRoles = $this->employee->roles->pluck('id')->toArray();
     }
 
-    /**
-     * Refresh wenn Updates passieren
-     */
     #[On('employee-data-refreshed')]
     public function refreshFromParent(int $employeeId): void
     {
         if ($employeeId === $this->employeeId) {
-            // Reload das Model mit Relations
-            $this->employee->load([
-                'teams:id,name',
-                'roles:id,name,is_manager',
-                'department:id,name'
-            ]);
-
-            // Re-populate form fields
-            $this->populateFormFields();
+            $this->loadEmployeeData();
         }
     }
 
@@ -111,7 +104,10 @@ class Details extends Component
 
         try {
             DB::transaction(function () {
-                $this->employee->update([
+                // Lade fresh für Update
+                $employee = User::findOrFail($this->employeeId);
+
+                $employee->update([
                     'name' => $this->name,
                     'last_name' => $this->last_name,
                     'email' => $this->email,
@@ -121,7 +117,7 @@ class Details extends Component
                     'department_id' => $this->department,
                 ]);
 
-                $this->syncRelations($this->employee);
+                $this->syncRelations($employee);
             });
 
             // Benachrichtige andere Components
@@ -164,6 +160,8 @@ class Details extends Component
 
     public function render(): View
     {
-        return view('livewire.alem.employee.profile.account.details');
+        return view('livewire.alem.employee.profile.account.details', [
+            'employee' => $this->employee ?? null
+        ]);
     }
 }

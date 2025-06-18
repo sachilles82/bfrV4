@@ -22,14 +22,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-//        Route::bind('employee', function (string $value) {
-//            return once(function () use ($value) {
-//                return User::userEmployeeFields()
-//                    ->where('slug', $value)
-//                    ->firstOrFail();
-//            });
-//        });
-
         Route::bind('employee', function (string $value) {
             return Cache::remember(
                 "employee_profile_{$value}",

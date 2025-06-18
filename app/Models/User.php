@@ -152,23 +152,6 @@ class User extends Authenticatable
         return $this->belongsTo(Department::class);
     }
 
-    /**
-     * Get the route key for the model.
-     */
-    public function getRouteKey(): mixed
-    {
-        // Hier kombinieren wir den Slug für URLs
-        return $this->slug;
-    }
-
-    /**
-     * Get the route key name for the model.
-     */
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
     protected static function booted(): void
     {
         static::created(function ($user) {
@@ -214,25 +197,35 @@ class User extends Authenticatable
         return ['company', 'team'];
     }
 
-    // In App\Models\User - füge diese Methode hinzu:
 
+    /** ********************* Employee Route Model Bindung */
     /**
-     * Scope to select only employee-related fields for user queries.
-     * This is useful for performance optimization when fetching user data
+     * Scope für dei EmployeeProfileController
+     * Er braucht die ID und den SLUG für die Route Model Bindung
      */
     public function scopeUserEmployeeFields($query)
     {
         return $query->select([
             'id',
-            'gender',
-            'name',
-            'last_name',
-            'email',
-            'phone_1',
-            'model_status',
-            'department_id',
             'slug'
         ]);
     }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKey(): mixed
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Get the route key name for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+    /** ********************* Employee Route Model Bindung */
 
 }

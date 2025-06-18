@@ -12,12 +12,9 @@ class EmployeeProfileController extends Controller
 {
     public function show(User $employee, string $activeTab = 'employee-update'): View
     {
-        $employee->load([
-            'teams:id,name',
-            'roles:id,name',
-            'department:id,name'
-        ]);
         $authUser = Auth::user();
+
+//        'employee' => $employee, erhält nur die slug und id
 
         return view('laravel.alem.employee.show', [
             'employee' => $employee,

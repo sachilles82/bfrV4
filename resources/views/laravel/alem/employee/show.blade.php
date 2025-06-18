@@ -21,6 +21,7 @@
                     :auth-user-id="$authUserId"
                     :current-team-id="$currentTeamId"
                     :company-id="$companyId"
+                    lazy
                 />
 
 
