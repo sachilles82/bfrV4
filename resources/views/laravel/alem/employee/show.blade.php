@@ -4,16 +4,34 @@
             <x-navigation.alem.employee.sidebar />
         </x-slot:sidebar>
 
-        <livewire:alem.employee.dynamic-navigation
-            :employee="$employee"
-            :employee-id="$employeeId"
-            :active-tab="$activeTab"
+        {{-- Header Navigation --}}
+        <x-slot:header>
+            <x-navigation.alem.employee.header
+                :employee="$employee"
+                :activeTab="$activeTab"
+            />
+        </x-slot:header>
 
-            :auth-user-id="$authUserId"
-            :current-team-id="$currentTeamId"
-            :company-id="$companyId"
-        />
+        {{-- Content --}}
+        <div class="mt-6 space-y-10 divide-y dark:divide-white/5 divide-gray-900/5">
+            @if($activeTab === 'employee-update')
+                {{-- Account Details - Sofort geladen --}}
+                <livewire:alem.employee.profile.account.details
+                    :employee="$employee"
+                    :auth-user-id="$authUserId"
+                    :current-team-id="$currentTeamId"
+                    :company-id="$companyId"
+                />
 
+                {{-- Employment Data - Lazy loaded --}}
+                <livewire:alem.employee.profile.employment-data.employment-data
+                    :user-id="$employee->id"
+                    lazy
+                />
 
+            @elseif($activeTab === 'report')
+                {{-- Andere Tabs... --}}
+            @endif
+        </div>
     </x-pupi.layout.container>
 </x-app-layout>

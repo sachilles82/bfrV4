@@ -61,10 +61,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::get('/employees', [EmployeeIndexController::class, 'index'])
             ->name('alem.employees');
 
-        // Route für das Mitarbeiter-Profil mit Slug aus Vor- und Nachname
-        Route::get('/employees/{slug}/{activeTab?}', [EmployeeProfileController::class, 'show'])
-            ->name('employees.profile')
-            ->where('slug', '.*'); // Erlaubt Bindestriche im Parameterwert
+//        // Route für das Mitarbeiter-Profil mit Slug aus Vor- und Nachname
+        Route::get('/employees/{employee:slug}/{activeTab?}', [EmployeeProfileController::class, 'show'])
+            ->name('employees.profile');
 
         Route::get('/departments', function () {
             return view('laravel/alem/department/index');

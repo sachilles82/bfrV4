@@ -9,7 +9,6 @@ use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\EmployeeDataEnums;
 use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\ValidateEmploymentData;
 use App\Models\Address\Country;
 use App\Models\Alem\Employee;
-use App\Models\User;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -17,6 +16,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Lazy;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -26,10 +26,12 @@ class EmploymentData extends Component
     use AuthorizesRequests;
     use AuthUserTeamCompanyId, ValidateEmploymentData, EmployeeDataEnums;
 
-    // Empfange Daten vom Parent
-    public User $employee;
+    // Nur user_id empfangen
+    #[Locked]
+    public int $userId;
+
+    // Employee Model (wird in mount geladen)
     public ?Employee $employeeModel = null;
-    public int $employeeId;
 
     // Employee form fields
     public ?string $ahv_number = '';
@@ -43,28 +45,55 @@ class EmploymentData extends Component
     // Dropdown data
     public array $countries = [];
 
-    public function mount(
-        User $employee,
-        ?Employee $employeeModel,
-        int $employeeId,
-        int $authUserId,
-        int $currentTeamId,
-        int $companyId
-    ): void {
-        // Empfange Daten vom Parent
-        $this->employee = $employee;
-        $this->employeeModel = $employeeModel;
-        $this->employeeId = $employeeId;
+    public function mount(int $userId): void
+    {
+        $this->userId = $userId;
 
-        $this->authUserId = $authUserId;
-        $this->currentTeamId = $currentTeamId;
-        $this->companyId = $companyId;
+        // Auth Daten bei Bedarf laden (Trait nutzt auth()->user())
+        $this->initializeAuthData();
 
-        // Populate form fields von übergebenen Daten
-        $this->populateFormFields();
+        // Lade Employee Model
+        $this->loadEmployeeData();
 
-        // Lade nur Countries für Dropdown
+        // Lade Countries für Dropdown
         $this->loadCountries();
+    }
+
+    /**
+     * Initialisiere Auth Daten vom Trait
+     */
+    private function initializeAuthData(): void
+    {
+        $authUser = auth()->user();
+        if ($authUser) {
+            $this->authUserId = $authUser->id;
+            $this->currentTeamId = $authUser->current_team_id;
+            $this->companyId = $authUser->company_id;
+        }
+    }
+
+    /**
+     * Lade Employee Daten
+     */
+    private function loadEmployeeData(): void
+    {
+        $this->employeeModel = Employee::where('user_id', $this->userId)
+            ->select([
+                'id',
+                'user_id',
+                'ahv_number',
+                'nationality',
+                'hometown',
+                'birthdate',
+                'religion',
+                'civil_status',
+                'residence_permit'
+            ])
+            ->first();
+
+        if ($this->employeeModel) {
+            $this->populateFormFields();
+        }
     }
 
     private function populateFormFields(): void
@@ -96,15 +125,14 @@ class EmploymentData extends Component
     }
 
     /**
-     * Refresh Daten wenn Parent neue Daten hat
+     * Refresh Daten wenn Updates passieren
      */
     #[On('employee-data-refreshed')]
-    public function refreshFromParent(User $employee): void
+    public function refreshFromParent(int $employeeId): void
     {
-        if ($employee->id === $this->employeeId) {
-            $this->employee = $employee;
-            $this->employeeModel = $employee->employee;
-            $this->populateFormFields();
+        // Prüfe ob es der richtige Employee ist
+        if ($this->employeeModel && $this->employeeModel->user_id === $employeeId) {
+            $this->loadEmployeeData();
         }
     }
 
@@ -129,15 +157,15 @@ class EmploymentData extends Component
                 } else {
                     // Erstelle neuen Employee Record
                     $this->employeeModel = Employee::create([
-                        'user_id' => $this->employee->id,
+                        'user_id' => $this->userId,
                         'uuid' => (string) \Illuminate\Support\Str::uuid(),
                         ...$employmentData
                     ]);
                 }
             });
 
-            // Benachrichtige Parent zum Refresh
-            $this->dispatch('employment-data-updated', employeeId: $this->employeeId);
+            // Benachrichtige andere Components
+            $this->dispatch('employment-data-updated', employeeId: $this->userId);
 
             Flux::toast(
                 text: __('Employment data updated successfully.'),

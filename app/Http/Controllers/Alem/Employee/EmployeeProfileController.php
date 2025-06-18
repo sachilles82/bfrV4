@@ -10,23 +10,22 @@ use Illuminate\View\View;
 
 class EmployeeProfileController extends Controller
 {
-    public function show(string $slug, string $activeTab = 'employee-update'): View
+    public function show(User $employee, string $activeTab = 'employee-update'): View
     {
-        $authUser = Auth::user();
+        // Lade Employee mit allen benötigten Relations für erste Component
+        $employee->load([
+            'teams:id,name',
+            'roles:id,name',
+            'department:id,name'
+        ]);
 
-        // Lade nur minimale Daten für Navigation
-        // Der ProfileManager Component lädt alle Details
-        $employee = User::select('id', 'slug', 'name', 'last_name', 'company_id')
-            ->where('slug', $slug)
-            ->where('user_type', UserType::Employee->value)
-            ->firstOrFail();
+        $authUser = Auth::user();
 
         return view('laravel.alem.employee.show', [
             'employee' => $employee,
-            'employeeId' => $employee->id,
             'activeTab' => $activeTab,
             'authUserId' => $authUser->id,
-            'currentTeamId' => $authUser->currentTeam->id,
+            'currentTeamId' => $authUser->current_team_id,
             'companyId' => $authUser->company_id,
         ]);
     }

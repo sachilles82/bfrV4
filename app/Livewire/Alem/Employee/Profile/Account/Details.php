@@ -15,25 +15,21 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
-use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy(isolate: true)]
 class Details extends Component
 {
     use AuthUserTeamCompanyId, WithDropDownRelations;
     use AuthorizesRequests, ValidateAccountDetails;
     use ModelStatusOptions, GenderOptions;
 
-    // WICHTIG: Verwende nur IDs, keine Models!
+    // Empfange User Model direkt
+    public User $employee;
+
     #[Locked]
     public int $employeeId;
-
-    // Transiente Properties (nicht von Livewire getrackt)
-    protected ?User $employee = null;
-    protected ?Employee $employeeModel = null;
 
     // User form fields
     public ?Gender $gender = null;
@@ -47,105 +43,65 @@ class Details extends Component
     public array $selectedRoles = [];
 
     public function mount(
-        int $employeeId,
+        User $employee,
         int $authUserId,
         int $currentTeamId,
         int $companyId
     ): void {
-        $this->employeeId = $employeeId;
+        // Empfange User Model direkt vom Controller
+        $this->employee = $employee;
+        $this->employeeId = $employee->id;
+
+        // Auth Daten
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade initial data
-        $this->loadEmployeeData();
+        // Populate form fields direkt vom übergebenen Model
+        $this->populateFormFields();
 
         // Lade nur Dropdown-Daten
         $this->loadRelationsData(['teams', 'departments', 'roles']);
     }
 
     /**
-     * Zentrale Methode zum Laden der Employee Daten
+     * Populate form fields vom übergebenen Employee Model
      */
-    protected function loadEmployeeData(): void
-    {
-        $this->employee = User::getForComponent(
-            userId: $this->employeeId,
-            relations: [
-                'teams:id,name',
-                'roles:id,name,is_manager',
-                'department:id,name'
-            ],
-            select: ['id', 'name', 'last_name', 'email', 'phone_1', 'gender', 'model_status', 'department_id']
-        );
-
-        if ($this->employee) {
-            $this->populateFormFields();
-        }
-    }
-
-    /**
-     * Lade Employee Model nur wenn nötig
-     */
-    protected function getEmployee(): User
-    {
-        if (!$this->employee) {
-            // Nutze Request-Cache
-            $cacheKey = "request_employee_{$this->employeeId}";
-
-            if (isset($GLOBALS[$cacheKey])) {
-                $this->employee = $GLOBALS[$cacheKey];
-            } else {
-                $this->employee = User::with([
-                    'teams:id,name',
-                    'roles:id,name,is_manager',
-                    'department:id,name'
-                ])->find($this->employeeId);
-
-                $GLOBALS[$cacheKey] = $this->employee;
-            }
-        }
-
-        return $this->employee;
-    }
-
     private function populateFormFields(): void
     {
-        $employee = $this->getEmployee();
+        $this->gender = $this->employee->gender;
+        $this->name = $this->employee->name;
+        $this->last_name = $this->employee->last_name;
+        $this->email = $this->employee->email;
+        $this->phone_1 = $this->employee->phone_1 ?? '';
+        $this->model_status = $this->employee->model_status;
+        $this->department = $this->employee->department_id;
 
-        $this->gender = $employee->gender;
-        $this->name = $employee->name;
-        $this->last_name = $employee->last_name;
-        $this->email = $employee->email;
-        $this->phone_1 = $employee->phone_1 ?? '';
-        $this->model_status = $employee->model_status;
-        $this->department = $employee->department_id;
-
-        // Relations sollten bereits geladen sein
-        if ($employee->relationLoaded('teams')) {
-            $this->selectedTeams = $employee->teams->pluck('id')->toArray();
+        // Relations sollten bereits vom Controller geladen sein
+        if ($this->employee->relationLoaded('teams')) {
+            $this->selectedTeams = $this->employee->teams->pluck('id')->toArray();
         }
 
-        if ($employee->relationLoaded('roles')) {
-            $this->selectedRoles = $employee->roles->pluck('id')->toArray();
+        if ($this->employee->relationLoaded('roles')) {
+            $this->selectedRoles = $this->employee->roles->pluck('id')->toArray();
         }
     }
 
     /**
-     * Refresh wenn Parent neue Daten sendet
+     * Refresh wenn Updates passieren
      */
     #[On('employee-data-refreshed')]
     public function refreshFromParent(int $employeeId): void
     {
         if ($employeeId === $this->employeeId) {
-            // Clear transient data
-            $this->employee = null;
-            $this->employeeModel = null;
+            // Reload das Model mit Relations
+            $this->employee->load([
+                'teams:id,name',
+                'roles:id,name,is_manager',
+                'department:id,name'
+            ]);
 
-            // Clear Request-Cache
-            unset($GLOBALS["request_employee_{$this->employeeId}"]);
-
-            // Reload
+            // Re-populate form fields
             $this->populateFormFields();
         }
     }
@@ -156,9 +112,7 @@ class Details extends Component
 
         try {
             DB::transaction(function () {
-                $employee = $this->getEmployee();
-
-                $employee->update([
+                $this->employee->update([
                     'name' => $this->name,
                     'last_name' => $this->last_name,
                     'email' => $this->email,
@@ -168,10 +122,10 @@ class Details extends Component
                     'department_id' => $this->department,
                 ]);
 
-                $this->syncRelations($employee);
+                $this->syncRelations($this->employee);
             });
 
-            // Benachrichtige Parent
+            // Benachrichtige andere Components
             $this->dispatch('employee-basic-data-updated', employeeId: $this->employeeId);
 
             Flux::toast(
