@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Enums\User\UserType;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -24,8 +23,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::bind('employee', function (string $value) {
             return once(function () use ($value) {
-                return User::where('slug', $value)
-                    ->where('user_type', UserType::Employee)
+                return User::userEmployeeFields()
+                    ->where('slug', $value)
                     ->firstOrFail();
             });
         });
