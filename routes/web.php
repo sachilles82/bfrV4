@@ -65,6 +65,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::get('/employees/{employee:slug}/{activeTab?}', [EmployeeProfileController::class, 'show'])
             ->name('employees.profile');
 
+        Route::get('/employees/{slug}/{activeTab?}', [EmployeeProfileController::class, 'show'])
+            ->name('employees.profile');
+
         Route::get('/departments', function () {
             return view('laravel/alem/department/index');
         })->name('settings.departments');
