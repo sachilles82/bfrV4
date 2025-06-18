@@ -84,7 +84,7 @@
                                                           value="{{ $department->id }}"/>
                             </td>
                             <x-pupi.table.tr.cell>
-                                <a wire:navigate.hover
+                                <a wire:navigate
                                    href="{{ route('settings.departments.show', $department->id) }}"
                                    class="font-medium text-gray-900 dark:text-gray-300 hover:text-indigo-700 decoration-1 hover:underline dark:hover:text-indigo-400">
                                     {{$department->name}}

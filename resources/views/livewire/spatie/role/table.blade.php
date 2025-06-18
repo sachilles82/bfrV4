@@ -40,7 +40,7 @@
                         class="hover:bg-gray-100 dark:hover:bg-gray-800/50"
                     >
                         <x-pupi.table.tr.tr>
-                            <a wire:navigate.hover
+                            <a wire:navigate
                                href="{{ route('settings.roles.show', [$role->id, 'baseApp']) }}"
                                class="inline-flex items-center rounded-lg px-2 py-1 text-sm font-medium ring-1 ring-inset mr-2
                                            bg-indigo-50 text-indigo-800 ring-indigo-700/10 hover:text-indigo-600 hover:bg-indigo-100 hover:ring-indigo-600/10 decoration-1 hover:underline

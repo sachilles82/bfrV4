@@ -40,12 +40,12 @@
                 <!-- Team Management -->
                 <flux:menu.heading>{{ __('Manage Team') }}</flux:menu.heading>
 
-                <flux:menu.item wire:navigate.hover href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
+                <flux:menu.item wire:navigate href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
                     <flux:icon.cog-6-tooth variant="outline" class="size-5"/>{{ __('Team Settings') }}
                 </flux:menu.item>
 
                 @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-                    <flux:menu.item wire:navigate.hover href="{{ route('teams.create') }}">
+                    <flux:menu.item wire:navigate href="{{ route('teams.create') }}">
                         <flux:icon.plus variant="outline" class="size-5"/>{{ __('Create Team') }}
                     </flux:menu.item>
                 @endcan
@@ -92,7 +92,7 @@
 
             <flux:menu.heading>{{ __('Manage Account') }}</flux:menu.heading>
 
-            <flux:menu.item wire:navigate.hover href="{{ route('profile.show') }}">
+            <flux:menu.item wire:navigate href="{{ route('profile.show') }}">
                 <flux:icon.user variant="outline" class="size-5"/>{{ __('Profile') }}
             </flux:menu.item>
 
@@ -100,11 +100,11 @@
 
             <flux:menu.heading> {{ __('Finance') }}</flux:menu.heading>
 
-            <flux:menu.item wire:navigate.hover href="/billing">
+            <flux:menu.item wire:navigate href="/billing">
                 <flux:icon.credit-card variant="outline" class="size-5"/>{{ __('Subscription') }}
             </flux:menu.item>
 
-            <flux:menu.item wire:navigate.hover href="/billing">
+            <flux:menu.item wire:navigate href="/billing">
                 <flux:icon.banknotes variant="outline" class="size-5"/> {{ __('Payments') }}
             </flux:menu.item>
 
@@ -114,7 +114,7 @@
 
                 <flux:menu.heading> {{ __('Security') }}</flux:menu.heading>
 
-                <flux:menu.item wire:navigate.hover href="{{ route('api-tokens.index') }}">
+                <flux:menu.item wire:navigate href="{{ route('api-tokens.index') }}">
                     <flux:icon.lock-closed variant="outline" class="size-5"/>
                     {{ __('API Tokens') }}
                 </flux:menu.item>

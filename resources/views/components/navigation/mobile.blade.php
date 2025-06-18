@@ -32,7 +32,7 @@
             <div class="mt-5 h-0 flex-1 overflow-y-auto px-4">
                 <nav class="space-y-1">
                     <a href="{{ route('dashboard') }}" @click="menu = false"
-                       wire:navigate.hover
+                       wire:navigate
                        class="{{ request()->routeIs('dashboard') ? 'text-white bg-indigo-800 dark:text-white dark:bg-gray-800' : 'dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 text-indigo-100 hover:bg-indigo-800 hover:text-white' }} group flex items-center rounded-md px-3 py-2 text-sm/6 font-medium">
                         <svg
                             class="{{ request()->routeIs('dashboard') ? 'dark:text-white dark:bg-gray-800' : 'text-indigo-300 dark:text-gray-400 group-hover:text-white' }} mr-3 h-6 w-6"
@@ -44,7 +44,7 @@
                     </a>
 
                     <a href="{{ route('settings.roles') }}" @click="menu = false"
-                       wire:navigate.hover
+                       wire:navigate
                        class="{{ request()->routeIs('settings.roles') ? 'text-white bg-indigo-800 dark:text-white dark:bg-gray-800' : 'dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 text-indigo-100 hover:bg-indigo-800 hover:text-white' }} group flex items-center rounded-md px-3 py-2 text-sm/6 font-medium">
                         <svg
                             class="{{ request()->routeIs('settings.roles') ? 'dark:text-white dark:bg-gray-800' : 'text-indigo-300 dark:text-gray-400 group-hover:text-white' }} mr-3 h-6 w-6"
