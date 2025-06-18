@@ -23,9 +23,11 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Route::bind('employee', function (string $value) {
-            return User::where('slug', $value)
-                ->where('user_type', UserType::Employee)
-                ->firstOrFail();
+            return once(function () use ($value) {
+                return User::where('slug', $value)
+                    ->where('user_type', UserType::Employee)
+                    ->firstOrFail();
+            });
         });
     }
 }

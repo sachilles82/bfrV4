@@ -23,7 +23,7 @@
                     :company-id="$companyId"
                 />
 
-                {{-- Employment Data - Lazy loaded --}}
+
                 <livewire:alem.employee.profile.employment-data.employment-data
                     :user-id="$employee->id"
                     lazy

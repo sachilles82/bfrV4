@@ -7,7 +7,6 @@ use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Livewire\Alem\Employee\Profile\Account\Helper\ValidateAccountDetails;
 use App\Models\User;
-use App\Models\Alem\Employee;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;

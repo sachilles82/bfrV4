@@ -184,7 +184,7 @@
                                     @endif
                                 </div>
                                 <div class="ml-4">
-                                    <a wire:navigate.hover href="{{ route('employees.profile', $user) }}"
+                                    <a wire:navigate href="{{ route('employees.profile', $user) }}"
                                        class="font-medium text-gray-900 dark:text-gray-300 hover:text-indigo-700 decoration-1 hover:underline dark:hover:text-indigo-400">
                                         {{ $user->name }} {{ $user->last_name }}
                                     </a>
