@@ -28,7 +28,6 @@ return new class extends Migration {
             $table->date('leave_at')->nullable();
 
             $table->string('ahv_number')->nullable();
-            $table->date('birthdate')->nullable();
             $table->string('nationality')->nullable();
             $table->string('hometown')->nullable();
             $table->string('religion')->nullable();
@@ -36,16 +35,6 @@ return new class extends Migration {
             $table->string('residence_permit')->nullable();
 
             $table->timestamps();
-
-            $table->index('user_id');
-            $table->index('employee_status');
-//
-//            $table->index(['user_id', 'employee_status'], 'idx_user_status');
-//            $table->index(['profession_id', 'stage_id'], 'idx_profession_stage');
-//            $table->index(['employee_status', 'profession_id'], 'idx_status_profession');
-//
-//            $table->index('supervisor_id', 'idx_supervisor');
-//            $table->index('employee_status', 'idx_employee_status');
         });
     }
 
