@@ -9,6 +9,8 @@ use App\Models\Address\State;
 use App\Models\Alem\Company;
 use App\Models\Alem\Department;
 use App\Models\Alem\Employee;
+use App\Models\Alem\QuickCrud\Profession;
+use App\Models\Alem\QuickCrud\Stage;
 use App\Models\Spatie\Role;
 use App\Traits\Cache\AdvancedCache;
 use App\Traits\HasAddress;
@@ -84,6 +86,10 @@ class User extends Authenticatable
         'model_status',
         'gender',
         'email_verified_at',
+
+        'profession_id',
+        'stage_id',
+        'supervisor_id',
     ];
 
     /**
@@ -111,7 +117,11 @@ class User extends Authenticatable
         'gender' => Gender::class,
         'department_id' => 'integer',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
+
+        'profession_id' => 'integer',
+        'stage_id' => 'integer',
+        'supervisor_id' => 'integer',
     ];
 
     /**
@@ -132,6 +142,30 @@ class User extends Authenticatable
         }
 
         return $this->joined_at->diffInYears(now());
+    }
+
+    /**
+     * Gibt den Vorgesetzten (Supervisor) als User zurück
+     */
+    public function supervisorUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    /**
+     * Gibt die Berufsbezeichnung/Position des Mitarbeiters zurück.
+     */
+    public function profession(): BelongsTo
+    {
+        return $this->belongsTo(Profession::class, 'profession_id');
+    }
+
+    /**
+     * Gibt die Karrierestufe des Mitarbeiters zurück.
+     */
+    public function stage(): BelongsTo
+    {
+        return $this->belongsTo(Stage::class, 'stage_id');
     }
 
     /* User & States Relation */

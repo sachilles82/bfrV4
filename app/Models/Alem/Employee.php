@@ -76,7 +76,7 @@ class Employee extends Model
     ];
 
     /**
-     * Boot-Methode mit Global Scopes
+     * Boot-Method mit Global Scopes
      */
     protected static function booted()
     {

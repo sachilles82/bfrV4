@@ -9,11 +9,7 @@ use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\UserType;
 use App\Models\Alem\Company;
-use App\Models\Alem\Department;
-use App\Models\Alem\Employee;
 use App\Models\Alem\Industry;
-use App\Models\Alem\QuickCrud\Profession;
-use App\Models\Alem\QuickCrud\Stage;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
@@ -57,34 +53,34 @@ class HighPerformanceTestDataSeeder extends Seeder
         // Team 1 (Betrieb 48) Konfiguration
         'team1' => [
             'name' => 'Betrieb 48',
-            'employees' => 5000,  // 100k als Standard
-            'managers' => 100,
-            'departments' => 100,
-            'professions' => 100,
-            'stages' => 100,
+            'employees' => 500,  //  Standard
+            'managers' => 10,
+            'departments' => 10,
+            'professions' => 10,
+            'stages' => 10,
         ],
 
         // Team 2 (Betrieb 55) Konfiguration
         'team2' => [
             'name' => 'Betrieb 55',
-            'employees' => 15000,  // 500k als Standard
-            'managers' => 500,
-            'departments' => 100,
-            'professions' => 100,
-            'stages' => 100,
+            'employees' => 150,  //  als Standard
+            'managers' => 5,
+            'departments' => 10,
+            'professions' => 10,
+            'stages' => 10,
         ],
 
         // Performance Konfiguration
         'performance' => [
-            'chunk_size' => 7500,
+            'chunk_size' => 50,
             'memory_limit' => '4G',
             'use_raw_sql' => true,
             'disable_foreign_keys' => true,
             'disable_indexes' => true,
             'use_csv_import' => false,
             'parallel_workers' => 4,
-            'user_insert_chunk' => 2000,  // Speziell für User-Tabelle
-            'other_insert_chunk' => 3000, // Für andere Tabellen
+            'user_insert_chunk' => 20,  // Speziell für User-Tabelle
+            'other_insert_chunk' => 30, // Für andere Tabellen
         ],
 
         // Sonstige Konfiguration
@@ -432,6 +428,9 @@ class HighPerformanceTestDataSeeder extends Seeder
         $stageCount = count($stageIds);
         $nonManagerCount = count($nonManagerRoleIds);
 
+        // Erstelle Supervisor-Pool für realistischere Hierarchie
+        $supervisorIds = [$ownerId]; // Owner ist immer ein möglicher Supervisor
+
         for ($j = 0; $j < $chunkSize; $j++) {
             $index = $startIndex + $j + $indexOffset + 1;
 
@@ -455,7 +454,11 @@ class HighPerformanceTestDataSeeder extends Seeder
             $email = strtolower($firstName . '.' . $lastName . '.' . $suffix . $index . '@firma.ch');
             $userEmails[] = $email;
 
-            // User-Daten
+            // Bestimme Supervisor
+            // Erste 10% haben den Owner als Supervisor, Rest hat zufälligen Supervisor aus Pool
+            $supervisorId = ($j < $chunkSize * 0.1) ? $ownerId : $supervisorIds[array_rand($supervisorIds)];
+
+            // User-Daten MIT den neuen Feldern
             $userData[] = [
                 'name' => $firstName,
                 'last_name' => $lastName,
@@ -466,6 +469,9 @@ class HighPerformanceTestDataSeeder extends Seeder
                 'company_id' => $companyId,
                 'user_type' => UserType::Employee->value,
                 'department_id' => $departmentIds[$j % $departmentCount],
+                'profession_id' => $professionIds[$j % $professionCount],     // NEU
+                'stage_id' => $stageIds[$j % $stageCount],                   // NEU
+                'supervisor_id' => $supervisorId,                            // NEU
                 'model_status' => ModelStatus::ACTIVE->value,
                 'phone_1' => '+417' . str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
                 'slug' => $firstName . '-' . $lastName . '-' . $suffix . '-' . $index,
@@ -476,6 +482,7 @@ class HighPerformanceTestDataSeeder extends Seeder
             ];
         }
 
+        // Rest der Methode bleibt gleich...
         // Bulk Insert Users und hole IDs
         $this->insertInChunks('users', $userData, 2000);
 
@@ -485,6 +492,14 @@ class HighPerformanceTestDataSeeder extends Seeder
             ->pluck('id', 'email')
             ->toArray();
 
+        // Erweitere den Supervisor-Pool mit den neu erstellten Manager-IDs
+        $managerEmails = array_slice($userEmails, 0, min($managerCount - $managersCreated, $chunkSize));
+        foreach ($managerEmails as $managerEmail) {
+            if (isset($userIds[$managerEmail])) {
+                $supervisorIds[] = $userIds[$managerEmail];
+            }
+        }
+
         // Erstelle Employee, Role und Team-Zuweisungen
         $j = 0;
         foreach ($userEmails as $email) {
@@ -493,7 +508,7 @@ class HighPerformanceTestDataSeeder extends Seeder
             $userId = $userIds[$email];
             $index = $startIndex + $j + $indexOffset + 1;
 
-            // Employee-Daten
+            // Employee-Daten (bleiben gleich, da Felder noch im Employee Model sind)
             $prefix = $configKey === 'team2' ? 'B55-' : 'PN';
             $padLength = $configKey === 'team2' ? 5 : 8;
 
@@ -502,7 +517,7 @@ class HighPerformanceTestDataSeeder extends Seeder
                 'profession_id' => $professionIds[$j % $professionCount],
                 'stage_id' => $stageIds[$j % $stageCount],
                 'personal_number' => $prefix . str_pad($index, $padLength, '0', STR_PAD_LEFT),
-                'supervisor_id' => $ownerId,
+                'supervisor_id' => $userData[$j]['supervisor_id'], // Verwende den gleichen Supervisor
                 'employee_status' => $this->getRandomEmployeeStatusValue(),
                 'created_at' => $currentTime,
                 'updated_at' => $currentTime,
@@ -534,7 +549,7 @@ class HighPerformanceTestDataSeeder extends Seeder
             $j++;
         }
 
-        // Bulk Inserts
+        // Bulk Inserts bleiben gleich...
         if (!empty($employeeData)) {
             $this->insertInChunks('employees', $employeeData, 5000);
         }
@@ -701,7 +716,10 @@ class HighPerformanceTestDataSeeder extends Seeder
             'user_type' => UserType::Owner,
             'model_status' => ModelStatus::ACTIVE,
             'slug' => Str::slug($this->config['owner']['name'] . '-' . $this->config['owner']['last_name']) . '-' . Str::random(5),
-        ]);
+            'profession_id' => null,
+            'stage_id' => null,
+            'supervisor_id' => null,
+            ]);
 
         $owner->assignRole('owner');
         return $owner;

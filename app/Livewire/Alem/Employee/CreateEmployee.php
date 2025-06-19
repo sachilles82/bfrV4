@@ -54,13 +54,13 @@ class CreateEmployee extends Component
     public ?ModelStatus $model_status = null;
     public ?Carbon $joined_at = null;
     public ?int $department = null;
+    public ?int $stage = null;
+    public ?int $profession = null;
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
     /** Mitarbeiter-Felder */
     public ?EmployeeStatus $employee_status = null;
-    public $profession;
-    public $stage;
     public ?int $supervisor = null;
     public bool $invitation = false;
 
@@ -104,6 +104,8 @@ class CreateEmployee extends Component
                     'password' => Hash::make(Str::password()),
                     'email_verified_at' => now(),
                     'department_id' => $this->department,
+                    'profession_id' => $this->profession,
+                    'stage_id' => $this->stage,
                     'joined_at' => $this->joined_at?->toDateString(),
                     'model_status' => $this->model_status,
                     'user_type' => UserType::Employee,
