@@ -109,7 +109,7 @@ class CreateEmployee extends Component
                     'joined_at' => $this->joined_at?->toDateString(),
                     'user_type' => UserType::Employee,
                     'model_status' => $this->model_status,
-                    'status' => $this->employee_status,
+                    'status' => $this->status,
                     'company_id' => $this->companyId,
                     'created_by' => $this->authUserId,
                 ]);

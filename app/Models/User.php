@@ -57,8 +57,8 @@ class User extends Authenticatable
     use SoftDeletes;
     use TwoFactorAuthenticatable;
     use Searchable;
-    use AdvancedCache, UserWithManagerRole
-//        EmployeeStatusManagement
+    use AdvancedCache, UserWithManagerRole,
+        EmployeeStatusManagement
         ;
 
     /**

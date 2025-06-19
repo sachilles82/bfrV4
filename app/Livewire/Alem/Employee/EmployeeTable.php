@@ -117,7 +117,7 @@ class EmployeeTable extends Component
             'roles' => function ($q_roles) use ($companyId) {
                 $q_roles->where('visible', RoleVisibility::Visible->value)
                     ->where('access', RoleHasAccessTo::EmployeePanel->value)
-                    ->where(function($query) use ($companyId) {
+                    ->where(function ($query) use ($companyId) {
                         $query->where('created_by', 1)
                             ->orWhere('company_id', $companyId);
                     })
@@ -126,21 +126,15 @@ class EmployeeTable extends Component
         ]);
 
         // Joins hinzufügen
-        $query->join('employees', 'users.id', '=', 'employees.user_id')
-            ->join('team_user', function ($join) use ($authCurrentTeamId) {
-                $join->on('users.id', '=', 'team_user.user_id')
-                    ->where('team_user.team_id', '=', $authCurrentTeamId);
-            })
-
+        $query->join('team_user', function ($join) use ($authCurrentTeamId) {
+            $join->on('users.id', '=', 'team_user.user_id')
+                ->where('team_user.team_id', '=', $authCurrentTeamId);
+        })
             ->leftJoin('professions', 'users.profession_id', '=', 'professions.id')
             ->leftJoin('stages', 'users.stage_id', '=', 'stages.id')
-
-
-
-
             ->leftJoin('departments', 'users.department_id', '=', 'departments.id');
 
-        $query->where('users.user_type', $this->userType);
+//        $query->where('users.user_type', $this->userType);
 
         $this->applySearch($query);
         $this->applyStatusFilter($query);
@@ -158,7 +152,7 @@ class EmployeeTable extends Component
         ]);
     }
 
-    public function placeholder():View
+    public function placeholder(): View
     {
         return view('livewire.placeholders.employee.index');
     }
