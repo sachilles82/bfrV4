@@ -30,10 +30,7 @@ class Employee extends Model
         'user_id',
         // Personal Data
         'personal_number',
-        'profession_id',
-        'stage_id',
         'employment_type',
-        'supervisor_id',
         // joined_at wird im User Model gespeichert
         'probation_enum',
         'notice_at',
@@ -70,9 +67,6 @@ class Employee extends Model
         'religion' => Religion::class,
         'civil_status' => CivilStatus::class,
         'residence_permit' => Residence::class,
-        'profession_id' => 'integer',
-        'stage_id' => 'integer',
-        'supervisor_id' => 'integer',
     ];
 
     /**
@@ -103,7 +97,7 @@ class Employee extends Model
      */
     public static function withDefaultRelations()
     {
-        return static::with(['user', 'profession', 'stage', 'supervisorUser']);
+        return static::with(['user']);
     }
 
     /**
@@ -144,30 +138,6 @@ class Employee extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Gibt den Vorgesetzten (Supervisor) als User zurück
-     */
-    public function supervisorUser(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'supervisor_id');
-    }
-
-    /**
-     * Gibt die Berufsbezeichnung/Position des Mitarbeiters zurück.
-     */
-    public function profession(): BelongsTo
-    {
-        return $this->belongsTo(Profession::class, 'profession_id');
-    }
-
-    /**
-     * Gibt die Karrierestufe des Mitarbeiters zurück.
-     */
-    public function stage(): BelongsTo
-    {
-        return $this->belongsTo(Stage::class, 'stage_id');
     }
 
     /**

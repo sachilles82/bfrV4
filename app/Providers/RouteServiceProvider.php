@@ -27,7 +27,7 @@ class RouteServiceProvider extends ServiceProvider
                 "employee_profile_{$value}",
                 300, // 5 Minuten
                 fn() => User::userEmployeeFields()
-                    ->where('slug', $value)
+                    ->where('url_slug', $value)
                     ->firstOrFail()
             );
         });

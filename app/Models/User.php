@@ -76,7 +76,7 @@ class User extends Authenticatable
         'password',
         'phone_1',
         'phone_2',
-        'slug',
+        'url_slug',
         'company_id',
         'team_id',
         'created_by',
@@ -90,6 +90,7 @@ class User extends Authenticatable
         'profession_id',
         'stage_id',
         'supervisor_id',
+//        'invitation',
     ];
 
     /**
@@ -201,9 +202,9 @@ class User extends Authenticatable
         });
 
         static::creating(function ($user) {
-            if (empty($user->slug)) {
-                // Erstelle Slug aus Vor- und Nachname
-                $user->slug = Str::slug($user->name . '-' . $user->last_name);
+            if (empty($user->url_slug)) {
+                // Erstelle url_slug aus Vor- und Nachname
+                $user->url_slug = Str::slug($user->name . '-' . $user->last_name);
             }
         });
 
@@ -211,7 +212,7 @@ class User extends Authenticatable
             // Den Slug nur aktualisieren, wenn sich der Name oder Nachname geändert hat
             if ($user->isDirty('name') || $user->isDirty('last_name')) {
                 // Erstelle Slug aus Vor- und Nachname
-                $user->slug = Str::slug($user->name . '-' . $user->last_name);
+                $user->url_slug = Str::slug($user->name . '-' . $user->last_name);
             }
         });
     }
@@ -241,7 +242,7 @@ class User extends Authenticatable
     {
         return $query->select([
             'id',
-            'slug'
+            'url_slug'
         ]);
     }
 
@@ -250,7 +251,7 @@ class User extends Authenticatable
      */
     public function getRouteKey(): mixed
     {
-        return $this->slug;
+        return $this->url_slug;
     }
 
     /**

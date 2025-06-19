@@ -59,6 +59,7 @@ class EditEmployee extends Component
     public ?ModelStatus $model_status = null;
     public ?Carbon $joined_at = null;
     public ?int $department = null;
+    public ?int $supervisor = null;
     public ?int $stage = null;
     public ?int $profession = null;
     public array $selectedTeams = [];
@@ -66,7 +67,7 @@ class EditEmployee extends Component
 
     /** Mitarbeiter-Felder */
     public ?EmployeeStatus $employee_status = null;
-    public ?int $supervisor = null;
+//    public ?int $supervisor = null;
 
 
     #[On('edit-employee-modal')]
@@ -78,7 +79,7 @@ class EditEmployee extends Component
 
         // Kein Join in der Edit und Create verwenden. Nur in der Table ist es sinnvoll
         $this->user = User::with([
-            'employee:id,user_id,employee_status,supervisor_id',
+            'employee:id',
             'teams:id,name',
             'roles:id,name,is_manager',
             'department:id,name'
@@ -108,6 +109,7 @@ class EditEmployee extends Component
 
         $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
         $this->department = $this->user->department_id;
+        $this->supervisor = $this->user->supervisor_id;
         $this->profession = $this->user->profession_id;
         $this->stage = $this->user->stage_id;
 
@@ -121,7 +123,7 @@ class EditEmployee extends Component
         if ($employee = $this->user->employee) {
             // Employee Status ENUM
             $this->employee_status = $employee->employee_status;
-            $this->supervisor = $employee->supervisor_id;
+//            $this->supervisor = $employee->supervisor_id;
         }
     }
 
@@ -142,6 +144,7 @@ class EditEmployee extends Component
                     'email' => $this->email,
                     'department_id' => $this->department,
                     'profession_id' => $this->profession,
+                    'supervisor_id' => $this->supervisor,
                     'stage_id' => $this->stage,
                     'joined_at' => $this->joined_at?->toDateString(),
                     'model_status' => $this->model_status,
@@ -175,9 +178,6 @@ class EditEmployee extends Component
             ['user_id' => $this->userId],
             [
                 'employee_status' => $this->employee_status,
-                'supervisor_id' => $this->supervisor,
-                'profession_id' => $this->profession,
-                'stage_id' => $this->stage,
             ]
         );
     }

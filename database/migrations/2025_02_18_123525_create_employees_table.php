@@ -7,8 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      * Erstellt die employees-Tabelle mit optimierten Fremdschlüsselbeziehungen
@@ -20,11 +19,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
 
             $table->string('personal_number')->nullable();
-            $table->foreignId('profession_id')->constrained('professions')->cascadeOnDelete();
-            $table->foreignId('stage_id')->constrained('stages')->cascadeOnDelete();
             $table->string('employment_type')->nullable();
 
-            $table->foreignId('supervisor_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->string('probation_enum')->default(Probation::THREE_MONTHS->value);
             $table->date('probation_at')->nullable();
             $table->string('notice_at')->nullable();
@@ -43,9 +39,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('user_id');
-            $table->index('profession_id');
-            $table->index('stage_id');
-            $table->index('supervisor_id');
             $table->index('employee_status');
 //
 //            $table->index(['user_id', 'employee_status'], 'idx_user_status');

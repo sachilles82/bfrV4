@@ -23,7 +23,7 @@ class DummyUserSeeder extends Seeder
             'current_team_id' => null,       // current_team_id statt team_id
             'company_id' => null,       // optional, falls erforderlich
             'created_by' => null,       // optional, falls erforderlich
-            'slug' => Str::slug('Wir durch Super Admin ersetzt im AdminSeeder'), // Slug erzeugen
+            'url_slug' => Str::slug('Wir durch Super Admin ersetzt im AdminSeeder'), // Slug erzeugen
         ]);
     }
 }

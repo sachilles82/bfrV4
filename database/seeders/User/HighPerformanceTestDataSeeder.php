@@ -408,7 +408,8 @@ class HighPerformanceTestDataSeeder extends Seeder
         $configKey,
         $firstNames,
         $lastNames
-    ): void {
+    ): void
+    {
         $currentTime = now()->toDateTimeString();
         $companyId = $company->id;
         $teamId = $team->id;
@@ -474,7 +475,7 @@ class HighPerformanceTestDataSeeder extends Seeder
                 'supervisor_id' => $supervisorId,                            // NEU
                 'model_status' => ModelStatus::ACTIVE->value,
                 'phone_1' => '+417' . str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
-                'slug' => $firstName . '-' . $lastName . '-' . $suffix . '-' . $index,
+                'url_slug' => $firstName . '-' . $lastName . '-' . $suffix . '-' . $index,
                 'created_by' => $ownerId,
                 'joined_at' => $this->generateRandomDate(),
                 'created_at' => $currentTime,
@@ -514,10 +515,7 @@ class HighPerformanceTestDataSeeder extends Seeder
 
             $employeeData[] = [
                 'user_id' => $userId,
-                'profession_id' => $professionIds[$j % $professionCount],
-                'stage_id' => $stageIds[$j % $stageCount],
                 'personal_number' => $prefix . str_pad($index, $padLength, '0', STR_PAD_LEFT),
-                'supervisor_id' => $userData[$j]['supervisor_id'], // Verwende den gleichen Supervisor
                 'employee_status' => $this->getRandomEmployeeStatusValue(),
                 'created_at' => $currentTime,
                 'updated_at' => $currentTime,
@@ -715,11 +713,11 @@ class HighPerformanceTestDataSeeder extends Seeder
             'remember_token' => Str::random(10),
             'user_type' => UserType::Owner,
             'model_status' => ModelStatus::ACTIVE,
-            'slug' => Str::slug($this->config['owner']['name'] . '-' . $this->config['owner']['last_name']) . '-' . Str::random(5),
+            'url_slug' => Str::slug($this->config['owner']['name'] . '-' . $this->config['owner']['last_name']) . '-' . Str::random(5),
             'profession_id' => null,
             'stage_id' => null,
             'supervisor_id' => null,
-            ]);
+        ]);
 
         $owner->assignRole('owner');
         return $owner;
@@ -799,7 +797,7 @@ class HighPerformanceTestDataSeeder extends Seeder
         $companyId = $ownerUser->company_id;
 
         // Verwende Raw Queries für bessere Performance
-        DB::table('employees')->whereIn('user_id', function($query) use ($companyId) {
+        DB::table('employees')->whereIn('user_id', function ($query) use ($companyId) {
             $query->select('id')->from('users')->where('company_id', $companyId);
         })->delete();
 
