@@ -41,7 +41,7 @@ trait Searchable
                 try {
                     $query->whereRaw(
                         // Qualifiziere alle Spalten mit dem Tabellennamen, um Mehrdeutigkeiten zu vermeiden
-                        'MATCH(users.name, users.last_name, users.email, users.phone_1) AGAINST (? IN BOOLEAN MODE)',
+                        'MATCH(users.name, users.email, users.phone_1) AGAINST (? IN BOOLEAN MODE)',
                         [$booleanSearchTerm]
                     );
                 } catch (\Exception $e) {
@@ -84,7 +84,6 @@ trait Searchable
                 $q->where(function ($innerQ) use ($likeTerm) {
                     // Auch hier alle Spalten mit Tabellennamen qualifizieren
                     $innerQ->orWhere('users.name', 'like', $likeTerm)
-                           ->orWhere('users.last_name', 'like', $likeTerm)
                            ->orWhere('users.email', 'like', $likeTerm)
                            ->orWhere('users.phone_1', 'like', $likeTerm);
                 });
