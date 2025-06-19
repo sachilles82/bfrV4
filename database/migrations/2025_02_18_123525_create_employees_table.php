@@ -26,7 +26,6 @@ return new class extends Migration {
             $table->string('notice_at')->nullable();
             $table->string('notice_enum')->default(NoticePeriod::ONE_MONTH->value);
             $table->date('leave_at')->nullable();
-            $table->string('employee_status')->default(EmployeeStatus::PROBATION->value);
 
             $table->string('ahv_number')->nullable();
             $table->date('birthdate')->nullable();

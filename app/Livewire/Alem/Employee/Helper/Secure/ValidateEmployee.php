@@ -38,7 +38,7 @@ trait ValidateEmployee
             'selectedRoles.*' => 'exists:roles,id',
 
             // Mitarbeiter-Felder
-            'employee_status' => ['required', Rule::enum(EmployeeStatus::class)],
+            'status' => ['required', Rule::enum(EmployeeStatus::class)],
             'profession' => 'required|exists:professions,id',
             'stage' => 'required|exists:stages,id',
 
@@ -97,8 +97,8 @@ trait ValidateEmployee
             'selectedRoles.*.exists' => __('One of the selected roles is invalid.'),
 
             // Employee field messages
-            'employee_status.required' => __('Employee status is required.'),
-            'employee_status.enum' => __('The selected employee status is invalid.'),
+            'status.required' => __('Employee status is required.'),
+            'status.enum' => __('The selected employee status is invalid.'),
 
             'profession.required' => __('Profession is required.'),
             'profession.exists' => __('The selected profession is invalid.'),

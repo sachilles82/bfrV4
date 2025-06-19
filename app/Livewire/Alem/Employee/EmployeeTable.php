@@ -108,8 +108,6 @@ class EmployeeTable extends Component
             'users.stage_id',
 
             'employees.id as employee_id', 'employees.employee_status',
-//            'employees.profession_id',
-//            'employees.stage_id',
             'professions.name as profession_name',
             'stages.name as stage_name',
             'departments.name as department_name'
@@ -133,9 +131,6 @@ class EmployeeTable extends Component
                 $join->on('users.id', '=', 'team_user.user_id')
                     ->where('team_user.team_id', '=', $authCurrentTeamId);
             })
-//            ->leftJoin('professions', 'employees.profession_id', '=', 'professions.id')
-//            ->leftJoin('stages', 'employees.stage_id', '=', 'stages.id')
-
 
             ->leftJoin('professions', 'users.profession_id', '=', 'professions.id')
             ->leftJoin('stages', 'users.stage_id', '=', 'stages.id')

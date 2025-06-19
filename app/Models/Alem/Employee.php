@@ -36,13 +36,11 @@ class Employee extends Model
         'notice_at',
         'notice_enum',
         'leave_at',
-        'employee_status',
 
         // Employment Data
         'ahv_number',
         'nationality',
         'hometown',
-        'birthdate',
         'religion',
         'civil_status',
         'residence_permit',
@@ -62,8 +60,6 @@ class Employee extends Model
         'probation_enum' => Probation::class,
         'notice_at' => 'date',
         'notice_enum' => NoticePeriod::class,
-        'employee_status' => EmployeeStatus::class,
-        'birthdate' => 'date',
         'religion' => Religion::class,
         'civil_status' => CivilStatus::class,
         'residence_permit' => Residence::class,
@@ -112,25 +108,25 @@ class Employee extends Model
         ]);
     }
 
-    /**
-     * Scope für Mitarbeiter mit bestimmtem Status
-     */
-    public function scopeWithStatus($query, EmployeeStatus $status)
-    {
-        return $query->where('employee_status', $status->value);
-    }
-
-    /**
-     * Liefert den formatierten Status
-     */
-    public function getFullStatusAttribute()
-    {
-        if (! $this->employee_status) {
-            return '';
-        }
-
-        return "{$this->employee_status->value}: {$this->employee_status->label()}";
-    }
+//    /**
+//     * Scope für Mitarbeiter mit bestimmtem Status
+//     */
+//    public function scopeWithStatus($query, EmployeeStatus $status)
+//    {
+//        return $query->where('employee_status', $status->value);
+//    }
+//
+//    /**
+//     * Liefert den formatierten Status
+//     */
+//    public function getFullStatusAttribute()
+//    {
+//        if (! $this->employee_status) {
+//            return '';
+//        }
+//
+//        return "{$this->employee_status->value}: {$this->employee_status->label()}";
+//    }
 
     /**
      * Gibt den Benutzer zurück, dem der Mitarbeiter zugeordnet ist.
@@ -140,43 +136,43 @@ class Employee extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Überprüft, ob der Mitarbeiter im Probezeitstatus ist.
-     */
-    public function isOnProbation(): bool
-    {
-        return $this->employee_status === EmployeeStatus::PROBATION;
-    }
-
-    /**
-     * Überprüft, ob der Mitarbeiter im Onboarding-Status ist.
-     */
-    public function isOnboarding(): bool
-    {
-        return $this->employee_status === EmployeeStatus::ONBOARDING;
-    }
-
-    /**
-     * Überprüft, ob der Mitarbeiter voll angestellt ist.
-     */
-    public function isEmployed(): bool
-    {
-        return $this->employee_status === EmployeeStatus::EMPLOYED;
-    }
-
-    /**
-     * Überprüft, ob der Mitarbeiter im Urlaub ist.
-     */
-    public function isOnLeave(): bool
-    {
-        return $this->employee_status === EmployeeStatus::ONLEAVE;
-    }
-
-    /**
-     * Überprüft, ob der Mitarbeiter die Firma verlassen hat.
-     */
-    public function hasLeft(): bool
-    {
-        return $this->employee_status === EmployeeStatus::LEAVE;
-    }
+//    /**
+//     * Überprüft, ob der Mitarbeiter im Probezeitstatus ist.
+//     */
+//    public function isOnProbation(): bool
+//    {
+//        return $this->employee_status === EmployeeStatus::PROBATION;
+//    }
+//
+//    /**
+//     * Überprüft, ob der Mitarbeiter im Onboarding-Status ist.
+//     */
+//    public function isOnboarding(): bool
+//    {
+//        return $this->employee_status === EmployeeStatus::ONBOARDING;
+//    }
+//
+//    /**
+//     * Überprüft, ob der Mitarbeiter voll angestellt ist.
+//     */
+//    public function isEmployed(): bool
+//    {
+//        return $this->employee_status === EmployeeStatus::EMPLOYED;
+//    }
+//
+//    /**
+//     * Überprüft, ob der Mitarbeiter im Urlaub ist.
+//     */
+//    public function isOnLeave(): bool
+//    {
+//        return $this->employee_status === EmployeeStatus::ONLEAVE;
+//    }
+//
+//    /**
+//     * Überprüft, ob der Mitarbeiter die Firma verlassen hat.
+//     */
+//    public function hasLeft(): bool
+//    {
+//        return $this->employee_status === EmployeeStatus::LEAVE;
+//    }
 }

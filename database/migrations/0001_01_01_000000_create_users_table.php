@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use App\Enums\User\UserType;
@@ -32,7 +33,10 @@ return new class extends Migration {
             $table->foreignId('company_id')->nullable();
             $table->foreignId('department_id')->nullable();
             $table->string('user_type')->default(UserType::Employee);
+            $table->string('status')->nullable();
+//                ->default(EmployeeStatus::PROBATION->value);
             $table->string('model_status')->default(ModelStatus::ACTIVE);
+            $table->date('birthdate')->nullable();
             $table->date('joined_at')->nullable();
             $table->foreignId('created_by')->nullable();
 

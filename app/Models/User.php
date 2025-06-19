@@ -3,8 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
+use App\Enums\User\UserType;
 use App\Models\Address\State;
 use App\Models\Alem\Company;
 use App\Models\Alem\Department;
@@ -86,6 +88,9 @@ class User extends Authenticatable
         'gender',
         'email_verified_at',
 
+        'birthdate',
+        'status',
+
         'profession_id',
         'stage_id',
         'supervisor_id',
@@ -119,6 +124,9 @@ class User extends Authenticatable
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
 
+
+        'birthdate' => 'date',
+
         'profession_id' => 'integer',
         'stage_id' => 'integer',
         'supervisor_id' => 'integer',
@@ -131,6 +139,23 @@ class User extends Authenticatable
         'deleted_at',
         'joined_at',
     ];
+
+    /**
+     * Dynamischer Status Accessor - du kannst verschiedene Status-Enums zurückgeben,
+     * abhängig vom User-Typ.
+     * Kein casting nötig, da wir den Enum direkt zurückgeben.
+     */
+    public function getStatusAttribute($value): mixed
+    {
+        if (!$value) return null;
+
+        return match($this->user_type) {
+            UserType::Employee => EmployeeStatus::tryFrom($value),
+//            UserType::Partner => PartnerStatus::tryFrom($value),    // Zukünftig
+//            UserType::Customer => CustomerStatus::tryFrom($value),  // Zukünftig
+            default => null
+        };
+    }
 
     /**
      * Berechnet die Betriebszugehörigkeit in Jahren
