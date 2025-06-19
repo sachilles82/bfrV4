@@ -137,13 +137,13 @@ class EditEmployee extends Component
             DB::transaction(function () {
 
                 User::where('id', $this->userId)->update([
+                    'gender' => $this->gender,
                     'name' => $this->name,
                     'last_name' => $this->last_name,
                     'email' => $this->email,
-                    'gender' => $this->gender,
-                    'model_status' => $this->model_status,
-                    'joined_at' => $this->joined_at?->toDateString(),
                     'department_id' => $this->department,
+                    'joined_at' => $this->joined_at?->toDateString(),
+                    'model_status' => $this->model_status,
                 ]);
 
                 $this->updateEmployeeData();

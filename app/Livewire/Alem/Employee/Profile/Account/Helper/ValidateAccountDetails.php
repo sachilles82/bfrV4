@@ -21,7 +21,7 @@ trait ValidateAccountDetails
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->employee)
+                Rule::unique('users', 'email')->ignore($this->employeeId)
             ],
             'model_status' => ['required', Rule::enum(ModelStatus::class)],
 

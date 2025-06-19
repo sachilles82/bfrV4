@@ -18,6 +18,7 @@ use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Throwable;
 
 #[Lazy]
 class Details extends Component
@@ -26,12 +27,10 @@ class Details extends Component
     use AuthorizesRequests, ValidateAccountDetails;
     use ModelStatusOptions, GenderOptions;
 
-    // NICHT public User $employee - das verursacht die doppelte Query!
-
     #[Locked]
     public int $employeeId;
 
-    private User $employee; // Private property
+    private User $employee;
 
     // User form fields
     public ?Gender $gender = null;
@@ -44,13 +43,8 @@ class Details extends Component
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    public function mount(
-        $employee, // Nicht typisiert!
-        int $authUserId,
-        int $currentTeamId,
-        int $companyId
-    ): void {
-        // Extrahiere nur die ID
+    public function mount($employee, int $authUserId, int $currentTeamId, int $companyId): void {
+
         $this->employeeId = is_object($employee) ? $employee->id : $employee['id'];
 
         // Auth Daten
@@ -58,44 +52,38 @@ class Details extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade den Employee einmal mit allen benötigten Daten
-        $this->loadEmployeeData();
-
-        // Lade nur Dropdown-Daten
-        $this->loadRelationsData(['teams', 'departments', 'roles']);
-    }
-
-    private function loadEmployeeData(): void
-    {
         $this->employee = User::with([
             'teams:id,name',
             'roles:id,name,is_manager',
             'department:id,name'
         ])->findOrFail($this->employeeId);
 
-        $this->populateFormFields();
+        // Lade den Employee einmal mit allen benötigten Daten
+        $this->loadEmployeeData();
+
+        // Lade nur Dropdown-Daten
+        $this->loadRelationsData([
+            'teams', 'departments', 'roles', 'supervisors'
+        ]);
     }
 
-    private function populateFormFields(): void
+    /**
+     * Lade die User Employee Daten
+     */
+    private function loadEmployeeData(): void
     {
+        if (!$this->employee) return;
+
         $this->gender = $this->employee->gender;
         $this->name = $this->employee->name;
         $this->last_name = $this->employee->last_name;
         $this->email = $this->employee->email;
         $this->phone_1 = $this->employee->phone_1 ?? '';
-        $this->model_status = $this->employee->model_status;
-        $this->department = $this->employee->department_id;
 
         $this->selectedTeams = $this->employee->teams->pluck('id')->toArray();
+        $this->department = $this->employee->department_id;
         $this->selectedRoles = $this->employee->roles->pluck('id')->toArray();
-    }
-
-    #[On('employee-data-refreshed')]
-    public function refreshFromParent(int $employeeId): void
-    {
-        if ($employeeId === $this->employeeId) {
-            $this->loadEmployeeData();
-        }
+        $this->model_status = $this->employee->model_status;
     }
 
     public function updateEmployee(): void
@@ -108,39 +96,40 @@ class Details extends Component
                 $employee = User::findOrFail($this->employeeId);
 
                 $employee->update([
+                    'gender' => $this->gender,
                     'name' => $this->name,
                     'last_name' => $this->last_name,
                     'email' => $this->email,
                     'phone_1' => $this->phone_1,
-                    'gender' => $this->gender,
-                    'model_status' => $this->model_status,
+
                     'department_id' => $this->department,
+                    'model_status' => $this->model_status,
                 ]);
 
                 $this->syncRelations($employee);
+
             });
 
-            // Benachrichtige andere Components
-            $this->dispatch('employee-basic-data-updated', employeeId: $this->employeeId);
+            $this->dispatch('employee-updated');
 
             Flux::toast(
-                text: __('Employee Profile updated successfully.'),
+                text: __('Employee Account Details updated successfully.'),
                 heading: __('Success.'),
                 variant: 'success'
             );
 
-        } catch (\Throwable $e) {
-            Flux::toast(
-                text: __('Error updating employee profile: ') . $e->getMessage(),
-                heading: __('Error'),
-                variant: 'danger'
-            );
+        } catch (Throwable $e) {
+//            $this->handleUpdateEmployeeAccountDetails($e);
         }
     }
 
+    /**
+     * @throws Throwable
+     */
     private function syncRelations(User $employee): void
     {
         DB::transaction(function () use ($employee): void {
+
             $wasManager = $employee->hasManagerRole();
 
             $employee->roles()->sync($this->selectedRoles);
