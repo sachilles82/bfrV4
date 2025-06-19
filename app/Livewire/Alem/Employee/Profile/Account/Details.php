@@ -35,7 +35,6 @@ class Details extends Component
     // User form fields
     public ?Gender $gender = null;
     public ?string $name = null;
-    public ?string $last_name = null;
     public ?string $email = null;
     public ?string $phone_1 = null;
     public ?ModelStatus $model_status = null;
@@ -76,7 +75,6 @@ class Details extends Component
 
         $this->gender = $this->employee->gender;
         $this->name = $this->employee->name;
-        $this->last_name = $this->employee->last_name;
         $this->email = $this->employee->email;
         $this->phone_1 = $this->employee->phone_1 ?? '';
 
@@ -98,7 +96,6 @@ class Details extends Component
                 $employee->update([
                     'gender' => $this->gender,
                     'name' => $this->name,
-                    'last_name' => $this->last_name,
                     'email' => $this->email,
                     'phone_1' => $this->phone_1,
 

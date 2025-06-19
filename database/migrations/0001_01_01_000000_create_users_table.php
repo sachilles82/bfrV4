@@ -16,159 +16,76 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // SQLite wird nicht unterstützt
-        if (config('database.default') === 'sqlite') {
-            throw new \Exception('Diese Anwendung unterstützt SQLite nicht mehr. Bitte verwenden Sie MySQL oder PostgreSQL.');
-        }
+        Schema::create('users', function (Blueprint $table) {
+            // Primärschlüssel und Identifikation
+            $table->id();
+            $table->string('url_slug')->unique()->nullable();
 
-        // --- MySQL-spezifische Implementation ---
-        if (config('database.default') === 'mysql') {
-            Schema::create('users', function (Blueprint $table) {
-                // Primärschlüssel und Identifikation
-                $table->id();
-                $table->string('url_slug')->unique()->nullable();
+            // Persönliche Informationen
+            $table->string('name');
+            $table->string('name_normalized')->virtualAs("regexp_replace(lower(name), '[^a-z0-9]', '')")->nullable()->index();
+            $table->string('gender')->default(Gender::Male)->nullable();
+            $table->string('phone_1')->nullable();
+            $table->string('phone_2')->nullable();
 
-                // Persönliche Informationen
-                $table->string('name');
-                $table->string('name_normalized')->virtualAs("regexp_replace(lower(name), '[^a-z0-9]', '')")->nullable()->index();
-                $table->string('last_name')->nullable();
-                $table->string('last_name_normalized')->virtualAs("regexp_replace(lower(last_name), '[^a-z0-9]', '')")->nullable()->index();
-                $table->string('gender')->default(Gender::Male)->nullable();
-                $table->string('phone_1')->nullable();
-                $table->string('phone_2')->nullable();
+            // Organisations- und Rollenzuordnung
+            $table->foreignId('company_id')->nullable();
+            $table->foreignId('department_id')->nullable();
+            $table->string('user_type')->default(UserType::Employee);
+            $table->string('model_status')->default(ModelStatus::ACTIVE);
+            $table->date('joined_at')->nullable();
+            $table->foreignId('created_by')->nullable();
 
-                // Organisations- und Rollenzuordnung
-                $table->foreignId('company_id')->nullable();
-                $table->foreignId('department_id')->nullable();
-                $table->string('user_type')->default(UserType::Employee);
-                $table->string('model_status')->default(ModelStatus::ACTIVE);
-                $table->date('joined_at')->nullable();
-                $table->foreignId('created_by')->nullable();
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
 
-                $table->string('email')->unique();
-                $table->timestamp('email_verified_at')->nullable();
-                $table->string('password');
-                $table->rememberToken();
+            $table->string('theme')->default('default');
+            $table->foreignId('current_team_id')->nullable();
+            $table->string('profile_photo_path', 2048)->nullable();
 
-                $table->string('theme')->default('default');
-                $table->foreignId('current_team_id')->nullable();
-                $table->string('profile_photo_path', 2048)->nullable();
+            $table->softDeletes();
+            $table->timestamps();
 
-                $table->softDeletes();
-                $table->timestamps();
+            // 🚀 OPTIMIERTE INDIZES für deine spezifischen Queries Dieser ist neu für die Profile seite
 
-                // 🚀 OPTIMIERTE INDIZES für deine spezifischen Queries Dieser ist neu für die Profile seite
+            // 1. Haupt-Performance Index für User-Lookups mit Relations
+            $table->index(['id', 'deleted_at'], 'idx_users_id_soft_delete');
 
-                // 1. Haupt-Performance Index für User-Lookups mit Relations
-                $table->index(['id', 'deleted_at'], 'idx_users_id_soft_delete');
+            // 2. Company-spezifische Lookups (sehr häufig verwendet)
+            $table->index(['company_id', 'user_type', 'model_status', 'deleted_at'], 'idx_company_user_filtering');
 
-                // 2. Company-spezifische Lookups (sehr häufig verwendet)
-                $table->index(['company_id', 'user_type', 'model_status', 'deleted_at'], 'idx_company_user_filtering');
+            // 3. Department Relations
+            $table->index(['department_id', 'deleted_at'], 'idx_department_soft_delete');
 
-                // 3. Department Relations
-                $table->index(['department_id', 'deleted_at'], 'idx_department_soft_delete');
+            // 4. Team Relations (für current_team_id)
+            $table->index(['current_team_id', 'company_id'], 'idx_current_team_company');
 
-                // 4. Team Relations (für current_team_id)
-                $table->index(['current_team_id', 'company_id'], 'idx_current_team_company');
-
-                // 5. Auth & Session Performance
-                $table->index(['email', 'deleted_at'], 'idx_email_soft_delete');
-                // 🚀 OPTIMIERTE INDIZES für deine spezifischen Queries Dieser ist neu für die Profile seite
+            // 5. Auth & Session Performance
+            $table->index(['email', 'deleted_at'], 'idx_email_soft_delete');
+            // 🚀 OPTIMIERTE INDIZES für deine spezifischen Queries Dieser ist neu für die Profile seite
 
 
-                // --- Optimierte Indizes für häufig abgefragte Felder ---
-                $table->index(['user_type', 'model_status', 'deleted_at'], 'idx_user_type_status_deleted');
-                $table->index(['company_id', 'department_id'], 'idx_company_department');
+            // --- Optimierte Indizes für häufig abgefragte Felder ---
+            $table->index(['user_type', 'model_status', 'deleted_at'], 'idx_user_type_status_deleted');
+            $table->index(['company_id', 'department_id'], 'idx_company_department');
 
-                // Indexes für die Sortierfelder
-                $table->index('name');
-                $table->index('joined_at');
-                $table->index('created_at');
-                $table->index('created_by');
-                $table->index('deleted_at');
+            // Indexes für die Sortierfelder
+            $table->index('name');
+            $table->index('joined_at');
+            $table->index('created_at');
+            $table->index('created_by');
+            $table->index('deleted_at');
 
-                // === Index für performante Tabelle ===
-                $table->index(['user_type', 'model_status', 'deleted_at', 'created_at'], 'idx_users_filter_sort');
+            // === Index für performante Tabelle ===
+            $table->index(['user_type', 'model_status', 'deleted_at', 'created_at'], 'idx_users_filter_sort');
 
 
-            });
-            // *** FULLTEXT Index für das Suchfeld (MySQL-spezifisch) ***
-            DB::statement('ALTER TABLE users ADD FULLTEXT INDEX users_search_original_fulltext_idx (name, last_name, email, phone_1)');
+        });
+        // *** FULLTEXT Index für das Suchfeld (MySQL-spezifisch) ***
+        DB::statement('ALTER TABLE users ADD FULLTEXT INDEX users_search_original_fulltext_idx (name, email, phone_1)');
 
-        } // Ende if MySQL
-
-        //        // --- PostgreSQL-spezifische Implementation ---
-        //        if (config('database.default') === 'pgsql') {
-        //            Schema::create('users', function (Blueprint $table) {
-        //                // Primärschlüssel und Identifikation
-        //                $table->id();
-        //                $table->string('slug')->unique()->nullable();
-        //
-        //                // Persönliche Informationen
-        //                $table->string('name');
-        //                $table->string('last_name')->nullable();
-        //                $table->string('gender')->default(Gender::Male)->nullable();
-        //                $table->string('phone_1')->nullable(); // Spalte existiert bereits
-        //                $table->string('phone_2')->nullable();
-        //
-        //                // Organisations- und Rollenzuordnung
-        //                $table->foreignId('company_id')->nullable();
-        //                $table->foreignId('department_id')->nullable();
-        //                $table->string('user_type')->default(UserType::Employee);
-        //                $table->string('model_status')->default(ModelStatus::ACTIVE);
-        //                $table->timestamp('joined_at')->nullable(); // Spalte existiert bereits
-        //                $table->foreignId('created_by')->nullable();
-        //
-        //                // Authentifizierung und Sicherheit
-        //                $table->string('email')->unique();
-        //                $table->timestamp('email_verified_at')->nullable();
-        //                $table->string('password');
-        //                $table->rememberToken();
-        //
-        //                // UI-Präferenzen
-        //                $table->string('theme')->default('default');
-        //                $table->foreignId('current_team_id')->nullable();
-        //                $table->string('profile_photo_path', 2048)->nullable();
-        //
-        //                // System-Zeitstempel
-        //                $table->softDeletes();
-        //                $table->timestamps();
-        //
-        //                // --- Optimierte Indizes für häufig abgefragte Felder ---
-        //                // Bestehende Indizes
-        //                $table->index(['user_type', 'model_status'], 'idx_user_type_status');
-        //                $table->index(['company_id', 'department_id'], 'idx_company_department');
-//        $table->index('name');
-//        $table->index('joined_at');
-//        $table->index('created_at');
-        //
-        //                // PostgreSQL-spezifische normalisierte Indizes
-        //                $table->rawIndex("regexp_replace(lower(name), '[^a-z0-9]', '')", 'users_name_normalized_index');
-        //                $table->rawIndex("regexp_replace(lower(last_name), '[^a-z0-9]', '')", 'users_last_name_normalized_index');
-        //
-        //                // *** NEU hinzugefügte Standard-Indizes ***
-        //
-        //
-        //                // Hinweis: Der MySQL FULLTEXT Index ist hier nicht direkt anwendbar.
-        //                // PostgreSQL benötigt eine andere Konfiguration für Volltextsuche (z.B. tsvector, GIN).
-        //            }); // Ende Schema::create für PostgreSQL
-        //        } // Ende if PostgreSQL
-        //
-        //        // --- Erstellung der anderen Tabellen (unverändert) ---
-        //        Schema::create('password_reset_tokens', function (Blueprint $table) {
-        //            $table->string('email')->primary();
-        //            $table->string('token');
-        //            $table->timestamp('created_at')->nullable();
-        //        });
-        //
-        //        Schema::create('sessions', function (Blueprint $table) {
-        //            $table->string('id')->primary();
-        //            $table->foreignId('user_id')->nullable()->index();
-        //            $table->string('ip_address', 45)->nullable();
-        //            $table->text('user_agent')->nullable();
-        //            $table->longText('payload');
-        //            $table->integer('last_activity')->index();
-        //        });
     }
 
     public function down(): void

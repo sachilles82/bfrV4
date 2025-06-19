@@ -131,7 +131,6 @@ trait UserWithManagerRole
             return self::select([
                 'users.id',
                 'users.name',
-                'users.last_name',
                 'users.profile_photo_path'
             ])
                 ->join('model_has_roles', function ($join) {

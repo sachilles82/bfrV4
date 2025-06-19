@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Account\Helper;
 
-use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use App\Models\Alem\Department;
@@ -16,7 +15,6 @@ trait ValidateAccountDetails
             // User-Felder
             'gender' => ['required', Rule::enum(Gender::class)],
             'name' => 'required|string|min:3',
-            'last_name' => 'required|string|min:3',
             'email' => [
                 'required',
                 'email',
@@ -55,10 +53,6 @@ trait ValidateAccountDetails
             'name.required' => __('Employee name is required.'),
             'name.string' => __('Employee name must be a string.'),
             'name.min' => __('Employee name must be at least 3 characters.'),
-
-            'last_name.required' => __('Employee last name is required.'),
-            'last_name.string' => __('Employee last name must be a string.'),
-            'last_name.min' => __('Employee last name must be at least 3 characters.'),
 
             'email.required' => __('Email is required.'),
             'email.email' => __('Email must be a valid email address.'),

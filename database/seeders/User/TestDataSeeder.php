@@ -38,8 +38,7 @@ class TestDataSeeder extends Seeder
     protected array $config = [
         // Owner Konfiguration
         'owner' => [
-            'name' => 'Daniel',
-            'last_name' => 'Skrbac',
+            'name' => 'Daniel Srbac',
             'email' => 'daniel@firma.ch',
             'password' => 'password',
         ],
@@ -240,10 +239,6 @@ class TestDataSeeder extends Seeder
                 $this->config['owner']['name'] = $name;
             }
 
-            if ($this->command->hasOption('owner-lastname') && $lastname = $this->command->option('owner-lastname')) {
-                $this->config['owner']['last_name'] = $lastname;
-            }
-
             if ($this->command->hasOption('owner-email') && $email = $this->command->option('owner-email')) {
                 $this->config['owner']['email'] = $email;
             }
@@ -332,15 +327,14 @@ class TestDataSeeder extends Seeder
 
         $owner = User::create([
             'name' => $this->config['owner']['name'],
-            'last_name' => $this->config['owner']['last_name'],
             'email' => $this->config['owner']['email'],
             'email_verified_at' => now(),
             'password' => $this->passwordHash,
             'remember_token' => Str::random(10),
             'user_type' => UserType::Owner,
             'model_status' => ModelStatus::ACTIVE,
-            'slug' => Str::slug($this->config['owner']['name'] . '-' . $this->config['owner']['last_name']) . '-' . Str::random(5),
-        ]);
+            'url_slug' => Str::slug($this->config['owner']['name']) . '-' . Str::random(3),
+            ]);
 
         $owner->assignRole('owner');
 
@@ -711,12 +705,10 @@ class TestDataSeeder extends Seeder
     protected function generateUniqueEmail($index, $configKey): string
     {
         $firstName = $this->faker->firstName;
-        $lastName = $this->faker->lastName;
         $suffix = $configKey === 'team2' ? '.b55' : '';
 
         return strtolower(
-            Str::slug($firstName) . '.' .
-            Str::slug($lastName) .
+            Str::slug($firstName).
             $suffix . '.' .
             $index . '@firma.ch'
         );
@@ -728,12 +720,10 @@ class TestDataSeeder extends Seeder
     protected function createUser($email, $companyId, $departmentId, $createdBy, $index, $configKey): int
     {
         $firstName = $this->faker->firstName;
-        $lastName = $this->faker->lastName;
         $suffix = $configKey === 'team2' ? '-b55' : '';
 
         return DB::table('users')->insertGetId([
             'name' => $firstName,
-            'last_name' => $lastName,
             'email' => $email,
             'email_verified_at' => now(),
             'password' => $this->passwordHash,
@@ -743,7 +733,7 @@ class TestDataSeeder extends Seeder
             'department_id' => $departmentId,
             'model_status' => ModelStatus::ACTIVE->value,
             'phone_1' => $this->generatePhoneNumber(),
-            'slug' => Str::slug($firstName . '-' . $lastName . $suffix . '-' . $index),
+            'url_slug' => Str::slug($firstName . $suffix . '-' . $index),
             'created_by' => $createdBy,
             'joined_at' => Carbon::now()->subDays(rand(0, 365 * 3)),
             'created_at' => now(),

@@ -54,7 +54,6 @@ class EditEmployee extends Component
     /** Benutzer-Felder */
     public ?Gender $gender = null;
     public ?string $name = null;
-    public ?string $last_name = null;
     public ?string $email = null;
     public ?ModelStatus $model_status = null;
     public ?Carbon $joined_at = null;
@@ -104,7 +103,6 @@ class EditEmployee extends Component
 
         $this->gender = $this->user->gender;
         $this->name = $this->user->name;
-        $this->last_name = $this->user->last_name;
         $this->email = $this->user->email;
 
         $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
@@ -123,7 +121,6 @@ class EditEmployee extends Component
         if ($employee = $this->user->employee) {
             // Employee Status ENUM
             $this->employee_status = $employee->employee_status;
-//            $this->supervisor = $employee->supervisor_id;
         }
     }
 
@@ -140,7 +137,6 @@ class EditEmployee extends Component
                 User::where('id', $this->userId)->update([
                     'gender' => $this->gender,
                     'name' => $this->name,
-                    'last_name' => $this->last_name,
                     'email' => $this->email,
                     'department_id' => $this->department,
                     'profession_id' => $this->profession,
@@ -226,7 +222,7 @@ class EditEmployee extends Component
         $this->resetErrorBag();
 
         $this->reset([
-            'gender', 'name', 'last_name', 'email', 'selectedTeams',
+            'gender', 'name', 'email', 'selectedTeams',
             'department', 'supervisor', 'selectedRoles', 'profession',
             'stage', 'joined_at', 'employee_status', 'model_status',
         ]);

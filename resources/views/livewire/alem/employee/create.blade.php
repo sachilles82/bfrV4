@@ -48,9 +48,9 @@
                     </div>
 
                     <!-- First Name -->
-                    <div class="sm:col-span-3">
+                    <div class="sm:col-span-5">
                         <x-pupi.input.group
-                            label="{{ __('First Name') }}"
+                            label="{{ __('Full Name') }}"
                             for="name"
                             badge="{{ __('Required') }}"
                             :error="$errors->first('name')"
@@ -59,26 +59,7 @@
 
                             <x-pupi.input.text
                                 wire:model="name"
-                                id="name" placeholder="{{ __('Enter name') }}"
-                            />
-
-                        </x-pupi.input.group>
-                    </div>
-
-                    <!-- Last Name -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Last Name') }}"
-                            for="last_name"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('last_name')"
-                            help-text="{{ __('') }}"
-                            model="last_name">
-
-                            <x-pupi.input.text
-                                wire:model="last_name"
-                                id="last_name"
-                                placeholder="{{ __('Enter last name') }}"
+                                id="name" placeholder="{{ __('Sahrim Alija') }}"
                             />
 
                         </x-pupi.input.group>

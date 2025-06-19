@@ -200,7 +200,7 @@ trait WithDropDownRelations
             ->reject(fn($sup) => $sup->id === $excludeId)
             ->map(fn($sup) => [
                 'id' => $sup->id,
-                'full_name' => $sup->name . ' ' . $sup->last_name,
+                'full_name' => $sup->name,
                 'profile_photo_path' => $sup->profile_photo_path
             ]);
     }

@@ -49,7 +49,6 @@ class CreateEmployee extends Component
     public ?int $userId = null;
     public ?Gender $gender = null;
     public ?string $name = null;
-    public ?string $last_name = null;
     public ?string $email = null;
     public ?ModelStatus $model_status = null;
     public ?Carbon $joined_at = null;
@@ -102,7 +101,6 @@ class CreateEmployee extends Component
                 $user = User::create([
                     'gender' => $this->gender,
                     'name' => $this->name,
-                    'last_name' => $this->last_name,
                     'email' => $this->email,
                     'password' => Hash::make(Str::password()),
                     'email_verified_at' => now(),
@@ -195,7 +193,7 @@ class CreateEmployee extends Component
         $this->resetErrorBag();
 
         $this->reset([
-            'gender', 'name', 'last_name', 'email', 'selectedTeams',
+            'gender', 'name', 'email', 'selectedTeams',
             'department', 'supervisor', 'selectedRoles', 'profession',
             'stage', 'joined_at', 'employee_status', 'model_status',
             'invitation',

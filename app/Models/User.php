@@ -71,7 +71,6 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'last_name',
         'email',
         'password',
         'phone_1',
@@ -204,15 +203,15 @@ class User extends Authenticatable
         static::creating(function ($user) {
             if (empty($user->url_slug)) {
                 // Erstelle url_slug aus Vor- und Nachname
-                $user->url_slug = Str::slug($user->name . '-' . $user->last_name);
+                $user->url_slug = Str::slug($user->name);
             }
         });
 
         static::updating(function ($user) {
             // Den Slug nur aktualisieren, wenn sich der Name oder Nachname geändert hat
-            if ($user->isDirty('name') || $user->isDirty('last_name')) {
+            if ($user->isDirty('name') ) {
                 // Erstelle Slug aus Vor- und Nachname
-                $user->url_slug = Str::slug($user->name . '-' . $user->last_name);
+                $user->url_slug = Str::slug($user->name);
             }
         });
     }

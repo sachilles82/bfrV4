@@ -100,7 +100,7 @@ class EmployeeTable extends Component
         // ----------------------- Ende FORCE INDEX --------------------------------
 
         $query->select([
-            'users.id', 'users.department_id', 'users.name', 'users.last_name', 'users.phone_1',
+            'users.id', 'users.department_id', 'users.name', 'users.phone_1',
             'users.email', 'users.joined_at', 'users.created_at', 'users.model_status',
             'users.profile_photo_path', 'users.url_slug', 'users.deleted_at',
 

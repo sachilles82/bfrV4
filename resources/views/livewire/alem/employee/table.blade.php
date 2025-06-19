@@ -176,7 +176,7 @@
                                              alt="{{ $user->name }}" class="h-11 w-11 rounded-full">
                                     @else
                                         @php
-                                            $nameInitials = strtoupper(join('+', array_map(fn($name) => substr($name, 0, 1), explode(' ', $user->name . ' ' . $user->last_name))));
+                                            $nameInitials = strtoupper(join('+', array_map(fn($name) => substr($name, 0, 1), explode(' ', $user->name))));
                                         @endphp
                                         <img
                                             src="https://ui-avatars.com/api/?name={{ $nameInitials }}&color=7F9CF5&background=EBF4FF"
@@ -186,7 +186,7 @@
                                 <div class="ml-4">
                                     <a wire:navigate href="{{ route('employees.profile', $user) }}"
                                        class="font-medium text-gray-900 dark:text-gray-300 hover:text-indigo-700 decoration-1 hover:underline dark:hover:text-indigo-400">
-                                        {{ $user->name }} {{ $user->last_name }}
+                                        {{ $user->name }}
                                     </a>
                                     <div class="mt-1 text-gray-500 dark:text-gray-400">
                                         @if($user->profession_name)

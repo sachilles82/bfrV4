@@ -34,8 +34,7 @@ class HighPerformanceTestDataSeeder extends Seeder
     protected array $config = [
         // Owner Konfiguration
         'owner' => [
-            'name' => 'Daniel',
-            'last_name' => 'Skrbac',
+            'name' => 'Daniel Skrbac',
             'email' => 'daniel@firma.ch',
             'password' => 'password',
         ],
@@ -356,7 +355,6 @@ class HighPerformanceTestDataSeeder extends Seeder
             // Multipliziere mit 3 statt 2 für mehr Sicherheit bei unique Namen
             $namesNeeded = max($currentChunkSize * 3, 1000);
             $firstNames = $this->preGenerateNames($namesNeeded, 'firstName');
-            $lastNames = $this->preGenerateNames($namesNeeded, 'lastName');
 
             $this->createEmployeeChunkOptimized(
                 $team,
@@ -374,7 +372,6 @@ class HighPerformanceTestDataSeeder extends Seeder
                 $managerCount,
                 $configKey,
                 $firstNames,
-                $lastNames
             );
 
             // Garbage Collection alle 10 Chunks
@@ -407,7 +404,6 @@ class HighPerformanceTestDataSeeder extends Seeder
         $managerCount,
         $configKey,
         $firstNames,
-        $lastNames
     ): void
     {
         $currentTime = now()->toDateTimeString();
@@ -437,22 +433,19 @@ class HighPerformanceTestDataSeeder extends Seeder
 
             // Verwende vorgenerierte Namen mit Sicherheitsprüfung
             $firstNameIndex = $j % count($firstNames);
-            $lastNameIndex = $j % count($lastNames);
 
             // Sicherheitsprüfung für Array-Zugriff
-            if (!isset($firstNames[$firstNameIndex]) || !isset($lastNames[$lastNameIndex])) {
+            if (!isset($firstNames[$firstNameIndex])) {
                 // Fallback auf Faker, falls Index nicht existiert
                 $firstName = $this->faker->firstName;
-                $lastName = $this->faker->lastName;
             } else {
                 $firstName = $firstNames[$firstNameIndex];
-                $lastName = $lastNames[$lastNameIndex];
             }
 
             $suffix = $configKey === 'team2' ? 'b55' : 't1';
 
             // Generiere Email ohne Slug für bessere Performance
-            $email = strtolower($firstName . '.' . $lastName . '.' . $suffix . $index . '@firma.ch');
+            $email = strtolower($firstName . $suffix . $index . '@firma.ch');
             $userEmails[] = $email;
 
             // Bestimme Supervisor
@@ -462,7 +455,6 @@ class HighPerformanceTestDataSeeder extends Seeder
             // User-Daten MIT den neuen Feldern
             $userData[] = [
                 'name' => $firstName,
-                'last_name' => $lastName,
                 'email' => $email,
                 'email_verified_at' => $currentTime,
                 'password' => $this->passwordHash,
@@ -475,7 +467,7 @@ class HighPerformanceTestDataSeeder extends Seeder
                 'supervisor_id' => $supervisorId,                            // NEU
                 'model_status' => ModelStatus::ACTIVE->value,
                 'phone_1' => '+417' . str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
-                'url_slug' => $firstName . '-' . $lastName . '-' . $suffix . '-' . $index,
+                'url_slug' => $firstName . $suffix . '-' . $index,
                 'created_by' => $ownerId,
                 'joined_at' => $this->generateRandomDate(),
                 'created_at' => $currentTime,
@@ -706,14 +698,13 @@ class HighPerformanceTestDataSeeder extends Seeder
     {
         $owner = User::create([
             'name' => $this->config['owner']['name'],
-            'last_name' => $this->config['owner']['last_name'],
             'email' => $this->config['owner']['email'],
             'email_verified_at' => now(),
             'password' => $this->passwordHash,
             'remember_token' => Str::random(10),
             'user_type' => UserType::Owner,
             'model_status' => ModelStatus::ACTIVE,
-            'url_slug' => Str::slug($this->config['owner']['name'] . '-' . $this->config['owner']['last_name']) . '-' . Str::random(5),
+            'url_slug' => Str::slug($this->config['owner']['name']) . '-' . Str::random(3),
             'profession_id' => null,
             'stage_id' => null,
             'supervisor_id' => null,
