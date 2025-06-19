@@ -15,9 +15,9 @@ use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
+use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -47,20 +47,21 @@ class CreateEmployee extends Component
 
     /** Benutzer-Felder */
     public ?int $userId = null;
-    public ?Gender $gender = null;
+    public ?string $gender = null;
     public ?string $name = null;
     public ?string $email = null;
-    public ?ModelStatus $model_status = null;
-    public ?EmployeeStatus $status = null;
+
+    public array $selectedTeams = [];
+    public ?int $department = null;
+    public ?int $supervisor = null;
+    public array $selectedRoles = [];
+
+    public ?int $profession = null;
+    public ?int $stage = null;
     public ?Carbon $joined_at = null;
 
-    /** Relation Dropdown-Felder */
-    public ?int $department = null;
-    public ?int $stage = null;
-    public ?int $profession = null;
-    public ?int $supervisor = null;
-    public array $selectedTeams = [];
-    public array $selectedRoles = [];
+    public ?string $status = null;
+    public ?string $model_status = null;
 
     public bool $invitation = false;
 
@@ -73,10 +74,10 @@ class CreateEmployee extends Component
         $this->resetFormInputs();
 
         // Setze Standardwerte
-        $this->gender = Gender::Male;
+        $this->gender = Gender::Male->value;
         $this->selectedTeams = $this->currentTeamId ? [$this->currentTeamId] : [];
-        $this->model_status = ModelStatus::ACTIVE;
-        $this->status = EmployeeStatus::PROBATION;
+        $this->model_status = ModelStatus::ACTIVE->value;
+        $this->status = EmployeeStatus::PROBATION->value;
         $this->invitation = true;
         $this->showCreateModal = true;
 
@@ -107,7 +108,7 @@ class CreateEmployee extends Component
                     'profession_id' => $this->profession,
                     'stage_id' => $this->stage,
                     'joined_at' => $this->joined_at?->toDateString(),
-                    'user_type' => UserType::Employee,
+                    'user_type' => UserType::Employee->value,
                     'model_status' => $this->model_status,
                     'status' => $this->status,
                     'company_id' => $this->companyId,

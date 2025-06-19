@@ -52,6 +52,7 @@ class EditEmployee extends Component
     public ?User $user = null;
 
     /** Benutzer-Felder */
+    /** Benutzer-Felder */
     public ?Gender $gender = null;
     public ?string $name = null;
     public ?string $email = null;
@@ -76,7 +77,7 @@ class EditEmployee extends Component
 
         $this->userId = $userId;
 
-        // Kein Join in der Edit und Create verwenden. Nur in der Table ist es sinnvoll
+        // Hier werden die Realtion des Users Employee geladen zu denen er gehört.
         $this->user = User::with([
             'employee:id',
             'teams:id,name',
@@ -86,7 +87,7 @@ class EditEmployee extends Component
 
         $this->loadEmployeeData();
 
-        // Lade nur was initial benötigt wird
+        // hier werden die Dropdown-Relationen geladen, die zu Auth User gehören.
         $this->loadRelationsData([
             'teams', 'departments', 'roles', 'professions', 'stages', 'supervisors'
         ]);

@@ -14,10 +14,10 @@ trait ValidateEmployee
     {
         $rules = [
             // User-Felder
-            'gender' => ['required', Rule::enum(Gender::class)],
+            'gender' => ['required', 'string', Rule::in(array_column(Gender::cases(), 'value'))],
             'name' => 'required|string|min:3',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->userId ?? null)],
-            'model_status' => ['required', Rule::enum(ModelStatus::class)],
+            'model_status' => ['required', 'string', Rule::in(array_column(ModelStatus::cases(), 'value'))],
             'joined_at' => 'required|date|before_or_equal:today',
 
             'department' => ['required', 'exists:departments,id',
@@ -37,8 +37,7 @@ trait ValidateEmployee
             'selectedRoles' => 'required|array|min:1',
             'selectedRoles.*' => 'exists:roles,id',
 
-            // Mitarbeiter-Felder
-            'status' => ['required', Rule::enum(EmployeeStatus::class)],
+            'status' => ['required', 'string', Rule::in(array_column(EmployeeStatus::cases(), 'value'))],
             'profession' => 'required|exists:professions,id',
             'stage' => 'required|exists:stages,id',
 

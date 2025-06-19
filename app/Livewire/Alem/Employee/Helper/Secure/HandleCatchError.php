@@ -19,7 +19,6 @@ trait HandleCatchError
             'formData' => $this->only([
                 'gender',
                 'name',
-                'last_name',
                 'email',
                 'model_status',
                 'joined_at',
@@ -51,7 +50,6 @@ trait HandleCatchError
             'formData' => $this->only([
                 'gender',
                 'name',
-                'last_name',
                 'email',
                 'model_status',
                 'joined_at',
