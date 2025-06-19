@@ -106,8 +106,8 @@ class EmployeeTable extends Component
 
             'users.profession_id',
             'users.stage_id',
+            'users.status',
 
-            'employees.id as employee_id', 'employees.employee_status',
             'professions.name as profession_name',
             'stages.name as stage_name',
             'departments.name as department_name'

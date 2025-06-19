@@ -3,22 +3,17 @@
 namespace App\Models\Alem;
 
 use App\Enums\Employee\CivilStatus;
-use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
-use App\Models\Alem\QuickCrud\Profession;
-use App\Models\Alem\QuickCrud\Stage;
 use App\Models\User;
-use App\Traits\Employee\EmployeeStatusManagement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Employee extends Model
 {
-    use EmployeeStatusManagement;
     use HasFactory;
 
     /**
@@ -96,37 +91,7 @@ class Employee extends Model
         return static::with(['user']);
     }
 
-    /**
-     * Scope für aktive Mitarbeiter
-     */
-    public function scopeActive($query)
-    {
-        return $query->whereIn('employee_status', [
-            EmployeeStatus::EMPLOYED->value,
-            EmployeeStatus::PROBATION->value,
-            EmployeeStatus::ONBOARDING->value,
-        ]);
-    }
 
-//    /**
-//     * Scope für Mitarbeiter mit bestimmtem Status
-//     */
-//    public function scopeWithStatus($query, EmployeeStatus $status)
-//    {
-//        return $query->where('employee_status', $status->value);
-//    }
-//
-//    /**
-//     * Liefert den formatierten Status
-//     */
-//    public function getFullStatusAttribute()
-//    {
-//        if (! $this->employee_status) {
-//            return '';
-//        }
-//
-//        return "{$this->employee_status->value}: {$this->employee_status->label()}";
-//    }
 
     /**
      * Gibt den Benutzer zurück, dem der Mitarbeiter zugeordnet ist.
@@ -136,43 +101,4 @@ class Employee extends Model
         return $this->belongsTo(User::class);
     }
 
-//    /**
-//     * Überprüft, ob der Mitarbeiter im Probezeitstatus ist.
-//     */
-//    public function isOnProbation(): bool
-//    {
-//        return $this->employee_status === EmployeeStatus::PROBATION;
-//    }
-//
-//    /**
-//     * Überprüft, ob der Mitarbeiter im Onboarding-Status ist.
-//     */
-//    public function isOnboarding(): bool
-//    {
-//        return $this->employee_status === EmployeeStatus::ONBOARDING;
-//    }
-//
-//    /**
-//     * Überprüft, ob der Mitarbeiter voll angestellt ist.
-//     */
-//    public function isEmployed(): bool
-//    {
-//        return $this->employee_status === EmployeeStatus::EMPLOYED;
-//    }
-//
-//    /**
-//     * Überprüft, ob der Mitarbeiter im Urlaub ist.
-//     */
-//    public function isOnLeave(): bool
-//    {
-//        return $this->employee_status === EmployeeStatus::ONLEAVE;
-//    }
-//
-//    /**
-//     * Überprüft, ob der Mitarbeiter die Firma verlassen hat.
-//     */
-//    public function hasLeft(): bool
-//    {
-//        return $this->employee_status === EmployeeStatus::LEAVE;
-//    }
 }

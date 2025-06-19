@@ -52,6 +52,8 @@ return new class extends Migration {
             $table->softDeletes();
             $table->timestamps();
 
+            $table->index(['user_type', 'status'], 'idx_user_type_status');
+
             // 🚀 OPTIMIERTE INDIZES für deine spezifischen Queries Dieser ist neu für die Profile seite
 
             // 1. Haupt-Performance Index für User-Lookups mit Relations

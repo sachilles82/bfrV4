@@ -260,15 +260,13 @@
                         </x-pupi.table.tr.cell>
 
                         <x-pupi.table.tr.cell>
-                            <div
-                                class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
-                                        {{ \App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->colors() ?? '' }}"
-                            >
+                            <div class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset gap-1
+                                    {{ $user->status ? $user->status->colors() : 'ring-gray-600/20 text-gray-500 bg-gray-50 dark:bg-gray-400/10 dark:text-gray-400 dark:ring-gray-400/20' }}">
                                 <x-dynamic-component
+                                    :component="$user->status ? $user->status->icon() : 'icon.x-circle'"
                                     class="h-5 w-5"
-                                    :component="\App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->icon() ?? 'heroicon-o-question-mark-circle'"
                                 />
-                                <div>{{ \App\Enums\Employee\EmployeeStatus::tryFrom($user->employee_status)?->label() ?? 'Unknown' }}</div>
+                                <span>{{ $user->status ? $user->status->label() : __('Unknown') }}</span>
                             </div>
                         </x-pupi.table.tr.cell>
 

@@ -15,6 +15,7 @@ use App\Models\Alem\QuickCrud\Profession;
 use App\Models\Alem\QuickCrud\Stage;
 use App\Models\Spatie\Role;
 use App\Traits\Cache\AdvancedCache;
+use App\Traits\Employee\EmployeeStatusManagement;
 use App\Traits\HasAddress;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
@@ -56,7 +57,9 @@ class User extends Authenticatable
     use SoftDeletes;
     use TwoFactorAuthenticatable;
     use Searchable;
-    use AdvancedCache, UserWithManagerRole;
+    use AdvancedCache, UserWithManagerRole
+//        EmployeeStatusManagement
+        ;
 
     /**
      * Cache-Konfiguration für dieses Model
@@ -155,6 +158,63 @@ class User extends Authenticatable
 //            UserType::Customer => CustomerStatus::tryFrom($value),  // Zukünftig
             default => null
         };
+    }
+
+    // Nach getStatusAttribute() hinzufügen:
+
+    /**
+     * Scope für aktive Mitarbeiter
+     */
+    public function scopeActiveEmployees($query)
+    {
+        return $query->where('user_type', UserType::Employee)
+            ->whereIn('status', [
+                EmployeeStatus::EMPLOYED->value,
+                EmployeeStatus::PROBATION->value,
+                EmployeeStatus::ONBOARDING->value,
+            ]);
+    }
+
+    /**
+     * Scope für Mitarbeiter mit bestimmtem Status
+     */
+    public function scopeWithEmployeeStatus($query, EmployeeStatus $status)
+    {
+        return $query->where('user_type', UserType::Employee)
+            ->where('status', $status->value);
+    }
+
+    /**
+     * Status-Check Methoden
+     */
+    public function isOnProbation(): bool
+    {
+        return $this->user_type === UserType::Employee &&
+            $this->status === EmployeeStatus::PROBATION;
+    }
+
+    public function isOnboarding(): bool
+    {
+        return $this->user_type === UserType::Employee &&
+            $this->status === EmployeeStatus::ONBOARDING;
+    }
+
+    public function isEmployed(): bool
+    {
+        return $this->user_type === UserType::Employee &&
+            $this->status === EmployeeStatus::EMPLOYED;
+    }
+
+    public function isOnLeave(): bool
+    {
+        return $this->user_type === UserType::Employee &&
+            $this->status === EmployeeStatus::ONLEAVE;
+    }
+
+    public function hasLeft(): bool
+    {
+        return $this->user_type === UserType::Employee &&
+            $this->status === EmployeeStatus::LEAVE;
     }
 
     /**

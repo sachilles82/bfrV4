@@ -26,7 +26,7 @@ trait HandleCatchError
                 'department',
                 'selectedTeams',
                 'selectedRoles',
-                'employee_status',
+                'status',
                 'profession',
                 'stage',
                 'supervisor',
@@ -58,7 +58,7 @@ trait HandleCatchError
                 'department',
                 'selectedTeams',
                 'selectedRoles',
-                'employee_status',
+                'status',
                 'profession',
                 'stage',
                 'supervisor'

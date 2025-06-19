@@ -51,6 +51,7 @@ class CreateEmployee extends Component
     public ?string $name = null;
     public ?string $email = null;
     public ?ModelStatus $model_status = null;
+    public ?EmployeeStatus $status = null;
     public ?Carbon $joined_at = null;
 
     /** Relation Dropdown-Felder */
@@ -60,9 +61,6 @@ class CreateEmployee extends Component
     public ?int $supervisor = null;
     public array $selectedTeams = [];
     public array $selectedRoles = [];
-
-    /** Mitarbeiter-Felder */
-    public ?EmployeeStatus $employee_status = null;
 
     public bool $invitation = false;
 
@@ -78,7 +76,7 @@ class CreateEmployee extends Component
         $this->gender = Gender::Male;
         $this->selectedTeams = $this->currentTeamId ? [$this->currentTeamId] : [];
         $this->model_status = ModelStatus::ACTIVE;
-        $this->employee_status = EmployeeStatus::PROBATION;
+        $this->status = EmployeeStatus::PROBATION;
         $this->invitation = true;
         $this->showCreateModal = true;
 
@@ -109,8 +107,9 @@ class CreateEmployee extends Component
                     'profession_id' => $this->profession,
                     'stage_id' => $this->stage,
                     'joined_at' => $this->joined_at?->toDateString(),
-                    'model_status' => $this->model_status,
                     'user_type' => UserType::Employee,
+                    'model_status' => $this->model_status,
+                    'status' => $this->employee_status,
                     'company_id' => $this->companyId,
                     'created_by' => $this->authUserId,
                 ]);
@@ -146,7 +145,6 @@ class CreateEmployee extends Component
     {
         Employee::create([
             'user_id' => $user->id,
-            'employee_status' => $this->employee_status,
         ]);
     }
 
@@ -195,7 +193,7 @@ class CreateEmployee extends Component
         $this->reset([
             'gender', 'name', 'email', 'selectedTeams',
             'department', 'supervisor', 'selectedRoles', 'profession',
-            'stage', 'joined_at', 'employee_status', 'model_status',
+            'stage', 'joined_at', 'status', 'model_status',
             'invitation',
         ]);
 

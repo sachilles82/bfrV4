@@ -10,15 +10,15 @@
         {{-- Das ist die Form mit der Create und der Table Componente --}}
         <x-pupi.layout.form-index>
 
-            <!--Create Button, open the Create Component-->
-            <x-slot:create>
-                <livewire:alem.employee.create-employee
-                    :auth-user-id="$authUserId"
-                    :current-team-id="$currentTeamId"
-                    :company-id="$companyId"
-                    wire:key="create-employee-component"
-                />
-            </x-slot:create>
+{{--            <!--Create Button, open the Create Component-->--}}
+{{--            <x-slot:create>--}}
+{{--                <livewire:alem.employee.create-employee--}}
+{{--                    :auth-user-id="$authUserId"--}}
+{{--                    :current-team-id="$currentTeamId"--}}
+{{--                    :company-id="$companyId"--}}
+{{--                    wire:key="create-employee-component"--}}
+{{--                />--}}
+{{--            </x-slot:create>--}}
 
 {{--            <flux:modal.trigger name="create-employee">--}}
 {{--                <div--}}
@@ -37,27 +37,27 @@
                 wire:key="employee-table-component"
             />
 
-            <!-- Edit Component -->
-            <livewire:alem.employee.edit-employee
-                :auth-user-id="$authUserId"
-                :current-team-id="$currentTeamId"
-                :company-id="$companyId"
-                wire:key="edit-employee-component"
-            />
+{{--            <!-- Edit Component -->--}}
+{{--            <livewire:alem.employee.edit-employee--}}
+{{--                :auth-user-id="$authUserId"--}}
+{{--                :current-team-id="$currentTeamId"--}}
+{{--                :company-id="$companyId"--}}
+{{--                wire:key="edit-employee-component"--}}
+{{--            />--}}
 
-            <livewire:alem.quick-crud.profession.profession-form
-                :auth-user-id="$authUserId"
-                :current-team-id="$currentTeamId"
-                :company-id="$companyId"
-                wire:key="profession-form-component"
-            />
+{{--            <livewire:alem.quick-crud.profession.profession-form--}}
+{{--                :auth-user-id="$authUserId"--}}
+{{--                :current-team-id="$currentTeamId"--}}
+{{--                :company-id="$companyId"--}}
+{{--                wire:key="profession-form-component"--}}
+{{--            />--}}
 
-            <livewire:alem.quick-crud.stage.stage-form
-                :auth-user-id="$authUserId"
-                :current-team-id="$currentTeamId"
-                :company-id="$companyId"
-                wire:key="stage-form-component"
-            />
+{{--            <livewire:alem.quick-crud.stage.stage-form--}}
+{{--                :auth-user-id="$authUserId"--}}
+{{--                :current-team-id="$currentTeamId"--}}
+{{--                :company-id="$companyId"--}}
+{{--                wire:key="stage-form-component"--}}
+{{--            />--}}
 
         </x-pupi.layout.form-index>
 

@@ -26,10 +26,11 @@ trait EmployeeStatus
 
     /**
      * Gibt den Namen der Relation zurück
+     * NICHT MEHR BENÖTIGT - arbeiten direkt mit users Tabelle
      */
     protected function getRelationName(): string
     {
-        return 'employee';
+        return ''; // Keine Relation mehr nötig
     }
 
     /**
@@ -37,7 +38,7 @@ trait EmployeeStatus
      */
     protected function getStatusFieldName(): string
     {
-        return 'employee_status';
+        return 'status';
     }
 
     /**
@@ -54,7 +55,7 @@ trait EmployeeStatus
     protected function applyEmployeeStatusFilter(Builder $query): Builder
     {
         if (!empty($this->employeeStatusFilter)) {
-            $query->where('employees.employee_status', $this->employeeStatusFilter); // - Die korrekte Logik für den Join
+            $query->where('users.status', $this->employeeStatusFilter);
         }
 
         return $query;

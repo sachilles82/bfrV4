@@ -755,7 +755,7 @@ class TestDataSeeder extends Seeder
             'stage_id' => $stageId,
             'personal_number' => $prefix . str_pad($index, $padLength, '0', STR_PAD_LEFT),
             'supervisor_id' => $supervisorId,
-            'employee_status' => $this->getRandomEmployeeStatus()->value,
+            'status' => $this->getRandomEmployeeStatus()->value,
             'created_at' => now(),
             'updated_at' => now(),
         ];

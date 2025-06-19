@@ -466,6 +466,7 @@ class HighPerformanceTestDataSeeder extends Seeder
                 'stage_id' => $stageIds[$j % $stageCount],                   // NEU
                 'supervisor_id' => $supervisorId,                            // NEU
                 'model_status' => ModelStatus::ACTIVE->value,
+                'status' => $this->getRandomEmployeeStatusValue(),
                 'phone_1' => '+417' . str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
                 'url_slug' => $firstName . $suffix . '-' . $index,
                 'created_by' => $ownerId,
@@ -508,7 +509,6 @@ class HighPerformanceTestDataSeeder extends Seeder
             $employeeData[] = [
                 'user_id' => $userId,
                 'personal_number' => $prefix . str_pad($index, $padLength, '0', STR_PAD_LEFT),
-                'employee_status' => $this->getRandomEmployeeStatusValue(),
                 'created_at' => $currentTime,
                 'updated_at' => $currentTime,
             ];

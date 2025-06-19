@@ -17,7 +17,7 @@ trait EmployeeStatusManagement
      */
     public function isOnProbation(): bool
     {
-        return $this->employee_status === EmployeeStatus::PROBATION;
+        return $this->status === EmployeeStatus::PROBATION;
     }
 
     /**
@@ -25,7 +25,7 @@ trait EmployeeStatusManagement
      */
     public function isOnboarding(): bool
     {
-        return $this->employee_status === EmployeeStatus::ONBOARDING;
+        return $this->status === EmployeeStatus::ONBOARDING;
     }
 
     /**
@@ -33,7 +33,7 @@ trait EmployeeStatusManagement
      */
     public function isEmployed(): bool
     {
-        return $this->employee_status === EmployeeStatus::EMPLOYED;
+        return $this->status === EmployeeStatus::EMPLOYED;
     }
 
     /**
@@ -41,7 +41,7 @@ trait EmployeeStatusManagement
      */
     public function isOnLeave(): bool
     {
-        return $this->employee_status === EmployeeStatus::ONLEAVE;
+        return $this->status === EmployeeStatus::ONLEAVE;
     }
 
     /**
@@ -49,7 +49,7 @@ trait EmployeeStatusManagement
      */
     public function hasLeft(): bool
     {
-        return $this->employee_status === EmployeeStatus::LEAVE;
+        return $this->status === EmployeeStatus::LEAVE;
     }
 
     /**
@@ -59,7 +59,7 @@ trait EmployeeStatusManagement
      */
     public function setEmployeeStatus(EmployeeStatus $status): self
     {
-        $this->update(['employee_status' => $status]);
+        $this->update(['status' => $status]);
 
         return $this;
     }
@@ -111,7 +111,7 @@ trait EmployeeStatusManagement
      */
     public function scopeOnProbation($query): Builder
     {
-        return $query->where('employee_status', EmployeeStatus::PROBATION);
+        return $query->where('status', EmployeeStatus::PROBATION);
     }
 
     /**
@@ -121,7 +121,7 @@ trait EmployeeStatusManagement
      */
     public function scopeOnboarding($query): Builder
     {
-        return $query->where('employee_status', EmployeeStatus::ONBOARDING);
+        return $query->where('status', EmployeeStatus::ONBOARDING);
     }
 
     /**
@@ -131,7 +131,7 @@ trait EmployeeStatusManagement
      */
     public function scopeEmployed($query): Builder
     {
-        return $query->where('employee_status', EmployeeStatus::EMPLOYED);
+        return $query->where('status', EmployeeStatus::EMPLOYED);
     }
 
     /**
@@ -141,7 +141,7 @@ trait EmployeeStatusManagement
      */
     public function scopeOnLeave($query): Builder
     {
-        return $query->where('employee_status', EmployeeStatus::ONLEAVE);
+        return $query->where('status', EmployeeStatus::ONLEAVE);
     }
 
     /**
@@ -151,6 +151,6 @@ trait EmployeeStatusManagement
      */
     public function scopeLeft($query): Builder
     {
-        return $query->where('employee_status', EmployeeStatus::LEAVE);
+        return $query->where('status', EmployeeStatus::LEAVE);
     }
 }

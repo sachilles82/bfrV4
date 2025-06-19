@@ -359,16 +359,16 @@
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Employee Status') }}"
-                            for="employee_status"
+                            for="status"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('employee_status')"
-                            model="employee_status"
+                            :error="$errors->first('status')"
+                            model="status"
                             help-text="{{ __('') }}">
 
                             <flux:select
                                 class="mt-2"
-                                wire:model="employee_status"
-                                id="employee_status"
+                                wire:model="status"
+                                id="status"
                                 variant="listbox">
 
                                 @foreach($this->employeeStatusOptions() as $statusOption)

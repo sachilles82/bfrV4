@@ -55,18 +55,18 @@ class EditEmployee extends Component
     public ?Gender $gender = null;
     public ?string $name = null;
     public ?string $email = null;
-    public ?ModelStatus $model_status = null;
-    public ?Carbon $joined_at = null;
+
+    public array $selectedTeams = [];
     public ?int $department = null;
     public ?int $supervisor = null;
-    public ?int $stage = null;
-    public ?int $profession = null;
-    public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    /** Mitarbeiter-Felder */
-    public ?EmployeeStatus $employee_status = null;
-//    public ?int $supervisor = null;
+    public ?int $profession = null;
+    public ?int $stage = null;
+    public ?Carbon $joined_at = null;
+
+    public ?EmployeeStatus $status = null;
+    public ?ModelStatus $model_status = null;
 
 
     #[On('edit-employee-modal')]
@@ -108,20 +108,16 @@ class EditEmployee extends Component
         $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
         $this->department = $this->user->department_id;
         $this->supervisor = $this->user->supervisor_id;
+        $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
         $this->profession = $this->user->profession_id;
         $this->stage = $this->user->stage_id;
 
-        // ModelStatus ENUM
-        $this->model_status = $this->user->model_status;
         $this->joined_at = $this->user->joined_at;
 
+        // Status ENUM
+        $this->status = $this->user->status;
+        $this->model_status = $this->user->model_status;
 
-        $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
-
-        if ($employee = $this->user->employee) {
-            // Employee Status ENUM
-            $this->employee_status = $employee->employee_status;
-        }
     }
 
     /**
@@ -143,6 +139,7 @@ class EditEmployee extends Component
                     'supervisor_id' => $this->supervisor,
                     'stage_id' => $this->stage,
                     'joined_at' => $this->joined_at?->toDateString(),
+                    'status' => $this->status,
                     'model_status' => $this->model_status,
                 ]);
 
@@ -172,9 +169,6 @@ class EditEmployee extends Component
     {
         Employee::updateOrCreate(
             ['user_id' => $this->userId],
-            [
-                'employee_status' => $this->employee_status,
-            ]
         );
     }
 
@@ -224,7 +218,7 @@ class EditEmployee extends Component
         $this->reset([
             'gender', 'name', 'email', 'selectedTeams',
             'department', 'supervisor', 'selectedRoles', 'profession',
-            'stage', 'joined_at', 'employee_status', 'model_status',
+            'stage', 'joined_at', 'status', 'model_status',
         ]);
 
         $this->resetDropdownRelationsData();
