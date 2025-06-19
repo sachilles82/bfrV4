@@ -13,7 +13,6 @@ use App\Models\Alem\Department;
 use App\Models\Alem\Employee;
 use App\Models\Alem\QuickCrud\Profession;
 use App\Models\Alem\QuickCrud\Stage;
-use App\Models\Spatie\Role;
 use App\Traits\Cache\AdvancedCache;
 use App\Traits\Employee\EmployeeStatusManagement;
 use App\Traits\HasAddress;
@@ -27,9 +26,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
@@ -57,9 +53,7 @@ class User extends Authenticatable
     use SoftDeletes;
     use TwoFactorAuthenticatable;
     use Searchable;
-    use AdvancedCache, UserWithManagerRole,
-        EmployeeStatusManagement
-        ;
+    use AdvancedCache, UserWithManagerRole;
 
     /**
      * Cache-Konfiguration für dieses Model
@@ -118,21 +112,19 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'joined_at' => 'date',
-        'model_status' => ModelStatus::class,
-        'gender' => Gender::class,
-        'department_id' => 'integer',
+        'birthdate' => 'date',
+        'email_verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-
-
-        'birthdate' => 'date',
-
+        'department_id' => 'integer',
         'profession_id' => 'integer',
         'stage_id' => 'integer',
         'supervisor_id' => 'integer',
+        'user_type' => UserType::class,
+        'model_status' => ModelStatus::class,
+        'gender' => Gender::class,
     ];
 
     /**
@@ -158,63 +150,6 @@ class User extends Authenticatable
 //            UserType::Customer => CustomerStatus::tryFrom($value),  // Zukünftig
             default => null
         };
-    }
-
-    // Nach getStatusAttribute() hinzufügen:
-
-    /**
-     * Scope für aktive Mitarbeiter
-     */
-    public function scopeActiveEmployees($query)
-    {
-        return $query->where('user_type', UserType::Employee)
-            ->whereIn('status', [
-                EmployeeStatus::EMPLOYED->value,
-                EmployeeStatus::PROBATION->value,
-                EmployeeStatus::ONBOARDING->value,
-            ]);
-    }
-
-    /**
-     * Scope für Mitarbeiter mit bestimmtem Status
-     */
-    public function scopeWithEmployeeStatus($query, EmployeeStatus $status)
-    {
-        return $query->where('user_type', UserType::Employee)
-            ->where('status', $status->value);
-    }
-
-    /**
-     * Status-Check Methoden
-     */
-    public function isOnProbation(): bool
-    {
-        return $this->user_type === UserType::Employee &&
-            $this->status === EmployeeStatus::PROBATION;
-    }
-
-    public function isOnboarding(): bool
-    {
-        return $this->user_type === UserType::Employee &&
-            $this->status === EmployeeStatus::ONBOARDING;
-    }
-
-    public function isEmployed(): bool
-    {
-        return $this->user_type === UserType::Employee &&
-            $this->status === EmployeeStatus::EMPLOYED;
-    }
-
-    public function isOnLeave(): bool
-    {
-        return $this->user_type === UserType::Employee &&
-            $this->status === EmployeeStatus::ONLEAVE;
-    }
-
-    public function hasLeft(): bool
-    {
-        return $this->user_type === UserType::Employee &&
-            $this->status === EmployeeStatus::LEAVE;
     }
 
     /**

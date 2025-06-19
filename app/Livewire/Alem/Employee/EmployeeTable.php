@@ -107,6 +107,7 @@ class EmployeeTable extends Component
             'users.profession_id',
             'users.stage_id',
             'users.status',
+            'users.user_type',
 
             'professions.name as profession_name',
             'stages.name as stage_name',
@@ -134,7 +135,7 @@ class EmployeeTable extends Component
             ->leftJoin('stages', 'users.stage_id', '=', 'stages.id')
             ->leftJoin('departments', 'users.department_id', '=', 'departments.id');
 
-//        $query->where('users.user_type', $this->userType);
+        $query->where('users.user_type', $this->userType);
 
         $this->applySearch($query);
         $this->applyStatusFilter($query);
