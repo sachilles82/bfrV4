@@ -72,14 +72,12 @@ class EditEmployee extends Component
     public function openEditEmployeeModal($userId): void
     {
         // $this->authorize('update', User::class);
-
         $this->userId = $userId;
 
         // Hier werden die Realtion des Users Employee geladen zu denen er gehört.
         $this->user = User::with([
             'teams:id,name',
             'roles:id,name,is_manager',
-            'department:id,name'
         ])
             ->select([
                 'id', 'name', 'email', 'gender', 'model_status',

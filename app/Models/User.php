@@ -14,7 +14,6 @@ use App\Models\Alem\Employee;
 use App\Models\Alem\QuickCrud\Profession;
 use App\Models\Alem\QuickCrud\Stage;
 use App\Traits\Cache\AdvancedCache;
-use App\Traits\Employee\EmployeeStatusManagement;
 use App\Traits\HasAddress;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
@@ -249,16 +248,14 @@ class User extends Authenticatable
 
         static::creating(function ($user) {
             if (empty($user->url_slug)) {
-                // Erstelle url_slug aus Vor- und Nachname
-                $user->url_slug = Str::slug($user->name);
+                $user->url_slug = Str::slug($user->name) . '-' . rand(1000, 9999);
             }
         });
 
         static::updating(function ($user) {
             // Den Slug nur aktualisieren, wenn sich der Name oder Nachname geändert hat
             if ($user->isDirty('name') ) {
-                // Erstelle Slug aus Vor- und Nachname
-                $user->url_slug = Str::slug($user->name);
+                $user->url_slug = Str::slug($user->name) . '-' . rand(1000, 9999);
             }
         });
     }

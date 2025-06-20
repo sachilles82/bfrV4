@@ -54,6 +54,7 @@ class Details extends Component
         $this->employee = User::with([
             'teams:id,name',
             'roles:id,name,is_manager',
+            'roles.permissions',
             'department:id,name'
         ])->findOrFail($this->employeeId);
 
