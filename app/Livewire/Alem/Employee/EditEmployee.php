@@ -63,10 +63,10 @@ class EditEmployee extends Component
 
     public ?int $profession = null;
     public ?int $stage = null;
-    public ?Carbon $joined_at = null;
+    public ?string $joined_at = null;
 
     public ?string $status = null;
-    public ?string  $model_status = null;
+    public ?string $model_status = null;
 
 
     #[On('edit-employee-modal')]
@@ -78,11 +78,16 @@ class EditEmployee extends Component
 
         // Hier werden die Realtion des Users Employee geladen zu denen er gehört.
         $this->user = User::with([
-            'employee:id',
             'teams:id,name',
             'roles:id,name,is_manager',
             'department:id,name'
-        ])->findOrFail($this->userId);
+        ])
+            ->select([
+                'id', 'name', 'email', 'gender', 'model_status',
+                'status', 'department_id', 'supervisor_id',
+                'profession_id', 'stage_id', 'joined_at', 'user_type'
+            ])
+            ->findOrFail($this->userId);
 
         $this->loadEmployeeData();
 
@@ -112,7 +117,7 @@ class EditEmployee extends Component
         $this->profession = $this->user->profession_id;
         $this->stage = $this->user->stage_id;
 
-        $this->joined_at = $this->user->joined_at;
+        $this->joined_at = $this->user->joined_at?->format('Y-m-d');
 
         // Status ENUM
         $this->status = $this->user->status?->value;
@@ -129,8 +134,8 @@ class EditEmployee extends Component
 
         try {
             DB::transaction(function () {
-
-                User::where('id', $this->userId)->update([
+                // ✅ Golden Path: Eloquent Update
+                $this->user->update([
                     'gender' => $this->gender,
                     'name' => $this->name,
                     'email' => $this->email,
@@ -138,7 +143,7 @@ class EditEmployee extends Component
                     'profession_id' => $this->profession,
                     'supervisor_id' => $this->supervisor,
                     'stage_id' => $this->stage,
-                    'joined_at' => $this->joined_at?->toDateString(),
+                    'joined_at' => $this->joined_at,
                     'status' => $this->status,
                     'model_status' => $this->model_status,
                 ]);
@@ -163,13 +168,13 @@ class EditEmployee extends Component
     }
 
     /**
-     * Erstellt oder aktualisiert die zugehörigen Mitarbeiterdaten.
+     * Nur sicherstellen dass Employee existiert
+     * Nur Existenz sichern → firstOrCreate()
+     * Existenz sichern + Update → updateOrCreate()
      */
     private function updateEmployeeData(): void
     {
-        Employee::updateOrCreate(
-            ['user_id' => $this->userId],
-        );
+        Employee::firstOrCreate(['user_id' => $this->userId]);
     }
 
     /**
@@ -194,6 +199,7 @@ class EditEmployee extends Component
             }
         });
     }
+
     /**
      * Setzt das Formular zurück und schließt das Modal.
      * Bereinigt zusätzlich alle Cache-Properties, um Speicher freizugeben.

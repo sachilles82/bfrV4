@@ -7,6 +7,7 @@ use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use App\Models\Alem\Department;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 trait ValidateEmployee
 {
@@ -14,10 +15,10 @@ trait ValidateEmployee
     {
         $rules = [
             // User-Felder
-            'gender' => ['required', Rule::in(array_column(Gender::cases(), 'value'))],
+            'gender' => ['required', new Enum(Gender::class)],
             'name' => 'required|string|min:3',
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->userId ?? null)],
-            'model_status' => ['required', Rule::in(array_column(ModelStatus::cases(), 'value'))],
+            'model_status' => ['required', new Enum(ModelStatus::class)],
             'joined_at' => 'required|date|before_or_equal:today',
 
             'department' => ['required', 'exists:departments,id',
@@ -37,7 +38,7 @@ trait ValidateEmployee
             'selectedRoles' => 'required|array|min:1',
             'selectedRoles.*' => 'exists:roles,id',
 
-            'status' => ['required', Rule::in(array_column(EmployeeStatus::cases(), 'value'))],
+            'status' => ['required', new Enum(EmployeeStatus::class)],
             'profession' => 'required|exists:professions,id',
             'stage' => 'required|exists:stages,id',
 
