@@ -52,8 +52,7 @@ class EditEmployee extends Component
     public ?User $user = null;
 
     /** Benutzer-Felder */
-    /** Benutzer-Felder */
-    public ?Gender $gender = null;
+    public ?string $gender = null;
     public ?string $name = null;
     public ?string $email = null;
 
@@ -66,8 +65,8 @@ class EditEmployee extends Component
     public ?int $stage = null;
     public ?Carbon $joined_at = null;
 
-    public ?EmployeeStatus $status = null;
-    public ?ModelStatus $model_status = null;
+    public ?string $status = null;
+    public ?string  $model_status = null;
 
 
     #[On('edit-employee-modal')]
@@ -102,7 +101,7 @@ class EditEmployee extends Component
     {
         if (!$this->user) return;
 
-        $this->gender = $this->user->gender;
+        $this->gender = $this->user->gender?->value;
         $this->name = $this->user->name;
         $this->email = $this->user->email;
 
@@ -116,8 +115,8 @@ class EditEmployee extends Component
         $this->joined_at = $this->user->joined_at;
 
         // Status ENUM
-        $this->status = $this->user->status;
-        $this->model_status = $this->user->model_status;
+        $this->status = $this->user->status?->value;
+        $this->model_status = $this->user->model_status?->value;
 
     }
 

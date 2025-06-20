@@ -122,9 +122,9 @@ class User extends Authenticatable
         'profession_id' => 'integer',
         'stage_id' => 'integer',
         'supervisor_id' => 'integer',
+        'gender' => Gender::class,
         'user_type' => UserType::class,
         'model_status' => ModelStatus::class,
-        'gender' => Gender::class,
     ];
 
     /**
