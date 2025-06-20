@@ -2,9 +2,6 @@
 
 namespace App\Livewire\Alem\Employee;
 
-use App\Enums\Employee\EmployeeStatus;
-use App\Enums\Model\ModelStatus;
-use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
 use App\Livewire\Alem\Employee\Helper\Secure\ValidateEmployee;
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
@@ -14,7 +11,6 @@ use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
-use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
@@ -68,6 +64,9 @@ class EditEmployee extends Component
     public ?string $status = null;
     public ?string $model_status = null;
 
+    /** Original Daten des Users aus der Datenbank für Vergleiche */
+    public array $originalData = [];
+
 
     #[On('edit-employee-modal')]
     public function openEditEmployeeModal($userId): void
@@ -85,7 +84,8 @@ class EditEmployee extends Component
             ->select([
                 'id', 'name', 'email', 'gender', 'model_status',
                 'status', 'department_id', 'supervisor_id',
-                'profession_id', 'stage_id', 'joined_at', 'user_type'
+                'profession_id', 'stage_id', 'joined_at', 'user_type',
+                'company_id'
             ])
             ->findOrFail($this->userId);
 
@@ -101,19 +101,30 @@ class EditEmployee extends Component
 
     /**
      * Befülle die Form mit User Employee Daten
+     * Speichere Original-Daten aus der Datenbank für den Vergleich
      */
     protected function loadEmployeeData(): void
     {
         if (!$this->user) return;
 
+        // WICHTIG: Speichere Original-Daten in EINEM public Array
+        $this->originalData = [
+            'email' => $this->user->email,
+            'teamIds' => $this->user->teams->pluck('id')->toArray(),
+            'roleIds' => $this->user->roles->pluck('id')->toArray(),
+        ];
+
+
         $this->gender = $this->user->gender?->value;
         $this->name = $this->user->name;
         $this->email = $this->user->email;
 
-        $this->selectedTeams = $this->user->teams->pluck('id')->toArray();
+        // Setze selected Arrays
+        $this->selectedTeams = $this->originalData['teamIds'];
+        $this->selectedRoles = $this->originalData['roleIds'];
+
         $this->department = $this->user->department_id;
         $this->supervisor = $this->user->supervisor_id;
-        $this->selectedRoles = $this->user->roles->pluck('id')->toArray();
         $this->profession = $this->user->profession_id;
         $this->stage = $this->user->stage_id;
 
@@ -149,7 +160,7 @@ class EditEmployee extends Component
                 ]);
 
                 $this->updateEmployeeData();
-                $this->syncRelations();
+                $this->updateTeamsRoles();
 
             });
 
@@ -178,26 +189,81 @@ class EditEmployee extends Component
     }
 
     /**
-     * Synchronisiert Rollen und Teams des Users
-     *
-     * @throws \Throwable
+     * Email Check für Validation
      */
-    private function syncRelations(): void
+    public function emailHasChanged(): bool
     {
-        DB::transaction(function (): void {
-            // Cache Manager-Status vor Änderung
-            $wasManager = $this->user->hasManagerRole();
+        return $this->email !== ($this->originalData['email'] ?? '');
+    }
 
-            // Batch-Synchronisation
-            $this->user->roles()->sync($this->selectedRoles);
+    /**
+     * Haupt-Methode mit optionaler Team-Sync
+     */
+    private function updateTeamsRoles(): void
+    {
+        $this->syncTeams();
+        $this->syncRolesWithManagerCheck();
+    }
+
+    /**
+     * Helper: Check Manager in Roles ohne DB Query
+     */
+    private function checkManagerInRoles(array $roleIds): bool
+    {
+        return collect($this->roles)
+            ->whereIn('id', $roleIds)
+            ->contains('is_manager', true);
+    }
+
+    /**
+     * Helper: Arrays vergleichen
+     */
+    private function arraysAreDifferent(array $array1, array $array2): bool
+    {
+        return count(array_diff($array1, $array2)) > 0 ||
+            count(array_diff($array2, $array1)) > 0;
+    }
+
+// Außerdem: In syncTeams() musst du diese Zeile korrigieren:
+    private function syncTeams(): void
+    {
+
+        // Verwende stattdessen:
+        $originalTeamIds = $this->originalData['teamIds'] ?? [];
+
+        $teamsChanged = $this->arraysAreDifferent($originalTeamIds, $this->selectedTeams);
+
+        if ($teamsChanged) {
             $this->user->teams()->sync($this->selectedTeams);
+        }
+    }
 
-            // Handle Manager-Status-Änderung
-            if ($wasManager !== $this->user->hasManagerRole()) {
-                User::clearManagerCache($this->user->company_id);
-                $this->forceReloadCollection('supervisors');
-            }
-        });
+    /**
+     * Optimierte syncRolesWithManagerCheck - KEINE zusätzliche Query!
+     */
+    private function syncRolesWithManagerCheck(): void
+    {
+        $originalRoleIds = $this->originalData['roleIds'] ?? [];
+
+        $rolesChanged = $this->arraysAreDifferent($originalRoleIds, $this->selectedRoles);
+
+        if (!$rolesChanged) {
+            return;
+        }
+
+        // Manager Status aus bereits geladenen Daten
+        $oldHasManager = $this->checkManagerInRoles($originalRoleIds);
+
+        // Sync Rollen
+        $this->user->roles()->sync($this->selectedRoles);
+
+        // Neuer Manager Status
+        $newHasManager = $this->checkManagerInRoles($this->selectedRoles);
+
+        if ($oldHasManager !== $newHasManager) {
+            User::clearManagerCache($this->user->company_id);
+            $this->forceReloadCollection('supervisors');
+        }
     }
 
     /**
@@ -225,6 +291,7 @@ class EditEmployee extends Component
             'gender', 'name', 'email', 'selectedTeams',
             'department', 'supervisor', 'selectedRoles', 'profession',
             'stage', 'joined_at', 'status', 'model_status',
+            'originalData'
         ]);
 
         $this->resetDropdownRelationsData();
