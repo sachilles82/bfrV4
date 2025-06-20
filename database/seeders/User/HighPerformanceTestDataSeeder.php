@@ -52,33 +52,33 @@ class HighPerformanceTestDataSeeder extends Seeder
         // Team 1 (Betrieb 48) Konfiguration
         'team1' => [
             'name' => 'Betrieb 48',
-            'employees' => 500,  //  Standard
-            'managers' => 10,
-            'departments' => 10,
-            'professions' => 10,
-            'stages' => 10,
+            'employees' => 250500,  //  Standard
+            'managers' => 100,
+            'departments' => 100,
+            'professions' => 100,
+            'stages' => 100,
         ],
 
         // Team 2 (Betrieb 55) Konfiguration
         'team2' => [
             'name' => 'Betrieb 55',
-            'employees' => 150,  //  als Standard
-            'managers' => 5,
-            'departments' => 10,
-            'professions' => 10,
-            'stages' => 10,
+            'employees' => 150000,  //  als Standard
+            'managers' => 100,
+            'departments' => 100,
+            'professions' => 100,
+            'stages' => 100,
         ],
 
         // Performance Konfiguration
         'performance' => [
-            'chunk_size' => 50,
+            'chunk_size' => 7500,
             'memory_limit' => '4G',
             'use_raw_sql' => true,
             'disable_foreign_keys' => true,
             'disable_indexes' => true,
             'use_csv_import' => false,
             'parallel_workers' => 4,
-            'user_insert_chunk' => 20,  // Speziell für User-Tabelle
+            'user_insert_chunk' => 2000,  // Speziell für User-Tabelle
             'other_insert_chunk' => 30, // Für andere Tabellen
         ],
 

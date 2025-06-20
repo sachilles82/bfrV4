@@ -6,6 +6,7 @@ use App\Models\Spatie\Role;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 trait UserWithManagerRole
 {
@@ -128,23 +129,23 @@ trait UserWithManagerRole
     public static function getCompanyManagers(int $companyId): Collection
     {
         return static::getCachedByCompany($companyId, function() use ($companyId) {
+            // Nutze whereExists statt JOIN für bessere Performance
             return self::select([
                 'users.id',
                 'users.name',
                 'users.profile_photo_path'
             ])
-                ->join('model_has_roles', function ($join) {
-                    $join->on('users.id', '=', 'model_has_roles.model_id')
-                        ->where('model_has_roles.model_type', User::class);
-                })
-                ->join('roles', function ($join) {
-                    $join->on('model_has_roles.role_id', '=', 'roles.id')
-                        ->where('roles.is_manager', true);
-                })
                 ->where('users.company_id', $companyId)
                 ->whereNull('users.deleted_at')
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                        ->from('model_has_roles')
+                        ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                        ->whereColumn('model_has_roles.model_id', 'users.id')
+                        ->where('model_has_roles.model_type', User::class)
+                        ->where('roles.is_manager', true);
+                })
                 ->orderBy('users.name')
-                ->distinct()
                 ->get();
         }, ['suffix' => 'managers']);
     }
