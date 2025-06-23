@@ -642,7 +642,7 @@ class UltraFastSeedCommand extends Command
 
             fputcsv($rolesCsv, [
                 $roleId,
-                'App\\Models\\User',
+                \App\Models\User::class,
                 $email, // Verwende Email als temporäre Referenz
             ]);
 
@@ -1190,7 +1190,7 @@ class UltraFastSeedCommand extends Command
 
             $roleData[] = [
                 'role_id' => $roleId,
-                'model_type' => 'App\\Models\\User',
+                'model_type' => \App\Models\User::class,
                 'model_id' => $userId,
             ];
 
@@ -1324,7 +1324,7 @@ class UltraFastSeedCommand extends Command
 
                 // Lösche Rollen-Zuweisungen (außer Owner)
                 DB::table('model_has_roles')
-                    ->where('model_type', 'App\\Models\\User')
+                    ->where('model_type', \App\Models\User::class)
                     ->whereIn('model_id', function ($query) use ($companyId, $ownerId) {
                         $query->select('id')
                             ->from('users')
