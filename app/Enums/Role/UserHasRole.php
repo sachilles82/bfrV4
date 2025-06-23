@@ -27,7 +27,7 @@ enum UserHasRole: string
     case Sales = 'Sales Team';
 
     /** Employee Roles */
-    case Employee = 'employee'; // Standart Role, der User erhält diese Rolle automatisch bei der Registrierung um sich im Employee Panel anmelden zu können
+    case Employee = 'employee'; // Standart Role, der User erhält diese Rolle automatisch bei der Registrierung umsich im Employee Panel anmelden zu können
     case Worker = 'Worker';
     case Manager = 'Manager';
     case Editor = 'Editor';
