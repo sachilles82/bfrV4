@@ -52,7 +52,7 @@ class HighPerformanceTestDataSeeder extends Seeder
         // Team 1 (Betrieb 48) Konfiguration
         'team1' => [
             'name' => 'Betrieb 48',
-            'employees' => 250500,  //  Standard
+            'employees' => 2500,  //  Standard
             'managers' => 100,
             'departments' => 100,
             'professions' => 100,
@@ -62,7 +62,7 @@ class HighPerformanceTestDataSeeder extends Seeder
         // Team 2 (Betrieb 55) Konfiguration
         'team2' => [
             'name' => 'Betrieb 55',
-            'employees' => 150000,  //  als Standard
+            'employees' => 1500,  //  als Standard
             'managers' => 100,
             'departments' => 100,
             'professions' => 100,
@@ -352,9 +352,9 @@ class HighPerformanceTestDataSeeder extends Seeder
             $currentChunkSize = min($chunkSize, $employeeCount - $i);
 
             // Generiere Namen für diesen Chunk mit ausreichend Reserve
-            // Multipliziere mit 3 statt 2 für mehr Sicherheit bei unique Namen
             $namesNeeded = max($currentChunkSize * 3, 1000);
             $firstNames = $this->preGenerateNames($namesNeeded, 'firstName');
+            $lastNames = $this->preGenerateNames($namesNeeded, 'lastName');
 
             $this->createEmployeeChunkOptimized(
                 $team,
@@ -372,6 +372,7 @@ class HighPerformanceTestDataSeeder extends Seeder
                 $managerCount,
                 $configKey,
                 $firstNames,
+                $lastNames
             );
 
             // Garbage Collection alle 10 Chunks
@@ -404,6 +405,7 @@ class HighPerformanceTestDataSeeder extends Seeder
         $managerCount,
         $configKey,
         $firstNames,
+        $lastNames
     ): void
     {
         $currentTime = now()->toDateTimeString();
@@ -427,34 +429,51 @@ class HighPerformanceTestDataSeeder extends Seeder
 
         // Erstelle Supervisor-Pool für realistischere Hierarchie
         $supervisorIds = [$ownerId]; // Owner ist immer ein möglicher Supervisor
+        // Speichere die Role ID für jeden User
+        $userRoleIds = [];
 
         for ($j = 0; $j < $chunkSize; $j++) {
             $index = $startIndex + $j + $indexOffset + 1;
 
             // Verwende vorgenerierte Namen mit Sicherheitsprüfung
             $firstNameIndex = $j % count($firstNames);
+            $lastNameIndex = $j % count($lastNames);
 
             // Sicherheitsprüfung für Array-Zugriff
-            if (!isset($firstNames[$firstNameIndex])) {
-                // Fallback auf Faker, falls Index nicht existiert
-                $firstName = $this->faker->firstName;
-            } else {
-                $firstName = $firstNames[$firstNameIndex];
-            }
+            $firstName = isset($firstNames[$firstNameIndex]) ? $firstNames[$firstNameIndex] : $this->faker->firstName;
+            $lastName = isset($lastNames[$lastNameIndex]) ? $lastNames[$lastNameIndex] : $this->faker->lastName;
+
+            // Erstelle vollständigen Namen
+            $fullName = $firstName . ' ' . $lastName;
 
             $suffix = $configKey === 'team2' ? 'b55' : 't1';
 
-            // Generiere Email ohne Slug für bessere Performance
-            $email = strtolower($firstName . $suffix . $index . '@firma.ch');
+            // Generiere Email basierend auf Vor- und Nachnamen
+            $emailName = strtolower($firstName . '.' . $lastName);
+            $email = $emailName . $suffix . $index . '@firma.ch';
             $userEmails[] = $email;
 
             // Bestimme Supervisor
             // Erste 10% haben den Owner als Supervisor, Rest hat zufälligen Supervisor aus Pool
             $supervisorId = ($j < $chunkSize * 0.1) ? $ownerId : $supervisorIds[array_rand($supervisorIds)];
 
+            // Bestimme welche Role dieser User bekommt
+            if ($managersCreated < $managerCount) {
+                $userRoleId = $managerRoleId;
+                $isManager = true;  // Manager Role hat is_manager = true
+                $managersCreated++;
+            } else {
+                // Zufällige Non-Manager Role
+                $userRoleId = $nonManagerRoleIds[$j % $nonManagerCount];
+                $isManager = false;  // Diese Rollen haben is_manager = false
+            }
+
+// Speichere die Role ID für späteren Gebrauch
+            $userRoleIds[$j] = $userRoleId;
+
             // User-Daten MIT den neuen Feldern
             $userData[] = [
-                'name' => $firstName,
+                'name' => $fullName,  // Vollständiger Name
                 'email' => $email,
                 'email_verified_at' => $currentTime,
                 'password' => $this->passwordHash,
@@ -462,13 +481,14 @@ class HighPerformanceTestDataSeeder extends Seeder
                 'company_id' => $companyId,
                 'user_type' => UserType::Employee->value,
                 'department_id' => $departmentIds[$j % $departmentCount],
-                'profession_id' => $professionIds[$j % $professionCount],     // NEU
-                'stage_id' => $stageIds[$j % $stageCount],                   // NEU
-                'supervisor_id' => $supervisorId,                            // NEU
+                'profession_id' => $professionIds[$j % $professionCount],
+                'stage_id' => $stageIds[$j % $stageCount],
+                'supervisor_id' => $supervisorId,
+                'manager' => $isManager,  // NEU: Setze Manager Feld direkt
                 'model_status' => ModelStatus::ACTIVE->value,
                 'status' => $this->getRandomEmployeeStatusValue(),
                 'phone_1' => '+417' . str_pad(mt_rand(0, 99999999), 8, '0', STR_PAD_LEFT),
-                'url_slug' => $firstName . $suffix . '-' . $index,
+                'url_slug' => Str::slug($fullName) . '-' . $index,
                 'created_by' => $ownerId,
                 'joined_at' => $this->generateRandomDate(),
                 'created_at' => $currentTime,
@@ -476,7 +496,6 @@ class HighPerformanceTestDataSeeder extends Seeder
             ];
         }
 
-        // Rest der Methode bleibt gleich...
         // Bulk Insert Users und hole IDs
         $this->insertInChunks('users', $userData, 2000);
 
@@ -487,7 +506,7 @@ class HighPerformanceTestDataSeeder extends Seeder
             ->toArray();
 
         // Erweitere den Supervisor-Pool mit den neu erstellten Manager-IDs
-        $managerEmails = array_slice($userEmails, 0, min($managerCount - $managersCreated, $chunkSize));
+        $managerEmails = array_slice($userEmails, 0, min($managerCount - ($managersCreated - $chunkSize), $chunkSize));
         foreach ($managerEmails as $managerEmail) {
             if (isset($userIds[$managerEmail])) {
                 $supervisorIds[] = $userIds[$managerEmail];
@@ -496,13 +515,14 @@ class HighPerformanceTestDataSeeder extends Seeder
 
         // Erstelle Employee, Role und Team-Zuweisungen
         $j = 0;
+        $managersInThisChunk = 0;
         foreach ($userEmails as $email) {
             if (!isset($userIds[$email])) continue;
 
             $userId = $userIds[$email];
             $index = $startIndex + $j + $indexOffset + 1;
 
-            // Employee-Daten (bleiben gleich, da Felder noch im Employee Model sind)
+            // Employee-Daten
             $prefix = $configKey === 'team2' ? 'B55-' : 'PN';
             $padLength = $configKey === 'team2' ? 5 : 8;
 
@@ -513,13 +533,8 @@ class HighPerformanceTestDataSeeder extends Seeder
                 'updated_at' => $currentTime,
             ];
 
-            // Rolle
-            if ($managersCreated < $managerCount) {
-                $roleId = $managerRoleId;
-                $managersCreated++;
-            } else {
-                $roleId = $nonManagerRoleIds[$j % $nonManagerCount];
-            }
+            // Rolle - verwende die vorher bestimmte Role ID
+            $roleId = $userRoleIds[$j];
 
             $roleData[] = [
                 'role_id' => $roleId,
@@ -539,7 +554,7 @@ class HighPerformanceTestDataSeeder extends Seeder
             $j++;
         }
 
-        // Bulk Inserts bleiben gleich...
+        // Bulk Inserts
         if (!empty($employeeData)) {
             $this->insertInChunks('employees', $employeeData, 5000);
         }
@@ -692,7 +707,7 @@ class HighPerformanceTestDataSeeder extends Seeder
     }
 
     /**
-     * Erstelle Owner (gekürzt für Übersichtlichkeit)
+     * Erstelle Owner
      */
     protected function createOwner(): User
     {
@@ -705,6 +720,7 @@ class HighPerformanceTestDataSeeder extends Seeder
             'user_type' => UserType::Owner,
             'model_status' => ModelStatus::ACTIVE,
             'url_slug' => Str::slug($this->config['owner']['name']) . '-' . Str::random(3),
+            'manager' => true,  // Owner ist immer ein Manager
             'profession_id' => null,
             'stage_id' => null,
             'supervisor_id' => null,
@@ -715,7 +731,7 @@ class HighPerformanceTestDataSeeder extends Seeder
     }
 
     /**
-     * Erstelle Company (gekürzt für Übersichtlichkeit)
+     * Erstelle Company
      */
     protected function createCompany(User $owner): Company
     {
@@ -739,7 +755,7 @@ class HighPerformanceTestDataSeeder extends Seeder
     }
 
     /**
-     * Erstelle Rollen (gekürzt für Übersichtlichkeit)
+     * Erstelle Rollen
      */
     protected function createRoles(User $owner, Company $company): array
     {
