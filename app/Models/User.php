@@ -126,6 +126,7 @@ class User extends Authenticatable
         'gender' => Gender::class,
         'user_type' => UserType::class,
         'model_status' => ModelStatus::class,
+        'manager' => 'boolean',
         // status wird dynamisch gesetzt, daher hier nicht als Cast
     ];
 

@@ -97,6 +97,11 @@ class CreateEmployee extends Component
         try {
             DB::transaction(function () {
 
+                // Check ob ausgewählte Rollen eine Manager-Rolle enthalten
+                $hasManagerRole = collect($this->roles)
+                    ->whereIn('id', $this->selectedRoles)
+                    ->contains('is_manager', true);
+
                 $user = User::create([
                     'gender' => $this->gender,
                     'name' => $this->name,
@@ -113,11 +118,18 @@ class CreateEmployee extends Component
                     'status' => $this->status,
                     'company_id' => $this->companyId,
                     'created_by' => $this->authUserId,
+                    'manager' => $hasManagerRole,
                 ]);
 
                 $this->createEmployee($user);
                 $this->assignTeams($user);
                 $this->assignRoles($user);
+
+                // Cache clearen wenn Manager erstellt wurde
+                if ($hasManagerRole) {
+                    User::clearManagerCache($user->company_id);
+                }
+
 
                 if ($this->invitation) {
                     // TODO: E-Mail-Benachrichtigung implementieren

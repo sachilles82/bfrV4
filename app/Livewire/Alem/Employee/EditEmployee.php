@@ -83,7 +83,7 @@ class EditEmployee extends Component
                 'id', 'name', 'email', 'gender', 'model_status',
                 'status', 'department_id', 'supervisor_id',
                 'profession_id', 'stage_id', 'joined_at', 'user_type',
-                'company_id'
+                'company_id','manager'
             ])
             ->findOrFail($this->userId);
 
@@ -258,7 +258,11 @@ class EditEmployee extends Component
         // Neuer Manager Status
         $newHasManager = $this->checkManagerInRoles($this->selectedRoles);
 
+        // Update manager field im User Model
         if ($oldHasManager !== $newHasManager) {
+            $this->user->update(['manager' => $newHasManager]);
+
+            // Cache clear und Collection reload
             User::clearManagerCache($this->user->company_id);
             $this->forceReloadCollection('supervisors');
         }

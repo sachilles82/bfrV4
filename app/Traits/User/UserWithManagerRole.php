@@ -2,18 +2,12 @@
 
 namespace App\Traits\User;
 
-use App\Models\Spatie\Role;
-use App\Models\User;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 trait UserWithManagerRole
 {
     /**
-     * 1. Prüft ob der User eine Manager-Rolle hat
-     *
-     * @return bool True wenn User mindestens eine Rolle mit is_manager = true hat
+     * Check if user has any role with is_manager = true
      */
     public function hasManagerRole(): bool
     {
@@ -21,132 +15,68 @@ trait UserWithManagerRole
     }
 
     /**
-     * 2. Leert den Manager-Cache für eine Company
-     *
-     * Löscht sowohl den persistenten Cache (Redis/File) als auch den Request-Cache
-     *
-     * @param int $companyId Die Company ID für die der Cache geleert werden soll
+     * Get manager cache key for company
+     */
+    public static function getManagerCacheKey(int $companyId): string
+    {
+        return "company_{$companyId}_managers";
+    }
+
+    /**
+     * Clear manager cache for company
      */
     public static function clearManagerCache(int $companyId): void
     {
-        $instance = new static;
-        $config = $instance->getCacheConfig();
+        Cache::forget(self::getManagerCacheKey($companyId));
+    }
 
-        // Generiere den korrekten Cache-Key mit suffix
-        $persistentKey = "{$config['prefix']}:company:{$companyId}:managers";
-        $requestKey = "request_{$config['prefix']}_company_{$companyId}_managers";
+    /**
+     * Get all managers for a company with caching
+     */
+    public static function getCompanyManagers(int $companyId)
+    {
+        return Cache::remember(
+            self::getManagerCacheKey($companyId),
+            60 * 60 * 24, // 24 hours
+            function () use ($companyId) {
+                return static::query()
+                    ->where('company_id', $companyId)
+                    ->where('manager', true) // Nutze das neue manager Feld
+                    ->select(['id', 'name', 'email'])
+                    ->orderBy('name')
+                    ->get();
+            }
+        );
+    }
 
-        // Leere persistent cache
-        Cache::forget($persistentKey);
+    /**
+     * Sync manager field based on roles
+     * Diese Methode soll aufgerufen werden, wenn Rollen geändert werden
+     */
+    public function syncManagerStatus(): void
+    {
+        $hasManagerRole = $this->roles()->where('is_manager', true)->exists();
 
-        // Leere request cache
-        if (isset(self::$requestCache[$requestKey])) {
-            unset(self::$requestCache[$requestKey]);
+        // Nur updaten wenn sich der Status ändert
+        if ($this->manager !== $hasManagerRole) {
+            $this->update(['manager' => $hasManagerRole]);
+
+            // Cache clearen wenn sich Manager Status ändert
+            if ($this->company_id) {
+                static::clearManagerCache($this->company_id);
+            }
         }
     }
 
     /**
-     * 3. Override assignRole - Erweitert die Spatie assignRole Methode
-     *
-     * Leert automatisch den Manager-Cache wenn ein User zum Manager wird
-     *
-     * @param mixed ...$roles Ein oder mehrere Rollen (string, id oder Role Model)
-     * @return mixed Das Ergebnis der parent assignRole Methode
+     * Boot method to sync manager status when roles change
      */
-    public function assignManagerRole(...$roles)
+    protected static function bootUserWithManagerRole()
     {
-        // Prüfe ob User bereits Manager ist
-        $wasManager = $this->hasManagerRole();
-
-        // Prüfe ob eine der neuen Rollen eine Manager-Rolle ist
-        $assigningManagerRole = collect($roles)
-            ->map(function($role) {
-                if (is_string($role)) {
-                    return Role::where('name', $role)->first();
-                } elseif (is_numeric($role)) {
-                    return Role::find($role);
-                }
-                return $role;
-            })
-            ->filter()
-            ->contains(fn($role) => $role && $role->is_manager);
-
-        // Führe die Rollenzuweisung durch
-        $result = parent::assignRole(...$roles);
-
-        // Cache leeren wenn User zum Manager wird
-        if (!$wasManager && $assigningManagerRole && $this->company_id) {
-            static::clearManagerCache($this->company_id);
-        }
-
-        return $result;
-    }
-
-    /**
-     * 4. Override removeRole - Erweitert die Spatie removeRole Methode
-     *
-     * Leert automatisch den Manager-Cache wenn ein User den Manager-Status verliert
-     *
-     * @param mixed $role Die zu entfernende Rolle (string, id oder Role Model)
-     * @return mixed Das Ergebnis der parent removeRole Methode
-     */
-    public function removeManagerRole($role)
-    {
-        // Konvertiere Rolle zu Model-Objekt
-        $roleModel = is_string($role)
-            ? Role::where('name', $role)->first()
-            : (is_numeric($role) ? Role::find($role) : $role);
-
-        // Prüfe ob es eine Manager-Rolle ist
-        $isRemovingManagerRole = $roleModel && $roleModel->is_manager;
-
-        // Prüfe ob User noch andere Manager-Rollen hat
-        $otherManagerRoles = $this->roles()
-            ->where('is_manager', true)
-            ->where('id', '!=', $roleModel->id ?? 0)
-            ->exists();
-
-        // Führe die Rollenentfernung durch
-        $result = parent::removeRole($role);
-
-        // Cache leeren wenn User keinen Manager-Status mehr hat
-        if ($isRemovingManagerRole && !$otherManagerRoles && $this->company_id) {
-            static::clearManagerCache($this->company_id);
-        }
-
-        return $result;
-    }
-
-    /**
-     * 5. Holt alle Manager einer Company mit Cache
-     *
-     * Verwendet einen separaten Cache-Key mit 'managers' Suffix
-     * um Manager-Daten getrennt von anderen User-Daten zu cachen
-     *
-     * @param int $companyId Die Company ID
-     * @return Collection Collection von User Models die Manager sind
-     */
-    public static function getCompanyManagers(int $companyId): Collection
-    {
-        return static::getCachedByCompany($companyId, function() use ($companyId) {
-            // Nutze whereExists statt JOIN für bessere Performance
-            return self::select([
-                'users.id',
-                'users.name',
-                'users.profile_photo_path'
-            ])
-                ->where('users.company_id', $companyId)
-                ->whereNull('users.deleted_at')
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                        ->from('model_has_roles')
-                        ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
-                        ->whereColumn('model_has_roles.model_id', 'users.id')
-                        ->where('model_has_roles.model_type', User::class)
-                        ->where('roles.is_manager', true);
-                })
-                ->orderBy('users.name')
-                ->get();
-        }, ['suffix' => 'managers']);
+        // Wenn Rollen über die Relation synchronisiert werden
+        static::updated(function ($user) {
+            // Dieser Hook wird nicht automatisch bei Role Sync ausgelöst
+            // Daher muss syncManagerStatus() manuell nach Role Sync aufgerufen werden
+        });
     }
 }

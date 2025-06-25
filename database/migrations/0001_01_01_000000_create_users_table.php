@@ -39,6 +39,7 @@ return new class extends Migration {
             $table->date('birthdate')->nullable();
             $table->date('joined_at')->nullable();
             $table->foreignId('created_by')->nullable();
+            $table->boolean('manager')->default(false);
 
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
