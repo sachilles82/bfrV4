@@ -90,6 +90,8 @@ class User extends Authenticatable
         'profession_id',
         'stage_id',
         'supervisor_id',
+        'manager',
+
 //        'invitation',
     ];
 
