@@ -17,6 +17,7 @@ use App\Traits\Cache\AdvancedCache;
 use App\Traits\HasAddress;
 use App\Traits\Model\ModelPermanentDeletion;
 use App\Traits\Model\ModelStatusManagement;
+use App\Traits\User\UserHasURL;
 use App\Traits\User\UserWithManagerRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,7 +53,7 @@ class User extends Authenticatable
     use SoftDeletes;
     use TwoFactorAuthenticatable;
     use Searchable;
-    use AdvancedCache, UserWithManagerRole;
+    use AdvancedCache, UserWithManagerRole, UserHasURL;
 
     /**
      * Cache-Konfiguration für dieses Model
@@ -139,6 +140,13 @@ class User extends Authenticatable
     ];
 
     /**
+     * Dieses User Model kann verschiede Enum Typen für den Status haben,
+     * daher ist der Status dynamisch.
+     *
+     * User Employee: EmployeeStatus
+     * User Partner: PartnerStatus (zukünftig)
+     * User Customer: CustomerStatus (zukünftig)
+     *
      * Dynamischer Status Accessor - gibt den korrekten Enum-Typ zurück
      * basierend auf dem user_type
      */
@@ -248,19 +256,6 @@ class User extends Authenticatable
                 app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
             }
         });
-
-        static::creating(function ($user) {
-            if (empty($user->url_slug)) {
-                $user->url_slug = Str::slug($user->name) . '-' . rand(1000, 9999);
-            }
-        });
-
-        static::updating(function ($user) {
-            // Den Slug nur aktualisieren, wenn sich der Name oder Nachname geändert hat
-            if ($user->isDirty('name') ) {
-                $user->url_slug = Str::slug($user->name) . '-' . rand(1000, 9999);
-            }
-        });
     }
 
     public function company(): BelongsTo
@@ -277,36 +272,5 @@ class User extends Authenticatable
         // User-Änderungen können Company und Team betreffen
         return ['company', 'team'];
     }
-
-
-    /** ********************* Employee Route Model Bindung */
-    /**
-     * Scope für dei EmployeeProfileController
-     * Er braucht die ID und den SLUG für die Route Model Bindung
-     */
-    public function scopeUserEmployeeFields($query)
-    {
-        return $query->select([
-            'id',
-            'url_slug'
-        ]);
-    }
-
-    /**
-     * Get the route key for the model.
-     */
-    public function getRouteKey(): mixed
-    {
-        return $this->url_slug;
-    }
-
-    /**
-     * Get the route key name for the model.
-     */
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-    /** ********************* Employee Route Model Bindung */
 
 }
