@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/documentation/user-model', function () {
+    return view('documentation.user-model');
+})->name('documentation.user-model');
+
+
 Route::get('/cartoon', function () {
     return view('cartoon');
 })->name('cartoon');
