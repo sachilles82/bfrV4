@@ -95,7 +95,7 @@ class Department extends Model
             return static::query()
                 ->where('team_id', $teamId)
                 ->where('model_status', ModelStatus::ACTIVE->value)
-                ->select(['id', 'name'])
+                ->select(['id', 'name', 'team_id'])
                 ->orderBy('name')
                 ->get();
         });

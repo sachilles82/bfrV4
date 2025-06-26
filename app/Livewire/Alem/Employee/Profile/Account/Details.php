@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Account;
 
-use App\Enums\Model\ModelStatus;
-use App\Enums\User\Gender;
+use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Livewire\Alem\Employee\Profile\Account\Helper\ValidateAccountDetails;
 use App\Models\User;
+use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
@@ -16,34 +16,37 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\On;
 use Livewire\Component;
-use Throwable;
 
 #[Lazy]
 class Details extends Component
 {
-    use AuthUserTeamCompanyId, WithDropDownRelations;
-    use AuthorizesRequests, ValidateAccountDetails;
-    use ModelStatusOptions, GenderOptions;
+    use AuthorizesRequests;
+    use AuthUserTeamCompanyId;
+    use ValidateAccountDetails, HandleCatchError;
+    use WithDropDownRelations;
+    use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
     #[Locked]
     public int $employeeId;
 
-    private User $employee;
+    public ?User $employee = null;
 
-    // User form fields
-    public ?Gender $gender = null;
+    /** User form fields */
+    public ?string $gender = null;
     public ?string $name = null;
     public ?string $email = null;
     public ?string $phone_1 = null;
-    public ?ModelStatus $model_status = null;
+    public ?string $model_status = null;
     public ?int $department = null;
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    public function mount($employee, int $authUserId, int $currentTeamId, int $companyId): void {
+    /** Original Daten des Users aus der Datenbank für Vergleiche */
+    public array $originalData = [];
 
+    public function mount($employee, int $authUserId, int $currentTeamId, int $companyId): void
+    {
         $this->employeeId = is_object($employee) ? $employee->id : $employee['id'];
 
         // Auth Daten
@@ -51,62 +54,98 @@ class Details extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
+        // Lade Employee mit allen benötigten Relations
         $this->employee = User::with([
             'teams:id,name',
             'roles:id,name,is_manager',
-            'roles.permissions',
-            'department:id,name'
-        ])->findOrFail($this->employeeId);
+        ])
+            ->select([
+                'id', 'name', 'email', 'gender', 'model_status',
+                'department_id', 'phone_1', 'company_id', 'manager'
+            ])
+            ->findOrFail($this->employeeId);
 
-        // Lade den Employee einmal mit allen benötigten Daten
         $this->loadEmployeeData();
 
-        // Lade nur Dropdown-Daten
+        // Lade Dropdown-Daten
         $this->loadRelationsData([
             'teams', 'departments', 'roles', 'supervisors'
         ]);
     }
 
     /**
-     * Lade die User Employee Daten
+     * Befülle die Form mit User Employee Daten
+     * Speichere Original-Daten aus der Datenbank für den Vergleich
      */
     private function loadEmployeeData(): void
     {
         if (!$this->employee) return;
 
-        $this->gender = $this->employee->gender;
+        // WICHTIG: Speichere Original-Daten in EINEM public Array
+        $this->originalData = [
+            'name' => $this->employee->name,
+            'email' => $this->employee->email,
+            'phone_1' => $this->employee->phone_1,
+            'gender' => $this->employee->gender?->value,
+            'teamIds' => $this->employee->teams->pluck('id')->toArray(),
+            'roleIds' => $this->employee->roles->pluck('id')->toArray(),
+            'department_id' => $this->employee->department_id,
+            'model_status' => $this->employee->model_status?->value,
+        ];
+
+        $this->gender = $this->employee->gender?->value;
         $this->name = $this->employee->name;
         $this->email = $this->employee->email;
         $this->phone_1 = $this->employee->phone_1 ?? '';
 
-        $this->selectedTeams = $this->employee->teams->pluck('id')->toArray();
+        // Setze selected Arrays
+        $this->selectedTeams = $this->originalData['teamIds'];
+        $this->selectedRoles = $this->originalData['roleIds'];
+
         $this->department = $this->employee->department_id;
-        $this->selectedRoles = $this->employee->roles->pluck('id')->toArray();
-        $this->model_status = $this->employee->model_status;
+        $this->model_status = $this->employee->model_status?->value;
     }
 
+    /**
+     * Aktualisiert die Benutzer- und Mitarbeiterdaten in der Datenbank.
+     */
     public function updateEmployee(): void
     {
+        \Log::info('updateEmployee called', [
+            'selectedRoles' => $this->selectedRoles,
+            'originalRoles' => $this->originalData['roleIds'] ?? [],
+        ]);
+
         $this->validate();
 
         try {
             DB::transaction(function () {
-                // Lade fresh für Update
-                $employee = User::findOrFail($this->employeeId);
+                // Lade Employee fresh für Update mit Relations für Manager Check
+                $employee = User::with('roles:id,name,is_manager')->findOrFail($this->employeeId);
 
+                // ✅ Golden Path: Eloquent Update
                 $employee->update([
                     'gender' => $this->gender,
                     'name' => $this->name,
                     'email' => $this->email,
                     'phone_1' => $this->phone_1,
-
                     'department_id' => $this->department,
                     'model_status' => $this->model_status,
                 ]);
 
-                $this->syncRelations($employee);
+                // Für die sync Methoden
+                $this->employee = $employee;
 
+                \Log::info('Before updateTeamsRoles', [
+                    'roles_loaded' => count($this->roles),
+                    'employee_exists' => !is_null($this->employee),
+                ]);
+
+                $this->updateTeamsRoles();
             });
+
+            // Aktualisiere die Original-Daten nach erfolgreichem Update
+            $this->loadEmployeeData();
 
             $this->dispatch('employee-updated');
 
@@ -116,28 +155,110 @@ class Details extends Component
                 variant: 'success'
             );
 
-        } catch (Throwable $e) {
-//            $this->handleUpdateEmployeeAccountDetails($e);
+        } catch (\Throwable $e) {
+            \Log::error('updateEmployee failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            $this->handleEditingError($e);
         }
     }
 
     /**
-     * @throws Throwable
+     * Email Check für Validation
      */
-    private function syncRelations(User $employee): void
+    public function emailHasChanged(): bool
     {
-        DB::transaction(function () use ($employee): void {
+        return $this->email !== ($this->originalData['email'] ?? '');
+    }
 
-            $wasManager = $employee->hasManagerRole();
+    /**
+     * Haupt-Methode mit optionaler Team-Sync
+     */
+    private function updateTeamsRoles(): void
+    {
+        $this->syncTeams();
+        $this->syncRolesWithManagerCheck();
+    }
 
-            $employee->roles()->sync($this->selectedRoles);
-            $employee->teams()->sync($this->selectedTeams);
+    /**
+     * Helper: Check Manager in Roles ohne DB Query
+     */
+    private function checkManagerInRoles(array $roleIds): bool
+    {
+        // Nutze die geladenen Dropdown-Daten
+        if (empty($this->dropdownRelations['roles'])) {
+            return false;
+        }
 
-            if ($wasManager !== $employee->hasManagerRole()) {
-                User::clearManagerCache($employee->company_id);
-                $this->forceReloadCollection('supervisors');
-            }
-        });
+        return collect($this->dropdownRelations['roles'])
+            ->whereIn('id', $roleIds)
+            ->contains('is_manager', true);
+    }
+
+    /**
+     * Helper: Arrays vergleichen
+     */
+    private function arraysAreDifferent(array $array1, array $array2): bool
+    {
+        return count(array_diff($array1, $array2)) > 0 ||
+            count(array_diff($array2, $array1)) > 0;
+    }
+
+    /**
+     * Teams nur synchronisieren wenn sich etwas geändert hat
+     */
+    private function syncTeams(): void
+    {
+        $originalTeamIds = $this->originalData['teamIds'] ?? [];
+        $teamsChanged = $this->arraysAreDifferent($originalTeamIds, $this->selectedTeams);
+
+        if ($teamsChanged) {
+            $this->employee->teams()->sync($this->selectedTeams);
+        }
+    }
+
+    /**
+     * Optimierte syncRolesWithManagerCheck - KEINE zusätzliche Query!
+     */
+    private function syncRolesWithManagerCheck(): void
+    {
+        $originalRoleIds = $this->originalData['roleIds'] ?? [];
+        $rolesChanged = $this->arraysAreDifferent($originalRoleIds, $this->selectedRoles);
+
+        \Log::info('syncRolesWithManagerCheck', [
+            'originalRoleIds' => $originalRoleIds,
+            'selectedRoles' => $this->selectedRoles,
+            'rolesChanged' => $rolesChanged,
+            'roles_in_dropdown' => collect($this->roles)->pluck('id')->toArray(),
+        ]);
+
+        if (!$rolesChanged) {
+            return;
+        }
+
+        // Manager Status aus bereits geladenen Daten
+        $oldHasManager = $this->checkManagerInRoles($originalRoleIds);
+
+        // Sync Rollen
+        $this->employee->roles()->sync($this->selectedRoles);
+
+        \Log::info('Roles synced', [
+            'sync_result' => 'success',
+            'oldHasManager' => $oldHasManager,
+        ]);
+
+        // Neuer Manager Status
+        $newHasManager = $this->checkManagerInRoles($this->selectedRoles);
+
+        // Update manager field im User Model
+        if ($oldHasManager !== $newHasManager) {
+            $this->employee->update(['manager' => $newHasManager]);
+
+            // Cache clear und Collection reload
+            User::clearManagerCache($this->employee->company_id);
+            $this->forceReloadCollection('supervisors');
+        }
     }
 
     public function placeholder(): string

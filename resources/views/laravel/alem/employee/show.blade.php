@@ -25,10 +25,10 @@
                 />
 
 
-                <livewire:alem.employee.profile.employment-data.employment-data
-                    :user-id="$employee->id"
-                    lazy
-                />
+{{--                <livewire:alem.employee.profile.employment-data.employment-data--}}
+{{--                    :user-id="$employee->id"--}}
+{{--                    lazy--}}
+{{--                />--}}
 
             @elseif($activeTab === 'report')
                 {{-- Andere Tabs... --}}

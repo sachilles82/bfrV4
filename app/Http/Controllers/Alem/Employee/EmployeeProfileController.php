@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Alem\Employee;
-
-use App\Enums\User\UserType;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;

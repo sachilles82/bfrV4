@@ -23,26 +23,13 @@ use Livewire\Component;
 class EditEmployee extends Component
 {
     use AuthorizesRequests;
-    use AuthUserTeamCompanyId, WithDropDownRelations, ValidateEmployee, HandleCatchError;
+    use AuthUserTeamCompanyId;
+    use ValidateEmployee, HandleCatchError;
+    use WithDropDownRelations;
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
-
 
     #[Locked]
     public ?int $userId = null;
-
-    /** Modal-Status: Braucht jedes Komponent mit einem Modal */
-    public bool $showEditModal = false;
-
-    protected function shouldCheckModalState(): bool
-    {
-        return true;
-    }
-
-    protected function isModalOpen(): bool
-    {
-        return $this->showEditModal;
-    }
-    /** Modal-Status mit Funktionen */
 
     // User identification
     public ?User $user = null;
@@ -66,6 +53,20 @@ class EditEmployee extends Component
 
     /** Original Daten des Users aus der Datenbank für Vergleiche */
     public array $originalData = [];
+
+    /** Modal-Status: Braucht jedes Komponent mit einem Modal */
+    public bool $showEditModal = false;
+
+    protected function shouldCheckModalState(): bool
+    {
+        return true;
+    }
+
+    protected function isModalOpen(): bool
+    {
+        return $this->showEditModal;
+    }
+    /** Modal-Status mit Funktionen */
 
 
     #[On('edit-employee-modal')]
