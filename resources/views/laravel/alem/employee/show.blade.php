@@ -26,7 +26,10 @@
 
 
 {{--                <livewire:alem.employee.profile.employment-data.employment-data--}}
-{{--                    :user-id="$employee->id"--}}
+{{--                    :employee-id="$employeeId"--}}
+{{--                    :auth-user-id="$authUserId"--}}
+{{--                    :current-team-id="$currentTeamId"--}}
+{{--                    :company-id="$companyId"--}}
 {{--                    lazy--}}
 {{--                />--}}
 

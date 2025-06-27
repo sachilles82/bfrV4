@@ -9,88 +9,50 @@ use Illuminate\Validation\Rule;
 trait ValidateAccountDetails
 {
     /**
-     * Definiert die Validierungsregeln basierend auf geänderten Daten
-     * Nutzt Laravel 11+ Features für bessere Performance
+     * Validiert nur die geänderten Felder
+     * @return array Die validierten Daten
      */
-    public function rules(): array
+    public function validateOnlyChanged(): array
+    {
+        $rules = $this->getChangedFieldRules();
+
+        if (empty($rules)) {
+            return [];
+        }
+
+        return $this->validate($rules);
+    }
+
+    /**
+     * Gibt nur die Regeln für geänderte Felder zurück
+     */
+    private function getChangedFieldRules(): array
     {
         $rules = [];
 
-        // Gender - Nur validieren wenn geändert
+        // Gender
         if ($this->genderHasChanged()) {
             $rules['gender'] = ['required', Rule::enum(Gender::class)];
-        } else {
-            // Minimale Validierung
-            $rules['gender'] = 'required|string';
         }
 
-        // Name - Nur validieren wenn geändert
+        // Name
         if ($this->nameHasChanged()) {
             $rules['name'] = 'required|string|min:3|max:255';
-        } else {
-            // Minimale Validierung
-            $rules['name'] = 'required|string';
         }
 
-        // Email - Unique Check nur wenn geändert
+        // Email
         if ($this->emailHasChanged()) {
             $rules['email'] = [
                 'required',
                 'email:rfc,dns,spoof',
                 'max:255',
-                Rule::unique('users', 'email')
-                    ->ignore($this->employeeId)
+                Rule::unique('users', 'email')->ignore($this->employeeId)
             ];
-        } else {
-            // Basis-Validierung ohne DB-Check
-            $rules['email'] = 'required|email:rfc|max:255';
         }
 
-        // Teams - Erweiterte Validierung nur wenn geändert
-        if ($this->teamsHaveChanged()) {
-            $rules['selectedTeams'] = ['required', 'array', 'min:1'];
-            $rules['selectedTeams.*'] = [
-                'integer',
-                Rule::in(array_column($this->teams, 'id'))  // Nutze geladene Teams
-            ];
-        } else {
-            // Minimale Validierung
-            $rules['selectedTeams'] = ['required', 'array', 'min:1'];
-            $rules['selectedTeams.*'] = 'integer';
-        }
-
-
-        // Department - Nur validieren wenn geändert
-        if ($this->departmentHasChanged()) {
-            $rules['department'] = [
-                'required',
-                'integer',
-                Rule::in(array_column($this->departments, 'id'))
-            ];
-        } else {
-            // Minimale Validierung ohne Rule::in Check
-            $rules['department'] = 'required|integer';
-        }
-
-        // Roles - Erweiterte Validierung nur wenn geändert
-        if ($this->rolesHaveChanged()) {
-            $rules['selectedRoles'] = ['required', 'array', 'min:1'];
-            $rules['selectedRoles.*'] = [
-                'integer',
-                Rule::in(array_column($this->roles, 'id'))  // Nutze geladene Rollen statt DB-Query
-            ];
-        } else {
-            // Minimale Validierung
-            $rules['selectedRoles'] = ['required', 'array', 'min:1'];
-            $rules['selectedRoles.*'] = 'integer';  // Nur Integer-Check wenn nicht geändert
-        }
-
-        // Wenn du unterscheiden willst zwischen "neu eingegeben" und "geändert":
+        // Phone
         if ($this->phoneHasChanged()) {
-            if (empty($this->phone_1)) {
-                // Phone wurde gelöscht - keine Validierung nötig
-            } else {
-                // Phone wurde eingegeben/geändert - validieren
+            if (!empty($this->phone_1)) {
                 $rules['phone_1'] = [
                     'nullable',
                     'string',
@@ -100,15 +62,78 @@ trait ValidateAccountDetails
             }
         }
 
-        // Model Status - Nur validieren wenn geändert
+        // Teams
+        if ($this->teamsHaveChanged()) {
+            $rules['selectedTeams'] = ['required', 'array', 'min:1'];
+            $rules['selectedTeams.*'] = [
+                'integer',
+                Rule::in(array_column($this->teams, 'id'))
+            ];
+        }
+
+        // Department
+        if ($this->departmentHasChanged()) {
+            $rules['department'] = [
+                'required',
+                'integer',
+                Rule::in(array_column($this->departments, 'id'))
+            ];
+        }
+
+        // Roles
+        if ($this->rolesHaveChanged()) {
+            $rules['selectedRoles'] = ['required', 'array', 'min:1'];
+            $rules['selectedRoles.*'] = [
+                'integer',
+                Rule::in(array_column($this->roles, 'id'))
+            ];
+        }
+
+        // Model Status
         if ($this->modelStatusHasChanged()) {
             $rules['model_status'] = ['required', Rule::enum(ModelStatus::class)];
-        } else {
-            // Minimale Validierung
-            $rules['model_status'] = 'required|string';
         }
 
         return $rules;
+    }
+
+    /**
+     * Legacy: Alle Validierungsregeln (für Backward Compatibility)
+     */
+    public function rules(): array
+    {
+        return [
+            'gender' => ['required', Rule::enum(Gender::class)],
+            'name' => 'required|string|min:3|max:255',
+            'email' => [
+                'required',
+                'email:rfc,dns,spoof',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($this->employeeId)
+            ],
+            'phone_1' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[\d\s\-\+\(\)]+$/'
+            ],
+            'selectedTeams' => ['required', 'array', 'min:1'],
+            'selectedTeams.*' => [
+                'integer',
+                Rule::in(array_column($this->teams, 'id'))
+            ],
+            'department' => [
+                'required',
+                'integer',
+                Rule::in(array_column($this->departments, 'id'))
+            ],
+            'selectedRoles' => ['required', 'array', 'min:1'],
+            'selectedRoles.*' => [
+                'integer',
+                Rule::in(array_column($this->roles, 'id'))
+            ],
+            'model_status' => ['required', Rule::enum(ModelStatus::class)]
+        ];
     }
 
     /**
@@ -125,8 +150,7 @@ trait ValidateAccountDetails
 
             // Gender
             'gender.required' => __('Gender is required.'),
-            'gender.string' => __('Gender must be a string.'),
-            'gender.in' => __('The selected gender is invalid.'),
+            'gender.enum' => __('The selected gender is invalid.'),
 
             // Email
             'email.required' => __('Email is required.'),
@@ -141,28 +165,94 @@ trait ValidateAccountDetails
 
             // Model Status
             'model_status.required' => __('Account status is required.'),
-            'model_status.string' => __('Account status must be a string.'),
-            'model_status.in' => __('The selected account status is invalid.'),
+            'model_status.enum' => __('The selected account status is invalid.'),
 
             // Department
             'department.required' => __('Department is required.'),
             'department.integer' => __('Department must be a number.'),
-            'department.exists' => __('The selected department does not exist.'),
+            'department.in' => __('The selected department does not exist.'),
 
             // Teams
             'selectedTeams.required' => __('At least one team must be selected.'),
             'selectedTeams.array' => __('Teams must be provided as a list.'),
             'selectedTeams.min' => __('Please select at least one team.'),
             'selectedTeams.*.integer' => __('Team ID must be a number.'),
-            'selectedTeams.*.exists' => __('One of the selected teams is invalid.'),
+            'selectedTeams.*.in' => __('One of the selected teams is invalid.'),
 
             // Roles
             'selectedRoles.required' => __('At least one role must be selected.'),
             'selectedRoles.array' => __('Roles must be provided as a list.'),
             'selectedRoles.min' => __('Please select at least one role.'),
             'selectedRoles.*.integer' => __('Role ID must be a number.'),
-            'selectedRoles.*.exists' => __('One of the selected roles is invalid.'),
+            'selectedRoles.*.in' => __('One of the selected roles is invalid.'),
         ];
+    }
+
+    /**
+     * Gibt alle geänderten Felder mit ihren Änderungen zurück
+     * Nützlich für Logging oder Debugging
+     */
+    public function getChangedFields(): array
+    {
+        $changed = [];
+
+        if ($this->genderHasChanged()) {
+            $changed['gender'] = [
+                'old' => $this->originalData['gender'] ?? null,
+                'new' => $this->gender
+            ];
+        }
+
+        if ($this->nameHasChanged()) {
+            $changed['name'] = [
+                'old' => $this->originalData['name'] ?? null,
+                'new' => $this->name
+            ];
+        }
+
+        if ($this->emailHasChanged()) {
+            $changed['email'] = [
+                'old' => $this->originalData['email'] ?? null,
+                'new' => $this->email
+            ];
+        }
+
+        if ($this->phoneHasChanged()) {
+            $changed['phone_1'] = [
+                'old' => $this->originalData['phone_1'] ?? null,
+                'new' => $this->phone_1
+            ];
+        }
+
+        if ($this->departmentHasChanged()) {
+            $changed['department_id'] = [
+                'old' => $this->originalData['department_id'] ?? null,
+                'new' => $this->department
+            ];
+        }
+
+        if ($this->modelStatusHasChanged()) {
+            $changed['model_status'] = [
+                'old' => $this->originalData['model_status'] ?? null,
+                'new' => $this->model_status
+            ];
+        }
+
+        if ($this->teamsHaveChanged()) {
+            $changed['teams'] = [
+                'old' => $this->originalData['teamIds'] ?? [],
+                'new' => $this->selectedTeams
+            ];
+        }
+
+        if ($this->rolesHaveChanged()) {
+            $changed['roles'] = [
+                'old' => $this->originalData['roleIds'] ?? [],
+                'new' => $this->selectedRoles
+            ];
+        }
+
+        return $changed;
     }
 
     /**
@@ -190,12 +280,11 @@ trait ValidateAccountDetails
     }
 
     /**
-     * Helper: Check ob Teams geändert wurden
+     * Helper: Check ob Phone geändert wurde
      */
-    private function teamsHaveChanged(): bool
+    private function phoneHasChanged(): bool
     {
-        $originalTeamIds = $this->originalData['teamIds'] ?? [];
-        return $this->arraysAreDifferent($this->selectedTeams, $originalTeamIds);
+        return $this->phone_1 !== ($this->originalData['phone_1'] ?? '');
     }
 
     /**
@@ -207,23 +296,6 @@ trait ValidateAccountDetails
     }
 
     /**
-     * Helper: Check ob Roles geändert wurden
-     */
-    private function rolesHaveChanged(): bool
-    {
-        $originalRoleIds = $this->originalData['roleIds'] ?? [];
-        return $this->arraysAreDifferent($this->selectedRoles, $originalRoleIds);
-    }
-
-    /**
-     * Helper: Check ob Phone geändert wurde
-     */
-    private function phoneHasChanged(): bool
-    {
-        return $this->phone_1 !== ($this->originalData['phone_1'] ?? '');
-    }
-
-    /**
      * Helper: Check ob Model Status geändert wurde
      */
     private function modelStatusHasChanged(): bool
@@ -231,29 +303,146 @@ trait ValidateAccountDetails
         return $this->model_status !== ($this->originalData['model_status'] ?? '');
     }
 
+//    /**
+//     * Helper: Check ob Teams geändert wurden
+//     */
+//    private function teamsHaveChanged(): bool
+//    {
+//        $originalTeamIds = $this->normalizeIntArray($this->originalData['teamIds'] ?? []);
+//        $currentTeamIds = $this->normalizeIntArray($this->selectedTeams);
+//        return !$this->arraysAreEqual($originalTeamIds, $currentTeamIds);
+//    }
+//
+//    /**
+//     * Helper: Check ob Roles geändert wurden
+//     */
+//    private function rolesHaveChanged(): bool
+//    {
+//        $originalRoleIds = $this->normalizeIntArray($this->originalData['roleIds'] ?? []);
+//        $currentRoleIds = $this->normalizeIntArray($this->selectedRoles);
+//        return !$this->arraysAreEqual($originalRoleIds, $currentRoleIds);
+//    }
+//
+//    /**
+//     * Vergleiche zwei Arrays (Order-unabhängig)
+//     */
+//    private function arraysAreEqual(array $array1, array $array2): bool
+//    {
+//        return $array1 === $array2;
+//    }
+//
+//    /**
+//     * Helper: Arrays vergleichen
+//     * (Sollte in der Hauptklasse existieren, hier als Fallback)
+//     */
+//    private function arraysAreDifferent(array $array1, array $array2): bool
+//    {
+//        if (method_exists($this, 'arraysAreDifferent')) {
+//            return parent::arraysAreDifferent($array1, $array2);
+//        }
+//
+//        return count(array_diff($array1, $array2)) > 0 ||
+//            count(array_diff($array2, $array1)) > 0;
+//    }
+
     /**
-     * Optional: Manuelle Feld-Validierung bei Bedarf
-     * Kann in der Blade mit wire:blur="validateField('email')" verwendet werden
+     * Generische Methode zum Vergleich von Integer-Arrays
+     * Normalisiert beide Arrays (sortiert, unique, nur integers) vor dem Vergleich
+     */
+    private function intArraysHaveChanged(array $original, array $current): bool
+    {
+        $normalizedOriginal = $this->normalizeIntArray($original);
+        $normalizedCurrent = $this->normalizeIntArray($current);
+        return !$this->arraysAreEqual($normalizedOriginal, $normalizedCurrent);
+    }
+
+    /**
+     * Normalisiere Integer Array (sortiert, unique, nur integers)
+     */
+    private function normalizeIntArray(array $array): array
+    {
+        $normalized = array_map('intval', array_filter($array, 'is_numeric'));
+        $normalized = array_unique($normalized);
+        sort($normalized);
+        return array_values($normalized);
+    }
+
+    /**
+     * Vergleiche zwei Arrays nach Normalisierung
+     */
+    private function arraysAreEqual(array $array1, array $array2): bool
+    {
+        return $array1 === $array2;
+    }
+
+    /**
+     * Helper: Check ob Teams geändert wurden
+     */
+    private function teamsHaveChanged(): bool
+    {
+        return $this->intArraysHaveChanged(
+            $this->originalData['teamIds'] ?? [],
+            $this->selectedTeams
+        );
+    }
+
+    /**
+     * Helper: Check ob Roles geändert wurden
+     */
+    private function rolesHaveChanged(): bool
+    {
+        return $this->intArraysHaveChanged(
+            $this->originalData['roleIds'] ?? [],
+            $this->selectedRoles
+        );
+    }
+
+// Die arraysAreDifferent() Methode kannst du löschen - wird nicht mehr gebraucht!
+
+    /**
+     * Validiere einzelnes Feld on-the-fly (z.B. wire:blur)
      */
     public function validateField(string $fieldName): void
     {
-        // Mapping für Array-Felder
         $fieldMapping = [
+            'gender' => 'genderHasChanged',
+            'name' => 'nameHasChanged',
             'email' => 'emailHasChanged',
+            'phone_1' => 'phoneHasChanged',
             'selectedTeams' => 'teamsHaveChanged',
             'selectedRoles' => 'rolesHaveChanged',
             'department' => 'departmentHasChanged',
+            'model_status' => 'modelStatusHasChanged',
         ];
 
-        // Prüfe ob das Feld überhaupt geändert wurde
+        // Prüfe ob das Feld geändert wurde
         if (isset($fieldMapping[$fieldName])) {
             $method = $fieldMapping[$fieldName];
             if (!$this->$method()) {
-                return; // Nichts zu validieren
+                // Feld nicht geändert - keine Validierung
+                return;
             }
         }
 
-        // Validiere nur dieses eine Feld
-        $this->validateOnly($fieldName);
+        // Hole nur die Regel für dieses Feld
+        $rules = $this->getChangedFieldRules();
+        if (isset($rules[$fieldName])) {
+            $this->validateOnly($fieldName, [$fieldName => $rules[$fieldName]]);
+        }
+    }
+
+    /**
+     * Prüft ob irgendwelche Änderungen vorliegen
+     */
+    public function hasAnyChanges(): bool
+    {
+        return $this->genderHasChanged() ||
+            $this->nameHasChanged() ||
+            $this->emailHasChanged() ||
+            $this->phoneHasChanged() ||
+            $this->departmentHasChanged() ||
+            $this->modelStatusHasChanged() ||
+            $this->teamsHaveChanged() ||
+            $this->rolesHaveChanged();
     }
 }

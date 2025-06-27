@@ -104,8 +104,10 @@ class Details extends Component
         $this->model_status = $this->employee->model_status?->value;
     }
 
+
     /**
      * Aktualisiert die Benutzer- und Mitarbeiterdaten in der Datenbank.
+     * Validiert nur die geänderten Felder für bessere Performance
      */
     public function updateEmployee(): void
     {
@@ -118,43 +120,68 @@ class Details extends Component
             ->map(fn($team) => (int) $team)
             ->toArray();
 
-        $this->validate();
+        // Prüfe ob überhaupt Änderungen vorliegen
+        if (!$this->hasAnyChanges()) {
+            Flux::toast(
+                text: __('No changes detected.'),
+                heading: __('Info'),
+                variant: 'info'
+            );
+            return;
+        }
+
+        // WICHTIG: Validiere NUR die geänderten Felder
+        $this->validateOnlyChanged();
 
         try {
             DB::transaction(function () {
-                // Lade Employee fresh für Update mit Relations für Manager Check
-                $employee = User::with('roles:id,name,is_manager')->findOrFail($this->employeeId);
+                // Erstelle Update-Array nur mit geänderten Feldern
+                $updateData = [];
 
-                // ✅ Golden Path: Eloquent Update
-                $employee->update([
-                    'gender' => $this->gender,
-                    'name' => $this->name,
-                    'email' => $this->email,
-                    'phone_1' => $this->phone_1,
-                    'department_id' => $this->department,
-                    'model_status' => $this->model_status,
-                ]);
+                if ($this->genderHasChanged()) {
+                    $updateData['gender'] = $this->gender;
+                }
+                if ($this->nameHasChanged()) {
+                    $updateData['name'] = $this->name;
+                }
+                if ($this->emailHasChanged()) {
+                    $updateData['email'] = $this->email;
+                }
+                if ($this->phoneHasChanged()) {
+                    $updateData['phone_1'] = $this->phone_1;
+                }
+                if ($this->departmentHasChanged()) {
+                    $updateData['department_id'] = $this->department;
+                }
+                if ($this->modelStatusHasChanged()) {
+                    $updateData['model_status'] = $this->model_status;
+                }
 
-                // Für die sync Methoden
-                $this->employee = $employee;
+                // Update nur wenn Felder geändert wurden
+                if (!empty($updateData)) {
+                    // OPTION 1: Nutze die bereits geladene Instanz aus mount()
+                    $this->employee->update($updateData);
 
+                    // OPTION 2: Wenn du sicher gehen willst, lade fresh (aber ohne Relations!)
+                    // User::where('id', $this->employeeId)->update($updateData);
+                }
+
+                // Teams und Roles - die sync() Methoden brauchen $this->employee
                 $this->updateTeamsRoles();
+
+                // Optional: Log die Änderungen
+                $changedFields = $this->getChangedFields();
+                if (!empty($changedFields)) {
+                    \Log::info('Employee updated', [
+                        'employee_id' => $this->employeeId,
+                        'changed_fields' => array_keys($changedFields),
+                        'changes' => $changedFields,
+                        'updated_by' => $this->authUserId
+                    ]);
+                }
             });
 
-//            // ✅ LÖSUNG: Lade Employee FRESH ohne Cache
-//            $this->employee = User::with([
-//                'teams:id,name',
-//                'roles:id,name,is_manager',
-//            ])
-//                ->select([
-//                    'id', 'name', 'email', 'gender', 'model_status',
-//                    'department_id', 'phone_1', 'company_id', 'manager'
-//                ])
-//                ->findOrFail($this->employeeId);
-//
-//            // Aktualisiere die Original-Daten nach erfolgreichem Update
-//            $this->loadEmployeeData();
-
+            // Aktualisiere Original-Daten nach erfolgreichem Update
             $this->updateOriginalDataAfterSave();
 
             $this->dispatch('employee-updated');
@@ -173,6 +200,72 @@ class Details extends Component
             $this->handleEditingError($e);
         }
     }
+//    public function updateEmployee(): void
+//    {
+//        // Type-Casting direkt am Anfang
+//        $this->selectedRoles = collect($this->selectedRoles)
+//            ->map(fn($role) => (int) $role)
+//            ->toArray();
+//
+//        $this->selectedTeams = collect($this->selectedTeams)
+//            ->map(fn($team) => (int) $team)
+//            ->toArray();
+//
+//        $this->validate();
+//
+//        try {
+//            DB::transaction(function () {
+//                // Lade Employee fresh für Update mit Relations für Manager Check
+//                $employee = User::with('roles:id,name,is_manager')->findOrFail($this->employeeId);
+//
+//                // ✅ Golden Path: Eloquent Update
+//                $employee->update([
+//                    'gender' => $this->gender,
+//                    'name' => $this->name,
+//                    'email' => $this->email,
+//                    'phone_1' => $this->phone_1,
+//                    'department_id' => $this->department,
+//                    'model_status' => $this->model_status,
+//                ]);
+//
+//                // Für die sync Methoden
+//                $this->employee = $employee;
+//
+//                $this->updateTeamsRoles();
+//            });
+//
+////            // ✅ LÖSUNG: Lade Employee FRESH ohne Cache
+////            $this->employee = User::with([
+////                'teams:id,name',
+////                'roles:id,name,is_manager',
+////            ])
+////                ->select([
+////                    'id', 'name', 'email', 'gender', 'model_status',
+////                    'department_id', 'phone_1', 'company_id', 'manager'
+////                ])
+////                ->findOrFail($this->employeeId);
+////
+////            // Aktualisiere die Original-Daten nach erfolgreichem Update
+////            $this->loadEmployeeData();
+//
+//            $this->updateOriginalDataAfterSave();
+//
+//            $this->dispatch('employee-updated');
+//
+//            Flux::toast(
+//                text: __('Employee Account Details updated successfully.'),
+//                heading: __('Success.'),
+//                variant: 'success'
+//            );
+//
+//        } catch (\Throwable $e) {
+//            \Log::error('updateEmployee failed', [
+//                'error' => $e->getMessage(),
+//                'trace' => $e->getTraceAsString(),
+//            ]);
+//            $this->handleEditingError($e);
+//        }
+//    }
     private function updateOriginalDataAfterSave(): void
     {
         // Update nur die originalData, ohne die Form-Felder zu überschreiben
