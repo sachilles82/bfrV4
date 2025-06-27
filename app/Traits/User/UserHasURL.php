@@ -124,26 +124,16 @@ trait UserHasURL
         return 'url_slug'; // Korrektur: Muss 'url_slug' sein, nicht 'slug'
     }
 
-//    /**
-//     * Resolve Route Model Binding mit optimierter Query
-//     */
-//    public function resolveRouteBinding($value, $field = null)
-//    {
-//        $field = $field ?: $this->getRouteKeyName();
-//
-//        return $this->withSlugFields()
-//            ->where($field, $value)
-//            ->first();
-//    }
-
-// In UserHasURL Trait
-    public static function findByUrlSlug($slug)
+    /**
+     * Generische resolveRouteBinding nur mit once() für Performance
+     */
+    public function resolveRouteBinding($value, $field = null)
     {
-        \Log::info('findByUrlSlug called', [
-            'slug' => $slug,
-            'backtrace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5)
-        ]);
+        $field = $field ?: $this->getRouteKeyName();
 
-        return static::where('url_slug', $slug)->first();
+        // Nutze once() um doppelte Queries zu vermeiden
+        return once(function () use ($field, $value) {
+            return static::where($field, $value)->first();
+        });
     }
 }
