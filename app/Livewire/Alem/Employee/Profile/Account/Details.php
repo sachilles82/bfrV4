@@ -45,11 +45,9 @@ class Details extends Component
     /** Original Daten des Users aus der Datenbank für Vergleiche */
     public array $originalData = [];
 
-    public function mount($employee, int $authUserId, int $currentTeamId, int $companyId): void
+    public function mount(int $employeeId, int $authUserId, int $currentTeamId, int $companyId): void
     {
-        $this->employeeId = is_object($employee) ? $employee->id : $employee['id'];
-
-        // Auth Daten
+        $this->employeeId = $employeeId;
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
@@ -111,13 +109,14 @@ class Details extends Component
      */
     public function updateEmployee(): void
     {
-        \Log::info('updateEmployee called', [
-            'selectedRoles' => $this->selectedRoles,
-            'originalRoles' => $this->originalData['roleIds'] ?? [],
+        // Type-Casting direkt am Anfang
+        $this->selectedRoles = collect($this->selectedRoles)
+            ->map(fn($role) => (int) $role)
+            ->toArray();
 
-            'selectedTeams' => $this->selectedTeams,
-            'originalTeams' => $this->originalData['teamIds'] ?? [],
-        ]);
+        $this->selectedTeams = collect($this->selectedTeams)
+            ->map(fn($team) => (int) $team)
+            ->toArray();
 
         $this->validate();
 
@@ -139,16 +138,24 @@ class Details extends Component
                 // Für die sync Methoden
                 $this->employee = $employee;
 
-                \Log::info('Before updateTeamsRoles', [
-                    'roles_loaded' => count($this->roles),
-                    'employee_exists' => !is_null($this->employee),
-                ]);
-
                 $this->updateTeamsRoles();
             });
 
-            // Aktualisiere die Original-Daten nach erfolgreichem Update
-            $this->loadEmployeeData();
+//            // ✅ LÖSUNG: Lade Employee FRESH ohne Cache
+//            $this->employee = User::with([
+//                'teams:id,name',
+//                'roles:id,name,is_manager',
+//            ])
+//                ->select([
+//                    'id', 'name', 'email', 'gender', 'model_status',
+//                    'department_id', 'phone_1', 'company_id', 'manager'
+//                ])
+//                ->findOrFail($this->employeeId);
+//
+//            // Aktualisiere die Original-Daten nach erfolgreichem Update
+//            $this->loadEmployeeData();
+
+            $this->updateOriginalDataAfterSave();
 
             $this->dispatch('employee-updated');
 
@@ -166,7 +173,20 @@ class Details extends Component
             $this->handleEditingError($e);
         }
     }
-
+    private function updateOriginalDataAfterSave(): void
+    {
+        // Update nur die originalData, ohne die Form-Felder zu überschreiben
+        $this->originalData = [
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone_1' => $this->phone_1,
+            'gender' => $this->gender,
+            'teamIds' => $this->selectedTeams,  // Verwende die aktuellen Werte
+            'roleIds' => $this->selectedRoles,  // Verwende die aktuellen Werte
+            'department_id' => $this->department,
+            'model_status' => $this->model_status,
+        ];
+    }
     /**
      * Haupt-Methode mit optionaler Team-Sync
      */
@@ -208,12 +228,6 @@ class Details extends Component
         $originalTeamIds = $this->originalData['teamIds'] ?? [];
         $teamsChanged = $this->arraysAreDifferent($originalTeamIds, $this->selectedTeams);
 
-        \Log::info('syncTeams', [
-            'originalTeamIds' => $originalTeamIds,
-            'selectedTeams' => $this->selectedTeams,
-            'teamsChanged' => $teamsChanged,
-        ]);
-
         if ($teamsChanged) {
             $this->employee->teams()->sync($this->selectedTeams);
         }
@@ -227,13 +241,6 @@ class Details extends Component
         $originalRoleIds = $this->originalData['roleIds'] ?? [];
         $rolesChanged = $this->arraysAreDifferent($originalRoleIds, $this->selectedRoles);
 
-        \Log::info('syncRolesWithManagerCheck', [
-            'originalRoleIds' => $originalRoleIds,
-            'selectedRoles' => $this->selectedRoles,
-            'rolesChanged' => $rolesChanged,
-            'roles_in_dropdown' => collect($this->roles)->pluck('id')->toArray(),
-        ]);
-
         if (!$rolesChanged) {
             return;
         }
@@ -243,11 +250,6 @@ class Details extends Component
 
         // Sync Rollen
         $this->employee->roles()->sync($this->selectedRoles);
-
-        \Log::info('Roles synced', [
-            'sync_result' => 'success',
-            'oldHasManager' => $oldHasManager,
-        ]);
 
         // Neuer Manager Status
         $newHasManager = $this->checkManagerInRoles($this->selectedRoles);

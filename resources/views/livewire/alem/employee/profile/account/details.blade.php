@@ -185,7 +185,7 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Rolle -->
+                    <!-- Role -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Roles') }}"

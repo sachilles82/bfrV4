@@ -12,10 +12,9 @@ class EmployeeProfileController extends Controller
     {
         $authUser = Auth::user();
 
-//        'employee' => $employee, erhält nur die slug und id
-
+        // Nur ID und slug sind bereits geladen
         return view('laravel.alem.employee.show', [
-            'employee' => $employee,
+            'employeeId' => $employee->id,
             'activeTab' => $activeTab,
             'authUserId' => $authUser->id,
             'currentTeamId' => $authUser->current_team_id,

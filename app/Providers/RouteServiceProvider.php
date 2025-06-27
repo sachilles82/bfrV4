@@ -26,7 +26,7 @@ class RouteServiceProvider extends ServiceProvider
             return Cache::remember(
                 "employee_profile_{$value}",
                 300, // 5 Minuten
-                fn() => User::userEmployeeFields()
+                fn() => User::select(['id', 'url_slug', 'name'])
                     ->where('url_slug', $value)
                     ->firstOrFail()
             );
