@@ -192,9 +192,9 @@ trait WithDropDownRelations
     /**
      * Optimierte Supervisor-Ladung
      */
-    protected function loadSupervisors(): Collection
+    protected function loadSupervisors(): array
     {
-        $excludeId = $this->userId ?? $this->authUserId;
+        $excludeId = $this->employeeId;
 
         return User::getCompanyManagers($this->companyId)
             ->reject(fn($sup) => $sup->id === $excludeId)
@@ -202,7 +202,10 @@ trait WithDropDownRelations
                 'id' => $sup->id,
                 'full_name' => $sup->name,
                 'profile_photo_path' => $sup->profile_photo_path
-            ]);
+
+            ])
+            ->values()
+            ->toArray();
     }
 
     /**

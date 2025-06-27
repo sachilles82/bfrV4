@@ -37,22 +37,22 @@
                             model="gender"
                             help-text="{{ __('') }}">
 
-                                <flux:select
-                                    class="mt-2"
-                                    wire:model="gender"
-                                    id="gender"
-                                    variant="listbox"
-                                    placeholder="{{ __('Select gender') }}">
+                            <flux:select
+                                class="mt-2"
+                                wire:model="gender"
+                                id="gender"
+                                variant="listbox"
+                                placeholder="{{ __('Select gender') }}">
 
-                                    @foreach($this->genderOptions() as $genderOption)
-                                        <flux:option
-                                            wire:key="gender-option-{{ $genderOption['value'] }}"
-                                            value="{{ $genderOption['value'] }}">
-                                            <span>{{ $genderOption['label'] }}</span>
-                                        </flux:option>
-                                    @endforeach
+                                @foreach($this->genderOptions() as $genderOption)
+                                    <flux:option
+                                        wire:key="gender-option-{{ $genderOption['value'] }}"
+                                        value="{{ $genderOption['value'] }}">
+                                        <span>{{ $genderOption['label'] }}</span>
+                                    </flux:option>
+                                @endforeach
 
-                                </flux:select>
+                            </flux:select>
 
                         </x-pupi.input.group>
                     </div>
@@ -182,6 +182,47 @@
 
                             </flux:select>
 
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Supervisor -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Supervisor') }}"
+                            for="supervisor"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('supervisor')"
+                            model="supervisor"
+                            help-text="{{ __('') }}">
+
+                            <flux:select
+                                class="mt-2"
+                                wire:model="supervisor"
+                                id="supervisor"
+                                variant="listbox"
+                                searchable
+                                placeholder="{{ __('Select Supervisor') }}">
+
+                                @forelse($supervisors as $supervisor)
+                                    <flux:option
+                                        wire:key="supervisor-option-{{ $supervisor['id'] }}"
+                                        value="{{ $supervisor['id'] }}">
+                                        <div class="flex items-center gap-2 whitespace-nowrap">
+                                            <flux:avatar
+                                                name="{{ $supervisor['full_name'] }}"
+                                                circle
+                                                size="xs"
+                                                src="{{ isset($supervisor['profile_photo_path']) && $supervisor['profile_photo_path'] ? asset('storage/' . $supervisor['profile_photo_path']) : null }}"
+                                                alt="{{ $supervisor['full_name'] }}"  {{-- Hier war der Fehler: 'name' existiert nicht --}}
+                                            />
+                                            {{ $supervisor['full_name'] }}
+                                        </div>
+                                    </flux:option>
+                                @empty
+                                    <flux:option value="">{{ __('No supervisors found') }}</flux:option>
+                                @endforelse
+
+                            </flux:select>
                         </x-pupi.input.group>
                     </div>
 

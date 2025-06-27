@@ -39,6 +39,7 @@ class Details extends Component
     public ?string $phone_1 = null;
     public ?string $model_status = null;
     public ?int $department = null;
+    public ?int $supervisor = null;
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
@@ -59,13 +60,13 @@ class Details extends Component
         ])
             ->select([
                 'id', 'name', 'email', 'gender', 'model_status',
-                'department_id', 'phone_1', 'company_id', 'manager'
+                'department_id', 'phone_1', 'company_id', 'manager','supervisor_id'
             ])
             ->findOrFail($this->employeeId);
 
         $this->loadEmployeeData();
 
-        // Lade Dropdown-Daten
+//        // Lade Dropdown-Daten
         $this->loadRelationsData([
             'teams', 'departments', 'roles', 'supervisors'
         ]);
@@ -88,6 +89,7 @@ class Details extends Component
             'teamIds' => $this->employee->teams->pluck('id')->toArray(),
             'roleIds' => $this->employee->roles->pluck('id')->toArray(),
             'department_id' => $this->employee->department_id,
+            'supervisor_id' => $this->employee->supervisor_id,
             'model_status' => $this->employee->model_status?->value,
         ];
 
@@ -101,6 +103,7 @@ class Details extends Component
         $this->selectedRoles = $this->originalData['roleIds'];
 
         $this->department = $this->employee->department_id;
+        $this->supervisor = $this->employee->supervisor_id;
         $this->model_status = $this->employee->model_status?->value;
     }
 
@@ -152,6 +155,9 @@ class Details extends Component
                 }
                 if ($this->departmentHasChanged()) {
                     $updateData['department_id'] = $this->department;
+                }
+                if ($this->supervisorHasChanged()) {
+                    $updateData['supervisor_id'] = $this->supervisor;
                 }
                 if ($this->modelStatusHasChanged()) {
                     $updateData['model_status'] = $this->model_status;
@@ -277,6 +283,7 @@ class Details extends Component
             'teamIds' => $this->selectedTeams,  // Verwende die aktuellen Werte
             'roleIds' => $this->selectedRoles,  // Verwende die aktuellen Werte
             'department_id' => $this->department,
+            'supervisor_id' => $this->supervisor,
             'model_status' => $this->model_status,
         ];
     }

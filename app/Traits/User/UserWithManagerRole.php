@@ -41,8 +41,8 @@ trait UserWithManagerRole
             function () use ($companyId) {
                 return static::query()
                     ->where('company_id', $companyId)
-                    ->where('manager', true) // Nutze das neue manager Feld
-                    ->select(['id', 'name', 'email'])
+                    ->where('manager', true)
+                    ->select(['id', 'name', 'profile_photo_path'])
                     ->orderBy('name')
                     ->get();
             }

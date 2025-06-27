@@ -80,6 +80,15 @@ trait ValidateAccountDetails
             ];
         }
 
+        // Supervisor
+        if ($this->supervisorHasChanged()) {
+            $rules['supervisor'] = [
+                'required',
+                'integer',
+                Rule::in(array_column($this->supervisors, 'id'))
+            ];
+        }
+
         // Roles
         if ($this->rolesHaveChanged()) {
             $rules['selectedRoles'] = ['required', 'array', 'min:1'];
@@ -127,6 +136,11 @@ trait ValidateAccountDetails
                 'integer',
                 Rule::in(array_column($this->departments, 'id'))
             ],
+            'supervisor' => [
+                'required',
+                'integer',
+                Rule::in(array_column($this->supervisors, 'id'))
+            ],
             'selectedRoles' => ['required', 'array', 'min:1'],
             'selectedRoles.*' => [
                 'integer',
@@ -171,6 +185,11 @@ trait ValidateAccountDetails
             'department.required' => __('Department is required.'),
             'department.integer' => __('Department must be a number.'),
             'department.in' => __('The selected department does not exist.'),
+
+            // Supervisor
+            'supervisor.required' => __('Supervisor is required.'),
+            'supervisor.integer' => __('Supervisor must be a number.'),
+            'supervisor.in' => __('The selected supervisor does not exist.'),
 
             // Teams
             'selectedTeams.required' => __('At least one team must be selected.'),
@@ -228,6 +247,13 @@ trait ValidateAccountDetails
             $changed['department_id'] = [
                 'old' => $this->originalData['department_id'] ?? null,
                 'new' => $this->department
+            ];
+        }
+
+        if ($this->supervisorHasChanged()) {
+            $changed['supervisor_id'] = [
+                'old' => $this->originalData['supervisor_id'] ?? null,
+                'new' => $this->supervisor
             ];
         }
 
@@ -296,54 +322,20 @@ trait ValidateAccountDetails
     }
 
     /**
+     * Helper: Check ob Supervisor geändert wurde
+     */
+    private function supervisorHasChanged(): bool
+    {
+        return $this->supervisor !== ($this->originalData['supervisor_id'] ?? null);
+    }
+
+    /**
      * Helper: Check ob Model Status geändert wurde
      */
     private function modelStatusHasChanged(): bool
     {
         return $this->model_status !== ($this->originalData['model_status'] ?? '');
     }
-
-//    /**
-//     * Helper: Check ob Teams geändert wurden
-//     */
-//    private function teamsHaveChanged(): bool
-//    {
-//        $originalTeamIds = $this->normalizeIntArray($this->originalData['teamIds'] ?? []);
-//        $currentTeamIds = $this->normalizeIntArray($this->selectedTeams);
-//        return !$this->arraysAreEqual($originalTeamIds, $currentTeamIds);
-//    }
-//
-//    /**
-//     * Helper: Check ob Roles geändert wurden
-//     */
-//    private function rolesHaveChanged(): bool
-//    {
-//        $originalRoleIds = $this->normalizeIntArray($this->originalData['roleIds'] ?? []);
-//        $currentRoleIds = $this->normalizeIntArray($this->selectedRoles);
-//        return !$this->arraysAreEqual($originalRoleIds, $currentRoleIds);
-//    }
-//
-//    /**
-//     * Vergleiche zwei Arrays (Order-unabhängig)
-//     */
-//    private function arraysAreEqual(array $array1, array $array2): bool
-//    {
-//        return $array1 === $array2;
-//    }
-//
-//    /**
-//     * Helper: Arrays vergleichen
-//     * (Sollte in der Hauptklasse existieren, hier als Fallback)
-//     */
-//    private function arraysAreDifferent(array $array1, array $array2): bool
-//    {
-//        if (method_exists($this, 'arraysAreDifferent')) {
-//            return parent::arraysAreDifferent($array1, $array2);
-//        }
-//
-//        return count(array_diff($array1, $array2)) > 0 ||
-//            count(array_diff($array2, $array1)) > 0;
-//    }
 
     /**
      * Generische Methode zum Vergleich von Integer-Arrays
@@ -441,6 +433,7 @@ trait ValidateAccountDetails
             $this->emailHasChanged() ||
             $this->phoneHasChanged() ||
             $this->departmentHasChanged() ||
+            $this->supervisorHasChanged() ||
             $this->modelStatusHasChanged() ||
             $this->teamsHaveChanged() ||
             $this->rolesHaveChanged();
