@@ -114,6 +114,9 @@ class Details extends Component
         \Log::info('updateEmployee called', [
             'selectedRoles' => $this->selectedRoles,
             'originalRoles' => $this->originalData['roleIds'] ?? [],
+
+            'selectedTeams' => $this->selectedTeams,
+            'originalTeams' => $this->originalData['teamIds'] ?? [],
         ]);
 
         $this->validate();
@@ -204,6 +207,12 @@ class Details extends Component
     {
         $originalTeamIds = $this->originalData['teamIds'] ?? [];
         $teamsChanged = $this->arraysAreDifferent($originalTeamIds, $this->selectedTeams);
+
+        \Log::info('syncTeams', [
+            'originalTeamIds' => $originalTeamIds,
+            'selectedTeams' => $this->selectedTeams,
+            'teamsChanged' => $teamsChanged,
+        ]);
 
         if ($teamsChanged) {
             $this->employee->teams()->sync($this->selectedTeams);
