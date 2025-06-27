@@ -28,9 +28,9 @@ class Details extends Component
     use ModelStatusOptions, EmployeeStatusOptions, GenderOptions;
 
     #[Locked]
-    public int $employeeId;
+    public int $userId;
 
-    public ?User $employee = null;
+    public ?User $user = null;
 
     /** User form fields */
     public ?string $gender = null;
@@ -46,15 +46,15 @@ class Details extends Component
     /** Original Daten des Users aus der Datenbank für Vergleiche */
     public array $originalData = [];
 
-    public function mount(int $employeeId, int $authUserId, int $currentTeamId, int $companyId): void
+    public function mount(int $userId, int $authUserId, int $currentTeamId, int $companyId): void
     {
-        $this->employeeId = $employeeId;
+        $this->userId = $userId;
         $this->authUserId = $authUserId;
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade Employee mit allen benötigten Relations
-        $this->employee = User::with([
+        // Lade userId mit allen benötigten Relations
+        $this->user = User::with([
             'teams:id,name',
             'roles:id,name,is_manager',
         ])
@@ -62,7 +62,7 @@ class Details extends Component
                 'id', 'name', 'email', 'gender', 'model_status',
                 'department_id', 'phone_1', 'company_id', 'manager','supervisor_id'
             ])
-            ->findOrFail($this->employeeId);
+            ->findOrFail($this->userId);
 
         $this->loadEmployeeData();
 
@@ -78,33 +78,33 @@ class Details extends Component
      */
     private function loadEmployeeData(): void
     {
-        if (!$this->employee) return;
+        if (!$this->user) return;
 
         // WICHTIG: Speichere Original-Daten in EINEM public Array
         $this->originalData = [
-            'name' => $this->employee->name,
-            'email' => $this->employee->email,
-            'phone_1' => $this->employee->phone_1,
-            'gender' => $this->employee->gender?->value,
-            'teamIds' => $this->employee->teams->pluck('id')->toArray(),
-            'roleIds' => $this->employee->roles->pluck('id')->toArray(),
-            'department_id' => $this->employee->department_id,
-            'supervisor_id' => $this->employee->supervisor_id,
-            'model_status' => $this->employee->model_status?->value,
+            'name' => $this->user->name,
+            'email' => $this->user->email,
+            'phone_1' => $this->user->phone_1,
+            'gender' => $this->user->gender?->value,
+            'teamIds' => $this->user->teams->pluck('id')->toArray(),
+            'roleIds' => $this->user->roles->pluck('id')->toArray(),
+            'department_id' => $this->user->department_id,
+            'supervisor_id' => $this->user->supervisor_id,
+            'model_status' => $this->user->model_status?->value,
         ];
 
-        $this->gender = $this->employee->gender?->value;
-        $this->name = $this->employee->name;
-        $this->email = $this->employee->email;
-        $this->phone_1 = $this->employee->phone_1 ?? '';
+        $this->gender = $this->user->gender?->value;
+        $this->name = $this->user->name;
+        $this->email = $this->user->email;
+        $this->phone_1 = $this->user->phone_1 ?? '';
 
         // Setze selected Arrays
         $this->selectedTeams = $this->originalData['teamIds'];
         $this->selectedRoles = $this->originalData['roleIds'];
 
-        $this->department = $this->employee->department_id;
-        $this->supervisor = $this->employee->supervisor_id;
-        $this->model_status = $this->employee->model_status?->value;
+        $this->department = $this->user->department_id;
+        $this->supervisor = $this->user->supervisor_id;
+        $this->model_status = $this->user->model_status?->value;
     }
 
 
@@ -166,25 +166,25 @@ class Details extends Component
                 // Update nur wenn Felder geändert wurden
                 if (!empty($updateData)) {
                     // OPTION 1: Nutze die bereits geladene Instanz aus mount()
-                    $this->employee->update($updateData);
+                    $this->user->update($updateData);
 
                     // OPTION 2: Wenn du sicher gehen willst, lade fresh (aber ohne Relations!)
-                    // User::where('id', $this->employeeId)->update($updateData);
+                    // User::where('id', $this->userId)->update($updateData);
                 }
 
-                // Teams und Roles - die sync() Methoden brauchen $this->employee
+                // Teams und Roles - die sync() Methoden brauchen $this->user
                 $this->updateTeamsRoles();
 
-                // Optional: Log die Änderungen
-                $changedFields = $this->getChangedFields();
-                if (!empty($changedFields)) {
-                    \Log::info('Employee updated', [
-                        'employee_id' => $this->employeeId,
-                        'changed_fields' => array_keys($changedFields),
-                        'changes' => $changedFields,
-                        'updated_by' => $this->authUserId
-                    ]);
-                }
+//                // Optional: Log die Änderungen
+//                $changedFields = $this->getChangedFields();
+//                if (!empty($changedFields)) {
+//                    \Log::info('Employee updated', [
+//                        'user_id' => $this->userId,
+//                        'changed_fields' => array_keys($changedFields),
+//                        'changes' => $changedFields,
+//                        'updated_by' => $this->authUserId
+//                    ]);
+//                }
             });
 
             // Aktualisiere Original-Daten nach erfolgreichem Update
@@ -267,7 +267,7 @@ class Details extends Component
         $teamsChanged = $this->arraysAreDifferent($originalTeamIds, $this->selectedTeams);
 
         if ($teamsChanged) {
-            $this->employee->teams()->sync($this->selectedTeams);
+            $this->user->teams()->sync($this->selectedTeams);
         }
     }
 
@@ -287,17 +287,17 @@ class Details extends Component
         $oldHasManager = $this->checkManagerInRoles($originalRoleIds);
 
         // Sync Rollen
-        $this->employee->roles()->sync($this->selectedRoles);
+        $this->user->roles()->sync($this->selectedRoles);
 
         // Neuer Manager Status
         $newHasManager = $this->checkManagerInRoles($this->selectedRoles);
 
         // Update manager field im User Model
         if ($oldHasManager !== $newHasManager) {
-            $this->employee->update(['manager' => $newHasManager]);
+            $this->user->update(['manager' => $newHasManager]);
 
             // Cache clear und Collection reload
-            User::clearManagerCache($this->employee->company_id);
+            User::clearManagerCache($this->user->company_id);
             $this->forceReloadCollection('supervisors');
         }
     }
@@ -310,7 +310,7 @@ class Details extends Component
     public function render(): View
     {
         return view('livewire.alem.employee.profile.account.details', [
-            'employee' => $this->employee ?? null
+            'user' => $this->user ?? null
         ]);
     }
 }

@@ -213,7 +213,7 @@
                                                 circle
                                                 size="xs"
                                                 src="{{ isset($supervisor['profile_photo_path']) && $supervisor['profile_photo_path'] ? asset('storage/' . $supervisor['profile_photo_path']) : null }}"
-                                                alt="{{ $supervisor['full_name'] }}"  {{-- Hier war der Fehler: 'name' existiert nicht --}}
+                                                alt="{{ $supervisor['full_name'] }}"
                                             />
                                             {{ $supervisor['full_name'] }}
                                         </div>

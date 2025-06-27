@@ -68,7 +68,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
             ->name('alem.employees');
 
 //        // Route für das Mitarbeiter-Profil mit url_slug aus Vor- und Nachname
-        Route::get('/employees/{employee:url_slug}/{activeTab?}', [EmployeeProfileController::class, 'show'])
+        Route::get('/employees/{user:url_slug}/{activeTab?}', [EmployeeProfileController::class, 'show'])
             ->name('employees.profile');
 
 

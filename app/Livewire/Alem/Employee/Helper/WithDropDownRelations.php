@@ -194,7 +194,7 @@ trait WithDropDownRelations
      */
     protected function loadSupervisors(): array
     {
-        $excludeId = $this->employeeId;
+        $excludeId = $this->userId;
 
         return User::getCompanyManagers($this->companyId)
             ->reject(fn($sup) => $sup->id === $excludeId)

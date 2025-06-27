@@ -7,7 +7,7 @@
         {{-- Header Navigation --}}
         <x-slot:header>
             <x-navigation.alem.employee.header
-                :employee-id="$employeeId"
+                :user-id="$userId"
                 :activeTab="$activeTab"
             />
         </x-slot:header>
@@ -17,7 +17,7 @@
             @if($activeTab === 'employee-update')
 {{--                 Account Details - Sofort geladen --}}
                 <livewire:alem.employee.profile.account.details
-                    :employee-id="$employeeId"
+                    :user-id="$userId"
                     :auth-user-id="$authUserId"
                     :current-team-id="$currentTeamId"
                     :company-id="$companyId"

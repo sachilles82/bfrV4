@@ -46,7 +46,7 @@ trait ValidateAccountDetails
                 'required',
                 'email:rfc,dns,spoof',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->employeeId)
+                Rule::unique('users', 'email')->ignore($this->userId)
             ];
         }
 
@@ -118,7 +118,7 @@ trait ValidateAccountDetails
                 'required',
                 'email:rfc,dns,spoof',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->employeeId)
+                Rule::unique('users', 'email')->ignore($this->userId)
             ],
             'phone_1' => [
                 'nullable',
