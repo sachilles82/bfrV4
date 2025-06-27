@@ -78,6 +78,14 @@
                             </div>
                         </div>
 
+                        <!-- Supervisor Field Skeleton (col-span-3) -->
+                        <div class="sm:col-span-3">
+                            <div class="space-y-2">
+                                <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
+                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
+                            </div>
+                        </div>
+
                         <!-- Roles Field Skeleton (col-span-3) -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
