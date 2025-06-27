@@ -165,14 +165,6 @@ class Details extends Component
     }
 
     /**
-     * Email Check für Validation
-     */
-    public function emailHasChanged(): bool
-    {
-        return $this->email !== ($this->originalData['email'] ?? '');
-    }
-
-    /**
      * Haupt-Methode mit optionaler Team-Sync
      */
     private function updateTeamsRoles(): void
