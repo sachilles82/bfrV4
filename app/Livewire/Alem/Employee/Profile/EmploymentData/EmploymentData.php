@@ -32,7 +32,8 @@ class EmploymentData extends Component
     #[Locked]
     public int $userId;
 
-    public ?Employee $employeeModel = null;
+    #[Locked]
+    public ?Employee $employeeUser = null;
 
     /** Employee form fields */
     public ?string $ahv_number = null;
@@ -57,7 +58,7 @@ class EmploymentData extends Component
         $this->companyId = $companyId;
 
         // Lade Employee Model mit allen benötigten Feldern
-        $this->employeeModel = Employee::where('user_id', $this->userId)
+        $this->employeeUser = Employee::where('user_id', $this->userId)
             ->select([
                 'id',
                 'user_id',
@@ -71,7 +72,7 @@ class EmploymentData extends Component
             ])
             ->first();
 
-        if ($this->employeeModel) {
+        if ($this->employeeUser) {
             $this->loadEmployeeData();
         }
 
@@ -85,27 +86,27 @@ class EmploymentData extends Component
      */
     private function loadEmployeeData(): void
     {
-        if (!$this->employeeModel) return;
+        if (!$this->employeeUser) return;
 
         // WICHTIG: Speichere Original-Daten in EINEM public Array
         $this->originalData = [
-            'ahv_number' => $this->employeeModel->ahv_number,
-//            'birthdate' => $this->employeeModel->birthdate?->format('Y-m-d'),
-            'nationality' => $this->employeeModel->nationality,
-            'hometown' => $this->employeeModel->hometown,
-            'religion' => $this->employeeModel->religion?->value,
-            'civil_status' => $this->employeeModel->civil_status?->value,
-            'residence_permit' => $this->employeeModel->residence_permit?->value,
+            'ahv_number' => $this->employeeUser->ahv_number,
+//            'birthdate' => $this->employeeUser->birthdate?->format('Y-m-d'),
+            'nationality' => $this->employeeUser->nationality,
+            'hometown' => $this->employeeUser->hometown,
+            'religion' => $this->employeeUser->religion?->value,
+            'civil_status' => $this->employeeUser->civil_status?->value,
+            'residence_permit' => $this->employeeUser->residence_permit?->value,
         ];
 
         // Setze Form-Felder
-        $this->ahv_number = $this->employeeModel->ahv_number ?? '';
-//        $this->birthdate = $this->employeeModel->birthdate?->format('Y-m-d') ?? '';
-        $this->nationality = $this->employeeModel->nationality ?? '';
-        $this->hometown = $this->employeeModel->hometown ?? '';
-        $this->religion = $this->employeeModel->religion?->value;
-        $this->civil_status = $this->employeeModel->civil_status?->value;
-        $this->residence_permit = $this->employeeModel->residence_permit?->value;
+        $this->ahv_number = $this->employeeUser->ahv_number ?? '';
+//        $this->birthdate = $this->employeeUser->birthdate?->format('Y-m-d') ?? '';
+        $this->nationality = $this->employeeUser->nationality ?? '';
+        $this->hometown = $this->employeeUser->hometown ?? '';
+        $this->religion = $this->employeeUser->religion?->value;
+        $this->civil_status = $this->employeeUser->civil_status?->value;
+        $this->residence_permit = $this->employeeUser->residence_permit?->value;
     }
 
     /**
@@ -172,16 +173,15 @@ class EmploymentData extends Component
                     $updateData['residence_permit'] = $this->residence_permit;
                 }
 
-                if ($this->employeeModel) {
+                if ($this->employeeUser) {
                     // Update nur wenn Felder geändert wurden
                     if (!empty($updateData)) {
-                        $this->employeeModel->update($updateData);
+                        $this->employeeUser->update($updateData);
                     }
                 } else {
                     // Erstelle neuen Employee Record
-                    $this->employeeModel = Employee::create([
+                    $this->employeeUser = Employee::create([
                         'user_id' => $this->userId,
-                        'uuid' => (string) \Illuminate\Support\Str::uuid(),
                         ...$updateData
                     ]);
                 }
@@ -225,7 +225,7 @@ class EmploymentData extends Component
     #[On('employment-data-refreshed')]
     public function refreshFromParent(int $employeeId): void
     {
-        if ($this->employeeModel && $this->employeeModel->user_id === $employeeId) {
+        if ($this->employeeUser && $this->employeeUser->user_id === $employeeId) {
             $this->loadEmployeeData();
         }
     }
