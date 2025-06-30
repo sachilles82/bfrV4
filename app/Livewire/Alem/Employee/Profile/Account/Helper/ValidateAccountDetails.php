@@ -389,8 +389,6 @@ trait ValidateAccountDetails
         );
     }
 
-// Die arraysAreDifferent() Methode kannst du löschen - wird nicht mehr gebraucht!
-
     /**
      * Validiere einzelnes Feld on-the-fly (z.B. wire:blur)
      */

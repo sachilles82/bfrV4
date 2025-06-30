@@ -11,12 +11,26 @@ use Illuminate\Support\Facades\Log;
  */
 trait HandleCatchError
 {
-    private function handleSavingError(\Throwable $e): void
+    /**
+     * Generische Fehlerbehandlung für alle Operationen
+     */
+    private function handleError(\Throwable $e, string $operation = 'processing', array $context = []): void
     {
-        Log::error("Fehler beim Erstellen des Mitarbeiters: {$e->getMessage()}", [
+        // Basis-Kontext für Logging
+        $logContext = [
             'exception' => $e,
             'acting_user_id' => $this->authUserId ?? auth()->id(),
-            'formData' => $this->only([
+            'operation' => $operation,
+        ];
+
+        // Füge zusätzlichen Kontext hinzu wenn vorhanden
+        if (!empty($context)) {
+            $logContext['context'] = $context;
+        }
+
+        // Füge Formulardaten hinzu wenn verfügbar
+        if (method_exists($this, 'only')) {
+            $logContext['formData'] = $this->only([
                 'gender',
                 'name',
                 'email',
@@ -30,59 +44,75 @@ trait HandleCatchError
                 'stage',
                 'supervisor',
                 'invitation'
-            ])
-        ]);
+            ]);
+        }
 
-        Flux::toast(
-            text: __('An error occurred while saving the employee.'),
-            heading: __('Error.'),
-            variant: 'danger'
-        );
+        Log::error("Fehler beim {$operation}: {$e->getMessage()}", $logContext);
+
+        // Zeige benutzerfreundliche Meldung
+        $this->showErrorToast($operation);
     }
 
+    /**
+     * Spezifische Methode für Speicher-Fehler (Create)
+     */
+    private function handleSavingError(\Throwable $e): void
+    {
+        $this->handleError($e, 'Erstellen des Mitarbeiters');
+    }
+
+    /**
+     * Spezifische Methode für Update-Fehler
+     * @throws \Throwable
+     */
     private function handleEditingError(\Throwable $e): void
     {
-        DB::rollBack();
+        // Prüfe ob eine Transaktion aktiv ist bevor Rollback
+        if (DB::transactionLevel() > 0) {
+            DB::rollBack();
+        }
 
-        Log::error("Fehler beim Erstellen des Mitarbeiters: {$e->getMessage()}", [
-            'exception' => $e,
-            'acting_user_id' => $this->authUserId ?? auth()->id(),
-            'formData' => $this->only([
-                'gender',
-                'name',
-                'email',
-                'model_status',
-                'joined_at',
-                'department',
-                'selectedTeams',
-                'selectedRoles',
-                'status',
-                'profession',
-                'stage',
-                'supervisor'
-            ])
-        ]);
-
-        Flux::toast(
-            text: __('An error occurred while saving the employee.'),
-            heading: __('Error.'),
-            variant: 'danger'
-        );
+        $this->handleError($e, 'Aktualisieren des Mitarbeiters');
     }
 
+    /**
+     * Spezifische Methode für Lade-Fehler
+     */
     private function handleLoadingError(\Throwable $e): void
     {
-        Log::error("Fehler beim Laden der Relationen: " . $e->getMessage());
+        $this->handleError($e, 'Laden der Relationsdaten');
+    }
+
+    /**
+     * Zeige Error Toast basierend auf Operation
+     */
+    private function showErrorToast(string $operation): void
+    {
+        $messages = [
+            'Erstellen des Mitarbeiters' => [
+                'text' => __('An error occurred while creating the employee.'),
+                'heading' => __('Creation Error')
+            ],
+            'Aktualisieren des Mitarbeiters' => [
+                'text' => __('An error occurred while updating the employee.'),
+                'heading' => __('Update Error')
+            ],
+            'Laden der Relationsdaten' => [
+                'text' => __('An error occurred while loading the relation data.'),
+                'heading' => __('Loading Error')
+            ],
+            'processing' => [
+                'text' => __('An unexpected error occurred. Please try again.'),
+                'heading' => __('Error')
+            ]
+        ];
+
+        $message = $messages[$operation] ?? $messages['processing'];
 
         Flux::toast(
-            text: __('An error occurred while loading the Relation Data.'),
-            heading: __('Error.'),
+            text: $message['text'],
+            heading: $message['heading'],
             variant: 'danger'
         );
     }
-
-
-
-
-
 }

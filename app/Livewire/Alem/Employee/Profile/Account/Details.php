@@ -30,7 +30,7 @@ class Details extends Component
     #[Locked]
     public int $userId;
 
-    public ?User $user = null;
+    public ?User $user = null; // der geladene User
 
     /** User form fields */
     public ?string $gender = null;
@@ -127,8 +127,8 @@ class Details extends Component
         if (!$this->hasAnyChanges()) {
             Flux::toast(
                 text: __('No changes detected.'),
-                heading: __('Info'),
-                variant: 'info'
+                heading: __('No Update'),
+                variant: 'warning'
             );
             return;
         }
@@ -165,26 +165,12 @@ class Details extends Component
 
                 // Update nur wenn Felder geändert wurden
                 if (!empty($updateData)) {
-                    // OPTION 1: Nutze die bereits geladene Instanz aus mount()
                     $this->user->update($updateData);
-
-                    // OPTION 2: Wenn du sicher gehen willst, lade fresh (aber ohne Relations!)
-                    // User::where('id', $this->userId)->update($updateData);
                 }
 
                 // Teams und Roles - die sync() Methoden brauchen $this->user
                 $this->updateTeamsRoles();
 
-//                // Optional: Log die Änderungen
-//                $changedFields = $this->getChangedFields();
-//                if (!empty($changedFields)) {
-//                    \Log::info('Employee updated', [
-//                        'user_id' => $this->userId,
-//                        'changed_fields' => array_keys($changedFields),
-//                        'changes' => $changedFields,
-//                        'updated_by' => $this->authUserId
-//                    ]);
-//                }
             });
 
             // Aktualisiere Original-Daten nach erfolgreichem Update
@@ -199,10 +185,6 @@ class Details extends Component
             );
 
         } catch (\Throwable $e) {
-            \Log::error('updateEmployee failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
             $this->handleEditingError($e);
         }
     }
@@ -250,23 +232,11 @@ class Details extends Component
     }
 
     /**
-     * Helper: Arrays vergleichen
-     */
-    private function arraysAreDifferent(array $array1, array $array2): bool
-    {
-        return count(array_diff($array1, $array2)) > 0 ||
-            count(array_diff($array2, $array1)) > 0;
-    }
-
-    /**
      * Teams nur synchronisieren wenn sich etwas geändert hat
      */
     private function syncTeams(): void
     {
-        $originalTeamIds = $this->originalData['teamIds'] ?? [];
-        $teamsChanged = $this->arraysAreDifferent($originalTeamIds, $this->selectedTeams);
-
-        if ($teamsChanged) {
+        if ($this->teamsHaveChanged()) {
             $this->user->teams()->sync($this->selectedTeams);
         }
     }
@@ -276,14 +246,12 @@ class Details extends Component
      */
     private function syncRolesWithManagerCheck(): void
     {
-        $originalRoleIds = $this->originalData['roleIds'] ?? [];
-        $rolesChanged = $this->arraysAreDifferent($originalRoleIds, $this->selectedRoles);
-
-        if (!$rolesChanged) {
+        if (!$this->rolesHaveChanged()) {
             return;
         }
 
         // Manager Status aus bereits geladenen Daten
+        $originalRoleIds = $this->originalData['roleIds'] ?? [];
         $oldHasManager = $this->checkManagerInRoles($originalRoleIds);
 
         // Sync Rollen
