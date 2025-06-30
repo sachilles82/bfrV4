@@ -273,8 +273,8 @@
                         <x-pupi.table.tr.cell>
                             <div class="text-gray-500 dark:text-gray-400">
                                 <flux:tooltip class="cursor-default"
-                                              content="{{ __('Created: ') }}
-                                                          {{ $user->created_at ? $user->created_at->format('d.m.Y') : __('Not set') }}"
+                                              content="{{ __('Last Update: ') }}
+                                                          {{ $user->updated_at ? $user->updated_at->format('d.m.Y') : __('Not set') }}"
                                               position="top">
                                     <div class="text-gray-500 dark:text-gray-400">
                                         {{ $user->created_at ? $user->created_at->diffForHumans() : __('Not available') }}

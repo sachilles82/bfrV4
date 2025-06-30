@@ -101,7 +101,7 @@ class EmployeeTable extends Component
 
         $query->select([
             'users.id', 'users.department_id', 'users.name', 'users.phone_1',
-            'users.email', 'users.joined_at', 'users.created_at', 'users.model_status',
+            'users.email', 'users.joined_at', 'users.created_at', 'users.updated_at', 'users.model_status',
             'users.profile_photo_path', 'users.url_slug', 'users.deleted_at',
 
             'users.profession_id',
