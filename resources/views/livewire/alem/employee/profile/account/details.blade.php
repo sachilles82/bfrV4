@@ -71,7 +71,7 @@
                                 wire:model="name"
                                 name="name"
                                 id="name"
-                                placeholder="{{ __('Sahrim Alija') }}"
+                                placeholder="{{ __('Name Lastname') }}"
                             />
 
                         </x-pupi.input.group>

@@ -21,15 +21,16 @@
                             for="ahv_number"
                             model="ahv_number"
                             badge="{{ __('Required') }}"
-                            error="{{ $errors->first('ahv_number') }}"
-                        >
+                            error="{{ $errors->first('ahv_number') }}">
+
                             <x-pupi.input.text
                                 wire:model="ahv_number"
-                                x-mask="999.9999.9999.99"
+                                x-mask="756.9999.9999.99"
                                 name="ahv_number"
                                 id="ahv_number"
                                 placeholder="{{ __('756.XXXX.XXXX.XX') }}"
                             />
+
                         </x-pupi.input.group>
                     </div>
 
@@ -40,8 +41,8 @@
                             for="nationality"
                             model="nationality"
                             badge="{{ __('Required') }}"
-                            error="{{ $errors->first('nationality') }}"
-                        >
+                            error="{{ $errors->first('nationality') }}">
+
                             <div class="relative mt-2">
                                 <flux:select
                                     wire:model="nationality"
@@ -49,10 +50,12 @@
                                     name="nationality"
                                     variant="listbox"
                                     searchable
-                                    placeholder="{{ __('Select Country') }}"
-                                >
+                                    placeholder="{{ __('Select Country') }}">
+
                                     @foreach ($countries as $country)
-                                        <flux:option value="{{ $country['name'] }}">
+                                        <flux:option
+                                            wire:key="country-option-{{ $country['code'] }}"
+                                            value="{{ $country['name'] }}">
                                             <div class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
                                                 <img src="/flags/country-{{ strtolower($country['code']) }}.svg"
                                                      class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-gray-800 text-gray-700 dark:text-gray-400">
@@ -62,6 +65,7 @@
                                             </div>
                                         </flux:option>
                                     @endforeach
+
                                 </flux:select>
                             </div>
                         </x-pupi.input.group>
@@ -74,37 +78,16 @@
                             for="hometown"
                             model="hometown"
                             badge="{{ __('Required') }}"
-                            error="{{ $errors->first('hometown') }}"
-                        >
+                            error="{{ $errors->first('hometown') }}">
+
                             <x-pupi.input.text
                                 wire:model="hometown"
                                 name="hometown"
                                 id="hometown"
                             />
+
                         </x-pupi.input.group>
                     </div>
-
-{{--                    <!-- Birthdate -->--}}
-{{--                    <div class="sm:col-span-3">--}}
-{{--                        <x-pupi.input.group--}}
-{{--                            label="{{ __('Birthdate') }}"--}}
-{{--                            for="birthdate"--}}
-{{--                            model="birthdate"--}}
-{{--                            badge="{{ __('Required') }}"--}}
-{{--                            :error="$errors->first('birthdate')"--}}
-{{--                        >--}}
-{{--                            <flux:date-picker--}}
-{{--                                with-today--}}
-{{--                                value="21-03-2025"--}}
-{{--                                wire:model.defer="birthdate"--}}
-{{--                                id="birthdate"--}}
-{{--                                type="date">--}}
-{{--                                <x-slot name="trigger">--}}
-{{--                                    <flux:date-picker.input class="mt-2"/>--}}
-{{--                                </x-slot>--}}
-{{--                            </flux:date-picker>--}}
-{{--                        </x-pupi.input.group>--}}
-{{--                    </div>--}}
 
                     <!-- Religion -->
                     <div class="sm:col-span-3">

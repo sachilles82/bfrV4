@@ -36,11 +36,6 @@ trait ValidateEmploymentData
             $rules['ahv_number'] = 'required|string|max:255';
         }
 
-//        // Birthdate
-//        if ($this->birthdateHasChanged()) {
-//            $rules['birthdate'] = 'required|date|before:today';
-//        }
-
         // Nationality
         if ($this->nationalityHasChanged()) {
             $rules['nationality'] = 'required|string|max:100';
@@ -76,7 +71,6 @@ trait ValidateEmploymentData
     {
         return [
             'ahv_number' => 'required|string|max:255',
-//            'birthdate' => 'required|date|before:today',
             'nationality' => 'required|string|max:100',
             'hometown' => 'required|string|max:100',
             'religion' => ['required', Rule::enum(Religion::class)],
@@ -95,11 +89,6 @@ trait ValidateEmploymentData
             'ahv_number.required' => __('The AHV number is required.'),
             'ahv_number.string' => __('The AHV number must be a string.'),
             'ahv_number.max' => __('The AHV number must not exceed 255 characters.'),
-
-//            // Birthdate
-//            'birthdate.required' => __('The birthdate is required.'),
-//            'birthdate.date' => __('The birthdate must be a valid date.'),
-//            'birthdate.before' => __('The birthdate must be in the past.'),
 
             // Nationality
             'nationality.required' => __('The nationality is required.'),
@@ -138,13 +127,6 @@ trait ValidateEmploymentData
                 'new' => $this->ahv_number
             ];
         }
-
-//        if ($this->birthdateHasChanged()) {
-//            $changed['birthdate'] = [
-//                'old' => $this->originalData['birthdate'] ?? null,
-//                'new' => $this->birthdate
-//            ];
-//        }
 
         if ($this->nationalityHasChanged()) {
             $changed['nationality'] = [
@@ -192,14 +174,6 @@ trait ValidateEmploymentData
         return $this->ahv_number !== ($this->originalData['ahv_number'] ?? '');
     }
 
-//    /**
-//     * Helper: Check ob Birthdate geändert wurde
-//     */
-//    private function birthdateHasChanged(): bool
-//    {
-//        return $this->birthdate !== ($this->originalData['birthdate'] ?? '');
-//    }
-
     /**
      * Helper: Check ob Nationality geändert wurde
      */
@@ -246,7 +220,6 @@ trait ValidateEmploymentData
     public function hasAnyChanges(): bool
     {
         return $this->ahvNumberHasChanged() ||
-//            $this->birthdateHasChanged() ||
             $this->nationalityHasChanged() ||
             $this->hometownHasChanged() ||
             $this->religionHasChanged() ||
@@ -261,7 +234,6 @@ trait ValidateEmploymentData
     {
         $fieldMapping = [
             'ahv_number' => 'ahvNumberHasChanged',
-//            'birthdate' => 'birthdateHasChanged',
             'nationality' => 'nationalityHasChanged',
             'hometown' => 'hometownHasChanged',
             'religion' => 'religionHasChanged',

@@ -2,10 +2,8 @@
 
 namespace App\Livewire\Alem\Employee\Profile\EmploymentData;
 
-use App\Enums\Employee\CivilStatus;
-use App\Enums\Employee\Religion;
-use App\Enums\Employee\Residence;
 use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\EmployeeDataEnums;
+use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\ValidateEmploymentData;
 use App\Models\Address\Country;
 use App\Models\Alem\Employee;
@@ -15,29 +13,26 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Livewire\Attributes\Isolate;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy(isolate: true)]
-#[Isolate]
+#[Lazy]
 class EmploymentData extends Component
 {
     use AuthorizesRequests;
     use AuthUserTeamCompanyId;
-    use ValidateEmploymentData, EmployeeDataEnums;
+    use ValidateEmploymentData, HandleCatchError;
+    use EmployeeDataEnums;
 
     #[Locked]
     public int $userId;
 
     #[Locked]
-    public ?Employee $employeeUser = null;
+    public ?Employee $employee = null;
 
     /** Employee form fields */
     public ?string $ahv_number = null;
-//    public ?string $birthdate = null;
     public ?string $nationality = null;
     public ?string $hometown = null;
     public ?string $religion = null;
@@ -58,21 +53,20 @@ class EmploymentData extends Component
         $this->companyId = $companyId;
 
         // Lade Employee Model mit allen benötigten Feldern
-        $this->employeeUser = Employee::where('user_id', $this->userId)
+        $this->employee = Employee::where('user_id', $this->userId)
             ->select([
                 'id',
                 'user_id',
                 'ahv_number',
                 'nationality',
                 'hometown',
-//                'birthdate',
                 'religion',
                 'civil_status',
                 'residence_permit'
             ])
             ->first();
 
-        if ($this->employeeUser) {
+        if ($this->employee) {
             $this->loadEmployeeData();
         }
 
@@ -86,27 +80,25 @@ class EmploymentData extends Component
      */
     private function loadEmployeeData(): void
     {
-        if (!$this->employeeUser) return;
+        if (!$this->employee) return;
 
         // WICHTIG: Speichere Original-Daten in EINEM public Array
         $this->originalData = [
-            'ahv_number' => $this->employeeUser->ahv_number,
-//            'birthdate' => $this->employeeUser->birthdate?->format('Y-m-d'),
-            'nationality' => $this->employeeUser->nationality,
-            'hometown' => $this->employeeUser->hometown,
-            'religion' => $this->employeeUser->religion?->value,
-            'civil_status' => $this->employeeUser->civil_status?->value,
-            'residence_permit' => $this->employeeUser->residence_permit?->value,
+            'ahv_number' => $this->employee->ahv_number,
+            'nationality' => $this->employee->nationality,
+            'hometown' => $this->employee->hometown,
+            'religion' => $this->employee->religion?->value,
+            'civil_status' => $this->employee->civil_status?->value,
+            'residence_permit' => $this->employee->residence_permit?->value,
         ];
 
         // Setze Form-Felder
-        $this->ahv_number = $this->employeeUser->ahv_number ?? '';
-//        $this->birthdate = $this->employeeUser->birthdate?->format('Y-m-d') ?? '';
-        $this->nationality = $this->employeeUser->nationality ?? '';
-        $this->hometown = $this->employeeUser->hometown ?? '';
-        $this->religion = $this->employeeUser->religion?->value;
-        $this->civil_status = $this->employeeUser->civil_status?->value;
-        $this->residence_permit = $this->employeeUser->residence_permit?->value;
+        $this->ahv_number = $this->employee->ahv_number ?? '';
+        $this->nationality = $this->employee->nationality ?? '';
+        $this->hometown = $this->employee->hometown ?? '';
+        $this->religion = $this->employee->religion?->value;
+        $this->civil_status = $this->employee->civil_status?->value;
+        $this->residence_permit = $this->employee->residence_permit?->value;
     }
 
     /**
@@ -154,9 +146,6 @@ class EmploymentData extends Component
                 if ($this->ahvNumberHasChanged()) {
                     $updateData['ahv_number'] = $this->ahv_number;
                 }
-//                if ($this->birthdateHasChanged()) {
-//                    $updateData['birthdate'] = $this->birthdate ?: null;
-//                }
                 if ($this->nationalityHasChanged()) {
                     $updateData['nationality'] = $this->nationality;
                 }
@@ -173,14 +162,14 @@ class EmploymentData extends Component
                     $updateData['residence_permit'] = $this->residence_permit;
                 }
 
-                if ($this->employeeUser) {
+                if ($this->employee) {
                     // Update nur wenn Felder geändert wurden
                     if (!empty($updateData)) {
-                        $this->employeeUser->update($updateData);
+                        $this->employee->update($updateData);
                     }
                 } else {
                     // Erstelle neuen Employee Record
-                    $this->employeeUser = Employee::create([
+                    $this->employee = Employee::create([
                         'user_id' => $this->userId,
                         ...$updateData
                     ]);
@@ -210,24 +199,12 @@ class EmploymentData extends Component
     {
         $this->originalData = [
             'ahv_number' => $this->ahv_number,
-//            'birthdate' => $this->birthdate,
             'nationality' => $this->nationality,
             'hometown' => $this->hometown,
             'religion' => $this->religion,
             'civil_status' => $this->civil_status,
             'residence_permit' => $this->residence_permit,
         ];
-    }
-
-    /**
-     * Refresh Daten wenn Updates passieren
-     */
-    #[On('employment-data-refreshed')]
-    public function refreshFromParent(int $employeeId): void
-    {
-        if ($this->employeeUser && $this->employeeUser->user_id === $employeeId) {
-            $this->loadEmployeeData();
-        }
     }
 
     public function placeholder(): string
