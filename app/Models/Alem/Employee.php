@@ -42,11 +42,6 @@ class Employee extends Model
     ];
 
     /**
-     * Appends für häufig benötigte berechnete Attribute
-     */
-    protected $appends = ['full_status'];
-
-    /**
      * Type-Casting für Attribute
      */
     protected $casts = [
@@ -65,10 +60,7 @@ class Employee extends Model
      */
     protected static function booted()
     {
-        // Global Scope für aktive Mitarbeiter (optional, nur bei Bedarf verwenden)
-        // static::addGlobalScope('notLeft', function ($builder) {
-        //     $builder->where('employee_status', '!=', EmployeeStatus::LEAVE->value);
-        // });
+        //
     }
 
     /**

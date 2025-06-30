@@ -84,27 +84,27 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Birthdate -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Birthdate') }}"
-                            for="birthdate"
-                            model="birthdate"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('birthdate')"
-                        >
-                            <flux:date-picker
-                                with-today
-                                value="21-03-2025"
-                                wire:model.defer="birthdate"
-                                id="birthdate"
-                                type="date">
-                                <x-slot name="trigger">
-                                    <flux:date-picker.input class="mt-2"/>
-                                </x-slot>
-                            </flux:date-picker>
-                        </x-pupi.input.group>
-                    </div>
+{{--                    <!-- Birthdate -->--}}
+{{--                    <div class="sm:col-span-3">--}}
+{{--                        <x-pupi.input.group--}}
+{{--                            label="{{ __('Birthdate') }}"--}}
+{{--                            for="birthdate"--}}
+{{--                            model="birthdate"--}}
+{{--                            badge="{{ __('Required') }}"--}}
+{{--                            :error="$errors->first('birthdate')"--}}
+{{--                        >--}}
+{{--                            <flux:date-picker--}}
+{{--                                with-today--}}
+{{--                                value="21-03-2025"--}}
+{{--                                wire:model.defer="birthdate"--}}
+{{--                                id="birthdate"--}}
+{{--                                type="date">--}}
+{{--                                <x-slot name="trigger">--}}
+{{--                                    <flux:date-picker.input class="mt-2"/>--}}
+{{--                                </x-slot>--}}
+{{--                            </flux:date-picker>--}}
+{{--                        </x-pupi.input.group>--}}
+{{--                    </div>--}}
 
                     <!-- Religion -->
                     <div class="sm:col-span-3">

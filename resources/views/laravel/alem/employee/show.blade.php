@@ -25,13 +25,13 @@
                 />
 
 
-{{--                <livewire:alem.employee.profile.employment-data.employment-data--}}
-{{--                    :employee-id="$employeeId"--}}
-{{--                    :auth-user-id="$authUserId"--}}
-{{--                    :current-team-id="$currentTeamId"--}}
-{{--                    :company-id="$companyId"--}}
-{{--                    lazy--}}
-{{--                />--}}
+                <livewire:alem.employee.profile.employment-data.employment-data
+                    :user-id="$userId"
+                    :auth-user-id="$authUserId"
+                    :current-team-id="$currentTeamId"
+                    :company-id="$companyId"
+                    lazy
+                />
 
             @elseif($activeTab === 'report')
                 {{-- Andere Tabs... --}}
