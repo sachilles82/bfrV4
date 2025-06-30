@@ -82,10 +82,10 @@ class Details extends Component
 
         // WICHTIG: Speichere Original-Daten in EINEM public Array
         $this->originalData = [
+            'gender' => $this->user->gender?->value,
             'name' => $this->user->name,
             'email' => $this->user->email,
             'phone_1' => $this->user->phone_1,
-            'gender' => $this->user->gender?->value,
             'teamIds' => $this->user->teams->pluck('id')->toArray(),
             'roleIds' => $this->user->roles->pluck('id')->toArray(),
             'department_id' => $this->user->department_id,
@@ -196,10 +196,10 @@ class Details extends Component
     {
         // Update nur die originalData, ohne die Form-Felder zu überschreiben
         $this->originalData = [
+            'gender' => $this->gender,
             'name' => $this->name,
             'email' => $this->email,
             'phone_1' => $this->phone_1,
-            'gender' => $this->gender,
             'teamIds' => $this->selectedTeams,
             'roleIds' => $this->selectedRoles,
             'department_id' => $this->department,

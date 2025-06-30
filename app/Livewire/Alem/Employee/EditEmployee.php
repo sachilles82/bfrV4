@@ -83,7 +83,9 @@ class EditEmployee extends Component
             ->select([
                 'id', 'name', 'email', 'gender', 'model_status',
                 'status', 'department_id', 'supervisor_id',
-                'profession_id', 'stage_id', 'joined_at', 'user_type',
+                'profession_id', 'stage_id', 'joined_at',
+                //?? für was user_type
+                'user_type',
                 'company_id','manager'
             ])
             ->findOrFail($this->userId);
@@ -108,9 +110,20 @@ class EditEmployee extends Component
 
         // WICHTIG: Speichere Original-Daten in EINEM public Array
         $this->originalData = [
+            'gender' => $this->user->gender?->value,
+            'name' => $this->user->name,
             'email' => $this->user->email,
             'teamIds' => $this->user->teams->pluck('id')->toArray(),
+            'department_id' => $this->user->department_id,
+            'supervisor_id' => $this->user->supervisor_id,
             'roleIds' => $this->user->roles->pluck('id')->toArray(),
+            'profession_id' => $this->user->profession_id,
+            'stage_id' => $this->user->stage_id,
+            'joined_at' => $this->user->joined_at?->format('Y-m-d'),
+
+            // Status ENUM
+            'status' => $this->user->status?->value,
+            'model_status' => $this->user->model_status?->value,
         ];
 
 
@@ -135,33 +148,222 @@ class EditEmployee extends Component
 
     }
 
-    /**
-     * Aktualisiert die Benutzer- und Mitarbeiterdaten in der Datenbank.
-     */
+//    /**
+//     * Aktualisiert die Benutzer- und Mitarbeiterdaten in der Datenbank.
+//     */
+//    public function updateEmployee(): void
+//    {
+//        // Type-Casting direkt am Anfang
+//        $this->selectedRoles = collect($this->selectedRoles)
+//            ->map(fn($role) => (int) $role)
+//            ->toArray();
+//
+//        $this->selectedTeams = collect($this->selectedTeams)
+//            ->map(fn($team) => (int) $team)
+//            ->toArray();
+//
+//        // Prüfe ob überhaupt Änderungen vorliegen
+//        if (!$this->hasAnyChanges()) {
+//            Flux::toast(
+//                text: __('No changes detected.'),
+//                heading: __('No Update'),
+//                variant: 'warning'
+//            );
+//            return;
+//        }
+//
+//        // WICHTIG: Hole die geänderten Felder VOR dem Update
+//        $changedFields = $this->getChangedFields();
+//
+//        // WICHTIG: Validiere NUR die geänderten Felder
+//        $this->validateOnlyChanged();
+//
+//        try {
+//            DB::transaction(function () {
+//                $updateData = [];
+//
+//                if ($this->genderHasChanged()) {
+//                    $updateData['gender'] = $this->gender;
+//                }
+//                if ($this->nameHasChanged()) {
+//                    $updateData['name'] = $this->name;
+//                }
+//                if ($this->emailHasChanged()) {
+//                    $updateData['email'] = $this->email;
+//                }
+//                if ($this->departmentHasChanged()) {
+//                    $updateData['department_id'] = $this->department;
+//                }
+//                if ($this->supervisorHasChanged()) {
+//                    $updateData['supervisor_id'] = $this->supervisor;
+//                }
+//                if ($this->professionHasChanged()) {
+//                    $updateData['profession_id'] = $this->profession;
+//                }
+//                if ($this->stageHasChanged()) {
+//                    $updateData['stage_id'] = $this->stage;
+//                }
+//                if ($this->joinedAtHasChanged()) {
+//                    $updateData['joined_at'] = $this->joined_at;
+//                }
+//                if ($this->statusHasChanged()) {
+//                    $updateData['status'] = $this->status;
+//                }
+//                if ($this->modelStatusHasChanged()) {
+//                    $updateData['model_status'] = $this->model_status;
+//                }
+//
+//                // Update nur wenn Felder geändert wurden
+//                if (!empty($updateData)) {
+//                    $this->user->update($updateData);
+//                }
+//
+//                // Teams und Roles - die sync() Methoden brauchen $this->user
+//                $this->updateEmployeeData();
+//                $this->updateTeamsRoles();
+//            });
+//
+//            // Aktualisiere Original-Daten nach erfolgreichem Update
+//            $this->updateOriginalDataAfterSave();
+//
+//            $this->closeEditEmployeeModal();
+//            $this->dispatch('employee-updated');
+//
+//            // Erstelle eine lesbare Liste der Änderungen
+//            $updatedFieldsList = $this->formatChangedFieldsForDisplay($changedFields);
+//
+//            Flux::toast(
+//                text: __('Updated fields: ') . $updatedFieldsList,
+//                heading: __('Employee updated successfully'),
+//                variant: 'success'
+//            );
+//
+//        } catch (\Throwable $e) {
+//            \Log::error('updateEmployee failed', [
+//                'error' => $e->getMessage(),
+//                'trace' => $e->getTraceAsString(),
+//            ]);
+//            $this->handleEditingError($e);
+//        }
+//    }
+//
+//    /**
+//     * Formatiert die geänderten Felder für die Anzeige im Toast
+//     */
+//    private function formatChangedFieldsForDisplay(array $changedFields): string
+//    {
+//        $fieldLabels = [
+//            'name' => __('Name'),
+//            'email' => __('Email'),
+//            'phone_1' => __('Phone'),
+//            'gender' => __('Gender'),
+//            'department_id' => __('Department'),
+//            'supervisor_id' => __('Supervisor'),
+//            'profession_id' => __('Profession'),
+//            'stage_id' => __('Stage'),
+//            'joined_at' => __('Joined At'),
+//            'status' => __('Status'),
+//            'model_status' => __('Model Status'),
+//            'teams' => __('Teams'),
+//            'roles' => __('Roles'),
+//        ];
+//
+//        $displayFields = [];
+//
+//        foreach ($changedFields as $field => $changes) {
+//            $label = $fieldLabels[$field] ?? ucfirst(str_replace('_', ' ', $field));
+//
+//            // Optional: Zeige auch die Werte an
+//            if (in_array($field, ['teams', 'roles'])) {
+//                // Bei Arrays zeige Anzahl
+//                $oldCount = count($changes['old']);
+//                $newCount = count($changes['new']);
+//                $displayFields[] = "{$label} ({$oldCount} → {$newCount})";
+//            } else {
+//                // Bei einzelnen Werten
+//                $displayFields[] = $label;
+//                // Oder mit Werten: $displayFields[] = "{$label}: {$changes['old']} → {$changes['new']}";
+//            }
+//        }
+//
+//        return implode(', ', $displayFields);
+//    }
     public function updateEmployee(): void
     {
-        $this->validate();
+        // Type-Casting direkt am Anfang
+        $this->selectedRoles = collect($this->selectedRoles)
+            ->map(fn($role) => (int) $role)
+            ->toArray();
+
+        $this->selectedTeams = collect($this->selectedTeams)
+            ->map(fn($team) => (int) $team)
+            ->toArray();
+
+        // Prüfe ob überhaupt Änderungen vorliegen
+        if (!$this->hasAnyChanges()) {
+            Flux::toast(
+                text: __('No changes detected.'),
+                heading: __('No Update'),
+                variant: 'warning'
+            );
+            return;
+        }
+
+        // WICHTIG: Validiere NUR die geänderten Felder
+        $this->validateOnlyChanged();
 
         try {
             DB::transaction(function () {
-                // ✅ Golden Path: Eloquent Update
-                $this->user->update([
-                    'gender' => $this->gender,
-                    'name' => $this->name,
-                    'email' => $this->email,
-                    'department_id' => $this->department,
-                    'profession_id' => $this->profession,
-                    'supervisor_id' => $this->supervisor,
-                    'stage_id' => $this->stage,
-                    'joined_at' => $this->joined_at,
-                    'status' => $this->status,
-                    'model_status' => $this->model_status,
-                ]);
 
+                $updateData = [];
+
+                if ($this->genderHasChanged()) {
+                    $updateData['gender'] = $this->gender;
+                }
+                if ($this->nameHasChanged()) {
+                    $updateData['name'] = $this->name;
+                }
+                if ($this->emailHasChanged()) {
+                    $updateData['email'] = $this->email;
+                }
+//                if ($this->teamHasChanged()) {
+//                    $updateData['team_ids'] = $this->selectedTeams;
+//                }
+                if ($this->departmentHasChanged()) {
+                    $updateData['department_id'] = $this->department;
+                }
+                if ($this->supervisorHasChanged()) {
+                    $updateData['supervisor_id'] = $this->supervisor;
+                }
+                if ($this->professionHasChanged()) {
+                    $updateData['profession_id'] = $this->profession;
+                }
+                if ($this->stageHasChanged()) {
+                    $updateData['stage_id'] = $this->stage;
+                }
+                if ($this->joinedAtHasChanged()) {
+                    $updateData['joined_at'] = $this->joined_at;
+                }
+                if ($this->statusHasChanged()) {
+                    $updateData['status'] = $this->status;
+                }
+                if ($this->modelStatusHasChanged()) {
+                    $updateData['model_status'] = $this->model_status;
+                }
+                // Update nur wenn Felder geändert wurden
+                if (!empty($updateData)) {
+                    $this->user->update($updateData);
+                }
+
+                // Teams und Roles - die sync() Methoden brauchen $this->user
                 $this->updateEmployeeData();
+
                 $this->updateTeamsRoles();
 
-            });
+            });;
+
+            // Aktualisiere Original-Daten nach erfolgreichem Update
+            $this->updateOriginalDataAfterSave();
 
             $this->closeEditEmployeeModal();
             $this->dispatch('employee-updated');
@@ -177,6 +379,30 @@ class EditEmployee extends Component
         }
     }
 
+
+    /**
+     * Prüft, ob Änderungen an den Feldern vorgenommen wurden
+     */
+    private function updateOriginalDataAfterSave(): void
+    {
+        // Update nur die originalData, ohne die Form-Felder zu überschreiben
+        $this->originalData = [
+            'gender' => $this->gender,
+            'name' => $this->name,
+            'email' => $this->email,
+            'teamIds' => $this->selectedTeams,
+            'department_id' => $this->department,
+            'supervisor_id' => $this->supervisor,
+            'roleIds' => $this->selectedRoles,
+            'profession_id' => $this->profession,
+            'stage_id' => $this->stage,
+            'joined_at' => $this->joined_at,
+            'status' => $this->status,
+            'model_status' => $this->model_status,
+
+        ];
+    }
+
     /**
      * Nur sicherstellen dass Employee existiert
      * Nur Existenz sichern → firstOrCreate()
@@ -185,14 +411,6 @@ class EditEmployee extends Component
     private function updateEmployeeData(): void
     {
         Employee::firstOrCreate(['user_id' => $this->userId]);
-    }
-
-    /**
-     * Email Check für Validation
-     */
-    public function emailHasChanged(): bool
-    {
-        return $this->email !== ($this->originalData['email'] ?? '');
     }
 
     /**
@@ -209,30 +427,24 @@ class EditEmployee extends Component
      */
     private function checkManagerInRoles(array $roleIds): bool
     {
-        return collect($this->roles)
+        // Nutze die geladenen Dropdown-Daten
+        if (empty($this->dropdownRelations['roles'])) {
+            return false;
+        }
+
+        return collect($this->dropdownRelations['roles'])
             ->whereIn('id', $roleIds)
             ->contains('is_manager', true);
     }
 
-    /**
-     * Helper: Arrays vergleichen
-     */
-    private function arraysAreDifferent(array $array1, array $array2): bool
-    {
-        return count(array_diff($array1, $array2)) > 0 ||
-            count(array_diff($array2, $array1)) > 0;
-    }
 
-// Außerdem: In syncTeams() musst du diese Zeile korrigieren:
+
+    /**
+     * Teams nur synchronisieren wenn sich etwas geändert hat
+     */
     private function syncTeams(): void
     {
-
-        // Verwende stattdessen:
-        $originalTeamIds = $this->originalData['teamIds'] ?? [];
-
-        $teamsChanged = $this->arraysAreDifferent($originalTeamIds, $this->selectedTeams);
-
-        if ($teamsChanged) {
+        if ($this->teamsHaveChanged()) {
             $this->user->teams()->sync($this->selectedTeams);
         }
     }
@@ -242,15 +454,12 @@ class EditEmployee extends Component
      */
     private function syncRolesWithManagerCheck(): void
     {
-        $originalRoleIds = $this->originalData['roleIds'] ?? [];
-
-        $rolesChanged = $this->arraysAreDifferent($originalRoleIds, $this->selectedRoles);
-
-        if (!$rolesChanged) {
+        if (!$this->rolesHaveChanged()) {
             return;
         }
 
         // Manager Status aus bereits geladenen Daten
+        $originalRoleIds = $this->originalData['roleIds'] ?? [];
         $oldHasManager = $this->checkManagerInRoles($originalRoleIds);
 
         // Sync Rollen
