@@ -352,7 +352,7 @@ trait ValidateAccountDetails
      */
     private function statusHasChanged(): bool
     {
-        return $this->status !== ($this->originalData['status'] ?? EmployeeStatus::EMPLOYED);
+        return $this->status !== ($this->originalData['status'] ?? null);
     }
 
     /**
@@ -429,6 +429,7 @@ trait ValidateAccountDetails
             'selectedRoles' => 'rolesHaveChanged',
             'department' => 'departmentHasChanged',
             'supervisor' => 'supervisorHasChanged',
+            'status' => 'statusHasChanged',
             'model_status' => 'modelStatusHasChanged',
         ];
 

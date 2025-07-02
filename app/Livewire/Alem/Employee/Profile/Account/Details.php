@@ -38,7 +38,7 @@ class Details extends Component
     public ?string $email = null;
     public ?string $phone_1 = null;
     public ?string $model_status = null;
-    public ?int $status = null;
+    public ?string $status = null;
     public ?int $department = null;
     public ?int $supervisor = null;
     public array $selectedTeams = [];
@@ -60,7 +60,7 @@ class Details extends Component
             'roles:id,name,is_manager',
         ])
             ->select([
-                'id', 'name', 'email', 'gender', 'model_status', 'status',
+                'id', 'name', 'email', 'gender', 'model_status', 'status', 'user_type',
                 'department_id', 'phone_1', 'company_id', 'manager','supervisor_id'
             ])
             ->findOrFail($this->userId);
