@@ -26,7 +26,7 @@ class Employee extends Model
         // Personal Data
         'personal_number',
         'employment_type',
-        // joined_at wird im User Model gespeichert
+
         'probation_enum',
         'notice_at',
         'notice_enum',
