@@ -38,6 +38,7 @@ class Details extends Component
     public ?string $email = null;
     public ?string $phone_1 = null;
     public ?string $model_status = null;
+    public ?int $status = null;
     public ?int $department = null;
     public ?int $supervisor = null;
     public array $selectedTeams = [];
@@ -59,7 +60,7 @@ class Details extends Component
             'roles:id,name,is_manager',
         ])
             ->select([
-                'id', 'name', 'email', 'gender', 'model_status',
+                'id', 'name', 'email', 'gender', 'model_status', 'status',
                 'department_id', 'phone_1', 'company_id', 'manager','supervisor_id'
             ])
             ->findOrFail($this->userId);
@@ -90,6 +91,7 @@ class Details extends Component
             'roleIds' => $this->user->roles->pluck('id')->toArray(),
             'department_id' => $this->user->department_id,
             'supervisor_id' => $this->user->supervisor_id,
+            'status' => $this->user->status?->value,
             'model_status' => $this->user->model_status?->value,
         ];
 
@@ -104,6 +106,7 @@ class Details extends Component
 
         $this->department = $this->user->department_id;
         $this->supervisor = $this->user->supervisor_id;
+        $this->status = $this->user->status?->value;
         $this->model_status = $this->user->model_status?->value;
     }
 
@@ -159,6 +162,9 @@ class Details extends Component
                 if ($this->supervisorHasChanged()) {
                     $updateData['supervisor_id'] = $this->supervisor;
                 }
+                if ($this->statusHasChanged()) {
+                    $updateData['status'] = $this->status;
+                }
                 if ($this->modelStatusHasChanged()) {
                     $updateData['model_status'] = $this->model_status;
                 }
@@ -204,6 +210,7 @@ class Details extends Component
             'roleIds' => $this->selectedRoles,
             'department_id' => $this->department,
             'supervisor_id' => $this->supervisor,
+            'status' => $this->status,
             'model_status' => $this->model_status,
         ];
     }

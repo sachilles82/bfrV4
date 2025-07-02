@@ -263,6 +263,41 @@
                         </x-pupi.input.group>
                     </div>
 
+                    <!-- Employee Status -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Employee Status') }}"
+                            for="status"
+                            badge="{{ __('Required') }}"
+                            :error="$errors->first('status')"
+                            model="status"
+                            help-text="{{ __('') }}">
+
+                            <flux:select
+                                class="mt-2"
+                                wire:model="status"
+                                id="status"
+                                variant="listbox">
+
+                                @foreach($this->employeeStatusOptions() as $statusOption)
+                                    <flux:option
+                                        wire:key="employeeDetails-status-option-{{ $statusOption['value'] }}"
+                                        value="{{ $statusOption['value'] }}">
+                                        <div class="flex items-center">
+                                            <span class="mr-2">
+                                                <x-dynamic-component
+                                                    :component="$statusOption['icon']"
+                                                    class="h-4 w-5 rounded-md {{ $statusOption['colors'] ?? '' }}"/>
+                                            </span>
+                                            <span>{{ $statusOption['label'] }}</span>
+                                        </div>
+                                    </flux:option>
+                                @endforeach
+
+                            </flux:select>
+                        </x-pupi.input.group>
+                    </div>
+
                     <!-- Model Status Select -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group

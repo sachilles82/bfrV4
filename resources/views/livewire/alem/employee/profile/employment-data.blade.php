@@ -15,7 +15,7 @@
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
                     <!-- AHV Number -->
-                    <div class="sm:col-span-4">
+                    <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('AHV Number') }}"
                             for="ahv_number"
@@ -30,6 +30,29 @@
                                 id="ahv_number"
                                 placeholder="{{ __('756.XXXX.XXXX.XX') }}"
                             />
+
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Residence Permit Upload -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('AHV Document Upload') }}"
+                            for="residence_permit"
+                            model="residence_permit"
+                            badge="{{ __('Optional') }}"
+                            help-text="{{ __('') }}">
+                            <div class="col-span-full flex items-center gap-x-6 mt-2">
+                                <img
+                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                    alt="" class="h-8 w-8 flex-none rounded-lg bg-gray-800 object-cover">
+                                <div>
+                                    <button type="button"
+                                            class="rounded-md dark:bg-white/10 px-3 py-2 text-sm font-semibold dark:text-white shadow-xs dark:hover:bg-white/20 dark:ring-transparent bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                        Change Upload
+                                    </button>
+                                </div>
+                            </div>
 
                         </x-pupi.input.group>
                     </div>
@@ -99,6 +122,7 @@
                             help-text="{{ __('') }}">
 
                             <flux:select
+                                class="!mt-2"
                                 wire:model="religion"
                                 name="religion"
                                 id="religion"
@@ -128,6 +152,7 @@
                             help-text="{{ __('') }}">
 
                             <flux:select
+                                class="!mt-2"
                                 wire:model="civil_status"
                                 name="civil_status"
                                 id="civil_status"
@@ -157,6 +182,7 @@
                             help-text="{{ __('') }}">
 
                             <flux:select
+                                class="!mt-2"
                                 wire:model="residence_permit"
                                 name="residence_permit"
                                 id="residence_permit"
@@ -172,6 +198,29 @@
                                 @endforeach
 
                             </flux:select>
+
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Residence Permit Upload -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Residence Permit Upload') }}"
+                            for="residence_permit"
+                            model="residence_permit"
+                            badge="{{ __('Optional') }}"
+                            help-text="{{ __('') }}">
+                            <div class="col-span-full flex items-center gap-x-6 mt-2">
+                                <img
+                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                    alt="" class="h-8 w-8 flex-none rounded-lg bg-gray-800 object-cover">
+                                <div>
+                                    <button type="button"
+                                            class="rounded-md dark:bg-white/10 px-3 py-2 text-sm font-semibold dark:text-white shadow-xs dark:hover:bg-white/20 dark:ring-transparent bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                        Change Upload
+                                    </button>
+                                </div>
+                            </div>
 
                         </x-pupi.input.group>
                     </div>

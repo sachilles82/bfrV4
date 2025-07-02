@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Account\Helper;
 
+use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use Illuminate\Validation\Rule;
@@ -98,6 +99,11 @@ trait ValidateAccountDetails
             ];
         }
 
+        // Status
+        if ($this->statusHasChanged()) {
+            $rules['status'] = ['required', Rule::enum(EmployeeStatus::class)];
+        }
+
         // Model Status
         if ($this->modelStatusHasChanged()) {
             $rules['model_status'] = ['required', Rule::enum(ModelStatus::class)];
@@ -146,6 +152,7 @@ trait ValidateAccountDetails
                 'integer',
                 Rule::in(array_column($this->roles, 'id'))
             ],
+            'status' => ['required', Rule::enum(EmployeeStatus::class)],
             'model_status' => ['required', Rule::enum(ModelStatus::class)]
         ];
     }
@@ -180,6 +187,10 @@ trait ValidateAccountDetails
             // Model Status
             'model_status.required' => __('Account status is required.'),
             'model_status.enum' => __('The selected account status is invalid.'),
+
+            // Status
+            'status.required' => __('Employee status is required.'),
+            'status.enum' => __('The selected employee status is invalid.'),
 
             // Department
             'department.required' => __('Department is required.'),
@@ -257,6 +268,13 @@ trait ValidateAccountDetails
             ];
         }
 
+        if ($this->statusHasChanged()) {
+            $changed['status'] = [
+                'old' => $this->originalData['status'] ?? null,
+                'new' => $this->status
+            ];
+        }
+
         if ($this->modelStatusHasChanged()) {
             $changed['model_status'] = [
                 'old' => $this->originalData['model_status'] ?? null,
@@ -327,6 +345,14 @@ trait ValidateAccountDetails
     private function supervisorHasChanged(): bool
     {
         return $this->supervisor !== ($this->originalData['supervisor_id'] ?? null);
+    }
+
+    /**
+     * Helper: Check ob Status geändert wurde
+     */
+    private function statusHasChanged(): bool
+    {
+        return $this->status !== ($this->originalData['status'] ?? EmployeeStatus::EMPLOYED);
     }
 
     /**
@@ -402,6 +428,7 @@ trait ValidateAccountDetails
             'selectedTeams' => 'teamsHaveChanged',
             'selectedRoles' => 'rolesHaveChanged',
             'department' => 'departmentHasChanged',
+            'supervisor' => 'supervisorHasChanged',
             'model_status' => 'modelStatusHasChanged',
         ];
 
@@ -433,6 +460,7 @@ trait ValidateAccountDetails
             $this->departmentHasChanged() ||
             $this->supervisorHasChanged() ||
             $this->modelStatusHasChanged() ||
+            $this->statusHasChanged() ||
             $this->teamsHaveChanged() ||
             $this->rolesHaveChanged();
     }
