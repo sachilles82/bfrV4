@@ -5,7 +5,6 @@ namespace App\Livewire\Alem\Employee\Profile\Account;
 use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
 use App\Livewire\Alem\Employee\Profile\Account\Helper\ValidateAccountDetails;
 use App\Models\User;
-use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\Enum\GenderOptions;
 use App\Traits\Model\ModelStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
@@ -44,9 +43,9 @@ class Details extends Component
     public function mount(int $userId, int $authUserId, int $currentTeamId, int $companyId): void
     {
         $this->userId = $userId;
-//        $this->authUserId = $authUserId;
-//        $this->currentTeamId = $currentTeamId;
-//        $this->companyId = $companyId;
+        $this->authUserId = $authUserId;
+        $this->currentTeamId = $currentTeamId;
+        $this->companyId = $companyId;
 
         // Lade userId mit allen benötigten Relations
         $this->user = User::select([
@@ -57,7 +56,7 @@ class Details extends Component
 
         $this->loadEmployeeData();
 
-////        // Lade Dropdown-Daten
+////        // Lade Relation für Dropdown-Daten
 //        $this->loadRelationsData([
 //            'teams', 'departments', 'roles', 'supervisors'
 //        ]);

@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Account\Helper;
 
-use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use Illuminate\Validation\Rule;
@@ -64,7 +63,7 @@ trait ValidateAccountDetails
         }
 
         // Phone 2 (optional, falls benötigt)
-        if ($this->phoneHasChanged()) {
+        if ($this->phone2HasChanged()) {
             if (!empty($this->phone_2)) {
                 $rules['phone_2'] = [
                     'nullable',
@@ -185,7 +184,7 @@ trait ValidateAccountDetails
             ];
         }
 
-        if ($this->phoneHasChanged()) {
+        if ($this->phone2HasChanged()) {
             $changed['phone_2'] = [
                 'old' => $this->originalData['phone_2'] ?? null,
                 'new' => $this->phone_2

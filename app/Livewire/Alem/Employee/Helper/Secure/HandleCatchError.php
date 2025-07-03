@@ -37,8 +37,6 @@ trait HandleCatchError
                 'phone_1',
                 'phone_2',
                 'model_status',
-                'joined_at',
-                'invitation'
             ]);
         }
 
