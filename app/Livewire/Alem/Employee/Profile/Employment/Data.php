@@ -3,8 +3,8 @@
 namespace App\Livewire\Alem\Employee\Profile\Employment;
 
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
+use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\ValidateEmploymentData;
 use App\Livewire\Alem\Employee\Profile\Personal\Helper\HandleCatchError;
-use App\Livewire\Alem\Employee\Profile\Personal\Helper\ValidatePersonalData;
 use App\Models\Alem\Employee;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;
@@ -24,7 +24,7 @@ class Data extends Component
 {
     use AuthorizesRequests;
     use AuthUserTeamCompanyId;
-    use ValidatePersonalData, HandleCatchError;
+    use ValidateEmploymentData, HandleCatchError;
     use WithDropDownRelations;
     use EmployeeStatusOptions, ProbationOptions, NoticePeriodOptions;
 

@@ -29,10 +29,8 @@ class PersonalData extends Component
     #[Locked]
     public int $userId;
 
-    #[Locked]
+    // Models should NOT be locked as they get updated
     public ?User $user = null;
-
-    #[Locked]
     public ?Employee $employee = null;
 
     /** Employee form fields */
@@ -42,7 +40,6 @@ class PersonalData extends Component
     public ?string $nationality = null;
     public ?string $hometown = null;
     public ?string $religion = null;
-//    public ?string $civil_status = null;
 
     /** Original Daten des Employees aus der Datenbank für Vergleiche */
     public array $originalData = [];
@@ -57,13 +54,10 @@ class PersonalData extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
+        // Lade User mit birthdate
         $this->user = User::select([
             'id',
-            'joined_at',
-            'company_id',
-            'current_team_id',
-            'profession_id',
-            'stage_id',
+            'birthdate',
         ])
             ->findOrFail($this->userId);
 
@@ -76,44 +70,37 @@ class PersonalData extends Component
                 'nationality',
                 'hometown',
                 'religion',
-                'civil_status',
                 'residence_permit'
             ])
             ->first();
 
-        if ($this->employee) {
-            $this->loadEmployeeData();
-        }
-
-        // Lade Countries für Dropdown
+        $this->loadPersonalData();
         $this->loadCountries();
     }
 
     /**
-     * Befülle die Form mit Employee Daten
+     * Befülle die Form mit Personal Daten
      * Speichere Original-Daten aus der Datenbank für den Vergleich
      */
-    private function loadEmployeeData(): void
+    private function loadPersonalData(): void
     {
-        if (!$this->employee) return;
-
         // WICHTIG: Speichere Original-Daten in EINEM public Array
         $this->originalData = [
-            'ahv_number' => $this->employee->ahv_number,
-            'nationality' => $this->employee->nationality,
-            'hometown' => $this->employee->hometown,
-            'religion' => $this->employee->religion?->value,
-            'civil_status' => $this->employee->civil_status?->value,
-            'residence_permit' => $this->employee->residence_permit?->value,
+            'birthdate' => $this->user->birthdate,
+            'ahv_number' => $this->employee?->ahv_number,
+            'nationality' => $this->employee?->nationality,
+            'hometown' => $this->employee?->hometown,
+            'religion' => $this->employee?->religion?->value,
+            'residence_permit' => $this->employee?->residence_permit?->value,
         ];
 
         // Setze Form-Felder
-        $this->ahv_number = $this->employee->ahv_number ?? '';
-        $this->nationality = $this->employee->nationality ?? '';
-        $this->hometown = $this->employee->hometown ?? '';
-        $this->religion = $this->employee->religion?->value;
-        $this->civil_status = $this->employee->civil_status?->value;
-        $this->residence_permit = $this->employee->residence_permit?->value;
+        $this->birthdate = $this->user->birthdate;
+        $this->ahv_number = $this->employee?->ahv_number ?? '';
+        $this->nationality = $this->employee?->nationality ?? '';
+        $this->hometown = $this->employee?->hometown ?? '';
+        $this->religion = $this->employee?->religion?->value;
+        $this->residence_permit = $this->employee?->residence_permit?->value;
     }
 
     /**
@@ -135,10 +122,10 @@ class PersonalData extends Component
     }
 
     /**
-     * Aktualisiert die Employment Daten in der Datenbank.
+     * Aktualisiert die Personal Daten in der Datenbank.
      * Validiert nur die geänderten Felder für bessere Performance
      */
-    public function updateEmploymentData(): void
+    public function updatePersonalData(): void
     {
         // Prüfe ob überhaupt Änderungen vorliegen
         if (!$this->hasAnyChanges()) {
@@ -155,7 +142,12 @@ class PersonalData extends Component
 
         try {
             DB::transaction(function () {
-                // Erstelle Update-Array nur mit geänderten Feldern
+                // Update User birthdate wenn geändert
+                if ($this->birthdateHasChanged()) {
+                    $this->user->update(['birthdate' => $this->birthdate]);
+                }
+
+                // Erstelle Update-Array nur mit geänderten Employee Feldern
                 $updateData = [];
 
                 if ($this->ahvNumberHasChanged()) {
@@ -170,9 +162,6 @@ class PersonalData extends Component
                 if ($this->religionHasChanged()) {
                     $updateData['religion'] = $this->religion;
                 }
-                if ($this->civilStatusHasChanged()) {
-                    $updateData['civil_status'] = $this->civil_status;
-                }
                 if ($this->residencePermitHasChanged()) {
                     $updateData['residence_permit'] = $this->residence_permit;
                 }
@@ -183,21 +172,23 @@ class PersonalData extends Component
                         $this->employee->update($updateData);
                     }
                 } else {
-                    // Erstelle neuen Employee Record
-                    $this->employee = Employee::create([
-                        'user_id' => $this->userId,
-                        ...$updateData
-                    ]);
+                    // Erstelle neuen Employee Record nur wenn es Employee-Daten gibt
+                    if (!empty($updateData)) {
+                        $this->employee = Employee::create([
+                            'user_id' => $this->userId,
+                            ...$updateData
+                        ]);
+                    }
                 }
             });
 
             // Aktualisiere Original-Daten nach erfolgreichem Update
             $this->updateOriginalDataAfterSave();
 
-            $this->dispatch('employment-data-updated');
+            $this->dispatch('personal-data-updated');
 
             Flux::toast(
-                text: __('Employment data updated successfully.'),
+                text: __('Personal data updated successfully.'),
                 heading: __('Success'),
                 variant: 'success'
             );
@@ -213,18 +204,18 @@ class PersonalData extends Component
     private function updateOriginalDataAfterSave(): void
     {
         $this->originalData = [
+            'birthdate' => $this->birthdate,
             'ahv_number' => $this->ahv_number,
             'nationality' => $this->nationality,
             'hometown' => $this->hometown,
             'religion' => $this->religion,
-            'civil_status' => $this->civil_status,
             'residence_permit' => $this->residence_permit,
         ];
     }
 
     public function placeholder(): string
     {
-        return view('livewire.placeholders.employee.employment-data');
+        return view('livewire.placeholders.employee.personal-data');
     }
 
     public function render(): View

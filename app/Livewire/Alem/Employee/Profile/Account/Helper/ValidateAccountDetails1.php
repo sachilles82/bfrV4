@@ -3,7 +3,7 @@
 namespace App\Livewire\Alem\Employee\Profile\Personal\Helper;
 
 use App\Enums\Employee\Religion;
-use App\Enums\Employee\Residence;
+use App\Enums\Employee\ResidencePermit;
 use Illuminate\Validation\Rule;
 
 trait ValidatePersonalData
@@ -66,7 +66,7 @@ trait ValidatePersonalData
 
         // Residence Permit
         if ($this->residencePermitHasChanged()) {
-            $rules['residence_permit'] = ['nullable', Rule::enum(Residence::class)];
+            $rules['residence_permit'] = ['nullable', Rule::enum(ResidencePermit::class)];
         }
 
         return $rules;
@@ -92,7 +92,7 @@ trait ValidatePersonalData
             ],
             'hometown' => 'nullable|string|max:255',
             'religion' => ['nullable', Rule::enum(Religion::class)],
-            'residence_permit' => ['nullable', Rule::enum(Residence::class)]
+            'residence_permit' => ['nullable', Rule::enum(ResidencePermit::class)]
         ];
     }
 

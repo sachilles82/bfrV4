@@ -33,16 +33,12 @@ trait HandleCatchError
         // Füge Personal-spezifische Formulardaten hinzu
         if (method_exists($this, 'only')) {
             $logContext['formData'] = $this->only([
-                'joined_at',
-                'personal_number',
-                'employment_type',
-                'profession',
-                'stage',
-                'probation_enum',
-                'probation_at',
-                'notice_at',
-                'notice_enum',
-                'leave_at'
+                'birthdate',
+                'ahv_number',
+                'nationality',
+                'hometown',
+                'religion',
+                'residence_permit'
             ]);
         }
 
@@ -64,6 +60,7 @@ trait HandleCatchError
         }
 
         $this->handleError($e, 'Aktualisieren der Personaldaten', [
+            'user_id' => $this->user?->id,
             'employee_id' => $this->employee?->id,
             'changed_fields' => $this->getChangedFieldsForLogging()
         ]);
@@ -75,6 +72,7 @@ trait HandleCatchError
     private function handleLoadingError(\Throwable $e): void
     {
         $this->handleError($e, 'Laden der Personaldaten', [
+            'user_exists' => $this->user !== null,
             'employee_exists' => $this->employee !== null
         ]);
     }
@@ -130,16 +128,12 @@ trait HandleCatchError
         $changedFields = [];
 
         $fields = [
-            'joined_at' => 'joinedAtHasChanged',
-            'personal_number' => 'personalNumberHasChanged',
-            'employment_type' => 'employmentTypeHasChanged',
-            'profession' => 'professionHasChanged',
-            'stage' => 'stageHasChanged',
-            'probation_enum' => 'probationEnumHasChanged',
-            'probation_at' => 'probationAtHasChanged',
-            'notice_at' => 'noticeAtHasChanged',
-            'notice_enum' => 'noticeEnumHasChanged',
-            'leave_at' => 'leaveAtHasChanged'
+            'birthdate' => 'birthdateHasChanged',
+            'ahv_number' => 'ahvNumberHasChanged',
+            'nationality' => 'nationalityHasChanged',
+            'hometown' => 'hometownHasChanged',
+            'religion' => 'religionHasChanged',
+            'residence_permit' => 'residencePermitHasChanged'
         ];
 
         foreach ($fields as $field => $method) {

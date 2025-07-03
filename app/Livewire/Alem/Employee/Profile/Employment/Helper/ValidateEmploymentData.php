@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 /**
  * Trait für die Fehlerbehandlung in der PersonalData Komponente.
  */
-trait ValidateEmployeementData
+trait ValidateEmploymentData
 {
     /**
      * Validiert nur die geänderten Felder

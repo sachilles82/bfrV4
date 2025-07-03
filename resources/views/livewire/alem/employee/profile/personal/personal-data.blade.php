@@ -10,7 +10,7 @@
     <x-slot name="form">
         <!-- Loading Overlay for the entire component -->
 
-        <form wire:submit.prevent="updateEmploymentData">
+        <form wire:submit.prevent="updatePersonalData">
             <div class="px-4 py-6 sm:p-8 relative">
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
@@ -68,29 +68,20 @@
                     <div class="sm:col-span-2">
                         <x-pupi.input.group
                             label="{{ __('Birthday') }}"
-                            for="residence_permit"
-                            model="residence_permit"
+                            for="birthday"
                             badge="{{ __('Required') }}"
-                            help-text="{{ __('') }}">
-
-                            <flux:select
-                                class="!mt-2"
-                                wire:model="residence_permit"
-                                name="residence_permit"
-                                id="residence_permit"
-                                variant="listbox"
-                                placeholder="{{ __('Select Residence Permit') }}">
-
-                                @foreach($this->residencePermitOptions() as $permitOption)
-                                    <flux:option
-                                        wire:key="residence-option-{{ $permitOption['value'] }}"
-                                        value="{{ $permitOption['value'] }}">
-                                        <span>{{ $permitOption['label'] }}</span>
-                                    </flux:option>
-                                @endforeach
-
-                            </flux:select>
-
+                            :error="$errors->first('birthday')"
+                            model="birthday"
+                            help-text="{{ __('') }}"
+                        >
+                            <flux:date-picker
+                                wire:model="birthday"
+                                id="birthday"
+                                type="date">
+                                <x-slot name="trigger">
+                                    <flux:date-picker.input class="mt-2"/>
+                                </x-slot>
+                            </flux:date-picker>
                         </x-pupi.input.group>
                     </div>
 
