@@ -3,7 +3,7 @@
 namespace App\Livewire\Alem\Employee\Profile\Employment;
 
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
-use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\ValidateEmploymentData;
+use App\Livewire\Alem\Employee\Profile\Employment\Helper\ValidateEmploymentData;
 use App\Livewire\Alem\Employee\Profile\Personal\Helper\HandleCatchError;
 use App\Models\Alem\Employee;
 use App\Models\User;
@@ -35,7 +35,7 @@ class Data extends Component
     public ?Employee $employee = null;
 
     /** Form fields */
-    public ?string $joined_at = null;
+    public ?string $joined_at = null;// was soll das sein? Angestellungsdatum?
     public ?string $personal_number = null;
     public ?string $employment_type = null;
     public ?int $profession = null;

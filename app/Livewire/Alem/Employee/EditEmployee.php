@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Alem\Employee;
 
-use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
 use App\Livewire\Alem\Employee\Helper\Secure\ValidateEmployee;
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
+use App\Livewire\Alem\Employee\Profile\Account\Helper\HandleCatchError;
 use App\Models\Alem\Employee;
 use App\Models\User;
 use App\Traits\Employee\EmployeeStatusOptions;

@@ -184,7 +184,33 @@ trait ValidatePersonalData
      */
     private function birthdateHasChanged(): bool
     {
-        return $this->birthdate !== ($this->originalData['birthdate'] ?? '');
+        // Normalisiere beide Werte für den Vergleich
+        $originalBirthdate = $this->normalizeDate($this->originalData['birthdate'] ?? null);
+        $currentBirthdate = $this->normalizeDate($this->birthdate);
+
+        return $originalBirthdate !== $currentBirthdate;
+    }
+
+    /**
+     * Normalisiert ein Datum für den Vergleich
+     */
+    private function normalizeDate($date): ?string
+    {
+        if (empty($date)) {
+            return null;
+        }
+
+        // Wenn es ein Carbon/DateTime Objekt ist
+        if ($date instanceof \DateTime) {
+            return $date->format('Y-m-d');
+        }
+
+        // Wenn es ein String ist, parse und formatiere es
+        try {
+            return \Carbon\Carbon::parse($date)->format('Y-m-d');
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**

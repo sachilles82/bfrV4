@@ -1,10 +1,10 @@
 <x-pupi.layout.form>
     <x-slot:title>
-        {{ __('Employee Employment Data') }}
+        {{ __('Personal Data') }}
     </x-slot:title>
 
     <x-slot:description>
-        {{ __('Update the employment data') }}
+        {{ __('Update the personal data') }}
     </x-slot:description>
 
     <x-slot name="form">
@@ -22,7 +22,7 @@
                         </div>
 
                         <!-- Nationality Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
+                        <div class="sm:col-span-4">
                             <div class="space-y-2">
                                 <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
@@ -30,7 +30,7 @@
                         </div>
 
                         <!-- Hometown Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
+                        <div class="sm:col-span-2">
                             <div class="space-y-2">
                                 <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
@@ -52,17 +52,8 @@
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
                             </div>
                         </div>
-
-                        <!-- Civil Status Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 w-22 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-
                         <!-- Residence Permit Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
+                        <div class="sm:col-span-4">
                             <div class="space-y-2">
                                 <div class="h-4 w-28 rounded bg-gray-200 dark:bg-gray-700"></div>
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>

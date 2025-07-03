@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Account;
 
-use App\Livewire\Alem\Employee\Helper\Secure\HandleCatchError;
+use App\Livewire\Alem\Employee\Profile\Account\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Profile\Account\Helper\ValidateAccountDetails;
 use App\Models\User;
 use App\Traits\Enum\GenderOptions;
