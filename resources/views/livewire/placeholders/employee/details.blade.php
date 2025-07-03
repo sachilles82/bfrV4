@@ -1,10 +1,10 @@
 <x-pupi.layout.form>
     <x-slot:title>
-        {{ __('User Account Details') }}
+        {{ __('Account Details') }}
     </x-slot:title>
 
     <x-slot:description>
-        {{ __('Update the user information below.') }}
+        {{ __('Update the employee account details.') }}
     </x-slot:description>
 
     <x-slot name="form">

@@ -63,47 +63,17 @@ trait ValidateAccountDetails
             }
         }
 
-        // Teams
-        if ($this->teamsHaveChanged()) {
-            $rules['selectedTeams'] = ['required', 'array', 'min:1'];
-            $rules['selectedTeams.*'] = [
-                'integer',
-                Rule::in(array_column($this->teams, 'id'))
-            ];
+        // Phone 2 (optional, falls benötigt)
+        if ($this->phoneHasChanged()) {
+            if (!empty($this->phone_2)) {
+                $rules['phone_2'] = [
+                    'nullable',
+                    'string',
+                    'max:20',
+                    'regex:/^[\d\s\-\+\(\)]+$/'
+                ];
+            }
         }
-
-        // Department
-        if ($this->departmentHasChanged()) {
-            $rules['department'] = [
-                'required',
-                'integer',
-                Rule::in(array_column($this->departments, 'id'))
-            ];
-        }
-
-        // Supervisor
-        if ($this->supervisorHasChanged()) {
-            $rules['supervisor'] = [
-                'required',
-                'integer',
-                Rule::in(array_column($this->supervisors, 'id'))
-            ];
-        }
-
-        // Roles
-        if ($this->rolesHaveChanged()) {
-            $rules['selectedRoles'] = ['required', 'array', 'min:1'];
-            $rules['selectedRoles.*'] = [
-                'integer',
-                Rule::in(array_column($this->roles, 'id'))
-            ];
-        }
-
-        // Status
-        if ($this->statusHasChanged()) {
-            $rules['status'] = ['required', Rule::enum(EmployeeStatus::class)];
-        }
-
         // Model Status
         if ($this->modelStatusHasChanged()) {
             $rules['model_status'] = ['required', Rule::enum(ModelStatus::class)];
@@ -132,27 +102,12 @@ trait ValidateAccountDetails
                 'max:20',
                 'regex:/^[\d\s\-\+\(\)]+$/'
             ],
-            'selectedTeams' => ['required', 'array', 'min:1'],
-            'selectedTeams.*' => [
-                'integer',
-                Rule::in(array_column($this->teams, 'id'))
+            'phone_2' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[\d\s\-\+\(\)]+$/'
             ],
-            'department' => [
-                'required',
-                'integer',
-                Rule::in(array_column($this->departments, 'id'))
-            ],
-            'supervisor' => [
-                'required',
-                'integer',
-                Rule::in(array_column($this->supervisors, 'id'))
-            ],
-            'selectedRoles' => ['required', 'array', 'min:1'],
-            'selectedRoles.*' => [
-                'integer',
-                Rule::in(array_column($this->roles, 'id'))
-            ],
-            'status' => ['required', Rule::enum(EmployeeStatus::class)],
             'model_status' => ['required', Rule::enum(ModelStatus::class)]
         ];
     }
@@ -184,37 +139,13 @@ trait ValidateAccountDetails
             'phone_1.max' => __('Phone number must not exceed 20 characters.'),
             'phone_1.regex' => __('Phone number format is invalid.'),
 
+            'phone_2.string' => __('Phone number must be a string.'),
+            'phone_2.max' => __('Phone number must not exceed 20 characters.'),
+            'phone_2.regex' => __('Phone number format is invalid.'),
+
             // Model Status
             'model_status.required' => __('Account status is required.'),
             'model_status.enum' => __('The selected account status is invalid.'),
-
-            // Status
-            'status.required' => __('Employee status is required.'),
-            'status.enum' => __('The selected employee status is invalid.'),
-
-            // Department
-            'department.required' => __('Department is required.'),
-            'department.integer' => __('Department must be a number.'),
-            'department.in' => __('The selected department does not exist.'),
-
-            // Supervisor
-            'supervisor.required' => __('Supervisor is required.'),
-            'supervisor.integer' => __('Supervisor must be a number.'),
-            'supervisor.in' => __('The selected supervisor does not exist.'),
-
-            // Teams
-            'selectedTeams.required' => __('At least one team must be selected.'),
-            'selectedTeams.array' => __('Teams must be provided as a list.'),
-            'selectedTeams.min' => __('Please select at least one team.'),
-            'selectedTeams.*.integer' => __('Team ID must be a number.'),
-            'selectedTeams.*.in' => __('One of the selected teams is invalid.'),
-
-            // Roles
-            'selectedRoles.required' => __('At least one role must be selected.'),
-            'selectedRoles.array' => __('Roles must be provided as a list.'),
-            'selectedRoles.min' => __('Please select at least one role.'),
-            'selectedRoles.*.integer' => __('Role ID must be a number.'),
-            'selectedRoles.*.in' => __('One of the selected roles is invalid.'),
         ];
     }
 
@@ -254,24 +185,10 @@ trait ValidateAccountDetails
             ];
         }
 
-        if ($this->departmentHasChanged()) {
-            $changed['department_id'] = [
-                'old' => $this->originalData['department_id'] ?? null,
-                'new' => $this->department
-            ];
-        }
-
-        if ($this->supervisorHasChanged()) {
-            $changed['supervisor_id'] = [
-                'old' => $this->originalData['supervisor_id'] ?? null,
-                'new' => $this->supervisor
-            ];
-        }
-
-        if ($this->statusHasChanged()) {
-            $changed['status'] = [
-                'old' => $this->originalData['status'] ?? null,
-                'new' => $this->status
+        if ($this->phoneHasChanged()) {
+            $changed['phone_2'] = [
+                'old' => $this->originalData['phone_2'] ?? null,
+                'new' => $this->phone_2
             ];
         }
 
@@ -279,20 +196,6 @@ trait ValidateAccountDetails
             $changed['model_status'] = [
                 'old' => $this->originalData['model_status'] ?? null,
                 'new' => $this->model_status
-            ];
-        }
-
-        if ($this->teamsHaveChanged()) {
-            $changed['teams'] = [
-                'old' => $this->originalData['teamIds'] ?? [],
-                'new' => $this->selectedTeams
-            ];
-        }
-
-        if ($this->rolesHaveChanged()) {
-            $changed['roles'] = [
-                'old' => $this->originalData['roleIds'] ?? [],
-                'new' => $this->selectedRoles
             ];
         }
 
@@ -332,27 +235,11 @@ trait ValidateAccountDetails
     }
 
     /**
-     * Helper: Check ob Department geändert wurde
+     * Helper: Check ob Phone 2 geändert wurde
      */
-    private function departmentHasChanged(): bool
+    private function phone2HasChanged(): bool
     {
-        return $this->department !== ($this->originalData['department_id'] ?? null);
-    }
-
-    /**
-     * Helper: Check ob Supervisor geändert wurde
-     */
-    private function supervisorHasChanged(): bool
-    {
-        return $this->supervisor !== ($this->originalData['supervisor_id'] ?? null);
-    }
-
-    /**
-     * Helper: Check ob Status geändert wurde
-     */
-    private function statusHasChanged(): bool
-    {
-        return $this->status !== ($this->originalData['status'] ?? null);
+        return $this->phone_2 !== ($this->originalData['phone_2'] ?? '');
     }
 
     /**
@@ -394,28 +281,6 @@ trait ValidateAccountDetails
     }
 
     /**
-     * Helper: Check ob Teams geändert wurden
-     */
-    private function teamsHaveChanged(): bool
-    {
-        return $this->intArraysHaveChanged(
-            $this->originalData['teamIds'] ?? [],
-            $this->selectedTeams
-        );
-    }
-
-    /**
-     * Helper: Check ob Roles geändert wurden
-     */
-    private function rolesHaveChanged(): bool
-    {
-        return $this->intArraysHaveChanged(
-            $this->originalData['roleIds'] ?? [],
-            $this->selectedRoles
-        );
-    }
-
-    /**
      * Validiere einzelnes Feld on-the-fly (z.B. wire:blur)
      */
     public function validateField(string $fieldName): void
@@ -425,11 +290,7 @@ trait ValidateAccountDetails
             'name' => 'nameHasChanged',
             'email' => 'emailHasChanged',
             'phone_1' => 'phoneHasChanged',
-            'selectedTeams' => 'teamsHaveChanged',
-            'selectedRoles' => 'rolesHaveChanged',
-            'department' => 'departmentHasChanged',
-            'supervisor' => 'supervisorHasChanged',
-            'status' => 'statusHasChanged',
+            'phone_2' => 'phone2HasChanged',
             'model_status' => 'modelStatusHasChanged',
         ];
 
@@ -458,11 +319,7 @@ trait ValidateAccountDetails
             $this->nameHasChanged() ||
             $this->emailHasChanged() ||
             $this->phoneHasChanged() ||
-            $this->departmentHasChanged() ||
-            $this->supervisorHasChanged() ||
-            $this->modelStatusHasChanged() ||
-            $this->statusHasChanged() ||
-            $this->teamsHaveChanged() ||
-            $this->rolesHaveChanged();
+            $this->phone2HasChanged() ||
+            $this->modelStatusHasChanged();
     }
 }

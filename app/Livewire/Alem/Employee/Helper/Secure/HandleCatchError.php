@@ -34,15 +34,10 @@ trait HandleCatchError
                 'gender',
                 'name',
                 'email',
+                'phone_1',
+                'phone_2',
                 'model_status',
                 'joined_at',
-                'department',
-                'selectedTeams',
-                'selectedRoles',
-                'status',
-                'profession',
-                'stage',
-                'supervisor',
                 'invitation'
             ]);
         }

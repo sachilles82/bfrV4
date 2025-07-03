@@ -3,8 +3,6 @@
 namespace App\Livewire\Alem\Employee\Profile\Member\Helper;
 
 use App\Enums\Employee\EmployeeStatus;
-use App\Enums\Model\ModelStatus;
-use App\Enums\User\Gender;
 use Illuminate\Validation\Rule;
 
 trait ValidateMemberInformation
