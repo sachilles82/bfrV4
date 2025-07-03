@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Alem\Employee\Profile\EmploymentData;
 
-use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\EmployeeDataEnums;
 use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\ValidateEmploymentData;
+use App\Livewire\Alem\Employee\Profile\Personal\Helper\EmployeeDataEnums;
 use App\Models\Address\Country;
 use App\Models\Alem\Employee;
 use App\Traits\User\AuthUserTeamCompanyId;

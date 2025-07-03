@@ -68,15 +68,15 @@
                     <div class="sm:col-span-2">
                         <x-pupi.input.group
                             label="{{ __('Birthday') }}"
-                            for="birthday"
+                            for="birthdate"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('birthday')"
-                            model="birthday"
+                            :error="$errors->first('birthdate')"
+                            model="birthdate"
                             help-text="{{ __('') }}"
                         >
                             <flux:date-picker
-                                wire:model="birthday"
-                                id="birthday"
+                                wire:model="birthdate"
+                                id="birthdate"
                                 type="date">
                                 <x-slot name="trigger">
                                     <flux:date-picker.input class="mt-2"/>

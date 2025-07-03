@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Personal;
 
-use App\Livewire\Alem\Employee\Profile\EmploymentData\Helper\EmployeeDataEnums;
+use App\Livewire\Alem\Employee\Profile\Personal\Helper\EmployeeDataEnums;
 use App\Livewire\Alem\Employee\Profile\Personal\Helper\ValidatePersonalData;
 use App\Livewire\Alem\Employee\Profile\Personal\Helper\HandleCatchError;
 use App\Models\Address\Country;
@@ -29,7 +29,6 @@ class PersonalData extends Component
     #[Locked]
     public int $userId;
 
-    // Models should NOT be locked as they get updated
     public ?User $user = null;
     public ?Employee $employee = null;
 
@@ -54,15 +53,9 @@ class PersonalData extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade User mit birthdate
-        $this->user = User::select([
-            'id',
-            'birthdate',
-        ])
-            ->findOrFail($this->userId);
-
-        // Lade Employee Model mit allen benötigten Feldern
-        $this->employee = Employee::where('user_id', $this->userId)
+        // Lade Employee mit User Relation (BEST PRACTICE)
+        $this->employee = Employee::with(['user:id,birthdate'])
+            ->where('user_id', $this->userId)
             ->select([
                 'id',
                 'user_id',
@@ -73,6 +66,15 @@ class PersonalData extends Component
                 'residence_permit'
             ])
             ->first();
+
+        // Falls kein Employee existiert, lade nur den User
+        if (!$this->employee) {
+            $this->user = User::select(['id', 'birthdate'])
+                ->findOrFail($this->userId);
+        } else {
+            // User ist bereits über die Relation geladen
+            $this->user = $this->employee->user;
+        }
 
         $this->loadPersonalData();
         $this->loadCountries();
@@ -85,8 +87,9 @@ class PersonalData extends Component
     private function loadPersonalData(): void
     {
         // WICHTIG: Speichere Original-Daten in EINEM public Array
+        // Formatiere Dates konsistent als String
         $this->originalData = [
-            'birthdate' => $this->user->birthdate,
+            'birthdate' => $this->user?->birthdate?->format('Y-m-d'),
             'ahv_number' => $this->employee?->ahv_number,
             'nationality' => $this->employee?->nationality,
             'hometown' => $this->employee?->hometown,
@@ -95,7 +98,7 @@ class PersonalData extends Component
         ];
 
         // Setze Form-Felder
-        $this->birthdate = $this->user->birthdate;
+        $this->birthdate = $this->user?->birthdate?->format('Y-m-d') ?? '';
         $this->ahv_number = $this->employee?->ahv_number ?? '';
         $this->nationality = $this->employee?->nationality ?? '';
         $this->hometown = $this->employee?->hometown ?? '';
@@ -144,7 +147,9 @@ class PersonalData extends Component
             DB::transaction(function () {
                 // Update User birthdate wenn geändert
                 if ($this->birthdateHasChanged()) {
-                    $this->user->update(['birthdate' => $this->birthdate]);
+                    // Parse das Datum für die Datenbank
+                    $parsedDate = !empty($this->birthdate) ? \Carbon\Carbon::parse($this->birthdate)->format('Y-m-d') : null;
+                    $this->user->update(['birthdate' => $parsedDate]);
                 }
 
                 // Erstelle Update-Array nur mit geänderten Employee Feldern
