@@ -54,7 +54,7 @@ class Details extends Component
             ])
             ->findOrFail($this->userId);
 
-        $this->loadEmployeeData();
+        $this->loadEmployeeDetails();
 
 ////        // Lade Relation für Dropdown-Daten
 //        $this->loadRelationsData([
@@ -66,7 +66,7 @@ class Details extends Component
      * Befülle die Form mit User Employee Daten
      * Speichere Original-Daten aus der Datenbank für den Vergleich
      */
-    private function loadEmployeeData(): void
+    private function loadEmployeeDetails(): void
     {
         if (!$this->user) return;
 
@@ -95,7 +95,7 @@ class Details extends Component
      * Aktualisiert die Benutzer- und Mitarbeiterdaten in der Datenbank.
      * Validiert nur die geänderten Felder für bessere Performance
      */
-    public function updateEmployee(): void
+    public function updateEmployeeDetails(): void
     {
 
 

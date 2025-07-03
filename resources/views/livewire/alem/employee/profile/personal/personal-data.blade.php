@@ -1,289 +1,269 @@
 <x-pupi.layout.form>
     <x-slot:title>
-        {{ __('Employee Personal Data') }}
+        {{ __('Personal Data') }}
     </x-slot:title>
 
     <x-slot:description>
-        {{ __('Update the personal data information below.') }}
+        {{ __('Update the personal data') }}
     </x-slot:description>
 
     <x-slot name="form">
-        <form wire:submit.prevent="updatePersonalData">
-            <div class="px-4 py-6 sm:p-8">
+        <!-- Loading Overlay for the entire component -->
+
+        <form wire:submit.prevent="updateEmploymentData">
+            <div class="px-4 py-6 sm:p-8 relative">
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
-                    <!-- Personal Number -->
+                    <!-- AHV Number -->
                     <div class="sm:col-span-4">
                         <x-pupi.input.group
-                            label="{{ __('Personal Number') }}"
-                            for="personal_number"
-                            badge="{{ __('Optional') }}"
-                            :error="$errors->first('personal_number')"
-                            model="personal_number"
-                            help-text="{{ __('') }}">
+                            label="{{ __('AHV Number') }}"
+                            for="ahv_number"
+                            model="ahv_number"
+                            badge="{{ __('Required') }}"
+                            error="{{ $errors->first('ahv_number') }}">
 
                             <x-pupi.input.text
-                                wire:model="personal_number"
-                                id="personal_number"
-                                name="personal_number"
-                                placeholder="{{ __('P.Nr.123') }}"
+                                wire:model="ahv_number"
+                                x-mask="756.9999.9999.99"
+                                name="ahv_number"
+                                id="ahv_number"
+                                placeholder="{{ __('756.XXXX.XXXX.XX') }}"
                             />
+
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Profession -->
-                    <div class="sm:col-span-3">
+                    <!-- Residence Permit -->
+                    <div class="sm:col-span-4">
                         <x-pupi.input.group
-                            label="{{ __('Profession') }}"
-                            for="profession"
+                            label="{{ __('Residence Permit') }}"
+                            for="residence_permit"
+                            model="residence_permit"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('profession')"
-                            model="profession"
                             help-text="{{ __('') }}">
 
                             <flux:select
-                                class="mt-2"
-                                wire:model="profession"
-                                id="profession"
+                                class="!mt-2"
+                                wire:model="residence_permit"
+                                name="residence_permit"
+                                id="residence_permit"
                                 variant="listbox"
-                                searchable
-                                placeholder="{{ __('Select Profession') }}">
+                                placeholder="{{ __('Select Residence Permit') }}">
 
-                                @forelse($professions as $prof)
+                                @foreach($this->residencePermitOptions() as $permitOption)
                                     <flux:option
-                                        wire:key="profession-option-{{ $prof['id'] }}"
-                                        value="{{ $prof['id'] }}">
-                                        <span class="truncate">{{ $prof['name'] }}</span>
+                                        wire:key="residence-option-{{ $permitOption['value'] }}"
+                                        value="{{ $permitOption['value'] }}">
+                                        <span>{{ $permitOption['label'] }}</span>
                                     </flux:option>
-                                @empty
-                                    <flux:option value="">{{ __('No professions found') }}</flux:option>
-                                @endforelse
-
-                                <x-slot name="add">
-
-                                    <flux:modal.trigger
-                                        name="create-profession"
-                                        @click="$dispatch('open-profession-manager')"
-                                    >
-                                        <x-pupi.button.open-manager/>
-                                    </flux:modal.trigger>
-
-                                </x-slot>
+                                @endforeach
 
                             </flux:select>
 
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Stage -->
-                    <div class="sm:col-span-3">
+                    <!-- Birthday -->
+                    <div class="sm:col-span-2">
                         <x-pupi.input.group
-                            label="{{ __('Stage') }}"
-                            for="stage"
+                            label="{{ __('Birthday') }}"
+                            for="residence_permit"
+                            model="residence_permit"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('stage')"
-                            model="stage"
                             help-text="{{ __('') }}">
 
                             <flux:select
-                                class="mt-2"
-                                wire:model="stage"
-                                id="stage"
+                                class="!mt-2"
+                                wire:model="residence_permit"
+                                name="residence_permit"
+                                id="residence_permit"
                                 variant="listbox"
-                                searchable
-                                placeholder="{{ __('Select Stage') }}">
+                                placeholder="{{ __('Select Residence Permit') }}">
 
-                                @forelse($stages as $st)
+                                @foreach($this->residencePermitOptions() as $permitOption)
                                     <flux:option
-                                        wire:key="stage-option-{{ $st['id'] }}"
-                                        value="{{ $st['id'] }}">
-                                        <span class="truncate">{{ $st['name'] }}</span>
+                                        wire:key="residence-option-{{ $permitOption['value'] }}"
+                                        value="{{ $permitOption['value'] }}">
+                                        <span>{{ $permitOption['label'] }}</span>
                                     </flux:option>
-                                @empty
-                                    <flux:option value="">{{ __('No stages found') }}</flux:option>
-                                @endforelse
-
-                                <x-slot name="add">
-
-                                    <flux:modal.trigger
-                                        name="create-stage"
-                                        @click="$dispatch('open-stage-manager')"
-                                    >
-                                        <x-pupi.button.open-manager/>
-                                    </flux:modal.trigger>
-
-                                </x-slot>
+                                @endforeach
 
                             </flux:select>
 
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Employment Type -->
+                    <!-- Nationality -->
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
-                            label="{{ __('Employment Type') }}"
-                            for="employment_type"
+                            label="{{ __('Nationality') }}"
+                            for="nationality"
+                            model="nationality"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('employment_type')"
-                            model="employment_type"
-                            help-text="{{ __('') }}">
+                            error="{{ $errors->first('nationality') }}">
+
+                            <div class="relative mt-2">
+                                <flux:select
+                                    wire:model="nationality"
+                                    id="nationality"
+                                    name="nationality"
+                                    variant="listbox"
+                                    searchable
+                                    placeholder="{{ __('Select Country') }}">
+
+                                    @foreach ($countries as $country)
+                                        <flux:option
+                                            wire:key="country-option-{{ $country['code'] }}"
+                                            value="{{ $country['name'] }}">
+                                            <div class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
+                                                <img src="/flags/country-{{ strtolower($country['code']) }}.svg"
+                                                     class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-gray-800 text-gray-700 dark:text-gray-400">
+                                                <div class="px-2 truncate">
+                                                    {{ $country['name'] }}
+                                                </div>
+                                            </div>
+                                        </flux:option>
+                                    @endforeach
+
+                                </flux:select>
+                            </div>
+                        </x-pupi.input.group>
+                    </div>
+
+                    <!-- Hometown -->
+                    <div class="sm:col-span-3">
+                        <x-pupi.input.group
+                            label="{{ __('Hometown') }}"
+                            for="hometown"
+                            model="hometown"
+                            badge="{{ __('Required') }}"
+                            error="{{ $errors->first('hometown') }}">
 
                             <x-pupi.input.text
-                                wire:model="employment_type"
-                                id="employment_type"
-                                name="employment_type"
+                                wire:model="hometown"
+                                name="hometown"
+                                id="hometown"
                             />
+
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Joined Date -->
-                    <div class="sm:col-span-2 sm:col-start-1">
+                    <!-- Religion -->
+                    <div class="sm:col-span-4">
                         <x-pupi.input.group
-                            label="{{ __('Joined Date') }}"
-                            for="joined_at"
+                            label="{{ __('Religion') }}"
+                            for="religion"
+                            model="religion"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('joined_at')"
-                            model="joined_at"
                             help-text="{{ __('') }}">
 
-                            <flux:date-picker
-                                with-today
-                                wire:model="joined_at"
-                                id="joined_at"
-                                type="date">
-                                <x-slot name="trigger">
-                                    <flux:date-picker.input class="mt-2"/>
-                                </x-slot>
-                            </flux:date-picker>
-                        </x-pupi.input.group>
-                    </div>
+                            <flux:select
+                                class="!mt-2"
+                                wire:model="religion"
+                                name="religion"
+                                id="religion"
+                                variant="listbox"
+                                placeholder="{{ __('Select Religion') }}">
 
-                    <!-- Probation Period -->
-                    <div class="sm:col-span-2">
-                        <x-pupi.input.group
-                            label="{{ __('Probation Period') }}"
-                            for="probation_enum"
-                            badge="{{ __('Required') }}"
-                            :error="$errors->first('probation_enum')"
-                            model="probation_enum"
-                            help-text="{{ __('') }}">
-
-                            <flux:select class="mt-2"
-                                         wire:model="probation_enum"
-                                         id="probation_enum"
-                                         name="probation_enum"
-                                         variant="listbox"
-                                         placeholder="{{ __('Select Probation Period') }}">
-
-                                @foreach($this->probationOptions() as $probationOption)
+                                @foreach($this->religionOptions() as $religionOption)
                                     <flux:option
-                                        wire:key="probation-option-{{ $probationOption['value'] }}"
-                                        value="{{ $probationOption['value'] }}">
-                                        <span>{{ $probationOption['label'] }}</span>
+                                        wire:key="religion-option-{{ $religionOption['value'] }}"
+                                        value="{{ $religionOption['value'] }}">
+                                        <span>{{ $religionOption['label'] }}</span>
                                     </flux:option>
                                 @endforeach
+
                             </flux:select>
+
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- Probation End Date -->
-                    <div class="sm:col-span-2">
-                        <x-pupi.input.group
-                            label="{{ __('Probation End Date') }}"
-                            for="probation_at"
-                            badge="{{ __('Optional') }}"
-                            :error="$errors->first('probation_at')"
-                            model="probation_at"
-                            help-text="{{ __('') }}">
+                    <!-- Civil Status -->
+                    {{--                    <div class="sm:col-span-3">--}}
+                    {{--                        <x-pupi.input.group--}}
+                    {{--                            label="{{ __('Civil Status') }}"--}}
+                    {{--                            for="civil_status"--}}
+                    {{--                            badge="{{ __('Required') }}"--}}
+                    {{--                            model="civil_status"--}}
+                    {{--                            help-text="{{ __('') }}">--}}
 
-                            <flux:date-picker
-                                with-today
-                                wire:model="probation_at"
-                                id="probation_at"
-                                type="date">
-                                <x-slot name="trigger">
-                                    <flux:date-picker.input class="mt-2"/>
-                                </x-slot>
-                            </flux:date-picker>
-                        </x-pupi.input.group>
-                    </div>
+                    {{--                            <flux:select--}}
+                    {{--                                class="!mt-2"--}}
+                    {{--                                wire:model="civil_status"--}}
+                    {{--                                name="civil_status"--}}
+                    {{--                                id="civil_status"--}}
+                    {{--                                variant="listbox"--}}
+                    {{--                                placeholder="{{ __('Select Civil Status') }}">--}}
 
-                    <!-- Notice Date -->
-                    <div class="sm:col-span-2 sm:col-start-1">
-                        <x-pupi.input.group
-                            label="{{ __('Notice Date') }}"
-                            for="notice_at"
-                            badge="{{ __('Optional') }}"
-                            :error="$errors->first('notice_at')"
-                            model="notice_at"
-                            help-text="{{ __('') }}">
+                    {{--                                @foreach($this->civilStatusOptions() as $civilStatusOption)--}}
+                    {{--                                    <flux:option--}}
+                    {{--                                        wire:key="civilStatus-option-{{ $civilStatusOption['value'] }}"--}}
+                    {{--                                        value="{{ $civilStatusOption['value'] }}">--}}
+                    {{--                                        <span>{{ $civilStatusOption['label'] }}</span>--}}
+                    {{--                                    </flux:option>--}}
+                    {{--                                @endforeach--}}
 
-                            <flux:date-picker
-                                with-today
-                                wire:model="notice_at"
-                                id="notice_at"
-                                type="date">
-                                <x-slot name="trigger">
-                                    <flux:date-picker.input class="mt-2"/>
-                                </x-slot>
-                            </flux:date-picker>
-                        </x-pupi.input.group>
-                    </div>
+                    {{--                            </flux:select>--}}
 
-                    <!-- Notice Period -->
-                    <div class="sm:col-span-2">
-                        <x-pupi.input.group
-                            label="{{ __('Notice Period') }}"
-                            for="notice_enum"
-                            badge="{{ __('Optional') }}"
-                            :error="$errors->first('notice_enum')"
-                            model="notice_enum"
-                            help-text="{{ __('') }}">
+                    {{--                        </x-pupi.input.group>--}}
+                    {{--                    </div>--}}
 
-                            <flux:select class="mt-2"
-                                         wire:model="notice_enum"
-                                         id="notice_enum"
-                                         name="notice_enum"
-                                         variant="listbox"
-                                         placeholder="{{ __('Select Notice Period') }}">
+                    {{--                    <!-- Residence Permit -->--}}
+                    {{--                    <div class="sm:col-span-3">--}}
+                    {{--                        <x-pupi.input.group--}}
+                    {{--                            label="{{ __('Residence Permit') }}"--}}
+                    {{--                            for="residence_permit"--}}
+                    {{--                            model="residence_permit"--}}
+                    {{--                            badge="{{ __('Required') }}"--}}
+                    {{--                            help-text="{{ __('') }}">--}}
 
-                                @foreach($this->noticePeriodOptions() as $noticeOption)
-                                    <flux:option
-                                        wire:key="notice-option-{{ $noticeOption['value'] }}"
-                                        value="{{ $noticeOption['value'] }}">
-                                        <span>{{ $noticeOption['label'] }}</span>
-                                    </flux:option>
-                                @endforeach
-                            </flux:select>
-                        </x-pupi.input.group>
-                    </div>
+                    {{--                            <flux:select--}}
+                    {{--                                class="!mt-2"--}}
+                    {{--                                wire:model="residence_permit"--}}
+                    {{--                                name="residence_permit"--}}
+                    {{--                                id="residence_permit"--}}
+                    {{--                                variant="listbox"--}}
+                    {{--                                placeholder="{{ __('Select Residence Permit') }}">--}}
 
-                    <!-- Leave Date -->
-                    <div class="sm:col-span-2">
-                        <x-pupi.input.group
-                            label="{{ __('Leave Date') }}"
-                            for="leave_at"
-                            badge="{{ __('Optional') }}"
-                            :error="$errors->first('leave_at')"
-                            model="leave_at"
-                            help-text="{{ __('') }}">
+                    {{--                                @foreach($this->residencePermitOptions() as $permitOption)--}}
+                    {{--                                    <flux:option--}}
+                    {{--                                        wire:key="residence-option-{{ $permitOption['value'] }}"--}}
+                    {{--                                        value="{{ $permitOption['value'] }}">--}}
+                    {{--                                        <span>{{ $permitOption['label'] }}</span>--}}
+                    {{--                                    </flux:option>--}}
+                    {{--                                @endforeach--}}
 
-                            <flux:date-picker
-                                with-today
-                                wire:model="leave_at"
-                                id="leave_at"
-                                type="date">
-                                <x-slot name="trigger">
-                                    <flux:date-picker.input class="mt-2"/>
-                                </x-slot>
-                            </flux:date-picker>
-                        </x-pupi.input.group>
-                    </div>
+                    {{--                            </flux:select>--}}
+
+                    {{--                        </x-pupi.input.group>--}}
+                    {{--                    </div>--}}
+
+                    {{--                    <!-- Residence Permit Upload -->--}}
+                    {{--                    <div class="sm:col-span-3">--}}
+                    {{--                        <x-pupi.input.group--}}
+                    {{--                            label="{{ __('Residence Permit Upload') }}"--}}
+                    {{--                            for="residence_permit"--}}
+                    {{--                            model="residence_permit"--}}
+                    {{--                            badge="{{ __('Optional') }}"--}}
+                    {{--                            help-text="{{ __('') }}">--}}
+                    {{--                            <div class="col-span-full flex items-center gap-x-6 mt-2">--}}
+                    {{--                                <img--}}
+                    {{--                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"--}}
+                    {{--                                    alt="" class="h-8 w-8 flex-none rounded-lg bg-gray-800 object-cover">--}}
+                    {{--                                <div>--}}
+                    {{--                                    <button type="button"--}}
+                    {{--                                            class="rounded-md dark:bg-white/10 px-3 py-2 text-sm font-semibold dark:text-white shadow-xs dark:hover:bg-white/20 dark:ring-transparent bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">--}}
+                    {{--                                        Change Upload--}}
+                    {{--                                    </button>--}}
+                    {{--                                </div>--}}
+                    {{--                            </div>--}}
+
+                    {{--                        </x-pupi.input.group>--}}
+                    {{--                    </div>--}}
 
                 </div>
             </div>
-
             <!-- Button Container -->
             <x-pupi.button.container>
                 <x-pupi.button.fluxsubmit/>
