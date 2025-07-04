@@ -35,7 +35,7 @@ trait HandleCatchError
             $logContext['formData'] = $this->only([
                 'birthdate',
                 'ahv_number',
-                'nationality',
+                'country_id',
                 'hometown',
                 'religion',
                 'residence_permit'
@@ -130,7 +130,7 @@ trait HandleCatchError
         $fields = [
             'birthdate' => 'birthdateHasChanged',
             'ahv_number' => 'ahvNumberHasChanged',
-            'nationality' => 'nationalityHasChanged',
+            'country_id' => 'countryIdHasChanged',
             'hometown' => 'hometownHasChanged',
             'religion' => 'religionHasChanged',
             'residence_permit' => 'residencePermitHasChanged'

@@ -7,6 +7,7 @@ use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
+use App\Models\Address\Country;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,7 +35,7 @@ class Employee extends Model
 
         // Employment Data
         'ahv_number',
-        'nationality',
+        'country_id',
         'hometown',
         'religion',
         'civil_status',
@@ -91,6 +92,14 @@ class Employee extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Country Relation
+     */
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
 }

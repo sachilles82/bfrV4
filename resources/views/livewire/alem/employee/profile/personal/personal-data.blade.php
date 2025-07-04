@@ -89,29 +89,30 @@
                     <div class="sm:col-span-3">
                         <x-pupi.input.group
                             label="{{ __('Nationality') }}"
-                            for="nationality"
-                            model="nationality"
+                            for="country_id"
+                            model="country_id"
                             badge="{{ __('Required') }}"
-                            error="{{ $errors->first('nationality') }}">
+                            error="{{ $errors->first('country_id') }}">
 
                             <div class="relative mt-2">
                                 <flux:select
-                                    wire:model="nationality"
-                                    id="nationality"
-                                    name="nationality"
+                                    wire:model="country_id"
+                                    id="country_id"
+                                    name="country_id"
                                     variant="listbox"
                                     searchable
                                     placeholder="{{ __('Select Country') }}">
 
-                                    @foreach ($countries as $country)
+                                    @foreach ($this->countries as $country)
                                         <flux:option
-                                            wire:key="country-option-{{ $country['code'] }}"
-                                            value="{{ $country['name'] }}">
+                                            wire:key="country-{{ $country->id }}"
+                                            value="{{ $country->id }}">
                                             <div class="text-gray-800 dark:text-white truncate px-2 py-0 my-0.5 flex items-center">
-                                                <img src="/flags/country-{{ strtolower($country['code']) }}.svg"
-                                                     class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-gray-800 text-gray-700 dark:text-gray-400">
+                                                <img src="/flags/country-{{ strtolower($country->code) }}.svg"
+                                                     class="h-5 w-5 me-2 flex-none rounded-b-2xl shadow-md dark:shadow-sm-light object-cover ring-1 ring-gray-700/20 dark:ring-white/10 bg-gray-500 dark:bg-gray-800 text-gray-700 dark:text-gray-400"
+                                                     alt="{{ $country->name }} flag">
                                                 <div class="px-2 truncate">
-                                                    {{ $country['name'] }}
+                                                    {{ $country->name }}
                                                 </div>
                                             </div>
                                         </flux:option>

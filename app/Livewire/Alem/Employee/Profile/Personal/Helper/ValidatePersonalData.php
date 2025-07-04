@@ -45,13 +45,12 @@ trait ValidatePersonalData
             ];
         }
 
-        // Nationality
-        if ($this->nationalityHasChanged()) {
-            $rules['nationality'] = [
+        // Country ID
+        if ($this->countryIdHasChanged()) {
+            $rules['country_id'] = [
                 'nullable',
-                'string',
-                'max:3',
-                Rule::in(array_column($this->countries ?? [], 'code'))
+                'integer',
+                'exists:countries,id'
             ];
         }
 
@@ -85,11 +84,10 @@ trait ValidatePersonalData
                 'string',
                 'regex:/^756\.\d{4}\.\d{4}\.\d{2}$/'
             ],
-            'nationality' => [
+            'country_id' => [
                 'nullable',
-                'string',
-                'max:3',
-                Rule::in(array_column($this->countries ?? [], 'code'))
+                'integer',
+                'exists:countries,id'
             ],
             'hometown' => 'nullable|string|max:255',
             'religion' => ['nullable', Rule::enum(Religion::class)],
@@ -111,10 +109,9 @@ trait ValidatePersonalData
             'ahv_number.string' => __('The AHV number must be a string.'),
             'ahv_number.regex' => __('The AHV number format is invalid. Format: 756.1234.5678.90'),
 
-            // Nationality
-            'nationality.string' => __('The nationality must be a string.'),
-            'nationality.max' => __('The nationality code must not exceed 3 characters.'),
-            'nationality.in' => __('The selected nationality is invalid.'),
+            // Country ID
+            'country_id.integer' => __('The country must be a valid selection.'),
+            'country_id.exists' => __('The selected country is invalid.'),
 
             // Hometown
             'hometown.string' => __('The hometown must be a string.'),
@@ -149,10 +146,10 @@ trait ValidatePersonalData
             ];
         }
 
-        if ($this->nationalityHasChanged()) {
-            $changed['nationality'] = [
-                'old' => $this->originalData['nationality'] ?? null,
-                'new' => $this->nationality
+        if ($this->countryIdHasChanged()) {
+            $changed['country_id'] = [
+                'old' => $this->originalData['country_id'] ?? null,
+                'new' => $this->country_id
             ];
         }
 
@@ -223,11 +220,12 @@ trait ValidatePersonalData
     }
 
     /**
-     * Helper: Check ob Nationality geändert wurde
+     * Helper: Prüft ob country_id geändert wurde
      */
-    private function nationalityHasChanged(): bool
+    private function countryIdHasChanged(): bool
     {
-        return $this->nationality !== ($this->originalData['nationality'] ?? '');
+        // Vergleiche als Integer, da country_id nullable sein kann
+        return (int) $this->country_id !== (int) ($this->originalData['country_id'] ?? 0);
     }
 
     /**
@@ -261,7 +259,7 @@ trait ValidatePersonalData
     {
         return $this->birthdateHasChanged() ||
             $this->ahvNumberHasChanged() ||
-            $this->nationalityHasChanged() ||
+            $this->countryIdHasChanged() ||
             $this->hometownHasChanged() ||
             $this->religionHasChanged() ||
             $this->residencePermitHasChanged();
@@ -275,7 +273,7 @@ trait ValidatePersonalData
         $fieldMapping = [
             'birthdate' => 'birthdateHasChanged',
             'ahv_number' => 'ahvNumberHasChanged',
-            'nationality' => 'nationalityHasChanged',
+            'country_id' => 'countryIdHasChanged',
             'hometown' => 'hometownHasChanged',
             'religion' => 'religionHasChanged',
             'residence_permit' => 'residencePermitHasChanged',

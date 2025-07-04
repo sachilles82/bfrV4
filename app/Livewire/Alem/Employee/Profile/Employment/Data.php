@@ -14,6 +14,7 @@ use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
@@ -56,27 +57,10 @@ class Data extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-//        // Lade User mit joined_at
-        $this->user = User::select([
-            'id',
-            'joined_at',
+
+        $this->employee = Employee::with([
+            'user:id,joined_at'
         ])
-            ->findOrFail($this->userId);
-
-//        $this->employee = Employee::with(['user:id,joined_at'])
-//            ->where('user_id', $this->userId)
-//            ->select([
-//                'id',
-//                'user_id',
-//                'ahv_number',
-//                'nationality',
-//                'hometown',
-//                'religion',
-//                'residence_permit'
-//            ])
-//            ->first();
-
-        $this->employee = Employee::with(['user:id'])
             ->where('user_id', $this->userId)
             ->select([
                 'id',
@@ -89,18 +73,40 @@ class Data extends Component
             ])
             ->first();
 
-//        // Lade Employee Model mit allen benötigten Feldern
-//        $this->employee = Employee::where('user_id', $this->userId)
+//        $this->employee = Cache::remember(
+//            key: "employee:{$userId}:with-user",
+//            ttl: now()->addMinutes(15),
+//            callback: fn() => Employee::with(['user:id,joined_at'])
+//                ->where('user_id', $userId)
+//                ->select([
+//                    'id',
+//                    'user_id',
+//                    'ahv_number',
+//                    'nationality',
+//                    'hometown',
+//                    'religion',
+//                    'residence_permit'
+//                ])
+//                ->first()
+//        );
+
+        //        // Lade User mit joined_at
+//        $this->user = User::select([
+//            'id',
+//            'joined_at',
+//        ])
+//            ->findOrFail($this->userId);
+//
+//        $this->employee = Employee::with(['user:id'])
+//            ->where('user_id', $this->userId)
 //            ->select([
 //                'id',
 //                'user_id',
-//                'personal_number',
-//                'employment_type',
-//                'probation_enum',
-//                'probation_at',
-//                'notice_at',
-//                'notice_enum',
-//                'leave_at'
+//                'ahv_number',
+//                'nationality',
+//                'hometown',
+//                'religion',
+//                'residence_permit'
 //            ])
 //            ->first();
 
@@ -131,7 +137,7 @@ class Data extends Component
         ];
 
         // Setze Form-Felder
-        $this->joined_at =  $this->user?->joined_at?->format('Y-m-d') ?? '';
+        $this->joined_at = $this->user?->joined_at?->format('Y-m-d') ?? '';
         $this->personal_number = $this->originalData['personal_number'] ?? '';
         $this->employment_type = $this->originalData['employment_type'] ?? '';
         $this->probation_enum = $this->originalData['probation_enum'];

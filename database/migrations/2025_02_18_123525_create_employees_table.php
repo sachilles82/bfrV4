@@ -28,7 +28,7 @@ return new class extends Migration {
             $table->date('leave_at')->nullable();
 
             $table->string('ahv_number')->nullable();
-            $table->string('nationality')->nullable();
+            $table->foreignId('country_id')->nullable()->constrained('countries')->cascadeOnDelete();
             $table->string('hometown')->nullable();
             $table->string('religion')->nullable();
             $table->string('civil_status')->nullable();
