@@ -56,31 +56,53 @@ class Data extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade User mit joined_at
+//        // Lade User mit joined_at
         $this->user = User::select([
             'id',
             'joined_at',
-            'company_id',
-            'current_team_id',
-            'profession_id',
-            'stage_id',
         ])
             ->findOrFail($this->userId);
 
-        // Lade Employee Model mit allen benötigten Feldern
-        $this->employee = Employee::where('user_id', $this->userId)
+//        $this->employee = Employee::with(['user:id,joined_at'])
+//            ->where('user_id', $this->userId)
+//            ->select([
+//                'id',
+//                'user_id',
+//                'ahv_number',
+//                'nationality',
+//                'hometown',
+//                'religion',
+//                'residence_permit'
+//            ])
+//            ->first();
+
+        $this->employee = Employee::with(['user:id'])
+            ->where('user_id', $this->userId)
             ->select([
                 'id',
                 'user_id',
-                'personal_number',
-                'employment_type',
-                'probation_enum',
-                'probation_at',
-                'notice_at',
-                'notice_enum',
-                'leave_at'
+                'ahv_number',
+                'nationality',
+                'hometown',
+                'religion',
+                'residence_permit'
             ])
             ->first();
+
+//        // Lade Employee Model mit allen benötigten Feldern
+//        $this->employee = Employee::where('user_id', $this->userId)
+//            ->select([
+//                'id',
+//                'user_id',
+//                'personal_number',
+//                'employment_type',
+//                'probation_enum',
+//                'probation_at',
+//                'notice_at',
+//                'notice_enum',
+//                'leave_at'
+//            ])
+//            ->first();
 
         $this->loadPersonalData();
 
@@ -98,11 +120,9 @@ class Data extends Component
     {
         // Original-Daten speichern
         $this->originalData = [
-            'joined_at' => $this->user->joined_at?->format('Y-m-d'),
+            'joined_at' => $this->user?->joined_at?->format('Y-m-d'),
             'personal_number' => $this->employee?->personal_number,
             'employment_type' => $this->employee?->employment_type,
-            'profession_id' => $this->user->profession_id,
-            'stage_id' => $this->user->stage_id,
             'probation_enum' => $this->employee?->probation_enum?->value,
             'probation_at' => $this->employee?->probation_at?->format('Y-m-d'),
             'notice_at' => $this->employee?->notice_at?->format('Y-m-d'),
@@ -111,11 +131,9 @@ class Data extends Component
         ];
 
         // Setze Form-Felder
-        $this->joined_at = $this->originalData['joined_at'] ?? '';
+        $this->joined_at =  $this->user?->joined_at?->format('Y-m-d') ?? '';
         $this->personal_number = $this->originalData['personal_number'] ?? '';
         $this->employment_type = $this->originalData['employment_type'] ?? '';
-        $this->profession = $this->originalData['profession_id'];
-        $this->stage = $this->originalData['stage_id'];
         $this->probation_enum = $this->originalData['probation_enum'];
         $this->probation_at = $this->originalData['probation_at'] ?? '';
         $this->notice_at = $this->originalData['notice_at'] ?? '';

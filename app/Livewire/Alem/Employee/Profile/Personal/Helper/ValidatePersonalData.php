@@ -4,6 +4,7 @@ namespace App\Livewire\Alem\Employee\Profile\Personal\Helper;
 
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 trait ValidatePersonalData
@@ -207,7 +208,7 @@ trait ValidatePersonalData
 
         // Wenn es ein String ist, parse und formatiere es
         try {
-            return \Carbon\Carbon::parse($date)->format('Y-m-d');
+            return Carbon::parse($date)->format('Y-m-d');
         } catch (\Exception $e) {
             return null;
         }
