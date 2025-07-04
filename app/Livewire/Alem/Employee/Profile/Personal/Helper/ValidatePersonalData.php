@@ -45,12 +45,12 @@ trait ValidatePersonalData
             ];
         }
 
-        // Country ID
+        // Country ID - Nutzt gecachte Countries Collection
         if ($this->countryIdHasChanged()) {
             $rules['country_id'] = [
                 'nullable',
                 'integer',
-                'exists:countries,id'
+                Rule::in($this->countries->pluck('id')->toArray())
             ];
         }
 
@@ -87,7 +87,7 @@ trait ValidatePersonalData
             'country_id' => [
                 'nullable',
                 'integer',
-                'exists:countries,id'
+                Rule::in($this->countries->pluck('id')->toArray())
             ],
             'hometown' => 'nullable|string|max:255',
             'religion' => ['nullable', Rule::enum(Religion::class)],
@@ -111,7 +111,7 @@ trait ValidatePersonalData
 
             // Country ID
             'country_id.integer' => __('The country must be a valid selection.'),
-            'country_id.exists' => __('The selected country is invalid.'),
+            'country_id.in' => __('The selected country is invalid.'),
 
             // Hometown
             'hometown.string' => __('The hometown must be a string.'),
@@ -178,7 +178,7 @@ trait ValidatePersonalData
     }
 
     /**
-     * Helper: Check ob Birthdate geändert wurde
+     * Helper: Für Date Formate: Nutze für alle Daten ähnlich wie Birthdate. Check ob Birthdate geändert wurde
      */
     private function birthdateHasChanged(): bool
     {
@@ -220,12 +220,11 @@ trait ValidatePersonalData
     }
 
     /**
-     * Helper: Prüft ob country_id geändert wurde
+     * Helper: Check ob country_id geändert wurde
      */
     private function countryIdHasChanged(): bool
     {
-        // Vergleiche als Integer, da country_id nullable sein kann
-        return (int) $this->country_id !== (int) ($this->originalData['country_id'] ?? 0);
+        return $this->country_id !== ($this->originalData['country_id'] ?? null);
     }
 
     /**

@@ -91,24 +91,27 @@ class Data extends Component
 //        );
 
         //        // Lade User mit joined_at
-//        $this->user = User::select([
-//            'id',
-//            'joined_at',
-//        ])
-//            ->findOrFail($this->userId);
-//
-//        $this->employee = Employee::with(['user:id'])
-//            ->where('user_id', $this->userId)
-//            ->select([
-//                'id',
-//                'user_id',
-//                'ahv_number',
-//                'nationality',
-//                'hometown',
-//                'religion',
-//                'residence_permit'
-//            ])
-//            ->first();
+        $this->user = User::select([
+            'id',
+            'birthdate',
+        ])
+            ->findOrFail($this->userId);
+
+        $this->employee = Employee::with([
+            'user:id,birthdate',
+            'country:id,name,code'
+        ])
+            ->where('user_id', $this->userId)
+            ->select([
+                'id',
+                'user_id',
+                'ahv_number',
+                'country_id',
+                'hometown',
+                'religion',
+                'residence_permit'
+            ])
+            ->first();
 
         $this->loadPersonalData();
 

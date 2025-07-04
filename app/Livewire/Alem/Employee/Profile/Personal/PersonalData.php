@@ -30,9 +30,6 @@ class PersonalData extends Component
     #[Locked]
     public int $userId;
 
-    public ?User $user = null;
-    public ?Employee $employee = null;
-
     /** Employee form fields */
     public ?string $ahv_number = null;
     public ?string $residence_permit = null;
@@ -51,37 +48,52 @@ class PersonalData extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade Employee mit User und Country Relation
-        $this->employee = Employee::with([
+        $this->loadPersonalData();
+    }
+
+    /**
+     * Employee als Computed Property
+     * Wird automatisch gecached und nach Validation Error neu geladen
+     */
+    #[Computed]
+    public function employee(): ?Employee
+    {
+        return Employee::with([
             'user:id,birthdate',
-            'country:id,name,code' // Lade Country Relation
+            'country:id,name,code'
         ])
             ->where('user_id', $this->userId)
             ->select([
                 'id',
                 'user_id',
                 'ahv_number',
-                'country_id', // Foreign Key
+                'country_id',
                 'hometown',
                 'religion',
                 'residence_permit'
             ])
             ->first();
-
-        // Falls kein Employee existiert, lade nur den User
-        if (!$this->employee) {
-            $this->user = User::select(['id', 'birthdate'])
-                ->findOrFail($this->userId);
-        } else {
-            $this->user = $this->employee->user;
-        }
-
-        $this->loadPersonalData();
     }
 
     /**
-     * Countries als Computed Property - wird nur einmal pro Request geladen
-     * und automatisch gecached von Livewire
+     * User als Computed Property
+     * Lädt User entweder über Employee Relation oder direkt
+     */
+    #[Computed]
+    public function user(): User
+    {
+        // Wenn Employee existiert, nutze die Relation
+        if ($this->employee && $this->employee->relationLoaded('user')) {
+            return $this->employee->user;
+        }
+
+        // Sonst lade User direkt
+        return User::select(['id', 'birthdate'])
+            ->findOrFail($this->userId);
+    }
+
+    /**
+     * Countries als Computed Property
      */
     #[Computed(cache: true)]
     public function countries(): Collection
@@ -94,30 +106,28 @@ class PersonalData extends Component
      */
     private function loadPersonalData(): void
     {
+        // Nutze Computed Properties - werden automatisch geladen
+        $user = $this->user;
+        $employee = $this->employee;
+
+        $userBirthdate = $user?->birthdate?->format('Y-m-d');
+
         $this->originalData = [
-            'birthdate' => $this->user?->birthdate?->format('Y-m-d'),
-            'ahv_number' => $this->employee?->ahv_number,
-            'country_id' => $this->employee?->country_id, // Foreign Key
-            'hometown' => $this->employee?->hometown,
-            'religion' => $this->employee?->religion?->value,
-            'residence_permit' => $this->employee?->residence_permit?->value,
+            'birthdate' => $userBirthdate,
+            'ahv_number' => $employee?->ahv_number,
+            'country_id' => $employee?->country_id,
+            'hometown' => $employee?->hometown,
+            'religion' => $employee?->religion?->value,
+            'residence_permit' => $employee?->residence_permit?->value,
         ];
 
         // Setze Form-Felder
-        $this->birthdate = $this->user?->birthdate?->format('Y-m-d') ?? '';
-        $this->ahv_number = $this->employee?->ahv_number ?? '';
-        $this->country_id = $this->employee?->country_id; // Foreign Key
-        $this->hometown = $this->employee?->hometown ?? '';
-        $this->religion = $this->employee?->religion?->value;
-        $this->residence_permit = $this->employee?->residence_permit?->value;
-    }
-
-    /**
-     * Helper: Prüft ob country_id geändert wurde
-     */
-    private function countryIdHasChanged(): bool
-    {
-        return $this->country_id != $this->originalData['country_id'];
+        $this->birthdate = $userBirthdate ?? '';
+        $this->ahv_number = $employee?->ahv_number ?? '';
+        $this->country_id = $employee?->country_id;
+        $this->hometown = $employee?->hometown ?? '';
+        $this->religion = $employee?->religion?->value;
+        $this->residence_permit = $employee?->residence_permit?->value;
     }
 
     /**
@@ -141,10 +151,12 @@ class PersonalData extends Component
         try {
             DB::transaction(function () {
                 // Update User birthdate wenn geändert
+                // Computed Property lädt User automatisch falls nötig
                 if ($this->birthdateHasChanged()) {
                     $parsedDate = !empty($this->birthdate)
                         ? \Carbon\Carbon::parse($this->birthdate)->format('Y-m-d')
                         : null;
+
                     $this->user->update(['birthdate' => $parsedDate]);
                 }
 
@@ -167,6 +179,7 @@ class PersonalData extends Component
                     $updateData['residence_permit'] = $this->residence_permit;
                 }
 
+                // Nutze Computed Property für Employee
                 if ($this->employee) {
                     // Update nur wenn Felder geändert wurden
                     if (!empty($updateData)) {
@@ -175,10 +188,13 @@ class PersonalData extends Component
                 } else {
                     // Erstelle neuen Employee Record nur wenn es Employee-Daten gibt
                     if (!empty($updateData)) {
-                        $this->employee = Employee::create([
+                        Employee::create([
                             'user_id' => $this->userId,
                             ...$updateData
                         ]);
+
+                        // WICHTIG: Clear Computed Property Cache nach Create
+                        unset($this->employee);
                     }
                 }
             });
