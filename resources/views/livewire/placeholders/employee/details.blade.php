@@ -31,15 +31,7 @@
                         </div>
 
                         <!-- First Name Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-
-                        <!-- Last Name Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
+                        <div class="sm:col-span-5">
                             <div class="space-y-2">
                                 <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
@@ -78,26 +70,10 @@
                             </div>
                         </div>
 
-                        <!-- Supervisor Field Skeleton (col-span-3) -->
+                        <!-- Department Field Skeleton (col-span-3) -->
                         <div class="sm:col-span-3">
                             <div class="space-y-2">
                                 <div class="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-
-                        <!-- Roles Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
-                                <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
-                            </div>
-                        </div>
-
-                        <!-- Account Status Field Skeleton (col-span-3) -->
-                        <div class="sm:col-span-3">
-                            <div class="space-y-2">
-                                <div class="h-4 w-25 rounded bg-gray-200 dark:bg-gray-700"></div>
                                 <div class="h-10 w-full rounded-md bg-gray-200 dark:bg-gray-700"></div>
                             </div>
                         </div>
