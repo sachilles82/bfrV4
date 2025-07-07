@@ -7,146 +7,72 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Trait für die Fehlerbehandlung in der PersonalData Komponente.
+ * Minimaler Trait für die Fehlerbehandlung beim Editieren
  */
 trait HandleCatchError
 {
     /**
-     * Generische Fehlerbehandlung für alle Operationen
-     */
-    private function handleError(\Throwable $e, string $operation = 'processing', array $context = []): void
-    {
-        // Basis-Kontext für Logging
-        $logContext = [
-            'exception' => $e,
-            'acting_user_id' => $this->authUserId ?? auth()->id(),
-            'target_user_id' => $this->userId,
-            'operation' => $operation,
-            'component' => 'PersonalData'
-        ];
-
-        // Füge zusätzlichen Kontext hinzu wenn vorhanden
-        if (!empty($context)) {
-            $logContext['context'] = $context;
-        }
-
-        // Füge Personal-spezifische Formulardaten hinzu
-        if (method_exists($this, 'only')) {
-            $logContext['formData'] = $this->only([
-                'joined_at',
-                'personal_number',
-                'prob_period',
-                'probation_at',
-                'notice_at',
-                'notice_period',
-                'leave_at',
-                'status',
-            ]);
-        }
-
-        Log::error("Fehler beim {$operation}: {$e->getMessage()}", $logContext);
-
-        // Zeige benutzerfreundliche Meldung
-        $this->showErrorToast($operation);
-    }
-
-    /**
-     * Spezifische Methode für Update-Fehler bei Personal Data
-     * @throws \Throwable
+     * Behandelt Fehler beim Speichern/Editieren
      */
     private function handleEditingError(\Throwable $e): void
     {
-        // Prüfe ob eine Transaktion aktiv ist bevor Rollback
+        // 1. Rollback der Datenbank-Transaktion
         if (DB::transactionLevel() > 0) {
             DB::rollBack();
         }
 
-        $this->handleError($e, 'Aktualisieren der Personaldaten', [
-            'employee_id' => $this->employee?->id,
-            'changed_fields' => $this->getChangedFieldsForLogging()
-        ]);
-    }
-
-    /**
-     * Spezifische Methode für Lade-Fehler
-     */
-    private function handleLoadingError(\Throwable $e): void
-    {
-        $this->handleError($e, 'Laden der Personaldaten', [
-            'employee_exists' => $this->employee !== null
-        ]);
-    }
-
-    /**
-     * Fehlerbehandlung für Validierungsfehler
-     */
-    private function handleValidationError(\Throwable $e): void
-    {
-        $this->handleError($e, 'Validierung der Personaldaten', [
-            'validation_errors' => $this->getErrorBag()->toArray()
-        ]);
-    }
-
-    /**
-     * Zeige Error Toast basierend auf Operation
-     */
-    private function showErrorToast(string $operation): void
-    {
-        $messages = [
-            'Aktualisieren der Personaldaten' => [
-                'text' => __('An error occurred while updating personal data.'),
-                'heading' => __('Update Error')
-            ],
-            'Laden der Personaldaten' => [
-                'text' => __('An error occurred while loading personal data.'),
-                'heading' => __('Loading Error')
-            ],
-            'Validierung der Personaldaten' => [
-                'text' => __('Please check your input and try again.'),
-                'heading' => __('Validation Error')
-            ],
-            'processing' => [
-                'text' => __('An unexpected error occurred. Please try again.'),
-                'heading' => __('Error')
-            ]
-        ];
-
-        $message = $messages[$operation] ?? $messages['processing'];
-
-        Flux::toast(
-            text: $message['text'],
-            heading: $message['heading'],
-            variant: 'danger'
-        );
-    }
-
-    /**
-     * Hilfsmethode um geänderte Felder für Logging zu sammeln
-     */
-    private function getChangedFieldsForLogging(): array
-    {
+        // 2. Finde heraus, welche Felder geändert wurden
         $changedFields = [];
-
-        $fields = [
-            'joined_at' => 'joinedAtHasChanged',
-            'personal_number' => 'personalNumberHasChanged',
-            'employment_type' => 'employmentTypeHasChanged',
-            'profession' => 'professionHasChanged',
-            'stage' => 'stageHasChanged',
-            'prob_period' => 'probationEnumHasChanged',
-            'probation_at' => 'probationAtHasChanged',
-            'notice_at' => 'noticeAtHasChanged',
-            'notice_period' => 'noticeEnumHasChanged',
-            'leave_at' => 'leaveAtHasChanged'
-        ];
-
-        foreach ($fields as $field => $method) {
-            if (method_exists($this, $method) && $this->$method()) {
-                $changedFields[] = $field;
+        if (method_exists($this, 'getChangedFields')) {
+            try {
+                $changedFields = $this->getChangedFields();
+            } catch (\Throwable $ignored) {
+                $changedFields = ['Unbekannt'];
             }
         }
 
-        return $changedFields;
+        // 3. Logge den Fehler mit allen wichtigen Informationen
+        Log::error('Fehler beim Speichern der Anstellungsdaten', [
+            // Der eigentliche Fehler
+            'error_message' => $e->getMessage(),
+            'error_file' => $e->getFile(),
+            'error_line' => $e->getLine(),
+
+            // Benutzer-Informationen
+            'bearbeiteter_user_id' => $this->userId,
+            'ausführender_user_id' => $this->authUserId ?? auth()->id(),
+            'team_id' => $this->currentTeamId ?? null,
+            'company_id' => $this->companyId ?? null,
+
+            // Welche Felder wurden geändert
+            'geänderte_felder' => $changedFields,
+
+            // Aktuelle Formular-Werte (falls Validierungsfehler)
+            'formular_daten' => [
+                'joined_at' => $this->joined_at ?? null,
+                'personal_number' => $this->personal_number ?? null,
+                'prob_period' => $this->prob_period ?? null,
+                'probation_at' => $this->probation_at ?? null,
+                'notice_at' => $this->notice_at ?? null,
+                'notice_period' => $this->notice_period ?? null,
+                'leave_at' => $this->leave_at ?? null,
+            ]
+        ]);
+
+        // 4. Zeige eine benutzerfreundliche Fehlermeldung
+        Flux::toast(
+            text: __('Fehler beim Speichern. Bitte versuchen Sie es erneut.'),
+            heading: __('Speicherfehler'),
+            variant: 'danger'
+        );
+
+        // Optional: In Development-Umgebung zeige mehr Details
+        if (config('app.debug')) {
+            Flux::toast(
+                text: 'Debug: ' . $e->getMessage(),
+                heading: 'Fehler-Details',
+                variant: 'warning'
+            );
+        }
     }
 }
-

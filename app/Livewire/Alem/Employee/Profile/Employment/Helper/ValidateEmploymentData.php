@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Employment\Helper;
 
+use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
 use Illuminate\Validation\Rule;
 
 /**
- * Trait für die Fehlerbehandlung in der PersonalData Komponente.
+ * Trait für die Validierung in der Employment Data Komponente.
  */
 trait ValidateEmploymentData
 {
@@ -38,34 +39,14 @@ trait ValidateEmploymentData
             $rules['joined_at'] = 'required|date|before_or_equal:today';
         }
 
-
-
         // Personal Number
         if ($this->personalNumberHasChanged()) {
             $rules['personal_number'] = 'nullable|string|max:50';
         }
-//
-//        // Profession
-//        if ($this->professionHasChanged()) {
-//            $rules['profession'] = [
-//                'required',
-//                'integer',
-//                Rule::in(array_column($this->professions ?? [], 'id'))
-//            ];
-//        }
-
-//        // Stage
-//        if ($this->stageHasChanged()) {
-//            $rules['stage'] = [
-//                'required',
-//                'integer',
-//                Rule::in(array_column($this->stages ?? [], 'id'))
-//            ];
-//        }
 
         // Probation Enum
         if ($this->probationEnumHasChanged()) {
-            $rules['prob_period'] = ['required', Rule::enum(Probation::class)];
+            $rules['prob_period'] = ['nullable', Rule::enum(Probation::class)];
         }
 
         // Probation At
@@ -99,17 +80,7 @@ trait ValidateEmploymentData
         return [
             'joined_at' => 'required|date|before_or_equal:today',
             'personal_number' => 'nullable|string|max:50',
-//            'profession' => [
-//                'required',
-//                'integer',
-//                Rule::in(array_column($this->professions ?? [], 'id'))
-//            ],
-//            'stage' => [
-//                'required',
-//                'integer',
-//                Rule::in(array_column($this->stages ?? [], 'id'))
-//            ],
-            'prob_period' => ['required', Rule::enum(Probation::class)],
+            'prob_period' => ['nullable', Rule::enum(Probation::class)],
             'probation_at' => 'nullable|date|after_or_equal:joined_at',
             'notice_at' => 'nullable|date',
             'notice_period' => ['nullable', Rule::enum(NoticePeriod::class)],
@@ -131,19 +102,8 @@ trait ValidateEmploymentData
             // Personal Number
             'personal_number.string' => __('The personal number must be a string.'),
             'personal_number.max' => __('The personal number must not exceed 50 characters.'),
-//
-//            // Profession
-//            'profession.required' => __('The profession is required.'),
-//            'profession.integer' => __('The profession must be a number.'),
-//            'profession.in' => __('The selected profession is invalid.'),
-
-//            // Stage
-//            'stage.required' => __('The stage is required.'),
-//            'stage.integer' => __('The stage must be a number.'),
-//            'stage.in' => __('The selected stage is invalid.'),
 
             // Probation
-            'prob_period.required' => __('The probation period is required.'),
             'prob_period.enum' => __('The selected probation period is invalid.'),
             'probation_at.date' => __('The probation end date must be a valid date.'),
             'probation_at.after_or_equal' => __('The probation end date must be after or equal to the joined date.'),
@@ -222,15 +182,7 @@ trait ValidateEmploymentData
      */
     private function joinedAtHasChanged(): bool
     {
-        return $this->joined_at !== ($this->originalData['joined_at'] ?? '');
-    }
-
-    /**
-     * Helper: Check ob Status geändert wurde
-     */
-    private function statusHasChanged(): bool
-    {
-        return $this->status !== ($this->originalData['status'] ?? null);
+        return $this->joined_at !== ($this->originalData['joined_at'] ?? null);
     }
 
     /**
@@ -238,7 +190,7 @@ trait ValidateEmploymentData
      */
     private function personalNumberHasChanged(): bool
     {
-        return $this->personal_number !== ($this->originalData['personal_number'] ?? '');
+        return $this->personal_number !== ($this->originalData['personal_number'] ?? null);
     }
 
     /**
@@ -254,7 +206,7 @@ trait ValidateEmploymentData
      */
     private function probationAtHasChanged(): bool
     {
-        return $this->probation_at !== ($this->originalData['probation_at'] ?? '');
+        return $this->probation_at !== ($this->originalData['probation_at'] ?? null);
     }
 
     /**
@@ -262,7 +214,7 @@ trait ValidateEmploymentData
      */
     private function noticeAtHasChanged(): bool
     {
-        return $this->notice_at !== ($this->originalData['notice_at'] ?? '');
+        return $this->notice_at !== ($this->originalData['notice_at'] ?? null);
     }
 
     /**
@@ -278,7 +230,7 @@ trait ValidateEmploymentData
      */
     private function leaveAtHasChanged(): bool
     {
-        return $this->leave_at !== ($this->originalData['leave_at'] ?? '');
+        return $this->leave_at !== ($this->originalData['leave_at'] ?? null);
     }
 
     /**

@@ -8,7 +8,7 @@
     </x-slot:description>
 
     <x-slot name="form">
-        <form wire:submit.prevent="updatePersonalData">
+        <form wire:submit.prevent="updateEmploymentData">
             <div class="px-4 py-6 sm:p-8">
                 <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 ">
 
@@ -30,26 +30,6 @@
                             />
                         </x-pupi.input.group>
                     </div>
-
-                    {{--                    <!-- Employment Type -->--}}
-                    {{--                    <div class="sm:col-span-3">--}}
-                    {{--                        <x-pupi.input.group--}}
-                    {{--                            label="{{ __('Employment Type') }}"--}}
-                    {{--                            for="employment_type"--}}
-                    {{--                            badge="{{ __('Required') }}"--}}
-                    {{--                            :error="$errors->first('employment_type')"--}}
-                    {{--                            model="employment_type"--}}
-                    {{--                            help-text="{{ __('') }}">--}}
-
-                    {{--                            <x-pupi.input.text--}}
-                    {{--                                wire:model="employment_type"--}}
-                    {{--                                id="employment_type"--}}
-                    {{--                                name="employment_type"--}}
-                    {{--                            />--}}
-                    {{--                        </x-pupi.input.group>--}}
-                    {{--                    </div>--}}
-
-
 
                     <!-- Joined Date -->
                     <div class="sm:col-span-2 sm:col-start-1">

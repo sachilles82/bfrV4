@@ -2,8 +2,6 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Employment;
 
-
-use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
 use App\Livewire\Alem\Employee\Profile\Employment\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Profile\Employment\Helper\ValidateEmploymentData;
 use App\Models\Alem\Employee;
@@ -26,24 +24,19 @@ class Data extends Component
     use AuthorizesRequests;
     use AuthUserTeamCompanyId;
     use ValidateEmploymentData, HandleCatchError;
-    use EmployeeStatusOptions, EmployeeDataEnums;
-    use WithDropDownRelations   ;
+    use EmployeeDataEnums;
 
     #[Locked]
     public int $userId;
 
-    public ?User $user = null;
-    public ?Employee $employee = null;
-
     /** Form fields */
     public ?string $personal_number = null;
-    public ?string $joined_at = null; // hier ist es angestellt seit Datum
+    public ?string $joined_at = null;
     public ?string $prob_period = null;
     public ?string $probation_at = null;
     public ?string $notice_at = null;
     public ?string $notice_period = null;
     public ?string $leave_at = null;
-    public ?string $status = null;
 
     /** Original Daten für Vergleiche */
     public array $originalData = [];
@@ -55,7 +48,7 @@ class Data extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        $this->loadPersonalData();
+        $this->loadEmploymentData();
     }
 
     /**
@@ -66,7 +59,7 @@ class Data extends Component
     public function employee(): ?Employee
     {
         return Employee::with([
-            'user:id,joined_at,status'
+            'user:id,joined_at'
         ])
             ->where('user_id', $this->userId)
             ->select([
@@ -95,51 +88,45 @@ class Data extends Component
         }
 
         // Sonst lade User direkt
-        return User::select(['id', 'birthdate'])
+        return User::select(['id', 'joined_at'])
             ->findOrFail($this->userId);
     }
 
     /**
-     * Befülle die Form mit Personal Daten
+     * Befülle die Form mit Employment Daten
      * Speichere Original-Daten aus der Datenbank für den Vergleich
      */
-    private function loadPersonalData(): void
+    private function loadEmploymentData(): void
     {
         $user = $this->user;
         $employee = $this->employee;
 
-        // Original-Daten speichern
+        // Original-Daten speichern - KEINE empty strings, nur null
         $this->originalData = [
             'joined_at' => $user?->joined_at?->format('Y-m-d'),
-            'status' => $user?->status?->value,
-
-            'personal_number' => $this->employee?->personal_number,
-            'employment_type' => $this->employee?->employment_type,
-            'prob_period' => $this->employee?->prob_period?->value,
-            'probation_at' => $this->employee?->probation_at?->format('Y-m-d'),
-            'notice_at' => $this->employee?->notice_at?->format('Y-m-d'),
-            'notice_period' => $this->employee?->notice_period?->value,
-            'leave_at' => $this->employee?->leave_at?->format('Y-m-d'),
+            'personal_number' => $employee?->personal_number,
+            'prob_period' => $employee?->prob_period?->value,
+            'probation_at' => $employee?->probation_at?->format('Y-m-d'),
+            'notice_at' => $employee?->notice_at?->format('Y-m-d'),
+            'notice_period' => $employee?->notice_period?->value,
+            'leave_at' => $employee?->leave_at?->format('Y-m-d'),
         ];
 
-        // Setze Form-Felder
-        $this->joined_at = $this->user?->joined_at?->format('Y-m-d') ?? '';
-        $this->status = $this->user?->status?->value;
-
-        $this->personal_number = $this->originalData['status'] ?? '';
-        $this->personal_number = $this->originalData['personal_number'] ?? '';
+        // Setze Form-Felder NUR mit den originalData
+        $this->joined_at = $this->originalData['joined_at'];
+        $this->personal_number = $this->originalData['personal_number'];
         $this->prob_period = $this->originalData['prob_period'];
-        $this->probation_at = $this->originalData['probation_at'] ?? '';
-        $this->notice_at = $this->originalData['notice_at'] ?? '';
+        $this->probation_at = $this->originalData['probation_at'];
+        $this->notice_at = $this->originalData['notice_at'];
         $this->notice_period = $this->originalData['notice_period'];
-        $this->leave_at = $this->originalData['leave_at'] ?? '';
+        $this->leave_at = $this->originalData['leave_at'];
     }
 
     /**
-     * Aktualisiert die Personal Daten in der Datenbank.
+     * Aktualisiert die Employment Daten in der Datenbank.
      * Validiert nur die geänderten Felder für bessere Performance
      */
-    public function updatePersonalData(): void
+    public function updateEmploymentData(): void
     {
         // Prüfe ob überhaupt Änderungen vorliegen
         if (!$this->hasAnyChanges()) {
@@ -160,11 +147,9 @@ class Data extends Component
                 $userUpdateData = [];
 
                 if ($this->joinedAtHasChanged()) {
-                    $userUpdateData['joined_at'] = $this->joined_at;
+                    $userUpdateData['joined_at'] = $this->joined_at ?: null;
                 }
-                if ($this->statusHasChanged()) {
-                    $userUpdateData['status'] = $this->status;
-                }
+
                 // Update User nur wenn Felder geändert wurden
                 if (!empty($userUpdateData)) {
                     $this->user->update($userUpdateData);
@@ -198,19 +183,26 @@ class Data extends Component
                         $this->employee->update($updateData);
                     }
                 } else {
-                    // Erstelle neuen Employee Record
-                    $this->employee = Employee::create([
-                        'user_id' => $this->userId,
-                        ...$updateData
-                    ]);
+                    // Erstelle neuen Employee Record nur wenn es Employee-Daten gibt
+                    if (!empty($updateData)) {
+                        Employee::create([
+                            'user_id' => $this->userId,
+                            ...$updateData
+                        ]);
+
+                        // WICHTIG: Clear Computed Property Cache nach Create
+                        unset($this->employee);
+                    }
                 }
             });
 
             // Aktualisiere Original-Daten nach erfolgreichem Update
             $this->updateOriginalDataAfterSave();
 
+            $this->dispatch('employment-data-updated');
+
             Flux::toast(
-                text: __('Personal data updated successfully.'),
+                text: __('Employment data updated successfully.'),
                 heading: __('Success'),
                 variant: 'success'
             );
@@ -227,7 +219,6 @@ class Data extends Component
     {
         $this->originalData = [
             'joined_at' => $this->joined_at,
-            'staus' => $this->status ?: $this->user?->status?->value,
             'personal_number' => $this->personal_number,
             'prob_period' => $this->prob_period,
             'probation_at' => $this->probation_at,
@@ -239,7 +230,7 @@ class Data extends Component
 
     public function placeholder(): string
     {
-        return view('livewire.placeholders.employee.personal-data');
+        return view('livewire.placeholders.employee.employment-data');
     }
 
     public function render(): View
