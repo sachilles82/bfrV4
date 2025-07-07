@@ -19,12 +19,11 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
 
             $table->string('personal_number')->nullable();
-            $table->string('employment_type')->nullable();
 
-            $table->string('probation_enum')->default(Probation::THREE_MONTHS->value);
+            $table->string('prob_period')->default(Probation::THREE_MONTHS->value);
             $table->date('probation_at')->nullable();
             $table->string('notice_at')->nullable();
-            $table->string('notice_enum')->default(NoticePeriod::ONE_MONTH->value);
+            $table->string('notice_period')->default(NoticePeriod::ONE_MONTH->value);
             $table->date('leave_at')->nullable();
 
             $table->string('ahv_number')->nullable();

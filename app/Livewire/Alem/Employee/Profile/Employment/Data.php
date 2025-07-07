@@ -2,20 +2,20 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Employment;
 
+
 use App\Livewire\Alem\Employee\Helper\WithDropDownRelations;
+use App\Livewire\Alem\Employee\Profile\Employment\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Profile\Employment\Helper\ValidateEmploymentData;
-use App\Livewire\Alem\Employee\Profile\Personal\Helper\HandleCatchError;
 use App\Models\Alem\Employee;
 use App\Models\User;
+use App\Traits\Employee\EmployeeDataEnums;
 use App\Traits\Employee\EmployeeStatusOptions;
-use App\Traits\Employee\NoticePeriodOptions;
-use App\Traits\Employee\ProbationOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -26,8 +26,8 @@ class Data extends Component
     use AuthorizesRequests;
     use AuthUserTeamCompanyId;
     use ValidateEmploymentData, HandleCatchError;
-    use WithDropDownRelations;
-    use EmployeeStatusOptions, ProbationOptions, NoticePeriodOptions;
+    use EmployeeStatusOptions, EmployeeDataEnums;
+    use WithDropDownRelations   ;
 
     #[Locked]
     public int $userId;
@@ -36,16 +36,14 @@ class Data extends Component
     public ?Employee $employee = null;
 
     /** Form fields */
-    public ?string $joined_at = null;// was soll das sein? Angestellungsdatum?
     public ?string $personal_number = null;
-    public ?string $employment_type = null;
-    public ?int $profession = null;
-    public ?int $stage = null;
-    public ?string $probation_enum = null;
+    public ?string $joined_at = null; // hier ist es angestellt seit Datum
+    public ?string $prob_period = null;
     public ?string $probation_at = null;
     public ?string $notice_at = null;
-    public ?string $notice_enum = null;
+    public ?string $notice_period = null;
     public ?string $leave_at = null;
+    public ?string $status = null;
 
     /** Original Daten für Vergleiche */
     public array $originalData = [];
@@ -57,68 +55,48 @@ class Data extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-
-        $this->employee = Employee::with([
-            'user:id,joined_at'
-        ])
-            ->where('user_id', $this->userId)
-            ->select([
-                'id',
-                'user_id',
-                'ahv_number',
-                'nationality',
-                'hometown',
-                'religion',
-                'residence_permit'
-            ])
-            ->first();
-
-//        $this->employee = Cache::remember(
-//            key: "employee:{$userId}:with-user",
-//            ttl: now()->addMinutes(15),
-//            callback: fn() => Employee::with(['user:id,joined_at'])
-//                ->where('user_id', $userId)
-//                ->select([
-//                    'id',
-//                    'user_id',
-//                    'ahv_number',
-//                    'nationality',
-//                    'hometown',
-//                    'religion',
-//                    'residence_permit'
-//                ])
-//                ->first()
-//        );
-
-        //        // Lade User mit joined_at
-        $this->user = User::select([
-            'id',
-            'birthdate',
-        ])
-            ->findOrFail($this->userId);
-
-        $this->employee = Employee::with([
-            'user:id,birthdate',
-            'country:id,name,code'
-        ])
-            ->where('user_id', $this->userId)
-            ->select([
-                'id',
-                'user_id',
-                'ahv_number',
-                'country_id',
-                'hometown',
-                'religion',
-                'residence_permit'
-            ])
-            ->first();
-
         $this->loadPersonalData();
+    }
 
-        // Lade Dropdown-Daten
-        $this->loadRelationsData([
-            'professions', 'stages', 'supervisors'
-        ]);
+    /**
+     * Employee als Computed Property
+     * Wird automatisch gecached und nach Validation Error neu geladen
+     */
+    #[Computed]
+    public function employee(): ?Employee
+    {
+        return Employee::with([
+            'user:id,joined_at,status'
+        ])
+            ->where('user_id', $this->userId)
+            ->select([
+                'id',
+                'user_id',
+                'personal_number',
+                'prob_period',
+                'probation_at',
+                'notice_period',
+                'notice_at',
+                'leave_at'
+            ])
+            ->first();
+    }
+
+    /**
+     * User als Computed Property
+     * Lädt User entweder über Employee Relation oder direkt
+     */
+    #[Computed]
+    public function user(): User
+    {
+        // Wenn Employee existiert, nutze die Relation
+        if ($this->employee && $this->employee->relationLoaded('user')) {
+            return $this->employee->user;
+        }
+
+        // Sonst lade User direkt
+        return User::select(['id', 'birthdate'])
+            ->findOrFail($this->userId);
     }
 
     /**
@@ -127,26 +105,33 @@ class Data extends Component
      */
     private function loadPersonalData(): void
     {
+        $user = $this->user;
+        $employee = $this->employee;
+
         // Original-Daten speichern
         $this->originalData = [
-            'joined_at' => $this->user?->joined_at?->format('Y-m-d'),
+            'joined_at' => $user?->joined_at?->format('Y-m-d'),
+            'status' => $user?->status?->value,
+
             'personal_number' => $this->employee?->personal_number,
             'employment_type' => $this->employee?->employment_type,
-            'probation_enum' => $this->employee?->probation_enum?->value,
+            'prob_period' => $this->employee?->prob_period?->value,
             'probation_at' => $this->employee?->probation_at?->format('Y-m-d'),
             'notice_at' => $this->employee?->notice_at?->format('Y-m-d'),
-            'notice_enum' => $this->employee?->notice_enum?->value,
+            'notice_period' => $this->employee?->notice_period?->value,
             'leave_at' => $this->employee?->leave_at?->format('Y-m-d'),
         ];
 
         // Setze Form-Felder
         $this->joined_at = $this->user?->joined_at?->format('Y-m-d') ?? '';
+        $this->status = $this->user?->status?->value;
+
+        $this->personal_number = $this->originalData['status'] ?? '';
         $this->personal_number = $this->originalData['personal_number'] ?? '';
-        $this->employment_type = $this->originalData['employment_type'] ?? '';
-        $this->probation_enum = $this->originalData['probation_enum'];
+        $this->prob_period = $this->originalData['prob_period'];
         $this->probation_at = $this->originalData['probation_at'] ?? '';
         $this->notice_at = $this->originalData['notice_at'] ?? '';
-        $this->notice_enum = $this->originalData['notice_enum'];
+        $this->notice_period = $this->originalData['notice_period'];
         $this->leave_at = $this->originalData['leave_at'] ?? '';
     }
 
@@ -177,11 +162,8 @@ class Data extends Component
                 if ($this->joinedAtHasChanged()) {
                     $userUpdateData['joined_at'] = $this->joined_at;
                 }
-                if ($this->professionHasChanged()) {
-                    $userUpdateData['profession_id'] = $this->profession;
-                }
-                if ($this->stageHasChanged()) {
-                    $userUpdateData['stage_id'] = $this->stage;
+                if ($this->statusHasChanged()) {
+                    $userUpdateData['status'] = $this->status;
                 }
                 // Update User nur wenn Felder geändert wurden
                 if (!empty($userUpdateData)) {
@@ -194,11 +176,8 @@ class Data extends Component
                 if ($this->personalNumberHasChanged()) {
                     $updateData['personal_number'] = $this->personal_number;
                 }
-                if ($this->employmentTypeHasChanged()) {
-                    $updateData['employment_type'] = $this->employment_type;
-                }
                 if ($this->probationEnumHasChanged()) {
-                    $updateData['probation_enum'] = $this->probation_enum;
+                    $updateData['prob_period'] = $this->prob_period;
                 }
                 if ($this->probationAtHasChanged()) {
                     $updateData['probation_at'] = $this->probation_at ?: null;
@@ -207,7 +186,7 @@ class Data extends Component
                     $updateData['notice_at'] = $this->notice_at ?: null;
                 }
                 if ($this->noticeEnumHasChanged()) {
-                    $updateData['notice_enum'] = $this->notice_enum;
+                    $updateData['notice_period'] = $this->notice_period;
                 }
                 if ($this->leaveAtHasChanged()) {
                     $updateData['leave_at'] = $this->leave_at ?: null;
@@ -248,14 +227,12 @@ class Data extends Component
     {
         $this->originalData = [
             'joined_at' => $this->joined_at,
+            'staus' => $this->status ?: $this->user?->status?->value,
             'personal_number' => $this->personal_number,
-            'employment_type' => $this->employment_type,
-            'profession_id' => $this->profession,
-            'stage_id' => $this->stage,
-            'probation_enum' => $this->probation_enum,
+            'prob_period' => $this->prob_period,
             'probation_at' => $this->probation_at,
             'notice_at' => $this->notice_at,
-            'notice_enum' => $this->notice_enum,
+            'notice_period' => $this->notice_period,
             'leave_at' => $this->leave_at,
         ];
     }

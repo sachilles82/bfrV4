@@ -20,9 +20,11 @@ trait HandleCatchError
         $logContext = [
             'exception' => $e,
             'acting_user_id' => $this->authUserId ?? auth()->id(),
-            'target_user_id' => $this->userId,
+            'target_user_id' => $this->userId ?? null,
             'operation' => $operation,
-            'component' => 'PersonalData'
+            'component' => 'PersonalData',
+            'team_id' => $this->currentTeamId ?? null,
+            'company_id' => $this->companyId ?? null
         ];
 
         // Füge zusätzlichen Kontext hinzu wenn vorhanden
@@ -30,16 +32,20 @@ trait HandleCatchError
             $logContext['context'] = $context;
         }
 
-        // Füge Personal-spezifische Formulardaten hinzu
+        // Füge Personal-spezifische Formulardaten hinzu (nur wenn verfügbar)
         if (method_exists($this, 'only')) {
-            $logContext['formData'] = $this->only([
-                'birthdate',
-                'ahv_number',
-                'country_id',
-                'hometown',
-                'religion',
-                'residence_permit'
-            ]);
+            try {
+                $logContext['formData'] = $this->only([
+                    'birthdate',
+                    'ahv_number',
+                    'country_id',
+                    'hometown',
+                    'religion',
+                    'residence_permit'
+                ]);
+            } catch (\Throwable $formException) {
+                $logContext['formData'] = 'Unable to retrieve form data';
+            }
         }
 
         Log::error("Fehler beim {$operation}: {$e->getMessage()}", $logContext);
@@ -50,7 +56,6 @@ trait HandleCatchError
 
     /**
      * Spezifische Methode für Update-Fehler bei Personal Data
-     * @throws \Throwable
      */
     private function handleEditingError(\Throwable $e): void
     {
@@ -59,11 +64,22 @@ trait HandleCatchError
             DB::rollBack();
         }
 
-        $this->handleError($e, 'Aktualisieren der Personaldaten', [
-            'user_id' => $this->user?->id,
-            'employee_id' => $this->employee?->id,
-            'changed_fields' => $this->getChangedFieldsForLogging()
-        ]);
+        // Sammle zusätzlichen Kontext
+        $context = [
+            'user_id' => $this->userId ?? null,
+            'employee_exists' => isset($this->employee) && $this->employee !== null
+        ];
+
+        // Versuche geänderte Felder zu ermitteln
+        try {
+            if (method_exists($this, 'getChangedFields')) {
+                $context['changed_fields'] = $this->getChangedFields();
+            }
+        } catch (\Throwable $changedFieldsException) {
+            $context['changed_fields'] = 'Unable to determine changed fields';
+        }
+
+        $this->handleError($e, 'Aktualisieren der Personaldaten', $context);
     }
 
     /**
@@ -71,10 +87,19 @@ trait HandleCatchError
      */
     private function handleLoadingError(\Throwable $e): void
     {
-        $this->handleError($e, 'Laden der Personaldaten', [
-            'user_exists' => $this->user !== null,
-            'employee_exists' => $this->employee !== null
-        ]);
+        $context = [
+            'user_id' => $this->userId ?? null
+        ];
+
+        // Prüfe ob User/Employee geladen werden konnten
+        try {
+            $context['user_exists'] = isset($this->user) && $this->user !== null;
+            $context['employee_exists'] = isset($this->employee) && $this->employee !== null;
+        } catch (\Throwable $checkException) {
+            $context['entity_check_failed'] = true;
+        }
+
+        $this->handleError($e, 'Laden der Personaldaten', $context);
     }
 
     /**
@@ -82,9 +107,18 @@ trait HandleCatchError
      */
     private function handleValidationError(\Throwable $e): void
     {
-        $this->handleError($e, 'Validierung der Personaldaten', [
-            'validation_errors' => $this->getErrorBag()->toArray()
-        ]);
+        $context = [];
+
+        // Versuche Validierungsfehler zu sammeln
+        try {
+            if (method_exists($this, 'getErrorBag')) {
+                $context['validation_errors'] = $this->getErrorBag()->toArray();
+            }
+        } catch (\Throwable $errorBagException) {
+            $context['validation_errors'] = 'Unable to retrieve validation errors';
+        }
+
+        $this->handleError($e, 'Validierung der Personaldaten', $context);
     }
 
     /**
@@ -94,11 +128,11 @@ trait HandleCatchError
     {
         $messages = [
             'Aktualisieren der Personaldaten' => [
-                'text' => __('An error occurred while updating personal data.'),
+                'text' => __('An error occurred while updating personal data. Please try again.'),
                 'heading' => __('Update Error')
             ],
             'Laden der Personaldaten' => [
-                'text' => __('An error occurred while loading personal data.'),
+                'text' => __('An error occurred while loading personal data. Please refresh the page.'),
                 'heading' => __('Loading Error')
             ],
             'Validierung der Personaldaten' => [
@@ -122,26 +156,16 @@ trait HandleCatchError
 
     /**
      * Hilfsmethode um geänderte Felder für Logging zu sammeln
+     * @deprecated Use getChangedFields() from ValidatePersonalData trait instead
      */
     private function getChangedFieldsForLogging(): array
     {
-        $changedFields = [];
-
-        $fields = [
-            'birthdate' => 'birthdateHasChanged',
-            'ahv_number' => 'ahvNumberHasChanged',
-            'country_id' => 'countryIdHasChanged',
-            'hometown' => 'hometownHasChanged',
-            'religion' => 'religionHasChanged',
-            'residence_permit' => 'residencePermitHasChanged'
-        ];
-
-        foreach ($fields as $field => $method) {
-            if (method_exists($this, $method) && $this->$method()) {
-                $changedFields[] = $field;
-            }
+        // Diese Methode ist redundant, da getChangedFields() bereits im
+        // ValidatePersonalData Trait existiert
+        if (method_exists($this, 'getChangedFields')) {
+            return array_keys($this->getChangedFields());
         }
 
-        return $changedFields;
+        return [];
     }
 }

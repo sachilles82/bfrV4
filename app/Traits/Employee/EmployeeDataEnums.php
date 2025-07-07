@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Profile\Personal\Helper;
+namespace App\Traits\Employee;
+
+use App\Enums\Employee\NoticePeriod;
+use App\Enums\Employee\Probation;
+use Livewire\Attributes\Computed;
 
 use App\Enums\Employee\CivilStatus;
-use App\Enums\Employee\Probation;
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
-use Livewire\Attributes\Computed;
 
 trait EmployeeDataEnums
 {
@@ -48,5 +50,15 @@ trait EmployeeDataEnums
     public function probationOptions(): array
     {
         return Probation::getProbationOptions();
+    }
+
+    /**
+     * Gibt die Optionen für die Kündigungsfrist zurück
+     * @return array Array mit Optionen für Dropdown-Menüs und andere UI-Elemente
+     */
+    #[Computed]
+    public function noticePeriodOptions(): array
+    {
+        return NoticePeriod::getNoticePeriodOptions();
     }
 }

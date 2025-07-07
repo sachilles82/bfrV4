@@ -4,9 +4,11 @@ namespace App\Livewire\Alem\Employee\Profile\Personal\Helper;
 
 use App\Enums\Employee\Religion;
 use App\Enums\Employee\Residence;
-use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
+/**
+ * Trait für die Validierung in der PersonalData Komponente.
+ */
 trait ValidatePersonalData
 {
     /**
@@ -33,7 +35,14 @@ trait ValidatePersonalData
 
         // Birthdate
         if ($this->birthdateHasChanged()) {
-            $rules['birthdate'] = 'nullable|date|before:today';
+            $rules['birthdate'] = [
+                'nullable',
+                'date',
+                'date_format:Y-m-d',
+                'before:today',
+                'after:' . now()->subYears(90)->format('Y-m-d'),
+                'before:' . now()->subYears(14)->format('Y-m-d')
+            ];
         }
 
         // AHV Number
@@ -41,11 +50,12 @@ trait ValidatePersonalData
             $rules['ahv_number'] = [
                 'nullable',
                 'string',
+                'size:16',
                 'regex:/^756\.\d{4}\.\d{4}\.\d{2}$/'
             ];
         }
 
-        // Country ID - Nutzt gecachte Countries Collection
+        // Country ID
         if ($this->countryIdHasChanged()) {
             $rules['country_id'] = [
                 'nullable',
@@ -56,7 +66,15 @@ trait ValidatePersonalData
 
         // Hometown
         if ($this->hometownHasChanged()) {
-            $rules['hometown'] = 'nullable|string|max:255';
+            $rules['hometown'] = [
+                'nullable',
+                'string',
+                'min:2',
+                'max:100',
+                'regex:/^[a-zA-ZäöüÄÖÜéèêëàâîïôùûçÇ\s\-\'\.]+$/u',
+                'not_regex:/\d/',
+                'not_regex:/[!@#$%^&*()_+=\[\]{};:"\\|,<>\/?]/'
+            ];
         }
 
         // Religion
@@ -78,10 +96,18 @@ trait ValidatePersonalData
     public function rules(): array
     {
         return [
-            'birthdate' => 'nullable|date|before:today',
+            'birthdate' => [
+                'nullable',
+                'date',
+                'date_format:Y-m-d',
+                'before:today',
+                'after:' . now()->subYears(90)->format('Y-m-d'),
+                'before:' . now()->subYears(14)->format('Y-m-d')
+            ],
             'ahv_number' => [
                 'nullable',
                 'string',
+                'size:16',
                 'regex:/^756\.\d{4}\.\d{4}\.\d{2}$/'
             ],
             'country_id' => [
@@ -89,7 +115,15 @@ trait ValidatePersonalData
                 'integer',
                 Rule::in($this->countries->pluck('id')->toArray())
             ],
-            'hometown' => 'nullable|string|max:255',
+            'hometown' => [
+                'nullable',
+                'string',
+                'min:2',
+                'max:100',
+                'regex:/^[a-zA-ZäöüÄÖÜéèêëàâîïôùûçÇ\s\-\'\.]+$/u',
+                'not_regex:/\d/',
+                'not_regex:/[!@#$%^&*()_+=\[\]{};:"\\|,<>\/?]/'
+            ],
             'religion' => ['nullable', Rule::enum(Religion::class)],
             'residence_permit' => ['nullable', Rule::enum(Residence::class)]
         ];
@@ -103,10 +137,13 @@ trait ValidatePersonalData
         return [
             // Birthdate
             'birthdate.date' => __('The birthdate must be a valid date.'),
-            'birthdate.before' => __('The birthdate must be in the past.'),
+            'birthdate.date_format' => __('The birthdate must be in format YYYY-MM-DD.'),
+            'birthdate.before' => __('The birthdate must be at least 14 years ago.'),
+            'birthdate.after' => __('The birthdate cannot be more than 90 years ago.'),
 
             // AHV Number
             'ahv_number.string' => __('The AHV number must be a string.'),
+            'ahv_number.size' => __('The AHV number must be exactly 16 characters long (13 digits and 3 dots).'),
             'ahv_number.regex' => __('The AHV number format is invalid. Format: 756.1234.5678.90'),
 
             // Country ID
@@ -115,7 +152,10 @@ trait ValidatePersonalData
 
             // Hometown
             'hometown.string' => __('The hometown must be a string.'),
-            'hometown.max' => __('The hometown must not exceed 255 characters.'),
+            'hometown.min' => __('The hometown must be at least 2 characters.'),
+            'hometown.max' => __('The hometown must not exceed 100 characters.'),
+            'hometown.regex' => __('The hometown can only contain letters, hyphens, apostrophes and dots.'),
+            'hometown.not_regex' => __('The hometown cannot contain numbers or special characters.'),
 
             // Religion
             'religion.enum' => __('The selected religion is invalid.'),
@@ -178,37 +218,11 @@ trait ValidatePersonalData
     }
 
     /**
-     * Helper: Für Date Formate: Nutze für alle Daten ähnlich wie Birthdate. Check ob Birthdate geändert wurde
+     * Helper: Check ob Birthdate geändert wurde
      */
     private function birthdateHasChanged(): bool
     {
-        // Normalisiere beide Werte für den Vergleich
-        $originalBirthdate = $this->normalizeDate($this->originalData['birthdate'] ?? null);
-        $currentBirthdate = $this->normalizeDate($this->birthdate);
-
-        return $originalBirthdate !== $currentBirthdate;
-    }
-
-    /**
-     * Normalisiert ein Datum für den Vergleich
-     */
-    private function normalizeDate($date): ?string
-    {
-        if (empty($date)) {
-            return null;
-        }
-
-        // Wenn es ein Carbon/DateTime Objekt ist
-        if ($date instanceof \DateTime) {
-            return $date->format('Y-m-d');
-        }
-
-        // Wenn es ein String ist, parse und formatiere es
-        try {
-            return Carbon::parse($date)->format('Y-m-d');
-        } catch (\Exception $e) {
-            return null;
-        }
+        return $this->birthdate !== ($this->originalData['birthdate'] ?? null);
     }
 
     /**
@@ -216,7 +230,7 @@ trait ValidatePersonalData
      */
     private function ahvNumberHasChanged(): bool
     {
-        return $this->ahv_number !== ($this->originalData['ahv_number'] ?? '');
+        return $this->ahv_number !== ($this->originalData['ahv_number'] ?? null);
     }
 
     /**
@@ -232,7 +246,7 @@ trait ValidatePersonalData
      */
     private function hometownHasChanged(): bool
     {
-        return $this->hometown !== ($this->originalData['hometown'] ?? '');
+        return $this->hometown !== ($this->originalData['hometown'] ?? null);
     }
 
     /**

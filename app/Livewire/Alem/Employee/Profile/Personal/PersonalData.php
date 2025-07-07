@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Personal;
 
-use App\Livewire\Alem\Employee\Profile\Personal\Helper\EmployeeDataEnums;
 use App\Livewire\Alem\Employee\Profile\Personal\Helper\ValidatePersonalData;
 use App\Livewire\Alem\Employee\Profile\Personal\Helper\HandleCatchError;
 use App\Models\Address\Country;
 use App\Models\Alem\Employee;
 use App\Models\User;
+use App\Traits\Employee\EmployeeDataEnums;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -30,15 +30,15 @@ class PersonalData extends Component
     #[Locked]
     public int $userId;
 
-    /** Employee form fields */
-    public ?string $ahv_number = null;
-    public ?string $residence_permit = null;
+    /** Form fields */
     public ?string $birthdate = null;
+    public ?string $ahv_number = null;
     public ?int $country_id = null;
     public ?string $hometown = null;
     public ?string $religion = null;
+    public ?string $residence_permit = null;
 
-    /** Original Daten des Employees aus der Datenbank für Vergleiche */
+    /** Original Daten für Vergleiche */
     public array $originalData = [];
 
     public function mount(int $userId, int $authUserId, int $currentTeamId, int $companyId): void
@@ -103,17 +103,16 @@ class PersonalData extends Component
 
     /**
      * Befülle die Form mit Personal Daten
+     * Speichere Original-Daten aus der Datenbank für den Vergleich
      */
     private function loadPersonalData(): void
     {
-        // Nutze Computed Properties - werden automatisch geladen
         $user = $this->user;
         $employee = $this->employee;
 
-        $userBirthdate = $user?->birthdate?->format('Y-m-d');
-
+        // Original-Daten speichern - KEINE empty strings, nur null
         $this->originalData = [
-            'birthdate' => $userBirthdate,
+            'birthdate' => $user?->birthdate?->format('Y-m-d'),
             'ahv_number' => $employee?->ahv_number,
             'country_id' => $employee?->country_id,
             'hometown' => $employee?->hometown,
@@ -121,17 +120,18 @@ class PersonalData extends Component
             'residence_permit' => $employee?->residence_permit?->value,
         ];
 
-        // Setze Form-Felder
-        $this->birthdate = $userBirthdate ?? '';
-        $this->ahv_number = $employee?->ahv_number ?? '';
-        $this->country_id = $employee?->country_id;
-        $this->hometown = $employee?->hometown ?? '';
-        $this->religion = $employee?->religion?->value;
-        $this->residence_permit = $employee?->residence_permit?->value;
+        // Setze Form-Felder NUR mit den originalData
+        $this->birthdate = $this->originalData['birthdate'];
+        $this->ahv_number = $this->originalData['ahv_number'];
+        $this->country_id = $this->originalData['country_id'];
+        $this->hometown = $this->originalData['hometown'];
+        $this->religion = $this->originalData['religion'];
+        $this->residence_permit = $this->originalData['residence_permit'];
     }
 
     /**
-     * Aktualisiert die Personal Daten in der Datenbank
+     * Aktualisiert die Personal Daten in der Datenbank.
+     * Validiert nur die geänderten Felder für bessere Performance
      */
     public function updatePersonalData(): void
     {
@@ -145,19 +145,21 @@ class PersonalData extends Component
             return;
         }
 
-        // Validiere NUR die geänderten Felder
+        // WICHTIG: Validiere NUR die geänderten Felder
         $this->validateOnlyChanged();
 
         try {
             DB::transaction(function () {
-                // Update User birthdate wenn geändert
-                // Computed Property lädt User automatisch falls nötig
-                if ($this->birthdateHasChanged()) {
-                    $parsedDate = !empty($this->birthdate)
-                        ? \Carbon\Carbon::parse($this->birthdate)->format('Y-m-d')
-                        : null;
+                // Update User Felder wenn geändert
+                $userUpdateData = [];
 
-                    $this->user->update(['birthdate' => $parsedDate]);
+                if ($this->birthdateHasChanged()) {
+                    $userUpdateData['birthdate'] = $this->birthdate ?: null;
+                }
+
+                // Update User nur wenn Felder geändert wurden
+                if (!empty($userUpdateData)) {
+                    $this->user->update($userUpdateData);
                 }
 
                 // Erstelle Update-Array nur mit geänderten Employee Feldern
@@ -179,7 +181,6 @@ class PersonalData extends Component
                     $updateData['residence_permit'] = $this->residence_permit;
                 }
 
-                // Nutze Computed Property für Employee
                 if ($this->employee) {
                     // Update nur wenn Felder geändert wurden
                     if (!empty($updateData)) {

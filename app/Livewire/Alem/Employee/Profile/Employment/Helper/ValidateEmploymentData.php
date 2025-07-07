@@ -38,37 +38,34 @@ trait ValidateEmploymentData
             $rules['joined_at'] = 'required|date|before_or_equal:today';
         }
 
+
+
         // Personal Number
         if ($this->personalNumberHasChanged()) {
             $rules['personal_number'] = 'nullable|string|max:50';
         }
+//
+//        // Profession
+//        if ($this->professionHasChanged()) {
+//            $rules['profession'] = [
+//                'required',
+//                'integer',
+//                Rule::in(array_column($this->professions ?? [], 'id'))
+//            ];
+//        }
 
-        // Employment Type
-        if ($this->employmentTypeHasChanged()) {
-            $rules['employment_type'] = 'required|string|max:100';
-        }
-
-        // Profession
-        if ($this->professionHasChanged()) {
-            $rules['profession'] = [
-                'required',
-                'integer',
-                Rule::in(array_column($this->professions ?? [], 'id'))
-            ];
-        }
-
-        // Stage
-        if ($this->stageHasChanged()) {
-            $rules['stage'] = [
-                'required',
-                'integer',
-                Rule::in(array_column($this->stages ?? [], 'id'))
-            ];
-        }
+//        // Stage
+//        if ($this->stageHasChanged()) {
+//            $rules['stage'] = [
+//                'required',
+//                'integer',
+//                Rule::in(array_column($this->stages ?? [], 'id'))
+//            ];
+//        }
 
         // Probation Enum
         if ($this->probationEnumHasChanged()) {
-            $rules['probation_enum'] = ['required', Rule::enum(Probation::class)];
+            $rules['prob_period'] = ['required', Rule::enum(Probation::class)];
         }
 
         // Probation At
@@ -83,7 +80,7 @@ trait ValidateEmploymentData
 
         // Notice Enum
         if ($this->noticeEnumHasChanged()) {
-            $rules['notice_enum'] = ['nullable', Rule::enum(NoticePeriod::class)];
+            $rules['notice_period'] = ['nullable', Rule::enum(NoticePeriod::class)];
         }
 
         // Leave At
@@ -102,21 +99,20 @@ trait ValidateEmploymentData
         return [
             'joined_at' => 'required|date|before_or_equal:today',
             'personal_number' => 'nullable|string|max:50',
-            'employment_type' => 'required|string|max:100',
-            'profession' => [
-                'required',
-                'integer',
-                Rule::in(array_column($this->professions ?? [], 'id'))
-            ],
-            'stage' => [
-                'required',
-                'integer',
-                Rule::in(array_column($this->stages ?? [], 'id'))
-            ],
-            'probation_enum' => ['required', Rule::enum(Probation::class)],
+//            'profession' => [
+//                'required',
+//                'integer',
+//                Rule::in(array_column($this->professions ?? [], 'id'))
+//            ],
+//            'stage' => [
+//                'required',
+//                'integer',
+//                Rule::in(array_column($this->stages ?? [], 'id'))
+//            ],
+            'prob_period' => ['required', Rule::enum(Probation::class)],
             'probation_at' => 'nullable|date|after_or_equal:joined_at',
             'notice_at' => 'nullable|date',
-            'notice_enum' => ['nullable', Rule::enum(NoticePeriod::class)],
+            'notice_period' => ['nullable', Rule::enum(NoticePeriod::class)],
             'leave_at' => 'nullable|date|after_or_equal:joined_at'
         ];
     }
@@ -135,31 +131,26 @@ trait ValidateEmploymentData
             // Personal Number
             'personal_number.string' => __('The personal number must be a string.'),
             'personal_number.max' => __('The personal number must not exceed 50 characters.'),
+//
+//            // Profession
+//            'profession.required' => __('The profession is required.'),
+//            'profession.integer' => __('The profession must be a number.'),
+//            'profession.in' => __('The selected profession is invalid.'),
 
-            // Employment Type
-            'employment_type.required' => __('The employment type is required.'),
-            'employment_type.string' => __('The employment type must be a string.'),
-            'employment_type.max' => __('The employment type must not exceed 100 characters.'),
-
-            // Profession
-            'profession.required' => __('The profession is required.'),
-            'profession.integer' => __('The profession must be a number.'),
-            'profession.in' => __('The selected profession is invalid.'),
-
-            // Stage
-            'stage.required' => __('The stage is required.'),
-            'stage.integer' => __('The stage must be a number.'),
-            'stage.in' => __('The selected stage is invalid.'),
+//            // Stage
+//            'stage.required' => __('The stage is required.'),
+//            'stage.integer' => __('The stage must be a number.'),
+//            'stage.in' => __('The selected stage is invalid.'),
 
             // Probation
-            'probation_enum.required' => __('The probation period is required.'),
-            'probation_enum.enum' => __('The selected probation period is invalid.'),
+            'prob_period.required' => __('The probation period is required.'),
+            'prob_period.enum' => __('The selected probation period is invalid.'),
             'probation_at.date' => __('The probation end date must be a valid date.'),
             'probation_at.after_or_equal' => __('The probation end date must be after or equal to the joined date.'),
 
             // Notice
             'notice_at.date' => __('The notice date must be a valid date.'),
-            'notice_enum.enum' => __('The selected notice period is invalid.'),
+            'notice_period.enum' => __('The selected notice period is invalid.'),
 
             // Leave
             'leave_at.date' => __('The leave date must be a valid date.'),
@@ -188,31 +179,10 @@ trait ValidateEmploymentData
             ];
         }
 
-        if ($this->employmentTypeHasChanged()) {
-            $changed['employment_type'] = [
-                'old' => $this->originalData['employment_type'] ?? null,
-                'new' => $this->employment_type
-            ];
-        }
-
-        if ($this->professionHasChanged()) {
-            $changed['profession_id'] = [
-                'old' => $this->originalData['profession_id'] ?? null,
-                'new' => $this->profession
-            ];
-        }
-
-        if ($this->stageHasChanged()) {
-            $changed['stage_id'] = [
-                'old' => $this->originalData['stage_id'] ?? null,
-                'new' => $this->stage
-            ];
-        }
-
         if ($this->probationEnumHasChanged()) {
-            $changed['probation_enum'] = [
-                'old' => $this->originalData['probation_enum'] ?? null,
-                'new' => $this->probation_enum
+            $changed['prob_period'] = [
+                'old' => $this->originalData['prob_period'] ?? null,
+                'new' => $this->prob_period
             ];
         }
 
@@ -231,9 +201,9 @@ trait ValidateEmploymentData
         }
 
         if ($this->noticeEnumHasChanged()) {
-            $changed['notice_enum'] = [
-                'old' => $this->originalData['notice_enum'] ?? null,
-                'new' => $this->notice_enum
+            $changed['notice_period'] = [
+                'old' => $this->originalData['notice_period'] ?? null,
+                'new' => $this->notice_period
             ];
         }
 
@@ -256,6 +226,14 @@ trait ValidateEmploymentData
     }
 
     /**
+     * Helper: Check ob Status geändert wurde
+     */
+    private function statusHasChanged(): bool
+    {
+        return $this->status !== ($this->originalData['status'] ?? null);
+    }
+
+    /**
      * Helper: Check ob Personal Number geändert wurde
      */
     private function personalNumberHasChanged(): bool
@@ -264,35 +242,11 @@ trait ValidateEmploymentData
     }
 
     /**
-     * Helper: Check ob Employment Type geändert wurde
-     */
-    private function employmentTypeHasChanged(): bool
-    {
-        return $this->employment_type !== ($this->originalData['employment_type'] ?? '');
-    }
-
-    /**
-     * Helper: Check ob Profession geändert wurde
-     */
-    private function professionHasChanged(): bool
-    {
-        return $this->profession !== ($this->originalData['profession_id'] ?? null);
-    }
-
-    /**
-     * Helper: Check ob Stage geändert wurde
-     */
-    private function stageHasChanged(): bool
-    {
-        return $this->stage !== ($this->originalData['stage_id'] ?? null);
-    }
-
-    /**
      * Helper: Check ob Probation Enum geändert wurde
      */
     private function probationEnumHasChanged(): bool
     {
-        return $this->probation_enum !== ($this->originalData['probation_enum'] ?? null);
+        return $this->prob_period !== ($this->originalData['prob_period'] ?? null);
     }
 
     /**
@@ -316,7 +270,7 @@ trait ValidateEmploymentData
      */
     private function noticeEnumHasChanged(): bool
     {
-        return $this->notice_enum !== ($this->originalData['notice_enum'] ?? null);
+        return $this->notice_period !== ($this->originalData['notice_period'] ?? null);
     }
 
     /**
@@ -334,9 +288,6 @@ trait ValidateEmploymentData
     {
         return $this->joinedAtHasChanged() ||
             $this->personalNumberHasChanged() ||
-            $this->employmentTypeHasChanged() ||
-            $this->professionHasChanged() ||
-            $this->stageHasChanged() ||
             $this->probationEnumHasChanged() ||
             $this->probationAtHasChanged() ||
             $this->noticeAtHasChanged() ||
@@ -352,13 +303,10 @@ trait ValidateEmploymentData
         $fieldMapping = [
             'joined_at' => 'joinedAtHasChanged',
             'personal_number' => 'personalNumberHasChanged',
-            'employment_type' => 'employmentTypeHasChanged',
-            'profession' => 'professionHasChanged',
-            'stage' => 'stageHasChanged',
-            'probation_enum' => 'probationEnumHasChanged',
+            'prob_period' => 'probationEnumHasChanged',
             'probation_at' => 'probationAtHasChanged',
             'notice_at' => 'noticeAtHasChanged',
-            'notice_enum' => 'noticeEnumHasChanged',
+            'notice_period' => 'noticeEnumHasChanged',
             'leave_at' => 'leaveAtHasChanged',
         ];
 

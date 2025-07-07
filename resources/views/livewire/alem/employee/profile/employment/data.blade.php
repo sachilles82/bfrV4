@@ -77,16 +77,16 @@
                     <div class="sm:col-span-2">
                         <x-pupi.input.group
                             label="{{ __('Probation Period') }}"
-                            for="probation_enum"
+                            for="prob_period"
                             badge="{{ __('Required') }}"
-                            :error="$errors->first('probation_enum')"
-                            model="probation_enum"
+                            :error="$errors->first('prob_period')"
+                            model="prob_period"
                             help-text="{{ __('') }}">
 
                             <flux:select class="mt-2"
-                                         wire:model="probation_enum"
-                                         id="probation_enum"
-                                         name="probation_enum"
+                                         wire:model="prob_period"
+                                         id="prob_period"
+                                         name="prob_period"
                                          variant="listbox"
                                          placeholder="{{ __('Select Probation Period') }}">
 
@@ -149,16 +149,16 @@
                     <div class="sm:col-span-2">
                         <x-pupi.input.group
                             label="{{ __('Notice Period') }}"
-                            for="notice_enum"
+                            for="notice_period"
                             badge="{{ __('Optional') }}"
-                            :error="$errors->first('notice_enum')"
-                            model="notice_enum"
+                            :error="$errors->first('notice_period')"
+                            model="notice_period"
                             help-text="{{ __('') }}">
 
                             <flux:select class="mt-2"
-                                         wire:model="notice_enum"
-                                         id="notice_enum"
-                                         name="notice_enum"
+                                         wire:model="notice_period"
+                                         id="notice_period"
+                                         name="notice_period"
                                          variant="listbox"
                                          placeholder="{{ __('Select Notice Period') }}">
 

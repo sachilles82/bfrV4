@@ -35,14 +35,12 @@ trait HandleCatchError
             $logContext['formData'] = $this->only([
                 'joined_at',
                 'personal_number',
-                'employment_type',
-                'profession',
-                'stage',
-                'probation_enum',
+                'prob_period',
                 'probation_at',
                 'notice_at',
-                'notice_enum',
-                'leave_at'
+                'notice_period',
+                'leave_at',
+                'status',
             ]);
         }
 
@@ -135,10 +133,10 @@ trait HandleCatchError
             'employment_type' => 'employmentTypeHasChanged',
             'profession' => 'professionHasChanged',
             'stage' => 'stageHasChanged',
-            'probation_enum' => 'probationEnumHasChanged',
+            'prob_period' => 'probationEnumHasChanged',
             'probation_at' => 'probationAtHasChanged',
             'notice_at' => 'noticeAtHasChanged',
-            'notice_enum' => 'noticeEnumHasChanged',
+            'notice_period' => 'noticeEnumHasChanged',
             'leave_at' => 'leaveAtHasChanged'
         ];
 

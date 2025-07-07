@@ -26,20 +26,25 @@ class Employee extends Model
         'user_id',
         // Personal Data
         'personal_number',
-        'employment_type',
 
-        'probation_enum',
+        'prob_period',
+        'probation_at',
         'notice_at',
-        'notice_enum',
+        'notice_period',
         'leave_at',
 
         // Employment Data
         'ahv_number',
+        'residence_permit',
+        // Brithdate ist im User Model
         'country_id',
         'hometown',
         'religion',
+        // Employee Status ist im User Model
+
+
+        // Zivile Daten
         'civil_status',
-        'residence_permit',
     ];
 
     /**
@@ -48,9 +53,9 @@ class Employee extends Model
     protected $casts = [
         'leave_at' => 'date',
         'probation_at' => 'date',
-        'probation_enum' => Probation::class,
+        'prob_period' => Probation::class,
         'notice_at' => 'date',
-        'notice_enum' => NoticePeriod::class,
+        'notice_period' => NoticePeriod::class,
         'religion' => Religion::class,
         'civil_status' => CivilStatus::class,
         'residence_permit' => Residence::class,
