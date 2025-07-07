@@ -7,7 +7,6 @@ use App\Livewire\Alem\Employee\Profile\Employment\Helper\ValidateEmploymentData;
 use App\Models\Alem\Employee;
 use App\Models\User;
 use App\Traits\Employee\EmployeeDataEnums;
-use App\Traits\Employee\EmployeeStatusOptions;
 use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;

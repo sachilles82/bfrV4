@@ -12,6 +12,7 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -28,9 +29,7 @@ class Information extends Component
     #[Locked]
     public int $userId;
 
-    public ?User $user = null; // der geladene User
-
-    /** User form fields */
+    /** Form fields */
     public ?string $status = null;
     public ?int $department = null;
     public ?int $profession = null;
@@ -39,7 +38,7 @@ class Information extends Component
     public array $selectedTeams = [];
     public array $selectedRoles = [];
 
-    /** Original Daten des Users aus der Datenbank für Vergleiche */
+    /** Original Daten für Vergleiche */
     public array $originalData = [];
 
     public function mount(int $userId, int $authUserId, int $currentTeamId, int $companyId): void
@@ -49,55 +48,61 @@ class Information extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        // Lade userId mit allen benötigten Relations
-        $this->user = User::with([
-            'teams:id,name',
-            'roles:id,name,is_manager',
-        ])
-            ->select([
-                'id', 'status', 'user_type',
-                'department_id', 'profession_id','stage_id', 'company_id', 'manager','supervisor_id'
-            ])
-            ->findOrFail($this->userId);
-
         $this->loadMemberData();
 
-//        // Lade Dropdown-Daten
+        // Lade Dropdown-Daten
         $this->loadRelationsData([
             'teams', 'departments', 'roles', 'supervisors', 'stages', 'professions'
         ]);
     }
 
     /**
-     * Befülle die Form mit User Member Daten
+     * User als Computed Property
+     * Wird automatisch gecached und nach Validation Error neu geladen
+     */
+    #[Computed]
+    public function user(): User
+    {
+        return User::with([
+            'teams:id,name',
+            'roles:id,name,is_manager',
+        ])
+            ->select([
+                'id', 'status', 'user_type',
+                'department_id', 'profession_id', 'stage_id',
+                'company_id', 'manager', 'supervisor_id'
+            ])
+            ->findOrFail($this->userId);
+    }
+
+    /**
+     * Befülle die Form mit Member Daten
      * Speichere Original-Daten aus der Datenbank für den Vergleich
      */
     private function loadMemberData(): void
     {
-        if (!$this->user) return;
+        $user = $this->user;
 
-        // WICHTIG: Speichere Original-Daten in EINEM public Array
+        // Original-Daten speichern - KEINE empty strings, nur null
         $this->originalData = [
-            'teamIds' => $this->user->teams->pluck('id')->toArray(),
-            'roleIds' => $this->user->roles->pluck('id')->toArray(),
-            'department_id' => $this->user->department_id,
-            'profession_id' => $this->user->profession_id,
-            'stage_id' => $this->user->stage_id,
-            'supervisor_id' => $this->user->supervisor_id,
-            'status' => $this->user->status?->value,
+            'teamIds' => $user->teams->pluck('id')->toArray(),
+            'roleIds' => $user->roles->pluck('id')->toArray(),
+            'department_id' => $user->department_id,
+            'profession_id' => $user->profession_id,
+            'stage_id' => $user->stage_id,
+            'supervisor_id' => $user->supervisor_id,
+            'status' => $user->status?->value,
         ];
 
-        // Setze selected Arrays
+        // Setze Form-Felder NUR mit den originalData
         $this->selectedTeams = $this->originalData['teamIds'];
         $this->selectedRoles = $this->originalData['roleIds'];
-
-        $this->department = $this->user->department_id;
-        $this->profession = $this->user->profession_id;
-        $this->stage = $this->user->stage_id;
-        $this->supervisor = $this->user->supervisor_id;
-        $this->status = $this->user->status?->value;
+        $this->department = $this->originalData['department_id'];
+        $this->profession = $this->originalData['profession_id'];
+        $this->stage = $this->originalData['stage_id'];
+        $this->supervisor = $this->originalData['supervisor_id'];
+        $this->status = $this->originalData['status'];
     }
-
 
     /**
      * Aktualisiert die Member Information in der Datenbank.
@@ -132,7 +137,6 @@ class Information extends Component
                 // Erstelle Update-Array nur mit geänderten Feldern
                 $updateData = [];
 
-
                 if ($this->departmentHasChanged()) {
                     $updateData['department_id'] = $this->department;
                 }
@@ -154,15 +158,17 @@ class Information extends Component
                     $this->user->update($updateData);
                 }
 
-                // Teams und Roles - die sync() Methoden brauchen $this->user
+                // Teams und Roles synchronisieren
                 $this->updateTeamsRoles();
-
             });
 
             // Aktualisiere Original-Daten nach erfolgreichem Update
             $this->updateOriginalDataAfterSave();
 
-            $this->dispatch('employee-updated');
+            // WICHTIG: Clear Computed Property Cache nach Update
+            unset($this->user);
+
+            $this->dispatch('member-information-updated');
 
             Flux::toast(
                 text: __('Member information updated successfully.'),
@@ -176,11 +182,10 @@ class Information extends Component
     }
 
     /**
-     * Prüft, ob Änderungen an den Feldern vorgenommen wurden
+     * Aktualisiert die Original-Daten nach erfolgreichem Speichern
      */
     private function updateOriginalDataAfterSave(): void
     {
-        // Update nur die originalData, ohne die Form-Felder zu überschreiben
         $this->originalData = [
             'teamIds' => $this->selectedTeams,
             'roleIds' => $this->selectedRoles,
@@ -191,28 +196,14 @@ class Information extends Component
             'status' => $this->status,
         ];
     }
+
     /**
-     * Haupt-Methode mit optionaler Team-Sync
+     * Haupt-Methode für Teams und Roles Update
      */
     private function updateTeamsRoles(): void
     {
         $this->syncTeams();
         $this->syncRolesWithManagerCheck();
-    }
-
-    /**
-     * Helper: Check Manager in Roles ohne DB Query
-     */
-    private function checkManagerInRoles(array $roleIds): bool
-    {
-        // Nutze die geladenen Dropdown-Daten
-        if (empty($this->dropdownRelations['roles'])) {
-            return false;
-        }
-
-        return collect($this->dropdownRelations['roles'])
-            ->whereIn('id', $roleIds)
-            ->contains('is_manager', true);
     }
 
     /**
@@ -254,14 +245,30 @@ class Information extends Component
         }
     }
 
+    /**
+     * Helper: Check Manager in Roles ohne DB Query
+     */
+    private function checkManagerInRoles(array $roleIds): bool
+    {
+        // Nutze die geladenen Dropdown-Daten
+        if (empty($this->dropdownRelations['roles'])) {
+            return false;
+        }
+
+        return collect($this->dropdownRelations['roles'])
+            ->whereIn('id', $roleIds)
+            ->contains('is_manager', true);
+    }
+
     public function placeholder(): string
     {
         return view('livewire.placeholders.employee.member-information');
     }
+
     public function render(): View
     {
         return view('livewire.alem.employee.profile.member.information', [
-            'user' => $this->user ?? null
+            'user' => $this->user
         ]);
     }
 }

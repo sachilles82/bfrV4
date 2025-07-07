@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Employment\Helper;
 
-use App\Enums\Employee\EmployeeStatus;
 use App\Enums\Employee\NoticePeriod;
 use App\Enums\Employee\Probation;
 use Illuminate\Validation\Rule;
@@ -36,12 +35,22 @@ trait ValidateEmploymentData
 
         // Joined At
         if ($this->joinedAtHasChanged()) {
-            $rules['joined_at'] = 'required|date|before_or_equal:today';
+            $rules['joined_at'] = [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+                'before_or_equal:today'
+            ];
         }
 
-        // Personal Number
+        // Personal Number - Blockiere nur gefährliche Zeichen
         if ($this->personalNumberHasChanged()) {
-            $rules['personal_number'] = 'nullable|string|max:50';
+            $rules['personal_number'] = [
+                'nullable',
+                'string',
+                'max:12',
+                'not_regex:/[<>\"\'%;()&+]/i'  // Blockiere XSS/SQL-Injection gefährliche Zeichen
+            ];
         }
 
         // Probation Enum
@@ -51,12 +60,12 @@ trait ValidateEmploymentData
 
         // Probation At
         if ($this->probationAtHasChanged()) {
-            $rules['probation_at'] = 'nullable|date|after_or_equal:joined_at';
+            $rules['probation_at'] = 'nullable|date|date_format:Y-m-d|after_or_equal:joined_at';
         }
 
         // Notice At
         if ($this->noticeAtHasChanged()) {
-            $rules['notice_at'] = 'nullable|date';
+            $rules['notice_at'] = 'nullable|date|date_format:Y-m-d|after_or_equal:joined_at';
         }
 
         // Notice Enum
@@ -66,7 +75,7 @@ trait ValidateEmploymentData
 
         // Leave At
         if ($this->leaveAtHasChanged()) {
-            $rules['leave_at'] = 'nullable|date|after_or_equal:joined_at';
+            $rules['leave_at'] = 'nullable|date|date_format:Y-m-d|after_or_equal:joined_at';
         }
 
         return $rules;
@@ -78,13 +87,23 @@ trait ValidateEmploymentData
     public function rules(): array
     {
         return [
-            'joined_at' => 'required|date|before_or_equal:today',
-            'personal_number' => 'nullable|string|max:50',
+            'joined_at' => [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+                'before_or_equal:today'
+            ],
+            'personal_number' => [
+                'nullable',
+                'string',
+                'max:12',
+                'not_regex:/[<>\"\'%;()&+]/i'  // Blockiere XSS/SQL-Injection gefährliche Zeichen
+            ],
             'prob_period' => ['nullable', Rule::enum(Probation::class)],
-            'probation_at' => 'nullable|date|after_or_equal:joined_at',
-            'notice_at' => 'nullable|date',
+            'probation_at' => 'nullable|date|date_format:Y-m-d|after_or_equal:joined_at',
+            'notice_at' => 'nullable|date|date_format:Y-m-d|after_or_equal:joined_at',
             'notice_period' => ['nullable', Rule::enum(NoticePeriod::class)],
-            'leave_at' => 'nullable|date|after_or_equal:joined_at'
+            'leave_at' => 'nullable|date|date_format:Y-m-d|after_or_equal:joined_at'
         ];
     }
 
@@ -97,23 +116,29 @@ trait ValidateEmploymentData
             // Joined At
             'joined_at.required' => __('The joined date is required.'),
             'joined_at.date' => __('The joined date must be a valid date.'),
+            'joined_at.date_format' => __('The joined date must be in format YYYY-MM-DD.'),
             'joined_at.before_or_equal' => __('The joined date cannot be in the future.'),
 
             // Personal Number
             'personal_number.string' => __('The personal number must be a string.'),
-            'personal_number.max' => __('The personal number must not exceed 50 characters.'),
+            'personal_number.max' => __('The personal number must not exceed 12 characters.'),
+            'personal_number.not_regex' => __('The personal number contains invalid characters.'),
 
             // Probation
             'prob_period.enum' => __('The selected probation period is invalid.'),
             'probation_at.date' => __('The probation end date must be a valid date.'),
+            'probation_at.date_format' => __('The probation end date must be in format YYYY-MM-DD.'),
             'probation_at.after_or_equal' => __('The probation end date must be after or equal to the joined date.'),
 
             // Notice
             'notice_at.date' => __('The notice date must be a valid date.'),
+            'notice_at.date_format' => __('The notice date must be in format YYYY-MM-DD.'),
+            'notice_at.after_or_equal' => __('The notice date must be after or equal to the joined date.'),
             'notice_period.enum' => __('The selected notice period is invalid.'),
 
             // Leave
             'leave_at.date' => __('The leave date must be a valid date.'),
+            'leave_at.date_format' => __('The leave date must be in format YYYY-MM-DD.'),
             'leave_at.after_or_equal' => __('The leave date must be after or equal to the joined date.'),
         ];
     }
