@@ -6,6 +6,9 @@ use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use Illuminate\Validation\Rule;
 
+/**
+ * Trait für die Validierung in der Account Details Komponente.
+ */
 trait ValidateAccountDetails
 {
     /**
@@ -35,44 +38,72 @@ trait ValidateAccountDetails
             $rules['gender'] = ['required', Rule::enum(Gender::class)];
         }
 
-        // Name
+        // Name - Starke Validierung
         if ($this->nameHasChanged()) {
-            $rules['name'] = 'required|string|min:3|max:255';
-        }
-
-        // Email
-        if ($this->emailHasChanged()) {
-            $rules['email'] = [
+            $rules['name'] = [
                 'required',
-                'email:rfc,dns,spoof',
+                'string',
+                'min:2',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->userId)
+                'regex:/^[a-zA-ZäöüÄÖÜéèêëàâîïôùûçÇßñÑ\s\-\'\.]+$/u',
+                'not_regex:/\d/',
+                'not_regex:/[!@#$%^&*()_+=\[\]{};:"\\|,<>\/?]/',
+                'not_regex:/\s{2,}/', // Keine mehrfachen Leerzeichen
             ];
         }
 
-        // Phone
-        if ($this->phoneHasChanged()) {
-            if (!empty($this->phone_1)) {
-                $rules['phone_1'] = [
-                    'nullable',
-                    'string',
-                    'max:20',
-                    'regex:/^[\d\s\-\+\(\)]+$/'
-                ];
-            }
+        // Email - Erweiterte Validierung
+        if ($this->emailHasChanged()) {
+            $rules['email'] = [
+                'required',
+                'string',
+                'email:rfc,dns,spoof,filter',
+                'max:255',
+                'lowercase',
+                Rule::unique('users', 'email')->ignore($this->userId),
+                'not_regex:/\.{2,}/', // Keine mehrfachen Punkte
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            ];
         }
 
-        // Phone 2 (optional, falls benötigt)
-        if ($this->phone2HasChanged()) {
-            if (!empty($this->phone_2)) {
-                $rules['phone_2'] = [
-                    'nullable',
-                    'string',
-                    'max:20',
-                    'regex:/^[\d\s\-\+\(\)]+$/'
-                ];
-            }
+        // Phone 1 - Starke Validierung
+        if ($this->phoneHasChanged()) {
+            $rules['phone_1'] = [
+                'nullable',
+                'string',
+                'min:10',
+                'max:20',
+                'regex:/^[\d\s\-\+\(\)\.]+$/',
+                'not_regex:/[a-zA-Z]/', // Keine Buchstaben
+                function ($attribute, $value, $fail) {
+                    // Entferne alle Nicht-Ziffern für die Längenprüfung
+                    $digitsOnly = preg_replace('/\D/', '', $value);
+                    if ($digitsOnly && (strlen($digitsOnly) < 10 || strlen($digitsOnly) > 15)) {
+                        $fail(__('The phone number must contain between 10 and 15 digits.'));
+                    }
+                },
+            ];
         }
+
+        // Phone 2 - Gleiche Validierung wie Phone 1
+        if ($this->phone2HasChanged()) {
+            $rules['phone_2'] = [
+                'nullable',
+                'string',
+                'min:10',
+                'max:20',
+                'regex:/^[\d\s\-\+\(\)\.]+$/',
+                'not_regex:/[a-zA-Z]/',
+                'different:phone_1', // Muss unterschiedlich zu Phone 1 sein
+                function ($attribute, $value, $fail) {
+                    $digitsOnly = preg_replace('/\D/', '', $value);
+                    if ($digitsOnly && (strlen($digitsOnly) < 10 || strlen($digitsOnly) > 15)) {
+                        $fail(__('The phone number must contain between 10 and 15 digits.'));
+                    }
+                },
+            ];
+        }
+
         // Model Status
         if ($this->modelStatusHasChanged()) {
             $rules['model_status'] = ['required', Rule::enum(ModelStatus::class)];
@@ -88,24 +119,42 @@ trait ValidateAccountDetails
     {
         return [
             'gender' => ['required', Rule::enum(Gender::class)],
-            'name' => 'required|string|min:3|max:255',
+            'name' => [
+                'required',
+                'string',
+                'min:2',
+                'max:255',
+                'regex:/^[a-zA-ZäöüÄÖÜéèêëàâîïôùûçÇßñÑ\s\-\'\.]+$/u',
+                'not_regex:/\d/',
+                'not_regex:/[!@#$%^&*()_+=\[\]{};:"\\|,<>\/?]/',
+                'not_regex:/\s{2,}/',
+            ],
             'email' => [
                 'required',
-                'email:rfc,dns,spoof',
+                'string',
+                'email:rfc,dns,spoof,filter',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->userId)
+                'lowercase',
+                Rule::unique('users', 'email')->ignore($this->userId),
+                'not_regex:/\.{2,}/',
+                'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
             ],
             'phone_1' => [
                 'nullable',
                 'string',
+                'min:10',
                 'max:20',
-                'regex:/^[\d\s\-\+\(\)]+$/'
+                'regex:/^[\d\s\-\+\(\)\.]+$/',
+                'not_regex:/[a-zA-Z]/',
             ],
             'phone_2' => [
                 'nullable',
                 'string',
+                'min:10',
                 'max:20',
-                'regex:/^[\d\s\-\+\(\)]+$/'
+                'regex:/^[\d\s\-\+\(\)\.]+$/',
+                'not_regex:/[a-zA-Z]/',
+                'different:phone_1',
             ],
             'model_status' => ['required', Rule::enum(ModelStatus::class)]
         ];
@@ -120,27 +169,39 @@ trait ValidateAccountDetails
             // Name
             'name.required' => __('Employee name is required.'),
             'name.string' => __('Employee name must be a string.'),
-            'name.min' => __('Employee name must be at least 3 characters.'),
+            'name.min' => __('Employee name must be at least 2 characters.'),
             'name.max' => __('Employee name must not exceed 255 characters.'),
+            'name.regex' => __('Employee name can only contain letters, spaces, hyphens, apostrophes and dots.'),
+            'name.not_regex' => __('Employee name contains invalid characters or formatting.'),
 
             // Gender
             'gender.required' => __('Gender is required.'),
             'gender.enum' => __('The selected gender is invalid.'),
 
             // Email
-            'email.required' => __('Email is required.'),
-            'email.email' => __('Email must be a valid email address.'),
-            'email.max' => __('Email must not exceed 255 characters.'),
-            'email.unique' => __('This email address is already in use.'),
+            'email.required' => __('Email address is required.'),
+            'email.string' => __('Email must be a string.'),
+            'email.email' => __('Please provide a valid email address.'),
+            'email.max' => __('Email address must not exceed 255 characters.'),
+            'email.unique' => __('This email address is already registered in the system.'),
+            'email.lowercase' => __('Email address must be in lowercase.'),
+            'email.regex' => __('Email address format is invalid.'),
+            'email.not_regex' => __('Email address contains invalid formatting.'),
 
-            // Phone
+            // Phone 1
             'phone_1.string' => __('Phone number must be a string.'),
+            'phone_1.min' => __('Phone number must be at least 10 characters.'),
             'phone_1.max' => __('Phone number must not exceed 20 characters.'),
-            'phone_1.regex' => __('Phone number format is invalid.'),
+            'phone_1.regex' => __('Phone number can only contain digits, spaces, hyphens, parentheses, dots and plus sign.'),
+            'phone_1.not_regex' => __('Phone number cannot contain letters.'),
 
-            'phone_2.string' => __('Phone number must be a string.'),
-            'phone_2.max' => __('Phone number must not exceed 20 characters.'),
-            'phone_2.regex' => __('Phone number format is invalid.'),
+            // Phone 2
+            'phone_2.string' => __('Secondary phone number must be a string.'),
+            'phone_2.min' => __('Secondary phone number must be at least 10 characters.'),
+            'phone_2.max' => __('Secondary phone number must not exceed 20 characters.'),
+            'phone_2.regex' => __('Secondary phone number can only contain digits, spaces, hyphens, parentheses, dots and plus sign.'),
+            'phone_2.not_regex' => __('Secondary phone number cannot contain letters.'),
+            'phone_2.different' => __('Secondary phone number must be different from primary phone number.'),
 
             // Model Status
             'model_status.required' => __('Account status is required.'),
@@ -150,7 +211,6 @@ trait ValidateAccountDetails
 
     /**
      * Gibt alle geänderten Felder mit ihren Änderungen zurück
-     * Nützlich für Logging oder Debugging
      */
     public function getChangedFields(): array
     {
@@ -206,7 +266,7 @@ trait ValidateAccountDetails
      */
     private function genderHasChanged(): bool
     {
-        return $this->gender !== ($this->originalData['gender'] ?? '');
+        return $this->gender !== ($this->originalData['gender'] ?? null);
     }
 
     /**
@@ -214,7 +274,7 @@ trait ValidateAccountDetails
      */
     private function nameHasChanged(): bool
     {
-        return $this->name !== ($this->originalData['name'] ?? '');
+        return $this->name !== ($this->originalData['name'] ?? null);
     }
 
     /**
@@ -222,7 +282,7 @@ trait ValidateAccountDetails
      */
     private function emailHasChanged(): bool
     {
-        return $this->email !== ($this->originalData['email'] ?? '');
+        return $this->email !== ($this->originalData['email'] ?? null);
     }
 
     /**
@@ -230,7 +290,7 @@ trait ValidateAccountDetails
      */
     private function phoneHasChanged(): bool
     {
-        return $this->phone_1 !== ($this->originalData['phone_1'] ?? '');
+        return $this->phone_1 !== ($this->originalData['phone_1'] ?? null);
     }
 
     /**
@@ -238,7 +298,7 @@ trait ValidateAccountDetails
      */
     private function phone2HasChanged(): bool
     {
-        return $this->phone_2 !== ($this->originalData['phone_2'] ?? '');
+        return $this->phone_2 !== ($this->originalData['phone_2'] ?? null);
     }
 
     /**
@@ -246,37 +306,20 @@ trait ValidateAccountDetails
      */
     private function modelStatusHasChanged(): bool
     {
-        return $this->model_status !== ($this->originalData['model_status'] ?? '');
+        return $this->model_status !== ($this->originalData['model_status'] ?? null);
     }
 
     /**
-     * Generische Methode zum Vergleich von Integer-Arrays
-     * Normalisiert beide Arrays (sortiert, unique, nur integers) vor dem Vergleich
+     * Prüft ob irgendwelche Änderungen vorliegen
      */
-    private function intArraysHaveChanged(array $original, array $current): bool
+    public function hasAnyChanges(): bool
     {
-        $normalizedOriginal = $this->normalizeIntArray($original);
-        $normalizedCurrent = $this->normalizeIntArray($current);
-        return !$this->arraysAreEqual($normalizedOriginal, $normalizedCurrent);
-    }
-
-    /**
-     * Normalisiere Integer Array (sortiert, unique, nur integers)
-     */
-    private function normalizeIntArray(array $array): array
-    {
-        $normalized = array_map('intval', array_filter($array, 'is_numeric'));
-        $normalized = array_unique($normalized);
-        sort($normalized);
-        return array_values($normalized);
-    }
-
-    /**
-     * Vergleiche zwei Arrays nach Normalisierung
-     */
-    private function arraysAreEqual(array $array1, array $array2): bool
-    {
-        return $array1 === $array2;
+        return $this->genderHasChanged() ||
+            $this->nameHasChanged() ||
+            $this->emailHasChanged() ||
+            $this->phoneHasChanged() ||
+            $this->phone2HasChanged() ||
+            $this->modelStatusHasChanged();
     }
 
     /**
@@ -310,15 +353,28 @@ trait ValidateAccountDetails
     }
 
     /**
-     * Prüft ob irgendwelche Änderungen vorliegen
+     * Sanitize phone number before saving
      */
-    public function hasAnyChanges(): bool
+    public function sanitizePhoneNumber(?string $phone): ?string
     {
-        return $this->genderHasChanged() ||
-            $this->nameHasChanged() ||
-            $this->emailHasChanged() ||
-            $this->phoneHasChanged() ||
-            $this->phone2HasChanged() ||
-            $this->modelStatusHasChanged();
+        if (!$phone) {
+            return null;
+        }
+
+        // Entferne mehrfache Leerzeichen und trimme
+        return preg_replace('/\s+/', ' ', trim($phone));
+    }
+
+    /**
+     * Sanitize name before saving
+     */
+    public function sanitizeName(?string $name): ?string
+    {
+        if (!$name) {
+            return null;
+        }
+
+        // Entferne mehrfache Leerzeichen und trimme
+        return preg_replace('/\s+/', ' ', trim($name));
     }
 }
