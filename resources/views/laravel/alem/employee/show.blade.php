@@ -24,6 +24,8 @@
                     lazy
                 />
 
+                <livewire:alem.employee.profile.family.child/>
+
                 <livewire:alem.employee.profile.account.details
                     :user-id="$userId"
                     :auth-user-id="$authUserId"

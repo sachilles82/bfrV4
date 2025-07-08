@@ -1,7 +1,7 @@
 <div>
     <x-pupi.layout.form>
         <x-slot:title>
-            {{ __('Marital Stauts') }}
+            {{ __('Marital Status') }}
         </x-slot:title>
 
         <x-slot:description>
