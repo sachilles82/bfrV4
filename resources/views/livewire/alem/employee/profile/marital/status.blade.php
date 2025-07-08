@@ -1,11 +1,11 @@
 <div>
     <x-pupi.layout.form>
         <x-slot:title>
-            {{ __('Family Status') }}
+            {{ __('Marital Stauts') }}
         </x-slot:title>
 
         <x-slot:description>
-            {{ __('Update the family status of employee') }}
+            {{ __('Update the marital data') }}
         </x-slot:description>
 
         <x-slot name="form">
@@ -49,17 +49,69 @@
             {{--            </div>--}}
 
 
-            <form wire:submit.prevent="updatePersonalData">
+            <form wire:submit.prevent="updateMaritalData">
                 <div class="px-4 py-6 sm:p-8 relative">
                     <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
+                        <!-- Civil Status -->
+                        <div class="sm:col-span-3">
+                            <x-pupi.input.group
+                                label="{{ __('Civil Status') }}"
+                                for="civil_status"
+                                badge="{{ __('Optional') }}"
+                                model="civil_status"
+                                :error="$errors->first('civil_status')"
+                                help-text="{{ __('') }}">
+
+                                <flux:select
+                                    class="!mt-2"
+                                    wire:model="civil_status"
+                                    name="civil_status"
+                                    id="civil_status"
+                                    variant="listbox"
+                                    placeholder="{{ __('Select Civil Status') }}">
+
+                                    @foreach($this->civilStatusOptions() as $civilStatusOption)
+                                        <flux:option
+                                            wire:key="civilStatus-option-{{ $civilStatusOption['value'] }}"
+                                            value="{{ $civilStatusOption['value'] }}">
+                                            <span>{{ $civilStatusOption['label'] }}</span>
+                                        </flux:option>
+                                    @endforeach
+
+                                </flux:select>
+
+                            </x-pupi.input.group>
+                        </div>
+
+                        <!-- Marriage Date -->
+                        <div class="sm:col-span-3">
+                            <x-pupi.input.group
+                                label="{{ __('Marriage Date') }}"
+                                for="marriage_at"
+                                badge="{{ __('Optional') }}"
+                                :error="$errors->first('marriage_at')"
+                                model="marriage_at"
+                                help-text="{{ __('') }}"
+                            >
+                                <flux:date-picker
+                                    wire:model="marriage_at"
+                                    id="marriage_at"
+                                    type="date">
+                                    <x-slot name="trigger">
+                                        <flux:date-picker.input class="mt-2"/>
+                                    </x-slot>
+                                </flux:date-picker>
+
+                            </x-pupi.input.group>
+                        </div>
 
                         <!-- Partner Name -->
-                        <div class="sm:col-span-5">
+                        <div class="sm:col-span-6">
                             <x-pupi.input.group
                                 label="{{ __('Partner/in Full Name') }}"
                                 for="name_partner"
-                                badge="{{ __('Required') }}"
+                                badge="{{ __('Optional') }}"
                                 model="name_partner"
                                 help-text="{{ __('') }}"
                                 :error="$errors->first('name_partner')">
@@ -75,13 +127,13 @@
                         </div>
 
                         <!-- AHV Number -->
-                        <div class="sm:col-span-4">
+                        <div class="sm:col-span-3">
                             <x-pupi.input.group
                                 label="{{ __('Partner/in AHV Number') }}"
                                 for="ahv_partner"
                                 model="ahv_partner"
-                                badge="{{ __('Required') }}"
-                                error="{{ $errors->first('ahv_partner') }}">
+                                badge="{{ __('Optional') }}"
+                                :error="$errors->first('ahv_partner')">
 
                                 <x-pupi.input.text
                                     wire:model="ahv_partner"
@@ -94,13 +146,12 @@
                             </x-pupi.input.group>
                         </div>
 
-
-                        <!-- Birthday -->
-                        <div class="sm:col-span-2">
+                        <!-- Partner Birthdate -->
+                        <div class="sm:col-span-3">
                             <x-pupi.input.group
                                 label="{{ __('Partner/in Birthdate') }}"
                                 for="birthdate_partner"
-                                badge="{{ __('Required') }}"
+                                badge="{{ __('Optional') }}"
                                 :error="$errors->first('birthdate_partner')"
                                 model="birthdate_partner"
                                 help-text="{{ __('') }}"
@@ -113,108 +164,60 @@
                                         <flux:date-picker.input class="mt-2"/>
                                     </x-slot>
                                 </flux:date-picker>
-                            </x-pupi.input.group>
-                        </div>
-
-                        <!-- Civil Status -->
-                        <div class="sm:col-span-3">
-                            <x-pupi.input.group
-                                label="{{ __('Civil Status') }}"
-                                for="civil_status"
-                                badge="{{ __('Required') }}"
-                                model="civil_status"
-                                help-text="{{ __('') }}">
-
-                                <flux:select
-                                    class="!mt-2"
-                                    wire:model="civil_status"
-                                    name="civil_status"
-                                    id="civil_status"
-                                    variant="listbox"
-                                    placeholder="{{ __('Select Civil Status') }}">
-
-                                    {{--                                                        @foreach($this->civilStatusOptions() as $civilStatusOption)--}}
-                                    {{--                                                            <flux:option--}}
-                                    {{--                                                                wire:key="civilStatus-option-{{ $civilStatusOption['value'] }}"--}}
-                                    {{--                                                                value="{{ $civilStatusOption['value'] }}">--}}
-                                    {{--                                                                <span>{{ $civilStatusOption['label'] }}</span>--}}
-                                    {{--                                                            </flux:option>--}}
-                                    {{--                                                        @endforeach--}}
-
-                                </flux:select>
 
                             </x-pupi.input.group>
                         </div>
 
-                        <!-- Birthday -->
-                        <div class="sm:col-span-2">
-                            <x-pupi.input.group
-                                label="{{ __('Marriage Date') }}"
-                                for="marriage_at"
-                                badge="{{ __('Required') }}"
-                                :error="$errors->first('marriage_at')"
-                                model="marriage_at"
-                                help-text="{{ __('') }}"
-                            >
-                                <flux:date-picker
-                                    wire:model="marriage_at"
-                                    id="marriage_at"
-                                    type="date">
-                                    <x-slot name="trigger">
-                                        <flux:date-picker.input class="mt-2"/>
-                                    </x-slot>
-                                </flux:date-picker>
-                            </x-pupi.input.group>
-                        </div>
-
-                        <!-- Email Invitation Toggle -->
+                        <!-- Single Parent Toggle -->
                         <div class="sm:col-span-3"
                              x-data="{
-                            invitationEnabled: @entangle('invitation').defer,
-                        }"
+                    singleParentEnabled: $wire.single_parent === true || $wire.single_parent === 1
+                }"
                         >
                             <div class="divide-y divide-gray-200 dark:divide-white/10">
                                 <div class="pb-2 flex items-center justify-between">
-                                <span class="flex grow flex-col">
-                                    <span class="text-sm/6 font-medium text-gray-900 dark:text-white"
-                                          id="invitation-label">
-                                        {{ __('Parent Status') }}
-                                    </span>
-                                    <!-- Text based on toggle state -->
-                                    <span class="text-sm"
-                                          :class="invitationEnabled ? 'text-indigo-600 dark:text-indigo-500' : 'text-gray-500 dark:text-gray-400'">
-                                        <span
-                                            x-show="!invitationEnabled">{{ __('Not Single Parent') }}</span>
-                                        <span x-show="invitationEnabled"
-                                              x-cloak>{{ __('Is Single Parent') }}</span>
-                                    </span>
-                                </span>
+                        <span class="flex grow flex-col">
+                            <span class="text-sm/6 font-medium text-gray-900 dark:text-white"
+                                  id="single-parent-label">
+                                {{ __('Parent Status') }}
+                            </span>
+                            <!-- Text based on toggle state -->
+                            <span class="text-sm"
+                                  :class="singleParentEnabled ? 'text-indigo-600 dark:text-indigo-500' : 'text-gray-500 dark:text-gray-400'">
+                                <span x-show="!singleParentEnabled">{{ __('Not Single Parent') }}</span>
+                                <span x-show="singleParentEnabled" x-cloak>{{ __('Is Single Parent') }}</span>
+                            </span>
+                        </span>
 
                                     <div class="flex items-center">
                                         <!-- Toggle Button -->
                                         <button
-                                            @click="(invitationEnabled = !invitationEnabled)"
+                                            @click="singleParentEnabled = !singleParentEnabled; $wire.single_parent = singleParentEnabled"
                                             type="button"
-                                            wire:model="single_partner"
-                                            class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                                            class="relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none cursor-pointer"
                                             :class="{
-                                            'bg-indigo-600 dark:bg-indigo-500 cursor-pointer': invitationEnabled,
-                                            'bg-gray-200 dark:bg-gray-700 cursor-pointer': !invitationEnabled,
-                                        }"
+                                    'bg-indigo-600 dark:bg-indigo-500': singleParentEnabled,
+                                    'bg-gray-200 dark:bg-gray-700': !singleParentEnabled,
+                                }"
                                             role="switch"
-                                            :aria-checked="invitationEnabled"
+                                            :aria-checked="singleParentEnabled"
                                         >
-                                        <span
-                                            class="pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
-                                            :class="invitationEnabled ? 'translate-x-5' : 'translate-x-0'"
-                                        ></span>
+                                <span
+                                    class="pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
+                                    :class="singleParentEnabled ? 'translate-x-5' : 'translate-x-0'"
+                                ></span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
+                            @error('single_parent')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
+
                     </div>
                 </div>
+
                 <!-- Button Container -->
                 <x-pupi.button.container>
                     <x-pupi.button.fluxsubmit/>

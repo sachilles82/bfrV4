@@ -58,6 +58,7 @@ class Employee extends Model
     protected $casts = [
         'leave_at' => 'date',
         'marriage_at' => 'date',
+        'single_parent' => 'boolean',
         'probation_at' => 'date',
         'prob_period' => Probation::class,
         'notice_at' => 'date',

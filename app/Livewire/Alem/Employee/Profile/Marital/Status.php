@@ -29,12 +29,12 @@ class Status extends Component
     public int $userId;
 
     /** Form fields */
-    public ?string $name_partner = null;
-    public ?string $ahv_partner = null;
-    public ?string $birthdate_partner = null;
     public ?string $civil_status = null;
+    public ?string $name_partner = null;
+    public bool $single_parent = false;
+    public ?string $birthdate_partner = null;
+    public ?string $ahv_partner = null;
     public ?string $marriage_at = null;
-    public ?string $single_parent = null;
 
     /** Original Daten für Vergleiche */
     public array $originalData = [];
@@ -46,7 +46,7 @@ class Status extends Component
         $this->currentTeamId = $currentTeamId;
         $this->companyId = $companyId;
 
-        $this->loadEmployeeMaritalData();
+        $this->loadMaritalData();
     }
 
     /**
@@ -86,39 +86,39 @@ class Status extends Component
         }
 
         // Sonst lade User direkt
-        return User::select('id')
+        return User::select(['id'])
             ->findOrFail($this->userId);
     }
 
     /**
-     * Befülle die Form mit Personal Daten
+     * Befülle die Form mit Marital Daten
      * Speichere Original-Daten aus der Datenbank für den Vergleich
      */
-    private function loadEmployeeMaritalData(): void
+    private function loadMaritalData(): void
     {
         $employee = $this->employee;
 
         // Original-Daten speichern - KEINE empty strings, nur null
         $this->originalData = [
-            'name_partner' => $employee->name_partner,
-            'ahv_partner' => $employee->ahv_partner,
-            'birthdate_partner' => $employee->birthdate_partner,
-            'civil_status' => $employee->civil_status,
-            'marriage_at' => $employee->marriage_at?->format('Y-m-d'),
-            'single_parent' => $employee->single_parent,
+            'civil_status' => $employee?->civil_status?->value,
+            'name_partner' => $employee?->name_partner,
+            'single_parent' => $employee?->single_parent,
+            'birthdate_partner' => $employee?->birthdate_partner,
+            'ahv_partner' => $employee?->ahv_partner,
+            'marriage_at' => $employee?->marriage_at?->format('Y-m-d'),
         ];
 
-        // Form-Felder befüllen
-        $this->name_partner = $this->originalData['name_partner'];
-        $this->ahv_partner = $this->originalData['ahv_partner'];
-        $this->birthdate_partner = $this->originalData['birthdate_partner'];
+        // Setze Form-Felder NUR mit den originalData
         $this->civil_status = $this->originalData['civil_status'];
-        $this->marriage_at = $this->originalData['marriage_at'];
+        $this->name_partner = $this->originalData['name_partner'];
         $this->single_parent = $this->originalData['single_parent'];
+        $this->birthdate_partner = $this->originalData['birthdate_partner'];
+        $this->ahv_partner = $this->originalData['ahv_partner'];
+        $this->marriage_at = $this->originalData['marriage_at'];
     }
 
     /**
-     * Aktualisiert die Personal Daten in der Datenbank.
+     * Aktualisiert die Marital Daten in der Datenbank.
      * Validiert nur die geänderten Felder für bessere Performance
      */
     public function updateMaritalData(): void
@@ -182,10 +182,10 @@ class Status extends Component
             // Aktualisiere Original-Daten nach erfolgreichem Update
             $this->updateOriginalDataAfterSave();
 
-            $this->dispatch('personal-data-updated');
+            $this->dispatch('marital-data-updated');
 
             Flux::toast(
-                text: __('Personal data updated successfully.'),
+                text: __('Marital status data updated successfully.'),
                 heading: __('Success'),
                 variant: 'success'
             );
@@ -201,15 +201,19 @@ class Status extends Component
     private function updateOriginalDataAfterSave(): void
     {
         $this->originalData = [
-            'name_partner' => $this->name_partner,
-            'ahv_partner' => $this->ahv_partner,
-            'birthdate_partner' => $this->birthdate_partner,
             'civil_status' => $this->civil_status,
-            'marriage_at' => $this->marriage_at,
+            'name_partner' => $this->name_partner,
             'single_parent' => $this->single_parent,
+            'birthdate_partner' => $this->birthdate_partner,
+            'ahv_partner' => $this->ahv_partner,
+            'marriage_at' => $this->marriage_at,
         ];
     }
 
+    public function placeholder(): string
+    {
+        return view('livewire.placeholders.employee.marital-status');
+    }
 
     public function render(): View
     {
