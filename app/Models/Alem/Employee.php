@@ -43,8 +43,13 @@ class Employee extends Model
         // Employee Status ist im User Model
 
 
-        // Zivile Daten
+        // Zivilstand des Employees
         'civil_status',
+        'name_partner',
+        'single_parent',
+        'birthdate_partner',
+        'ahv_partner',
+        'marriage_at',
     ];
 
     /**
@@ -52,6 +57,7 @@ class Employee extends Model
      */
     protected $casts = [
         'leave_at' => 'date',
+        'marriage_at' => 'date',
         'probation_at' => 'date',
         'prob_period' => Probation::class,
         'notice_at' => 'date',

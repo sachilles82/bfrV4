@@ -33,6 +33,12 @@ return new class extends Migration {
             $table->string('civil_status')->nullable();
             $table->string('residence_permit')->nullable();
 
+            $table->string('name_partner')->nullable();
+            $table->boolean('single_parent')->default(false);
+            $table->date('birthdate_partner')->nullable();
+            $table->string('ahv_partner')->nullable();
+            $table->date('marriage_at')->nullable();
+
             $table->timestamps();
         });
     }
