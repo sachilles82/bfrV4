@@ -9,77 +9,69 @@
         </x-slot:description>
 
         <x-slot name="form">
-            <div class="px-6 sm:px-6 lg:px-8">
+            <div>
+                <x-pupi.table2.main>
+                    <x-slot:head>
+                        <x-pupi.table2.th.th>
+                            {{ __('Full Name') }}
+                        </x-pupi.table2.th.th>
+                        <x-pupi.table2.th.notsort>
+                            {{ __('Gender') }}
+                        </x-pupi.table2.th.notsort>
+                        <x-pupi.table2.th.notsort>
+                            {{ __('Birthdate') }}
+                        </x-pupi.table2.th.notsort>
+                        <x-pupi.table2.th.notsort>
+                            {{ __('AHV Number') }}
+                        </x-pupi.table2.th.notsort>
+                        <x-pupi.table2.th.notsort>
+                            {{ __('Zulagen') }}
+                        </x-pupi.table2.th.notsort>
+                        <x-pupi.table2.th.actions/>
+                    </x-slot:head>
+                    <x-slot:body>
+                        <x-pupi.table2.tr.body>
+                            <x-pupi.table2.tr.cell1>
+                                Alem Alija
+                            </x-pupi.table2.tr.cell1>
+                            <x-pupi.table2.tr.cell>
+                                Männlich
+                            </x-pupi.table2.tr.cell>
+                            <x-pupi.table2.tr.cell>
+                                11.01.2022
+                            </x-pupi.table2.tr.cell>
+                            <x-pupi.table2.tr.cell>
+                                756.13.456.79
+                            </x-pupi.table2.tr.cell>
+                            <x-pupi.table2.tr.cell>
+                                11.01.2038
+                            </x-pupi.table2.tr.cell>
+                            <x-pupi.table2.tr.action>
+                                <flux:dropdown align="end" offset="-15">
+                                    <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal"
+                                                 size="sm"
+                                                 variant="ghost" inset="top bottom"/>
 
-                <div class="my-6 flow-root">
-                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                                <thead>
-                                <tr>
-                                    <th scope="col"
-                                        class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 dark:text-white sm:pl-0">
-                                        Full Name
-                                    </th>
-                                    <th scope="col"
-                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Gender
-                                    </th>
-                                    <th scope="col"
-                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Birthdate
-                                    </th>
-                                    <th scope="col"
-                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">AHV Number
-                                    </th>
-                                    <th scope="col"
-                                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Zulagen
-                                    </th>
-                                    <th scope="col" class="relative py-3.5 pr-4 pl-3 sm:pr-0">
-                                        <span class="sr-only">Edit</span>
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-                                <tr>
-                                    <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white sm:pl-0">
-                                        Alem Alija
-                                    </td>
-                                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">
-                                        Männlich
-                                    </td>
-                                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">
-                                        11.01.2022
-                                    </td>
-                                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">756.13.456.79</td>
-                                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">11.01.2038</td>
-                                    <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Edit<span
-                                                class="sr-only">, Alem Alija</span></a>
-                                    </td>
-                                </tr>
+                                    <flux:menu class="min-w-32">
+                                        <flux:menu.item
+                                            {{--                                                                                            wire:click="showEditModal({{ $role->id }})"--}}
+                                            icon="pencil-square">
+                                            {{ __('Edit') }}
+                                        </flux:menu.item>
 
-                                <tr>
-                                    <td class="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 dark:text-white sm:pl-0">
-                                        Alem Alija
-                                    </td>
-                                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">
-                                        Männlich
-                                    </td>
-                                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">
-                                        11.01.2022
-                                    </td>
-                                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">756.13.456.79</td>
-                                    <td class="px-3 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-300">11.01.2038</td>
-                                    <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Edit<span
-                                                class="sr-only">, Alem Alija</span></a>
-                                    </td>
-                                </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                                        <flux:menu.item
+                                            {{--                                                                                            wire:click="delete({{ $role->id }})"--}}
+                                            wire:confirm="{{ __('Are you sure you want to remove this role?') }}"
+                                            wire:confirm.prompt="Are you sure?\n\nType YES to confirm|YES"
+                                            icon="trash" variant="danger">
+                                            {{ __('Delete') }}
+                                        </flux:menu.item>
+                                    </flux:menu>
+                                </flux:dropdown>
+                            </x-pupi.table2.tr.action>
+                        </x-pupi.table2.tr.body>
+                    </x-slot:tbody>
+                </x-pupi.table2.main>
             </div>
 
             <!-- Button Container -->
