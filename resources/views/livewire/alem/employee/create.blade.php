@@ -336,7 +336,7 @@
                             :error="$errors->first('joined_at')">
 
                             <flux:date-picker
-                                wire:model.defer="joined_at"
+                                wire:model="joined_at"
                                 with-today
                                 value="21-03-2025"
                                 week-numbers
