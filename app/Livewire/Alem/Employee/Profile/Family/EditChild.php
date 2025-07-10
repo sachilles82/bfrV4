@@ -10,6 +10,7 @@ use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -25,11 +26,10 @@ class EditChild extends Component
     // Child identification
     #[Locked]
     public ?int $childId = null;
-    public ?Child $child = null;
 
-    // Parent User ID - wird beim Event gesetzt
+    // Parent User ID - wird vom Parent Component übergeben
     #[Locked]
-    public ?int $userId = null;
+    public int $userId;
 
     // Child Form Fields
     public ?string $name = null;
@@ -41,34 +41,39 @@ class EditChild extends Component
     /** Original Daten des Child aus der Datenbank für Vergleiche */
     public array $originalData = [];
 
+    /**
+     * Child als Computed Property
+     * Wird automatisch gecached und nach Validation Error neu geladen
+     */
+    #[Computed]
+    public function child(): ?Child
+    {
+        if (!$this->childId) {
+            return null;
+        }
+
+        return Child::where('id', $this->childId)
+            ->where('user_id', $this->userId)
+            ->select([
+                'id', 'user_id', 'name', 'gender',
+                'birthdate', 'ahv_number', 'valid_until'
+            ])
+            ->first();
+    }
+
     #[On('edit-child-modal')]
     public function openEditChildModal($childId): void
     {
         $this->childId = $childId;
 
-        // $this->authorize('update', [Child::class, $childId]);
-
-        // Lade Child mit User ID
-        $this->child = Child::select([
-            'id', 'user_id', 'name', 'gender',
-            'birthdate', 'ahv_number', 'valid_until'
-        ])->findOrFail($this->childId);
-
-        // Setze userId vom Child
-        if ($this->userId === null) {
-            $this->userId = $this->child->user_id;
-        }
-
-        // Sicherheitsprüfung - Child muss zum korrekten User gehören
-        if ($this->child->user_id !== $this->userId) {
+        // Prüfe ob Child existiert und zum User gehört
+        if (!$this->child) {
             abort(403, 'Unauthorized access to child data');
         }
 
         // Lade die Daten in die Form
         $this->loadChildData();
 
-        // Öffne Flux Modal
-        $this->modal('edit-child')->show();
     }
 
     /**
@@ -77,23 +82,25 @@ class EditChild extends Component
      */
     protected function loadChildData(): void
     {
-        if (!$this->child) return;
+        $child = $this->child;
+
+        if (!$child) return;
 
         // WICHTIG: Speichere Original-Daten für Vergleich
         $this->originalData = [
-            'name' => $this->child->name,
-            'gender' => $this->child->gender?->value,
-            'birthdate' => $this->child->birthdate?->format('Y-m-d'),
-            'ahv_number' => $this->child->ahv_number,
-            'valid_until' => $this->child->valid_until?->format('Y-m-d'),
+            'name' => $child->name,
+            'gender' => $child->gender?->value,
+            'birthdate' => $child->birthdate?->format('Y-m-d'),
+            'ahv_number' => $child->ahv_number,
+            'valid_until' => $child->valid_until?->format('Y-m-d'),
         ];
 
         // Setze Form-Felder
-        $this->name = $this->child->name;
-        $this->gender = $this->child->gender?->value;
-        $this->birthdate = $this->child->birthdate?->format('Y-m-d');
-        $this->ahv_number = $this->child->ahv_number;
-        $this->valid_until = $this->child->valid_until?->format('Y-m-d');
+        $this->name = $child->name;
+        $this->gender = $child->gender?->value;
+        $this->birthdate = $child->birthdate?->format('Y-m-d');
+        $this->ahv_number = $child->ahv_number;
+        $this->valid_until = $child->valid_until?->format('Y-m-d');
     }
 
     /**
@@ -101,7 +108,7 @@ class EditChild extends Component
      */
     public function updateChild(): void
     {
-        // Prüfe ob überhaupt Änderungen vorliegen
+        // Prüfe ob überhaupt Änderungen vorliegen (Methode aus ValidateChild Trait)
         if (!$this->hasAnyChanges()) {
             Flux::toast(
                 text: __('No changes detected.'),
@@ -111,13 +118,14 @@ class EditChild extends Component
             return;
         }
 
-        // Validiere NUR die geänderten Felder
+        // Validiere NUR die geänderten Felder (Methode aus ValidateChild Trait)
         $this->validateOnlyChanged();
 
         try {
             DB::transaction(function () {
                 $updateData = [];
 
+                // Nutze die Methoden aus ValidateChild Trait
                 if ($this->nameHasChanged()) {
                     $updateData['name'] = $this->name;
                 }
@@ -128,9 +136,9 @@ class EditChild extends Component
                     $updateData['birthdate'] = $this->birthdate;
 
                     // Neu berechnen wenn Birthdate geändert wurde
-                    if ($this->birthdate && !$this->valid_until) {
+                    if ($this->birthdate && !$this->validUntilHasChanged()) {
                         $birthdate = \Carbon\Carbon::parse($this->birthdate);
-                        $updateData['valid_until'] = $birthdate->copy()->addYears(18)->format('Y-m-d');
+                        $updateData['valid_until'] = $birthdate->copy()->addYears(18);
                     }
                 }
                 if ($this->ahvNumberHasChanged()) {
@@ -142,14 +150,21 @@ class EditChild extends Component
 
                 // Update nur wenn Felder geändert wurden
                 if (!empty($updateData)) {
-                    $this->child->update($updateData);
+                    // Nutze fresh() um sicherzustellen, dass wir das aktuelle Model haben
+                    Child::where('id', $this->childId)
+                        ->where('user_id', $this->userId)
+                        ->update($updateData);
                 }
             });
 
             // Aktualisiere Original-Daten nach erfolgreichem Update
             $this->updateOriginalDataAfterSave();
 
+            // Clear Computed Property Cache nach Update
+            unset($this->child);
+
             $this->closeEditChildModal();
+
             $this->dispatch('child-updated');
 
             Flux::toast(
@@ -159,76 +174,9 @@ class EditChild extends Component
             );
 
         } catch (\Throwable $e) {
+            // Nutze HandleCatchError Trait für Fehlerbehandlung
             $this->handleEditingError($e);
         }
-    }
-
-    /**
-     * Prüft ob irgendwelche Änderungen vorliegen
-     */
-    public function hasAnyChanges(): bool
-    {
-        return $this->nameHasChanged() ||
-            $this->genderHasChanged() ||
-            $this->birthdateHasChanged() ||
-            $this->ahvNumberHasChanged() ||
-            $this->validUntilHasChanged();
-    }
-
-    /**
-     * Validiert nur die geänderten Felder
-     */
-    private function validateOnlyChanged(): void
-    {
-        $rules = [];
-
-        if ($this->nameHasChanged()) {
-            $rules['name'] = 'required|string|max:255';
-        }
-        if ($this->genderHasChanged()) {
-            $rules['gender'] = 'nullable|string';
-        }
-        if ($this->birthdateHasChanged()) {
-            $rules['birthdate'] = 'nullable|date|before:today';
-        }
-        if ($this->ahvNumberHasChanged()) {
-            $rules['ahv_number'] = 'nullable|string|max:20';
-        }
-        if ($this->validUntilHasChanged()) {
-            $rules['valid_until'] = 'nullable|date|after:today';
-        }
-
-        if (!empty($rules)) {
-            $this->validate($rules);
-        }
-    }
-
-    /**
-     * Helper-Methoden für Änderungsprüfungen
-     */
-    private function nameHasChanged(): bool
-    {
-        return $this->name !== $this->originalData['name'];
-    }
-
-    private function genderHasChanged(): bool
-    {
-        return $this->gender !== $this->originalData['gender'];
-    }
-
-    private function birthdateHasChanged(): bool
-    {
-        return $this->birthdate !== $this->originalData['birthdate'];
-    }
-
-    private function ahvNumberHasChanged(): bool
-    {
-        return $this->ahv_number !== $this->originalData['ahv_number'];
-    }
-
-    private function validUntilHasChanged(): bool
-    {
-        return $this->valid_until !== $this->originalData['valid_until'];
     }
 
     /**
@@ -264,20 +212,19 @@ class EditChild extends Component
         $this->resetErrorBag();
 
         $this->reset([
-            'childId', 'child',
+            'childId',
             'name', 'gender', 'birthdate',
             'ahv_number', 'valid_until',
             'originalData'
         ]);
+
+        // Clear Computed Property Cache
+        unset($this->child);
     }
 
     public function render(): View
     {
         return view('livewire.alem.employee.profile.family.edit-child');
     }
-
-    /**
-     * Placeholder für Lazy Loading
-     */
 
 }

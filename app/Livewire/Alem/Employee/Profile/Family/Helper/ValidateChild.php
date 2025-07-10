@@ -140,6 +140,51 @@ trait ValidateChild
     }
 
     /**
+     * Gibt alle geänderten Felder mit ihren Änderungen zurück
+     */
+    public function getChangedFields(): array
+    {
+        $changed = [];
+
+        if ($this->nameHasChanged()) {
+            $changed['name'] = [
+                'old' => $this->originalData['name'] ?? null,
+                'new' => $this->name
+            ];
+        }
+
+        if ($this->genderHasChanged()) {
+            $changed['gender'] = [
+                'old' => $this->originalData['gender'] ?? null,
+                'new' => $this->gender
+            ];
+        }
+
+        if ($this->birthdateHasChanged()) {
+            $changed['birthdate'] = [
+                'old' => $this->originalData['birthdate'] ?? null,
+                'new' => $this->birthdate
+            ];
+        }
+
+        if ($this->ahvNumberHasChanged()) {
+            $changed['ahv_number'] = [
+                'old' => $this->originalData['ahv_number'] ?? null,
+                'new' => $this->ahv_number
+            ];
+        }
+
+        if ($this->validUntilHasChanged()) {
+            $changed['valid_until'] = [
+                'old' => $this->originalData['valid_until'] ?? null,
+                'new' => $this->valid_until
+            ];
+        }
+
+        return $changed;
+    }
+
+    /**
      * Prüft ob irgendwelche Änderungen vorliegen
      */
     public function hasAnyChanges(): bool
@@ -151,7 +196,9 @@ trait ValidateChild
             $this->validUntilHasChanged();
     }
 
-    // Helper-Methoden für Änderungsprüfung
+    /**
+     * Helper-Methoden für Änderungsprüfung
+     */
     private function nameHasChanged(): bool
     {
         return $this->name !== ($this->originalData['name'] ?? null);
@@ -175,5 +222,34 @@ trait ValidateChild
     private function validUntilHasChanged(): bool
     {
         return $this->valid_until !== ($this->originalData['valid_until'] ?? null);
+    }
+
+    /**
+     * Validiere einzelnes Feld on-the-fly (z.B. wire:blur)
+     */
+    public function validateField(string $fieldName): void
+    {
+        $fieldMapping = [
+            'name' => 'nameHasChanged',
+            'gender' => 'genderHasChanged',
+            'birthdate' => 'birthdateHasChanged',
+            'ahv_number' => 'ahvNumberHasChanged',
+            'valid_until' => 'validUntilHasChanged',
+        ];
+
+        // Prüfe ob das Feld geändert wurde
+        if (isset($fieldMapping[$fieldName])) {
+            $method = $fieldMapping[$fieldName];
+            if (!$this->$method()) {
+                // Feld nicht geändert - keine Validierung
+                return;
+            }
+        }
+
+        // Hole nur die Regel für dieses Feld
+        $rules = $this->getChangedFieldRules();
+        if (isset($rules[$fieldName])) {
+            $this->validateOnly($fieldName, [$fieldName => $rules[$fieldName]]);
+        }
     }
 }

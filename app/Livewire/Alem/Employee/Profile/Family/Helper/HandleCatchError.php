@@ -6,27 +6,50 @@ use Flux\Flux;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Trait für die Fehlerbehandlung beim Editieren von Kindern
+ */
 trait HandleCatchError
 {
     /**
      * Behandelt Fehler beim Speichern/Editieren von Kindern
      */
-    private function handleSavingError(\Throwable $e): void
+    private function handleEditingError(\Throwable $e): void
     {
-        // Rollback der Transaktion
+        // 1. Rollback der Datenbank-Transaktion
         if (DB::transactionLevel() > 0) {
             DB::rollBack();
         }
 
-        // Logge den Fehler
+        // 2. Finde heraus, welche Felder geändert wurden
+        $changedFields = [];
+        if (method_exists($this, 'getChangedFields')) {
+            try {
+                $changedFields = $this->getChangedFields();
+            } catch (\Throwable $ignored) {
+                $changedFields = ['Unbekannt'];
+            }
+        }
+
+        // 3. Logge den Fehler mit allen wichtigen Informationen
         Log::error('Fehler beim Speichern der Kinderdaten', [
+            // Der eigentliche Fehler
             'error_message' => $e->getMessage(),
             'error_file' => $e->getFile(),
             'error_line' => $e->getLine(),
-            'parent_user_id' => $this->userId ?? null,
+
+            // Identifikation
             'child_id' => $this->childId ?? null,
-            'auth_user_id' => $this->authUserId ?? auth()->id(),
-            'form_data' => [
+            'parent_user_id' => $this->userId ?? null,
+            'ausführender_user_id' => $this->authUserId ?? auth()->id(),
+            'team_id' => $this->currentTeamId ?? null,
+            'company_id' => $this->companyId ?? null,
+
+            // Welche Felder wurden geändert
+            'geänderte_felder' => $changedFields,
+
+            // Aktuelle Formular-Werte (falls Validierungsfehler)
+            'formular_daten' => [
                 'name' => $this->name ?? null,
                 'gender' => $this->gender ?? null,
                 'birthdate' => $this->birthdate ?? null,
@@ -35,28 +58,29 @@ trait HandleCatchError
             ]
         ]);
 
-        // Benutzerfreundliche Fehlermeldung
+        // 4. Zeige eine benutzerfreundliche Fehlermeldung
         Flux::toast(
-            text: __('Error saving child data. Please try again.'),
-            heading: __('Save Error'),
+            text: __('Error while saving child data. Please try again.'),
+            heading: __('Saving Error'),
             variant: 'danger'
         );
 
-        // Debug-Info in Development
+        // Optional: In Development-Umgebung zeige mehr Details
         if (config('app.debug')) {
             Flux::toast(
                 text: 'Debug: ' . $e->getMessage(),
-                heading: 'Error Details',
+                heading: 'Fehler-Details',
                 variant: 'warning'
             );
         }
     }
 
     /**
-     * Behandelt Fehler beim Editieren
+     * Behandelt Fehler beim Erstellen von Kindern
+     * (Alias für Konsistenz mit anderen Components)
      */
-    private function handleEditingError(\Throwable $e): void
+    private function handleSavingError(\Throwable $e): void
     {
-        $this->handleSavingError($e);
+        $this->handleEditingError($e);
     }
 }
