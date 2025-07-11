@@ -1,18 +1,84 @@
 <div>
+    <x-pupi.table2.tr.body>
+        <x-pupi.table2.tr.cell1>
+            {{ $child->name }}
+        </x-pupi.table2.tr.cell1>
+        <x-pupi.table2.tr.cell>
+            {{ __($child->gender?->label() ?? '-') }}
+        </x-pupi.table2.tr.cell>
+        <x-pupi.table2.tr.cell>
+            <flux:tooltip class="cursor-default"
+                          content="{{ __('Age: ') . $child->age . ' ' . __('years') }}"
+                          position="top">
+                {{ $child->birthdate?->format('d.m.Y') ?? '-' }}
+            </flux:tooltip>
+        </x-pupi.table2.tr.cell>
+        <x-pupi.table2.tr.cell>
+            {{ $child->age }} {{ __('years') }}
+        </x-pupi.table2.tr.cell>
+        <x-pupi.table2.tr.cell>
+            {{ $child->ahv_number ?? '-' }}
+        </x-pupi.table2.tr.cell>
+        <x-pupi.table2.tr.cell>
+            @if($child->valid_until)
+                {{ $child->valid_until->format('d.m.Y') }}
+                @if($child->is_valid)
+                    <span class="text-green-600 dark:text-green-400">✓</span>
+                @else
+                    <span class="text-red-600 dark:text-red-400">✗</span>
+                @endif
+            @else
+                -
+            @endif
+        </x-pupi.table2.tr.cell>
+        <x-pupi.table2.tr.action>
+            <flux:dropdown align="end" offset="-15">
+                <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal"
+                             size="sm"
+                             variant="ghost" inset="top bottom"/>
+
+                <flux:menu class="min-w-32">
+                    <flux:modal.trigger name="edit-child-{{ $child->id }}">
+                        <flux:menu.item
+                            icon="pencil">
+                            {{ __('Edit') }}
+                        </flux:menu.item>
+                    </flux:modal.trigger>
+
+                    <flux:separator class="my-1"/>
+
+                    <flux:menu.item
+
+                        wire:click="$dispatch('deleted')"
+                        wire:confirm="{{ __('Are you sure you want to remove this child?') }}"
+{{--                        wire:confirm.prompt="Are you sure?\n\nType DELETE to confirm|DELETE"--}}
+{{--                        wire:click="$dispatch('deleted', { childId: {{ $child->id }} })"--}}
+                        icon="trash"
+                        variant="danger">
+                        {{ __('Delete') }}
+                    </flux:menu.item>
+
+                </flux:menu>
+            </flux:dropdown>
+
+{{--            <button wire:click="$dispatch('deleted')" type="button" class="text-center rounded-xl bg-red-500 text-white px-6 py-2 font-semibold disabled:cursor-not-allowed disabled:opacity-50">Delete</button>--}}
+
+        </x-pupi.table2.tr.action>
+    </x-pupi.table2.tr.body>
+
+    {{--    <!-- Edit Modal -->--}}
     <flux:modal
-        name="create-child"
+        name="edit-child-{{ $child->id }}"
         variant="flyout"
         position="left"
-        class="space-y-6 lg:min-w-3xl"
-    >
+        class="space-y-6 lg:min-w-3xl">
         <div>
-            <flux:heading size="lg">{{ __('Add Child') }}</flux:heading>
-            <flux:subheading>{{ __('Register a child for family allowance') }}</flux:subheading>
+            <flux:heading size="lg">{{ __('Edit Child') }}</flux:heading>
+            <flux:subheading>{{ __('Update child information for family allowance') }}</flux:subheading>
         </div>
 
         <!-- Formular: Child Data -->
-        <form wire:submit="saveChild" class="space-y-4">
-
+        <form wire:submit="save" class="space-y-4">
             <!-- Personal Information Section -->
             <div class="py-4">
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -22,10 +88,10 @@
                         <x-pupi.input.group
                             label="{{ __('Gender') }}"
                             for="gender"
-                            badge="{{ __('Required') }}"
+                            badge="{{ __('Optional') }}"
                             :error="$errors->first('gender')"
                             model="gender"
-                            help-text="{{ __('') }}">
+                            help-text="">
 
                             <flux:select
                                 class="mt-2"
@@ -36,8 +102,9 @@
 
                                 @foreach($this->genderOptions() as $genderOption)
                                     <flux:option
-                                        wire:key="gender-option-{{ $genderOption['value'] }}"
-                                        value="{{ $genderOption['value'] }}">
+                                        wire:key="gender-option-{{ $child->id }}-{{ $genderOption['value'] }}"
+                                        value="{{ $genderOption['value'] }}"
+                                        :selected="$gender === $genderOption['value']">
                                         <span>{{ $genderOption['label'] }}</span>
                                     </flux:option>
                                 @endforeach
@@ -47,21 +114,21 @@
                         </x-pupi.input.group>
                     </div>
 
-                    <!-- First Name -->
+                    <!-- Full Name -->
                     <div class="sm:col-span-5">
                         <x-pupi.input.group
                             label="{{ __('Full Name') }}"
                             for="name"
                             badge="{{ __('Required') }}"
                             :error="$errors->first('name')"
-                            help-text="{{ __('') }}"
+                            help-text=""
                             model="name">
 
                             <x-pupi.input.text
                                 wire:model="name"
+                                :value="$name"
                                 id="name"
-                                required
-                                placeholder="{{ __('Your Child Name') }}"
+                                placeholder="{{ __('Child Name') }}"
                             />
 
                         </x-pupi.input.group>
@@ -74,13 +141,13 @@
                             for="birthdate"
                             badge="{{ __('Required') }}"
                             model="birthdate"
+                            :value="$birthdate"
                             :error="$errors->first('birthdate')"
                             help-text="{{ __('Child must be under 25 years old') }}">
 
                             <flux:input
                                 wire:model="birthdate"
                                 id="birthdate"
-                                required
                                 type="date"
                                 max="{{ now()->format('Y-m-d') }}"
                                 min="{{ now()->subYears(25)->format('Y-m-d') }}"
@@ -102,6 +169,7 @@
 
                             <x-pupi.input.text
                                 wire:model="ahv_number"
+                                :value="$ahv_number"
                                 id="ahv_number"
                                 placeholder="756.1234.5678.90"
                                 x-mask="999.9999.9999.99"
@@ -122,6 +190,7 @@
 
                             <flux:input
                                 wire:model="valid_until"
+                                :value="$valid_until"
                                 id="valid_until"
                                 type="date"
                                 min="{{ now()->format('Y-m-d') }}"
@@ -136,11 +205,11 @@
 
             <!-- Form Buttons -->
             <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                <flux:button wire:click="closeCreateChildModal" type="button" variant="ghost">
+                <flux:button wire:click="closeEditModal" type="button" variant="ghost">
                     {{ __('Cancel') }}
                 </flux:button>
                 <flux:button type="submit" variant="primary">
-                    {{ __('Add Child') }}
+                    {{ __('Save Changes') }}
                 </flux:button>
             </div>
         </form>

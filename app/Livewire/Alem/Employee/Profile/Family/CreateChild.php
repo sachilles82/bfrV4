@@ -129,6 +129,7 @@ use App\Livewire\Alem\Employee\Profile\Family\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Profile\Family\Helper\ValidateChild;
 use App\Models\Alem\Child;
 use App\Traits\Enum\GenderOptions;
+use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
@@ -146,9 +147,6 @@ class CreateChild extends Component
     #[Locked]
     public int $userId;
 
-    // Modal State
-    public bool $show = false;
-
     // Child Form Fields
     public ?string $name = null;
     public ?string $gender = null;
@@ -159,24 +157,12 @@ class CreateChild extends Component
     public function mount(int $userId): void
     {
         $this->userId = $userId;
-        // Setze Default Gender
-        $this->gender = Gender::Male->value;
-    }
-
-    /**
-     * Öffnet das Create Modal
-     */
-    public function openModal(): void
-    {
-        $this->resetFormInputs();
-        $this->gender = Gender::Male->value;
-        $this->show = true;
     }
 
     /**
      * Speichert ein neues Kind
      */
-    public function add(): void
+    public function saveChild(): void
     {
         $this->validate();
 
@@ -184,7 +170,7 @@ class CreateChild extends Component
             DB::transaction(function () {
                 // Berechne valid_until wenn birthdate gesetzt ist
                 if ($this->birthdate && !$this->valid_until) {
-                    $birthdate = \Carbon\Carbon::parse($this->birthdate);
+                    $birthdate = Carbon::parse($this->birthdate);
                     $this->valid_until = $birthdate->copy()->addYears(18)->format('Y-m-d');
                 }
 
@@ -198,8 +184,8 @@ class CreateChild extends Component
                 ]);
             });
 
-            $this->reset('show');
             $this->dispatch('added');
+            $this->closeCreateChildModal();
 
             Flux::toast(
                 text: __('Child added successfully.'),
@@ -210,6 +196,20 @@ class CreateChild extends Component
         } catch (\Throwable $e) {
             $this->handleSavingError($e);
         }
+    }
+
+    /**
+     * Schließt das Modal und bereinigt alle Daten
+     */
+    public function closeCreateChildModal(): void
+    {
+        $this->modal('create-child')->close();
+
+        $this->js("
+        setTimeout(() => {
+              \$wire.resetFormInputs();
+            }, 1);
+        ");
     }
 
     public function resetFormInputs(): void

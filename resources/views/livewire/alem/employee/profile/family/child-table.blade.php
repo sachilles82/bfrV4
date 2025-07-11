@@ -39,8 +39,9 @@
                             @forelse($children as $child)
 
                                 <livewire:alem.employee.profile.family.child-row
+                                    :child="$child"
                                     :key="$child->id"
-                                    :$child
+{{--                                    :key="'child-' . $child->id . '-' . $refreshKey"--}}
                                     @deleted="delete({{ $child->id }})"
                                 />
                             @empty
@@ -57,15 +58,20 @@
                                     </td>
                                 </tr>
                             @endforelse
+
                         </x-slot:body>
                     </x-pupi.table2.main>
                 </x-slot:table>
 
-                @if($children->hasMorePages())
-                    <x-slot:pagination>
-                        {{ $children->links() }}
-                    </x-slot:pagination>
-                @endif
+                <x-slot:pagination>
+                    {{ $children->links() }}
+                </x-slot:pagination>
+
+                {{--                @if($children->hasMorePages() )--}}
+                {{--                    <x-slot:pagination>--}}
+                {{--                        {{ $children->links() }}--}}
+                {{--                    </x-slot:pagination>--}}
+                {{--                @endif--}}
 
             </x-pupi.table2.container>
 
@@ -73,7 +79,6 @@
             <x-pupi.button.container>
                 <flux:modal.trigger name="create-child">
                     <flux:button
-                        @click="$dispatch('create-child-modal', { userId: {{ $userId }} })"
                         variant="primary">
                         {{ __('Add Child') }}
                     </flux:button>
@@ -82,4 +87,15 @@
 
         </x-slot>
     </x-pupi.layout.form>
+
+    <livewire:alem.employee.profile.family.create-child
+        :user-id="$userId"
+        {{--        :auth-user-id="$authUserId"--}}
+        {{--        :current-team-id="$currentTeamId"--}}
+        {{--        :company-id="$companyId"--}}
+{{--        @child-created="$refresh"--}}
+
+        @added="$refresh"
+    />
+
 </div>
