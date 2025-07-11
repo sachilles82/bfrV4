@@ -184,7 +184,7 @@ class CreateChild extends Component
                 ]);
             });
 
-            $this->dispatch('added');
+            $this->dispatch('child-created');
             $this->closeCreateChildModal();
 
             Flux::toast(

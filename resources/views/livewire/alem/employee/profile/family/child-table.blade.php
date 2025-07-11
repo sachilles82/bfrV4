@@ -45,7 +45,7 @@
                                     @deleted="delete({{ $child->id }})"
 
 {{--                                    :key="'child-row-' . $child->id . '-' . now()->timestamp"--}}
-                                    
+
                                 />
                             @empty
                                 <tr>
@@ -97,7 +97,7 @@
         {{--        :auth-user-id="$authUserId"--}}
         {{--        :current-team-id="$currentTeamId"--}}
         {{--        :company-id="$companyId"--}}
-        @child-created="$refresh"
+{{--        @child-created="$refresh"--}}
     />
 
 </div>

@@ -51,7 +51,7 @@
 
                         wire:click="$parent.delete({{ $child->id }})"
 {{--                        wire:click="$dispatch('deleted')"--}}
-{{--                        wire:confirm="{{ __('Are you sure you want to remove this child?') }}"--}}
+                        wire:confirm="{{ __('Are you sure you want to remove this child?') }}"
 {{--                        wire:confirm.prompt="Are you sure?\n\nType DELETE to confirm|DELETE"--}}
 {{--                        wire:click="$dispatch('deleted', { childId: {{ $child->id }} })"--}}
                         icon="trash"
