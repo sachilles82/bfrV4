@@ -31,20 +31,20 @@
                     :company-id="$companyId"
                 />
 
-                <!-- Create Modal wird NUR gerendert wenn Alpine Store es anzeigt -->
-                <livewire:alem.employee.profile.family.create-child
-                    :user-id="$userId"
-                    :auth-user-id="$authUserId"
-                    :current-team-id="$currentTeamId"
-                    :company-id="$companyId"
-                />
+{{--                <!-- Create Modal wird NUR gerendert wenn Alpine Store es anzeigt -->--}}
+{{--                <livewire:alem.employee.profile.family.create-child--}}
+{{--                    :user-id="$userId"--}}
+{{--                    :auth-user-id="$authUserId"--}}
+{{--                    :current-team-id="$currentTeamId"--}}
+{{--                    :company-id="$companyId"--}}
+{{--                />--}}
 
-                <livewire:alem.employee.profile.family.edit-child
-                    :user-id="$userId"
-                    :auth-user-id="$authUserId"
-                    :current-team-id="$currentTeamId"
-                    :company-id="$companyId"
-                />
+{{--                <livewire:alem.employee.profile.family.edit-child--}}
+{{--                    :user-id="$userId"--}}
+{{--                    :auth-user-id="$authUserId"--}}
+{{--                    :current-team-id="$currentTeamId"--}}
+{{--                    :company-id="$companyId"--}}
+{{--                />--}}
 
 
 {{--                <livewire:alem.employee.profile.marital.status--}}

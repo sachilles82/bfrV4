@@ -16,7 +16,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy]
+#[Lazy(isolate: false)]
 class EditChild extends Component
 {
     use AuthorizesRequests;

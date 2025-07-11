@@ -10,7 +10,6 @@
 
         <x-slot name="form">
             <x-pupi.table2.container
-                wire:key="user-child-table-{{ now() }}"
             >
                 <x-slot:table>
                     <x-pupi.table2.main>
@@ -38,63 +37,12 @@
 
                         <x-slot:body>
                             @forelse($children as $child)
-                                <x-pupi.table2.tr.body wire:key="child-row-{{ $child->id }}">
-                                    <x-pupi.table2.tr.cell1>
-                                        {{ $child->name }}
-                                    </x-pupi.table2.tr.cell1>
-                                    <x-pupi.table2.tr.cell>
-                                        {{ __($child->gender?->label() ?? '-') }}
-                                    </x-pupi.table2.tr.cell>
-                                    <x-pupi.table2.tr.cell>
-                                        <flux:tooltip class="cursor-default"
-                                                      content="{{ __('Age: ') . $child->age . ' ' . __('years') }}"
-                                                      position="top">
-                                            {{ $child->birthdate?->format('d.m.Y') ?? '-' }}
-                                        </flux:tooltip>
-                                    </x-pupi.table2.tr.cell>
-                                    <x-pupi.table2.tr.cell>
-                                        {{ $child->age }} {{ __('years') }}
-                                    </x-pupi.table2.tr.cell>
-                                    <x-pupi.table2.tr.cell>
-                                        {{ $child->ahv_number ?? '-' }}
-                                    </x-pupi.table2.tr.cell>
-                                    <x-pupi.table2.tr.cell>
-                                        @if($child->valid_until)
-                                            {{ $child->valid_until->format('d.m.Y') }}
-                                            @if($child->is_valid)
-                                                <span class="text-green-600 dark:text-green-400">✓</span>
-                                            @else
-                                                <span class="text-red-600 dark:text-red-400">✗</span>
-                                            @endif
-                                        @else
-                                            -
-                                        @endif
-                                    </x-pupi.table2.tr.cell>
-                                    <x-pupi.table2.tr.action>
-                                        <flux:dropdown align="end" offset="-15">
-                                            <flux:button class="hover:bg-gray-200/75" icon="ellipsis-horizontal"
-                                                         size="sm"
-                                                         variant="ghost" inset="top bottom"/>
 
-                                            <flux:menu class="min-w-32">
-                                                <flux:modal.trigger name="edit-child">
-                                                    <flux:menu.item
-                                                        wire:click="$dispatch('edit-child-modal', { childId: {{ $child->id }} })"   >                                                     {{ __('Edit') }}
-                                                    </flux:menu.item>
-                                                </flux:modal.trigger>
-
-                                                <flux:separator class="my-1"/>
-
-                                                <flux:menu.item
-                                                    wire:click="deleteChild({{ $child->id }})"
-                                                    wire:confirm="{{ __('Are you sure you want to remove this child?') }}"
-                                                    icon="trash" variant="danger">
-                                                    {{ __('Delete') }}
-                                                </flux:menu.item>
-                                            </flux:menu>
-                                        </flux:dropdown>
-                                    </x-pupi.table2.tr.action>
-                                </x-pupi.table2.tr.body>
+                                <livewire:alem.employee.profile.family.child-row
+                                    :key="$child->id"
+                                    :$child
+                                    @deleted="delete({{ $child->id }})"
+                                />
                             @empty
                                 <tr>
                                     <td colspan="7" class="px-6 py-12 text-center">

@@ -12,7 +12,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-#[Lazy]
+#[Lazy(isolate: false)]
 class ChildTable extends Component
 {
     use AuthorizesRequests;
@@ -21,6 +21,7 @@ class ChildTable extends Component
     // Eigenschaften für vorgeladene Daten
     #[Locked]
     public ?int $userId = null;
+
     public int $authUserId;
     public int $currentTeamId;
     public int $companyId;
@@ -33,7 +34,7 @@ class ChildTable extends Component
     }
 
     /**
-     * Hört auf die Events 'child-created', 'child-updated', 'child-deleted' und aktualisiert die Tabelle
+     * Hört auf die Events und aktualisiert die Tabelle
      */
     #[On(['child-created', 'child-updated', 'child-deleted'])]
     public function refreshTable(): void
@@ -46,7 +47,6 @@ class ChildTable extends Component
      */
     public function updated($property): void
     {
-        // Falls später Filter hinzugefügt werden
         if ($property === 'perPage') {
             $this->resetPage();
         }
@@ -55,7 +55,7 @@ class ChildTable extends Component
     /**
      * Löscht ein Kind (Soft Delete)
      */
-    public function deleteChild(int $childId): void
+    public function delete(int $childId): void
     {
         // $this->authorize('delete', [Child::class, $childId]);
 
@@ -64,11 +64,12 @@ class ChildTable extends Component
 
             // Sicherheitsprüfung - nur über Parent User
             if ($child->user_id !== $this->userId) {
-                abort(403);
+                abort(403, 'Unauthorized action.');
             }
 
             $child->delete();
 
+            // Event dispatchen für andere Komponenten
             $this->dispatch('child-deleted');
 
             Flux::toast(
@@ -93,25 +94,21 @@ class ChildTable extends Component
     {
         // $this->authorize('viewAny', [Child::class, $this->userId]);
 
-        $query = Child::query();
-
-        $query->select([
-            'children.id',
-            'children.name',
-            'children.gender',
-            'children.birthdate',
-            'children.ahv_number',
-            'children.valid_until',
-        ]);
-
-        // Where Bedingung für den spezifischen User
-        $query->where('children.user_id', $this->userId);
-
-        // Sortierung - neueste zuerst
-        $query->latest('children.created_at');
-
-        // Pagination
-        $children = $query->simplePaginate($this->perPage);
+        $children = Child::query()
+            ->select([
+                'id',
+                'name',
+                'gender',
+                'birthdate',
+                'ahv_number',
+                'valid_until',
+                'user_id',
+                'created_at',
+                'updated_at'
+            ])
+            ->where('user_id', $this->userId)
+            ->latest()
+            ->simplePaginate($this->perPage);
 
         return view('livewire.alem.employee.profile.family.child-table', [
             'children' => $children
