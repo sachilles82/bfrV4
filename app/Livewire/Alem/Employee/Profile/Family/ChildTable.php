@@ -26,33 +26,33 @@ class ChildTable extends Component
         $this->userId = $userId;
     }
 
-//    // In ChildTable.php
-//    public int $refreshKey = 0;
-//
-//    #[On('child-created')]
-//    public function refreshTable(): void
-//    {
-//        $this->refreshKey++;
-//        $this->resetPage();
-//    }
+    // In ChildTable.php
+    public int $refreshKey = 0;
 
-    /**
-     * Löscht ein Kind
-     */
-    public function delete($childId): void
+    #[On('child-created')]
+    public function refreshTable(): void
     {
-        $child = Child::find($childId);
-
-        if ($child && $child->user_id === $this->userId) {
-            $child->delete();
-
-            Flux::toast(
-                text: __('Child removed successfully.'),
-                heading: __('Success'),
-                variant: 'success'
-            );
-        }
+        $this->refreshKey++;
+        $this->resetPage();
     }
+
+//    /**
+//     * Löscht ein Kind
+//     */
+//    public function delete($childId): void
+//    {
+//        $child = Child::find($childId);
+//
+//        if ($child && $child->user_id === $this->userId) {
+//            $child->delete();
+//
+//            Flux::toast(
+//                text: __('Child removed successfully.'),
+//                heading: __('Success'),
+//                variant: 'success'
+//            );
+//        }
+//    }
 
     public function render(): View
     {

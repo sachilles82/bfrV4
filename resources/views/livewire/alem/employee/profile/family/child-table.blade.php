@@ -40,9 +40,12 @@
 
                                 <livewire:alem.employee.profile.family.child-row
                                     :child="$child"
-                                    :key="$child->id"
-{{--                                    :key="'child-' . $child->id . '-' . $refreshKey"--}}
+                                    :key="'child-' . $child->id . '-' . $refreshKey"
+
                                     @deleted="delete({{ $child->id }})"
+
+{{--                                    :key="'child-row-' . $child->id . '-' . now()->timestamp"--}}
+                                    
                                 />
                             @empty
                                 <tr>
@@ -88,14 +91,13 @@
         </x-slot>
     </x-pupi.layout.form>
 
+    <!-- Create Modal wird NUR gerendert wenn Alpine Store es anzeigt -->
     <livewire:alem.employee.profile.family.create-child
         :user-id="$userId"
         {{--        :auth-user-id="$authUserId"--}}
         {{--        :current-team-id="$currentTeamId"--}}
         {{--        :company-id="$companyId"--}}
-{{--        @child-created="$refresh"--}}
-
-        @added="$refresh"
+        @child-created="$refresh"
     />
 
 </div>

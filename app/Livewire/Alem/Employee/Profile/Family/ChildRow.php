@@ -15,7 +15,7 @@ class ChildRow extends Component
     use AuthorizesRequests;
     use GenderOptions;
 
-    public Child $child;
+    public $child;
 
     // Child Form Fields für Edit
     public ?string $name = null;
@@ -27,7 +27,11 @@ class ChildRow extends Component
     public function mount(Child $child): void
     {
         $this->child = $child;
-        $this->resetFormInputs();
+        $this->name = $this->child->name;
+        $this->gender = $this->child->gender?->value;
+        $this->birthdate = $this->child->birthdate?->format('Y-m-d');
+        $this->ahv_number = $this->child->ahv_number;
+        $this->valid_until = $this->child->valid_until?->format('Y-m-d');
     }
 
     public function delete(): void
@@ -108,11 +112,7 @@ class ChildRow extends Component
 
     private function resetFormInputs(): void
     {
-        $this->name = $this->child->name;
-        $this->gender = $this->child->gender?->value;
-        $this->birthdate = $this->child->birthdate?->format('Y-m-d');
-        $this->ahv_number = $this->child->ahv_number;
-        $this->valid_until = $this->child->valid_until?->format('Y-m-d');
+
     }
 
     public function render()
