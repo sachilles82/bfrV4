@@ -61,6 +61,15 @@
                                     </td>
                                 </tr>
                             @endforelse
+{{--                            @forelse($children as $child)--}}
+{{--                                <livewire:alem.employee.profile.family.child-row--}}
+{{--                                    :child="$child"--}}
+{{--                                    :key="'child-' . $child->id"--}}
+{{--                                    @deleted="delete({{ $child->id }})"--}}
+{{--                                />--}}
+{{--                            @empty--}}
+{{--                                --}}{{-- Empty state --}}
+{{--                            @endforelse--}}
 
                         </x-slot:body>
                     </x-pupi.table2.main>

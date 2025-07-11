@@ -7,6 +7,7 @@ use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -30,29 +31,40 @@ class ChildTable extends Component
     public int $refreshKey = 0;
 
     #[On('child-created')]
+    #[On('child-updated')]
+    #[On('child-deleted')]
     public function refreshTable(): void
     {
         $this->refreshKey++;
         $this->resetPage();
     }
 
-//    /**
-//     * Löscht ein Kind
-//     */
-//    public function delete($childId): void
-//    {
-//        $child = Child::find($childId);
-//
-//        if ($child && $child->user_id === $this->userId) {
-//            $child->delete();
-//
-//            Flux::toast(
-//                text: __('Child removed successfully.'),
-//                heading: __('Success'),
-//                variant: 'success'
-//            );
-//        }
-//    }
+    public function delete($childId): void
+    {
+        try {
+            $child = Child::find($childId);
+
+            if ($child && $child->user_id === $this->userId) {
+                $childName = $child->name;
+                $child->delete();
+
+                sleep(1); // Optional: wie im Tutorial für visuelles Feedback
+
+                Flux::toast(
+                    text: __('Child :name removed successfully.', ['name' => $childName]),
+                    heading: __('Success'),
+                    variant: 'success'
+                );
+            }
+        } catch (\Throwable $e) {
+            Flux::toast(
+                text: __('Error deleting child.'),
+                heading: __('Error'),
+                variant: 'danger'
+            );
+        }
+    }
+
 
     public function render(): View
     {
