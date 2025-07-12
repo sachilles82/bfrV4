@@ -167,7 +167,6 @@
 
                                 <flux:input
                                     wire:model="form.valid_until"
-                                    :value="$form->valid_until"
                                     id="form.valid_until"
                                     type="date"
                                     min="{{ now()->format('Y-m-d') }}"
