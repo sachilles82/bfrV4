@@ -124,12 +124,9 @@
                                 :error="$errors->first('birthdate')"
                                 help-text="{{ __('Child must be under 25 years old') }}">
 
-                                <flux:input
+                                <flux:date-picker
                                     wire:model="birthdate"
                                     id="birthdate"
-                                    type="date"
-                                    max="{{ now()->format('Y-m-d') }}"
-                                    min="{{ now()->subYears(25)->format('Y-m-d') }}"
                                     class="mt-2"
                                 />
 
@@ -165,11 +162,9 @@
                                 :error="$errors->first('valid_until')"
                                 help-text="{{ __('Automatically set to 18th birthday if not specified') }}">
 
-                                <flux:input
+                                <flux:date-picker
                                     wire:model="valid_until"
                                     id="valid_until"
-                                    type="date"
-                                    min="{{ now()->format('Y-m-d') }}"
                                     class="mt-2"
                                 />
 
