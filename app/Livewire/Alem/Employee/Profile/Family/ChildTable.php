@@ -30,6 +30,8 @@ class ChildTable extends Component
         try {
             $child = Child::find($childId);
 
+            //Authorize the action
+
             if ($child && $child->user_id === $this->userId) {
                 $childName = $child->name;
 

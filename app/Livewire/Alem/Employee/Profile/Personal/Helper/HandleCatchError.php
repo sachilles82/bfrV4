@@ -2,76 +2,52 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Personal\Helper;
 
-use Flux\Flux;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Traits\Error\BaseHandleCatchError;
 
 /**
- * Minimaler Trait für die Fehlerbehandlung beim Editieren
+ * Spezifischer Error Handler für Personal-bezogene Components
  */
 trait HandleCatchError
 {
+    use BaseHandleCatchError;
+
     /**
-     * Behandelt Fehler beim Speichern/Editieren
+     * Behandelt Fehler beim Speichern von Personaldaten
      */
     private function handleEditingError(\Throwable $e): void
     {
-        // 1. Rollback der Datenbank-Transaktion
-        if (DB::transactionLevel() > 0) {
-            DB::rollBack();
-        }
+        $this->handleError($e, 'Personaldaten');
+    }
 
-        // 2. Finde heraus, welche Felder geändert wurden
-        $changedFields = [];
-        if (method_exists($this, 'getChangedFields')) {
-            try {
-                $changedFields = $this->getChangedFields();
-            } catch (\Throwable $ignored) {
-                $changedFields = ['Unbekannt'];
+    /**
+     * Implementierung für Personal Components
+     */
+    protected function collectIdentificationData(): array
+    {
+        return [
+            'bearbeiteter_user_id' => $this->userId ?? null,
+            'employee_id' => property_exists($this, 'employee') && $this->employee ? $this->employee->id : null,
+        ];
+    }
+
+    /**
+     * Implementierung für Personal Components
+     */
+    protected function collectFormData(): array
+    {
+        $knownPersonalFields = [
+            'birthdate', 'ahv_number', 'country_id',
+            'hometown', 'religion', 'residence_permit'
+        ];
+
+        $formData = [];
+
+        foreach ($knownPersonalFields as $field) {
+            if (property_exists($this, $field)) {
+                $formData[$field] = $this->$field ?? null;
             }
         }
 
-        // 3. Logge den Fehler mit allen wichtigen Informationen
-        Log::error('Fehler beim Speichern der Personaldaten', [
-            // Der eigentliche Fehler
-            'error_message' => $e->getMessage(),
-            'error_file' => $e->getFile(),
-            'error_line' => $e->getLine(),
-
-            // Benutzer-Informationen
-            'bearbeiteter_user_id' => $this->userId,
-            'ausführender_user_id' => $this->authUserId ?? auth()->id(),
-            'team_id' => $this->currentTeamId ?? null,
-            'company_id' => $this->companyId ?? null,
-
-            // Welche Felder wurden geändert
-            'geänderte_felder' => $changedFields,
-
-            // Aktuelle Formular-Werte (falls Validierungsfehler)
-            'formular_daten' => [
-                'birthdate' => $this->birthdate ?? null,
-                'ahv_number' => $this->ahv_number ?? null,
-                'country_id' => $this->country_id ?? null,
-                'hometown' => $this->hometown ?? null,
-                'religion' => $this->religion ?? null,
-                'residence_permit' => $this->residence_permit ?? null,
-            ]
-        ]);
-
-        // 4. Zeige eine benutzerfreundliche Fehlermeldung
-        Flux::toast(
-            text: __('Error while saving personal data. Please try again.'),
-            heading: __('Saving Error'),
-            variant: 'danger'
-        );
-
-        // Optional: In Development-Umgebung zeige mehr Details
-        if (config('app.debug')) {
-            Flux::toast(
-                text: 'Debug: ' . $e->getMessage(),
-                heading: 'Fehler-Details',
-                variant: 'warning'
-            );
-        }
+        return $formData;
     }
 }

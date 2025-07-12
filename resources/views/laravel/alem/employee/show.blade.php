@@ -26,9 +26,6 @@
 
                 <livewire:alem.employee.profile.family.child-table
                     :user-id="$userId"
-                    :auth-user-id="$authUserId"
-                    :current-team-id="$currentTeamId"
-                    :company-id="$companyId"
                 />
 
 

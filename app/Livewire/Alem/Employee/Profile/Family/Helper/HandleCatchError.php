@@ -2,85 +2,74 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Family\Helper;
 
-use Flux\Flux;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Traits\Error\BaseHandleCatchError;
 
 /**
- * Trait für die Fehlerbehandlung beim Editieren von Kindern
+ * Spezifischer Error Handler für Child-bezogene Components
  */
 trait HandleCatchError
 {
+    use BaseHandleCatchError;
+
     /**
      * Behandelt Fehler beim Speichern/Editieren von Kindern
      */
     private function handleEditingError(\Throwable $e): void
     {
-        // 1. Rollback der Datenbank-Transaktion
-        if (DB::transactionLevel() > 0) {
-            DB::rollBack();
-        }
-
-        // 2. Finde heraus, welche Felder geändert wurden
-        $changedFields = [];
-        if (method_exists($this, 'getChangedFields')) {
-            try {
-                $changedFields = $this->getChangedFields();
-            } catch (\Throwable $ignored) {
-                $changedFields = ['Unbekannt'];
-            }
-        }
-
-        // 3. Logge den Fehler mit allen wichtigen Informationen
-        Log::error('Fehler beim Speichern der Kinderdaten', [
-            // Der eigentliche Fehler
-            'error_message' => $e->getMessage(),
-            'error_file' => $e->getFile(),
-            'error_line' => $e->getLine(),
-
-            // Identifikation
-            'child_id' => $this->childId ?? null,
-            'parent_user_id' => $this->userId ?? null,
-            'ausführender_user_id' => $this->authUserId ?? auth()->id(),
-            'team_id' => $this->currentTeamId ?? null,
-            'company_id' => $this->companyId ?? null,
-
-            // Welche Felder wurden geändert
-            'geänderte_felder' => $changedFields,
-
-            // Aktuelle Formular-Werte (falls Validierungsfehler)
-            'formular_daten' => [
-                'name' => $this->name ?? null,
-                'gender' => $this->gender ?? null,
-                'birthdate' => $this->birthdate ?? null,
-                'ahv_number' => $this->ahv_number ?? null,
-                'valid_until' => $this->valid_until ?? null,
-            ]
-        ]);
-
-        // 4. Zeige eine benutzerfreundliche Fehlermeldung
-        Flux::toast(
-            text: __('Error while saving child data. Please try again.'),
-            heading: __('Saving Error'),
-            variant: 'danger'
-        );
-
-        // Optional: In Development-Umgebung zeige mehr Details
-        if (config('app.debug')) {
-            Flux::toast(
-                text: 'Debug: ' . $e->getMessage(),
-                heading: 'Fehler-Details',
-                variant: 'warning'
-            );
-        }
+        $this->handleError($e, 'Kinderdaten');
     }
 
     /**
-     * Behandelt Fehler beim Erstellen von Kindern
-     * (Alias für Konsistenz mit anderen Components)
+     * Alias für Konsistenz
      */
     private function handleSavingError(\Throwable $e): void
     {
         $this->handleEditingError($e);
+    }
+
+    /**
+     * Implementierung für Child Components
+     */
+    protected function collectIdentificationData(): array
+    {
+        $data = [
+            'child_id' => null,
+            'parent_user_id' => null,
+        ];
+
+        // Versuche Child ID zu finden
+        if (property_exists($this, 'child') && $this->child) {
+            $data['child_id'] = $this->child->id ?? null;
+            $data['parent_user_id'] = $this->child->user_id ?? null;
+        } elseif (property_exists($this, 'childId')) {
+            $data['child_id'] = $this->childId;
+        }
+
+        // Falls user_id noch nicht gefunden, suche weiter
+        if (!$data['parent_user_id'] && property_exists($this, 'userId')) {
+            $data['parent_user_id'] = $this->userId;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Implementierung für Child Components
+     */
+    protected function collectFormData(): array
+    {
+        $knownChildFields = [
+            'name', 'gender', 'birthdate', 'ahv_number', 'valid_until'
+        ];
+
+        $formData = [];
+
+        foreach ($knownChildFields as $field) {
+            if (property_exists($this, $field)) {
+                $formData[$field] = $this->$field ?? null;
+            }
+        }
+
+        return $formData;
     }
 }
