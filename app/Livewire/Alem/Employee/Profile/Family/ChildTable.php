@@ -7,10 +7,8 @@ use App\Traits\Table\WithPerPagePagination;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Lazy]
@@ -27,18 +25,6 @@ class ChildTable extends Component
         $this->userId = $userId;
     }
 
-    // In ChildTable.php
-    public int $refreshKey = 0;
-
-    #[On('child-created')]
-    #[On('child-updated')]
-    #[On('child-deleted')]
-    public function refreshTable(): void
-    {
-        $this->refreshKey++;
-        $this->resetPage();
-    }
-
     public function delete($childId): void
     {
         try {
@@ -46,9 +32,10 @@ class ChildTable extends Component
 
             if ($child && $child->user_id === $this->userId) {
                 $childName = $child->name;
+
                 $child->delete();
 
-                sleep(1); // Optional: wie im Tutorial für visuelles Feedback
+                $this->resetPage();
 
                 Flux::toast(
                     text: __('Child :name removed successfully.', ['name' => $childName]),
@@ -66,6 +53,7 @@ class ChildTable extends Component
     }
 
 
+
     public function render(): View
     {
         $children = Child::query()
@@ -77,8 +65,6 @@ class ChildTable extends Component
                 'ahv_number',
                 'valid_until',
                 'user_id',
-                'created_at',
-                'updated_at'
             ])
             ->where('user_id', $this->userId)
             ->latest()

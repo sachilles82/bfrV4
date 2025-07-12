@@ -162,29 +162,30 @@ class CreateChild extends Component
     /**
      * Speichert ein neues Kind
      */
-    public function saveChild(): void
+    public function add(): void
     {
-        $this->validate();
+
 
         try {
             DB::transaction(function () {
                 // Berechne valid_until wenn birthdate gesetzt ist
                 if ($this->birthdate && !$this->valid_until) {
-                    $birthdate = Carbon::parse($this->birthdate);
+                    $birthdate = \Carbon\Carbon::parse($this->birthdate);
                     $this->valid_until = $birthdate->copy()->addYears(18)->format('Y-m-d');
                 }
 
                 Child::create([
                     'user_id' => $this->userId,
                     'name' => $this->name,
-                    'gender' => $this->gender,
-                    'birthdate' => $this->birthdate,
-                    'ahv_number' => $this->ahv_number,
-                    'valid_until' => $this->valid_until,
+                    'gender' => $this->gender ?: null,
+                    'birthdate' => $this->birthdate ?: null,
+                    'ahv_number' => $this->ahv_number ?: null,
+                    'valid_until' => $this->valid_until ?: null,
                 ]);
             });
 
-            $this->dispatch('child-created');
+            $this->dispatch('added');
+
             $this->closeCreateChildModal();
 
             Flux::toast(

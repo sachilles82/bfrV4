@@ -24,22 +24,22 @@
 {{--                    lazy--}}
 {{--                />--}}
 
-{{--                <livewire:alem.employee.profile.family.child-table--}}
-{{--                    :user-id="$userId"--}}
-{{--                    :auth-user-id="$authUserId"--}}
-{{--                    :current-team-id="$currentTeamId"--}}
-{{--                    :company-id="$companyId"--}}
-{{--                />--}}
-
-
-
-
-                <livewire:alem.employee.profile.family.show-child
+                <livewire:alem.employee.profile.family.child-table
                     :user-id="$userId"
                     :auth-user-id="$authUserId"
                     :current-team-id="$currentTeamId"
                     :company-id="$companyId"
                 />
+
+
+
+
+{{--                <livewire:alem.employee.profile.family.show-child--}}
+{{--                    :user-id="$userId"--}}
+{{--                    :auth-user-id="$authUserId"--}}
+{{--                    :current-team-id="$currentTeamId"--}}
+{{--                    :company-id="$companyId"--}}
+{{--                />--}}
 
 
 

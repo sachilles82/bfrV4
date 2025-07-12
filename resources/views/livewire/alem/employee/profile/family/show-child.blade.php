@@ -61,7 +61,7 @@
                 </x-slot:table>
 
                 <x-slot:pagination>
-{{--                    {{ $children->links() }}--}}
+                    {{ $children->links() }}
                 </x-slot:pagination>
 
                 {{--                @if($children->hasMorePages() )--}}

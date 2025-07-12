@@ -8,9 +8,8 @@
             {{ __('Update the children data') }}
         </x-slot:description>
 
-        <x-slot name="form">
-            <x-pupi.table2.container
-            >
+        <x-slot:form>
+            <x-pupi.table2.container>
                 <x-slot:table>
                     <x-pupi.table2.main>
                         <x-slot:head>
@@ -73,10 +72,11 @@
 
             </x-pupi.table2.container>
 
-            <livewire:alem.employee.profile.family.add-child-dialog
+            <livewire:alem.employee.profile.family.create-child
                 :user-id="$userId"
-                @added="$refresh" />
+                @added="$refresh"
+            />
 
-        </x-slot>
+        </x-slot:form>
     </x-pupi.layout.form>
-    </div>
+</div>
