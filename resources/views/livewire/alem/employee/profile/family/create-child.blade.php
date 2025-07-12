@@ -112,9 +112,10 @@
 
                             <x-pupi.input.text
                                 wire:model="ahv_number"
+                                x-mask="756.9999.9999.99"
+                                name="ahv_number"
                                 id="ahv_number"
-                                placeholder="756.1234.5678.90"
-                                x-mask="999.9999.9999.99"
+                                placeholder="{{ __('756.XXXX.XXXX.XX') }}"
                             />
 
                         </x-pupi.input.group>

@@ -107,6 +107,7 @@
                                     autofocus
                                     wire:model="name"
                                     id="name"
+                                    name="name"
                                     placeholder="{{ __('Child Name') }}"
                                 />
 
@@ -141,16 +142,16 @@
                             <x-pupi.input.group
                                 label="{{ __('AHV Number') }}"
                                 for="ahv_number"
-                                badge="{{ __('Optional') }}"
-                                :error="$errors->first('ahv_number')"
-                                help-text="{{ __('Format: 756.xxxx.xxxx.xx') }}"
-                                model="ahv_number">
+                                model="ahv_number"
+                                badge="{{ __('Required') }}"
+                                error="{{ $errors->first('ahv_number') }}">
 
                                 <x-pupi.input.text
                                     wire:model="ahv_number"
+                                    x-mask="756.9999.9999.99"
+                                    name="ahv_number"
                                     id="ahv_number"
-                                    placeholder="756.1234.5678.90"
-                                    x-mask="999.9999.9999.99"
+                                    placeholder="{{ __('756.XXXX.XXXX.XX') }}"
                                 />
 
                             </x-pupi.input.group>
