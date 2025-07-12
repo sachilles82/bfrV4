@@ -127,8 +127,11 @@
                                 <flux:date-picker
                                     wire:model="birthdate"
                                     id="birthdate"
-                                    class="mt-2"
-                                />
+                                    class="mt-2">
+                                    <x-slot name="trigger">
+                                        <flux:date-picker.input />
+                                    </x-slot>
+                                </flux:date-picker>
 
                             </x-pupi.input.group>
                         </div>
@@ -165,8 +168,11 @@
                                 <flux:date-picker
                                     wire:model="valid_until"
                                     id="valid_until"
-                                    class="mt-2"
-                                />
+                                    class="mt-2">
+                                    <x-slot name="trigger">
+                                        <flux:date-picker.input />
+                                    </x-slot>
+                                </flux:date-picker>
 
                             </x-pupi.input.group>
                         </div>
