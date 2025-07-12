@@ -6,11 +6,7 @@
         {{ __($child->gender?->label() ?? '-') }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        <flux:tooltip class="cursor-default"
-                      content="{{ __('Age: ') . $child->age . ' ' . __('years') }}"
-                      position="top">
-            {{ $child->birthdate?->format('d.m.Y') ?? '-' }}
-        </flux:tooltip>
+        {{ $child->birthdate?->format('d.m.Y') ?? '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
         {{ $child->age }} {{ __('years') }}
@@ -19,16 +15,8 @@
         {{ $child->ahv_number ?? '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        @if($child->valid_until)
-            {{ $child->valid_until->format('d.m.Y') }}
-            @if($child->is_valid)
-                <span class="text-green-600 dark:text-green-400">✓</span>
-            @else
-                <span class="text-red-600 dark:text-red-400">✗</span>
-            @endif
-        @else
-            -
-        @endif
+        {{ $child->valid_until->format('d.m.Y') }}
+        <span class="text-green-600 dark:text-green-400">✓</span>
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.action>
         <flux:dropdown align="end" offset="-15">
@@ -58,8 +46,7 @@
         </flux:dropdown>
     </x-pupi.table2.tr.action>
 
-    <td class="">
-
+    <td class="hidden sm:table-cell">
         <flux:modal
             name="edit-child-{{ $child->id }}"
             variant="flyout"
@@ -119,7 +106,6 @@
                                 <x-pupi.input.text
                                     autofocus
                                     wire:model="form.name"
-                                    :value="$form->name"
                                     id="form.name"
                                     placeholder="{{ __('Child Name') }}"
                                 />
@@ -135,7 +121,6 @@
                                 for="form.birthdate"
                                 badge="{{ __('Required') }}"
                                 model="form.birthdate"
-                                :value="$form->birthdate"
                                 :error="$errors->first('form.birthdate')"
                                 help-text="{{ __('Child must be under 25 years old') }}">
 
@@ -163,7 +148,6 @@
 
                                 <x-pupi.input.text
                                     wire:model="form.ahv_number"
-                                    :value="$form->ahv_number"
                                     id="form.ahv_number"
                                     placeholder="756.1234.5678.90"
                                     x-mask="999.9999.9999.99"
@@ -178,7 +162,6 @@
                                 label="{{ __('Valid Until') }}"
                                 for="form.valid_until"
                                 badge="{{ __('Optional') }}"
-                                model="form.valid_until"
                                 :error="$errors->first('form.valid_until')"
                                 help-text="{{ __('Automatically set to 18th birthday if not specified') }}">
 
