@@ -16,11 +16,9 @@ class ChildForm extends Form
     public $ahv_number = '';
     public $valid_until = '';
 
-    // Nicht validierte Properties
     public ?int $userId = null;
     public ?Child $child = null;
 
-    // ENTFERNE mount() - das gehört hier nicht hin!
 
     public function setChild(Child $child): void
     {

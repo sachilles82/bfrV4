@@ -58,7 +58,7 @@
             </div>
 
             <!-- Formular: Child Data -->
-            <form wire:submit="save" class="space-y-4">
+            <form wire:submit="updateChild" class="space-y-4">
                 <!-- Personal Information Section -->
                 <div class="py-4">
                     <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
