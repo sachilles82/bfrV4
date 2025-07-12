@@ -7,7 +7,6 @@ use App\Livewire\Alem\Employee\Profile\Marital\Helper\ValidateMaritalData;
 use App\Models\Alem\Employee;
 use App\Models\User;
 use App\Traits\Employee\EmployeeDataEnums;
-use App\Traits\User\AuthUserTeamCompanyId;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -21,7 +20,6 @@ use Livewire\Component;
 class Status extends Component
 {
     use AuthorizesRequests;
-    use AuthUserTeamCompanyId;
     use ValidateMaritalData, HandleCatchError;
     use EmployeeDataEnums;
 
@@ -39,12 +37,9 @@ class Status extends Component
     /** Original Daten für Vergleiche */
     public array $originalData = [];
 
-    public function mount(int $userId, int $authUserId, int $currentTeamId, int $companyId): void
+    public function mount(int $userId): void
     {
         $this->userId = $userId;
-        $this->authUserId = $authUserId;
-        $this->currentTeamId = $currentTeamId;
-        $this->companyId = $companyId;
 
         $this->loadMaritalData();
     }

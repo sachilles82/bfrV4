@@ -1,75 +1,51 @@
 <?php
 
-namespace App\Livewire\Alem\Employee\Profile\Member\Helper;
+namespace App\Livewire\Alem\Employee\Profile\Personal\Helper;
 
 use App\Traits\Error\BaseHandleCatchError;
 
 /**
- * Spezifischer Error Handler für Member-bezogene Components
+ * Spezifischer Error Handler für Personal-bezogene Components
  */
 trait HandleCatchError
 {
     use BaseHandleCatchError;
 
     /**
-     * Behandelt Fehler beim Speichern/Editieren
+     * Behandelt Fehler beim Speichern von Personaldaten
      */
     private function handleEditingError(\Throwable $e): void
     {
-        $this->handleError($e, 'Mitglieder-Informationen');
+        $this->handleError($e, 'Personaldaten');
     }
 
     /**
-     * Behandelt Fehler beim Erstellen
-     */
-    private function handleSavingError(\Throwable $e): void
-    {
-        $this->handleError($e, 'Mitglieder-Informationen', [
-            'operation_type' => 'creating'
-        ]);
-    }
-
-    /**
-     * Behandelt Fehler beim Laden der Relationsdaten
-     */
-    private function handleLoadingError(\Throwable $e): void
-    {
-        $this->handleError($e, 'Relationsdaten', [
-            'operation_type' => 'loading'
-        ]);
-    }
-
-    /**
-     * Implementierung für Member Components
+     * Implementierung für Personal Components
      */
     protected function collectIdentificationData(): array
     {
         return [
             'bearbeiteter_user_id' => $this->userId ?? null,
+            'employee_id' => property_exists($this, 'employee') && $this->employee ? $this->employee->id : null,
         ];
     }
 
     /**
-     * Implementierung für Member Components
+     * Implementierung für Personal Components
      */
     protected function collectFormData(): array
     {
+        $knownPersonalFields = [
+            'birthdate', 'ahv_number', 'country_id',
+            'hometown', 'religion', 'residence_permit'
+        ];
+
         $formData = [];
 
-        // Skalare Felder
-        $scalarFields = ['status', 'department', 'profession', 'stage', 'supervisor'];
-        foreach ($scalarFields as $field) {
+        foreach ($knownPersonalFields as $field) {
             if (property_exists($this, $field)) {
                 $formData[$field] = $this->$field ?? null;
             }
-        }
-
-        // Array Felder
-        if (property_exists($this, 'selectedTeams')) {
-            $formData['selectedTeams'] = $this->selectedTeams ?? [];
-        }
-        if (property_exists($this, 'selectedRoles')) {
-            $formData['selectedRoles'] = $this->selectedRoles ?? [];
         }
 
         return $formData;
