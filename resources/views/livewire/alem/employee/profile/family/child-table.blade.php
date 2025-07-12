@@ -39,14 +39,20 @@
                             @forelse($children as $child)
 
                                 <livewire:alem.employee.profile.family.child-row
-                                    :child="$child"
-                                    :key="'child-' . $child->id . '-' . $refreshKey"
+                                    :key="$child->id"
+                                    :$child @deleted="delete({{ $child->id }})"
+                                />
 
-                                    @deleted="delete({{ $child->id }})"
+
+                                {{--                                <livewire:alem.employee.profile.family.child-row--}}
+{{--                                    :child="$child"--}}
+{{--                                    :key="'child-' . $child->id . '-' . $refreshKey"--}}
+
+{{--                                    @deleted="delete({{ $child->id }})"--}}
 
 {{--                                    :key="'child-row-' . $child->id . '-' . now()->timestamp"--}}
 
-                                />
+{{--                                />--}}
                             @empty
                                 <tr>
                                     <td colspan="7" class="px-6 py-12 text-center">
@@ -61,15 +67,6 @@
                                     </td>
                                 </tr>
                             @endforelse
-{{--                            @forelse($children as $child)--}}
-{{--                                <livewire:alem.employee.profile.family.child-row--}}
-{{--                                    :child="$child"--}}
-{{--                                    :key="'child-' . $child->id"--}}
-{{--                                    @deleted="delete({{ $child->id }})"--}}
-{{--                                />--}}
-{{--                            @empty--}}
-{{--                                --}}{{-- Empty state --}}
-{{--                            @endforelse--}}
 
                         </x-slot:body>
                     </x-pupi.table2.main>
@@ -87,26 +84,10 @@
 
             </x-pupi.table2.container>
 
-            <!-- Button Container -->
-            <x-pupi.button.container>
-                <flux:modal.trigger name="create-child">
-                    <flux:button
-                        variant="primary">
-                        {{ __('Add Child') }}
-                    </flux:button>
-                </flux:modal.trigger>
-            </x-pupi.button.container>
+            <livewire:alem.employee.profile.family.add-child-dialog
+                :user-id="$userId"
+                @added="$refresh" />
 
         </x-slot>
     </x-pupi.layout.form>
-
-    <!-- Create Modal wird NUR gerendert wenn Alpine Store es anzeigt -->
-    <livewire:alem.employee.profile.family.create-child
-        :user-id="$userId"
-        {{--        :auth-user-id="$authUserId"--}}
-        {{--        :current-team-id="$currentTeamId"--}}
-        {{--        :company-id="$companyId"--}}
-{{--        @child-created="$refresh"--}}
-    />
-
-</div>
+    </div>

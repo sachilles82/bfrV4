@@ -34,14 +34,12 @@
 
 
 
-                <div class="flex justify-center items-start pt-24 bg-slate-200 min-h-screen text-slate-800">
-                    <livewire:alem.employee.profile.family.show-child
-                        :user-id="$userId"
-                        :auth-user-id="$authUserId"
-                        :current-team-id="$currentTeamId"
-                        :company-id="$companyId"
-                    />
-                </div>
+                <livewire:alem.employee.profile.family.show-child
+                    :user-id="$userId"
+                    :auth-user-id="$authUserId"
+                    :current-team-id="$currentTeamId"
+                    :company-id="$companyId"
+                />
 
 
 

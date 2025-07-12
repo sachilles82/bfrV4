@@ -11,7 +11,7 @@
         </div>
 
         <!-- Formular: Child Data -->
-        <form wire:submit="saveChild" class="space-y-4">
+        <form wire:submit="add" class="space-y-4">
 
             <!-- Personal Information Section -->
             <div class="py-4">
@@ -24,12 +24,12 @@
                             for="gender"
                             badge="{{ __('Required') }}"
                             :error="$errors->first('gender')"
-                            model="gender"
+                            model="form.gender"
                             help-text="{{ __('') }}">
 
                             <flux:select
                                 class="mt-2"
-                                wire:model="gender"
+                                wire:model="form.gender"
                                 id="gender"
                                 variant="listbox"
                                 placeholder="{{ __('Select gender') }}">
@@ -55,10 +55,10 @@
                             badge="{{ __('Required') }}"
                             :error="$errors->first('name')"
                             help-text="{{ __('') }}"
-                            model="name">
+                            model="form.name">
 
                             <x-pupi.input.text
-                                wire:model="name"
+                                wire:model="form.name"
                                 id="name"
                                 required
                                 placeholder="{{ __('Your Child Name') }}"
@@ -73,12 +73,12 @@
                             label="{{ __('Birthdate') }}"
                             for="birthdate"
                             badge="{{ __('Required') }}"
-                            model="birthdate"
+                            model="form.birthdate"
                             :error="$errors->first('birthdate')"
                             help-text="{{ __('Child must be under 25 years old') }}">
 
                             <flux:input
-                                wire:model="birthdate"
+                                wire:model="form.birthdate"
                                 id="birthdate"
                                 required
                                 type="date"
@@ -98,10 +98,10 @@
                             badge="{{ __('Optional') }}"
                             :error="$errors->first('ahv_number')"
                             help-text="{{ __('Format: 756.xxxx.xxxx.xx') }}"
-                            model="ahv_number">
+                            model="form.ahv_number">
 
                             <x-pupi.input.text
-                                wire:model="ahv_number"
+                                wire:model="form.ahv_number"
                                 id="ahv_number"
                                 placeholder="756.1234.5678.90"
                                 x-mask="999.9999.9999.99"
@@ -116,12 +116,12 @@
                             label="{{ __('Valid Until') }}"
                             for="valid_until"
                             badge="{{ __('Optional') }}"
-                            model="valid_until"
+                            model="form.valid_until"
                             :error="$errors->first('valid_until')"
                             help-text="{{ __('Automatically set to 18th birthday if not specified') }}">
 
                             <flux:input
-                                wire:model="valid_until"
+                                wire:model="form.valid_until"
                                 id="valid_until"
                                 type="date"
                                 min="{{ now()->format('Y-m-d') }}"
