@@ -2,76 +2,59 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Marital\Helper;
 
-use Flux\Flux;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Traits\Error\BaseHandleCatchError;
 
 /**
- * Minimaler Trait für die Fehlerbehandlung beim Editieren
+ * Spezifischer Error Handler für Marital-bezogene Components
  */
 trait HandleCatchError
 {
+    use BaseHandleCatchError;
+
     /**
      * Behandelt Fehler beim Speichern/Editieren
      */
     private function handleEditingError(\Throwable $e): void
     {
-        // 1. Rollback der Datenbank-Transaktion
-        if (DB::transactionLevel() > 0) {
-            DB::rollBack();
-        }
+        $this->handleError($e, 'Ehestatus-Daten');
+    }
 
-        // 2. Finde heraus, welche Felder geändert wurden
-        $changedFields = [];
-        if (method_exists($this, 'getChangedFields')) {
-            try {
-                $changedFields = $this->getChangedFields();
-            } catch (\Throwable $ignored) {
-                $changedFields = ['Unbekannt'];
+    /**
+     * Alias für Konsistenz
+     */
+    private function handleSavingError(\Throwable $e): void
+    {
+        $this->handleEditingError($e);
+    }
+
+    /**
+     * Implementierung für Marital Components
+     */
+    protected function collectIdentificationData(): array
+    {
+        return [
+            'bearbeiteter_user_id' => $this->userId ?? null,
+        ];
+    }
+
+    /**
+     * Implementierung für Marital Components
+     */
+    protected function collectFormData(): array
+    {
+        $knownMaritalFields = [
+            'civil_status', 'name_partner', 'single_parent',
+            'birthdate_partner', 'ahv_partner', 'marriage_at'
+        ];
+
+        $formData = [];
+
+        foreach ($knownMaritalFields as $field) {
+            if (property_exists($this, $field)) {
+                $formData[$field] = $this->$field ?? null;
             }
         }
 
-        // 3. Logge den Fehler mit allen wichtigen Informationen
-        Log::error('Fehler beim Speichern der Ehestatus-Daten', [
-            // Der eigentliche Fehler
-            'error_message' => $e->getMessage(),
-            'error_file' => $e->getFile(),
-            'error_line' => $e->getLine(),
-
-            // Benutzer-Informationen
-            'bearbeiteter_user_id' => $this->userId,
-            'ausführender_user_id' => $this->authUserId ?? auth()->id(),
-            'team_id' => $this->currentTeamId ?? null,
-            'company_id' => $this->companyId ?? null,
-
-            // Welche Felder wurden geändert
-            'geänderte_felder' => $changedFields,
-
-            // Aktuelle Formular-Werte (falls Validierungsfehler)
-            'formular_daten' => [
-                'civil_status' => $this->civil_status ?? null,
-                'name_partner' => $this->name_partner ?? null,
-                'single_parent' => $this->single_parent ?? null,
-                'birthdate_partner' => $this->birthdate_partner ?? null,
-                'ahv_partner' => $this->ahv_partner ?? null,
-                'marriage_at' => $this->marriage_at ?? null,
-            ]
-        ]);
-
-        // 4. Zeige eine benutzerfreundliche Fehlermeldung
-        Flux::toast(
-            text: __('Error while saving marital status data. Please try again.'),
-            heading: __('Saving Error'),
-            variant: 'danger'
-        );
-
-        // Optional: In Development-Umgebung zeige mehr Details
-        if (config('app.debug')) {
-            Flux::toast(
-                text: 'Debug: ' . $e->getMessage(),
-                heading: 'Fehler-Details',
-                variant: 'warning'
-            );
-        }
+        return $formData;
     }
 }

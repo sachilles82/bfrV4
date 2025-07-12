@@ -2,77 +2,59 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Employment\Helper;
 
-use Flux\Flux;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Traits\Error\BaseHandleCatchError;
 
 /**
- * Minimaler Trait für die Fehlerbehandlung beim Editieren
+ * Spezifischer Error Handler für Employment-bezogene Components
  */
 trait HandleCatchError
 {
+    use BaseHandleCatchError;
+
     /**
      * Behandelt Fehler beim Speichern/Editieren
      */
     private function handleEditingError(\Throwable $e): void
     {
-        // 1. Rollback der Datenbank-Transaktion
-        if (DB::transactionLevel() > 0) {
-            DB::rollBack();
-        }
+        $this->handleError($e, 'Anstellungsdaten');
+    }
 
-        // 2. Finde heraus, welche Felder geändert wurden
-        $changedFields = [];
-        if (method_exists($this, 'getChangedFields')) {
-            try {
-                $changedFields = $this->getChangedFields();
-            } catch (\Throwable $ignored) {
-                $changedFields = ['Unbekannt'];
+    /**
+     * Alias für Konsistenz
+     */
+    private function handleSavingError(\Throwable $e): void
+    {
+        $this->handleEditingError($e);
+    }
+
+    /**
+     * Implementierung für Employment Components
+     */
+    protected function collectIdentificationData(): array
+    {
+        return [
+            'bearbeiteter_user_id' => $this->userId ?? null,
+        ];
+    }
+
+    /**
+     * Implementierung für Employment Components
+     */
+    protected function collectFormData(): array
+    {
+        $knownEmploymentFields = [
+            'joined_at', 'personal_number', 'prob_period',
+            'probation_at', 'notice_at', 'notice_period', 'leave_at'
+        ];
+
+        $formData = [];
+
+        foreach ($knownEmploymentFields as $field) {
+            if (property_exists($this, $field)) {
+                $formData[$field] = $this->$field ?? null;
             }
         }
 
-        // 3. Logge den Fehler mit allen wichtigen Informationen
-        Log::error('Fehler beim Speichern der Anstellungsdaten', [
-            // Der eigentliche Fehler
-            'error_message' => $e->getMessage(),
-            'error_file' => $e->getFile(),
-            'error_line' => $e->getLine(),
-
-            // Benutzer-Informationen
-            'bearbeiteter_user_id' => $this->userId,
-            'ausführender_user_id' => $this->authUserId ?? auth()->id(),
-            'team_id' => $this->currentTeamId ?? null,
-            'company_id' => $this->companyId ?? null,
-
-            // Welche Felder wurden geändert
-            'geänderte_felder' => $changedFields,
-
-            // Aktuelle Formular-Werte (falls Validierungsfehler)
-            'formular_daten' => [
-                'joined_at' => $this->joined_at ?? null,
-                'personal_number' => $this->personal_number ?? null,
-                'prob_period' => $this->prob_period ?? null,
-                'probation_at' => $this->probation_at ?? null,
-                'notice_at' => $this->notice_at ?? null,
-                'notice_period' => $this->notice_period ?? null,
-                'leave_at' => $this->leave_at ?? null,
-            ]
-        ]);
-
-        // 4. Zeige eine benutzerfreundliche Fehlermeldung
-        Flux::toast(
-            text: __('Fehler beim Speichern. Bitte versuchen Sie es erneut.'),
-            heading: __('Speicherfehler'),
-            variant: 'danger'
-        );
-
-        // Optional: In Development-Umgebung zeige mehr Details
-        if (config('app.debug')) {
-            Flux::toast(
-                text: 'Debug: ' . $e->getMessage(),
-                heading: 'Fehler-Details',
-                variant: 'warning'
-            );
-        }
+        return $formData;
     }
 }
