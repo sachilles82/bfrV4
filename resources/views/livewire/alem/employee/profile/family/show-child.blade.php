@@ -8,9 +8,8 @@
             {{ __('Update the children data') }}
         </x-slot:description>
 
-        <x-slot name="form">
-            <x-pupi.table2.container
-            >
+        <x-slot:form>
+            <x-pupi.table2.container>
                 <x-slot:table>
                     <x-pupi.table2.main>
                         <x-slot:head>
@@ -42,17 +41,6 @@
                                     :key="$child->id"
                                     :$child @deleted="delete({{ $child->id }})"
                                 />
-
-
-                                {{--                                <livewire:alem.employee.profile.family.child-row--}}
-                                {{--                                    :child="$child"--}}
-                                {{--                                    :key="'child-' . $child->id . '-' . $refreshKey"--}}
-
-                                {{--                                    @deleted="delete({{ $child->id }})"--}}
-
-                                {{--                                    :key="'child-row-' . $child->id . '-' . now()->timestamp"--}}
-
-                                {{--                                />--}}
                             @empty
                                 <tr>
                                     <td colspan="7" class="px-6 py-12 text-center">
@@ -86,8 +74,9 @@
 
             <livewire:alem.employee.profile.family.add-child-dialog
                 :user-id="$userId"
-                @added="$refresh" />
+                @added="$refresh"
+            />
 
-        </x-slot>
+        </x-slot:form>
     </x-pupi.layout.form>
 </div>

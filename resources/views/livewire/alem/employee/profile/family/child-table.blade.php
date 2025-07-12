@@ -42,17 +42,6 @@
                                     :key="$child->id"
                                     :$child @deleted="delete({{ $child->id }})"
                                 />
-
-
-                                {{--                                <livewire:alem.employee.profile.family.child-row--}}
-{{--                                    :child="$child"--}}
-{{--                                    :key="'child-' . $child->id . '-' . $refreshKey"--}}
-
-{{--                                    @deleted="delete({{ $child->id }})"--}}
-
-{{--                                    :key="'child-row-' . $child->id . '-' . now()->timestamp"--}}
-
-{{--                                />--}}
                             @empty
                                 <tr>
                                     <td colspan="7" class="px-6 py-12 text-center">
