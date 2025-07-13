@@ -8,6 +8,7 @@ use App\Models\Alem\Company;
 use App\Models\Alem\Employee;
 use App\Models\Alem\QuickCrud\Profession;
 use App\Models\Alem\QuickCrud\Stage;
+use App\Models\Alem\SOS;
 use App\Models\Spatie\Permission;
 use App\Models\Spatie\Role;
 use App\Policies\Address\AddressablePolicy;
@@ -16,6 +17,7 @@ use App\Policies\Alem\CompanyPolicy;
 use App\Policies\Alem\Employee\EmployeePolicy;
 use App\Policies\Alem\Employee\Setting\ProfessionPolicy;
 use App\Policies\Alem\Employee\Setting\StagePolicy;
+use App\Policies\Alem\SOSPolicy;
 use App\Policies\Spatie\PermissionPolicy;
 use App\Policies\Spatie\RolePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -40,6 +42,7 @@ class AuthServiceProvider extends ServiceProvider
         Employee::class => EmployeePolicy::class,
         Profession::class => ProfessionPolicy::class,
         Stage::class => StagePolicy::class,
+        SOS::class => SOSPolicy::class,
     ];
 
     /**

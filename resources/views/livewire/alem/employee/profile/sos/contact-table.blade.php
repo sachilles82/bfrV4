@@ -1,11 +1,11 @@
 <div>
     <x-pupi.layout.form>
         <x-slot:title>
-            {{ __('Children') }}
+            {{ __('SOS Emergency Contact') }}
         </x-slot:title>
 
         <x-slot:description>
-            {{ __('Update the children data') }}
+            {{ __('Update the emergency contact data') }}
         </x-slot:description>
 
         <x-slot:form>
@@ -20,26 +20,23 @@
                                 {{ __('Gender') }}
                             </x-pupi.table2.th.notsort>
                             <x-pupi.table2.th.notsort>
-                                {{ __('Birthdate') }}
+                                {{ __('Related') }}
                             </x-pupi.table2.th.notsort>
                             <x-pupi.table2.th.notsort>
-                                {{ __('Age') }}
+                                {{ __('Phone') }}
                             </x-pupi.table2.th.notsort>
                             <x-pupi.table2.th.notsort>
-                                {{ __('AHV Number') }}
-                            </x-pupi.table2.th.notsort>
-                            <x-pupi.table2.th.notsort>
-                                {{ __('Valid Until') }}
+                                {{ __('Email') }}
                             </x-pupi.table2.th.notsort>
                             <x-pupi.table2.th.actions/>
                         </x-slot:head>
 
                         <x-slot:body>
-                            @forelse($children as $child)
+                            @forelse($contacts as $contact)
 
-                                <livewire:alem.employee.profile.family.child-row
-                                    :key="$child->id"
-                                    :$child @deleted="delete({{ $child->id }})"
+                                <livewire:alem.employee.profile.sos.contact-row
+                                    :key="$contact->id"
+                                    :$contact @deleted="delete({{ $contact->id }})"
                                 />
                             @empty
                                 <tr>
@@ -50,7 +47,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                             </svg>
-                                            <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ __('No children registered yet.') }}</p>
+                                            <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">{{ __('No Emergency Contact registered yet.') }}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -61,7 +58,7 @@
                 </x-slot:table>
 
                 <x-slot:pagination>
-                    {{ $children->links() }}
+                    {{ $contacts->links() }}
                 </x-slot:pagination>
 
                 {{--                @if($children->hasMorePages() )--}}
@@ -72,7 +69,7 @@
 
             </x-pupi.table2.container>
 
-            <livewire:alem.employee.profile.family.add-child-dialog
+            <livewire:alem.employee.profile.sos.create-contact
                 :user-id="$userId"
                 @added="$refresh"
             />
