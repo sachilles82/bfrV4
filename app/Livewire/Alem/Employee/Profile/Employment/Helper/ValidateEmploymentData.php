@@ -272,34 +272,4 @@ trait ValidateEmploymentData
             $this->leaveAtHasChanged();
     }
 
-    /**
-     * Validiere einzelnes Feld on-the-fly (z.B. wire:blur)
-     */
-    public function validateField(string $fieldName): void
-    {
-        $fieldMapping = [
-            'joined_at' => 'joinedAtHasChanged',
-            'personal_number' => 'personalNumberHasChanged',
-            'prob_period' => 'probationEnumHasChanged',
-            'probation_at' => 'probationAtHasChanged',
-            'notice_at' => 'noticeAtHasChanged',
-            'notice_period' => 'noticeEnumHasChanged',
-            'leave_at' => 'leaveAtHasChanged',
-        ];
-
-        // Prüfe ob das Feld geändert wurde
-        if (isset($fieldMapping[$fieldName])) {
-            $method = $fieldMapping[$fieldName];
-            if (!$this->$method()) {
-                // Feld nicht geändert - keine Validierung
-                return;
-            }
-        }
-
-        // Hole nur die Regel für dieses Feld
-        $rules = $this->getChangedFieldRules();
-        if (isset($rules[$fieldName])) {
-            $this->validateOnly($fieldName, [$fieldName => $rules[$fieldName]]);
-        }
-    }
 }

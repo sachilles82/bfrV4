@@ -330,37 +330,6 @@ trait ValidateMemberInformation
     }
 
     /**
-     * Validiere einzelnes Feld on-the-fly (z.B. wire:blur)
-     */
-    public function validateField(string $fieldName): void
-    {
-        $fieldMapping = [
-            'selectedTeams' => 'teamsHaveChanged',
-            'selectedRoles' => 'rolesHaveChanged',
-            'department' => 'departmentHasChanged',
-            'profession' => 'professionHasChanged',
-            'stage' => 'stageHasChanged',
-            'supervisor' => 'supervisorHasChanged',
-            'status' => 'statusHasChanged',
-        ];
-
-        // Prüfe ob das Feld geändert wurde
-        if (isset($fieldMapping[$fieldName])) {
-            $method = $fieldMapping[$fieldName];
-            if (!$this->$method()) {
-                // Feld nicht geändert - keine Validierung
-                return;
-            }
-        }
-
-        // Hole nur die Regel für dieses Feld
-        $rules = $this->getChangedFieldRules();
-        if (isset($rules[$fieldName])) {
-            $this->validateOnly($fieldName, [$fieldName => $rules[$fieldName]]);
-        }
-    }
-
-    /**
      * Prüft ob irgendwelche Änderungen vorliegen
      */
     public function hasAnyChanges(): bool

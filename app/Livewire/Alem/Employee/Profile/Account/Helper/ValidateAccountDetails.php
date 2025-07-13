@@ -323,36 +323,6 @@ trait ValidateAccountDetails
     }
 
     /**
-     * Validiere einzelnes Feld on-the-fly (z.B. wire:blur)
-     */
-    public function validateField(string $fieldName): void
-    {
-        $fieldMapping = [
-            'gender' => 'genderHasChanged',
-            'name' => 'nameHasChanged',
-            'email' => 'emailHasChanged',
-            'phone_1' => 'phoneHasChanged',
-            'phone_2' => 'phone2HasChanged',
-            'model_status' => 'modelStatusHasChanged',
-        ];
-
-        // Prüfe ob das Feld geändert wurde
-        if (isset($fieldMapping[$fieldName])) {
-            $method = $fieldMapping[$fieldName];
-            if (!$this->$method()) {
-                // Feld nicht geändert - keine Validierung
-                return;
-            }
-        }
-
-        // Hole nur die Regel für dieses Feld
-        $rules = $this->getChangedFieldRules();
-        if (isset($rules[$fieldName])) {
-            $this->validateOnly($fieldName, [$fieldName => $rules[$fieldName]]);
-        }
-    }
-
-    /**
      * Sanitize phone number before saving
      */
     public function sanitizePhoneNumber(?string $phone): ?string
