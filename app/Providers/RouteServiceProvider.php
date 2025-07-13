@@ -23,13 +23,21 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Spezifisches Binding für Employee-Routes
+//        // Spezifisches Binding für Employee-Routes
+//        Route::bind('user', function (string $value) {
+//            return once(function () use ($value) {
+//                return User::where('url_slug', $value)
+//                    ->where('user_type', UserType::Employee)
+//                    ->firstOrFail();
+//            });
+//        });
+
         Route::bind('user', function (string $value) {
-            return once(function () use ($value) {
-                return User::where('url_slug', $value)
-                    ->where('user_type', UserType::Employee)
-                    ->firstOrFail();
-            });
+            return User::query()
+                ->where('url_slug', $value)
+                ->where('user_type', UserType::Employee)
+                ->select(['id', 'url_slug'])
+                ->firstOrFail();
         });
 
 //        // Standard User Binding (ohne UserType Filter)

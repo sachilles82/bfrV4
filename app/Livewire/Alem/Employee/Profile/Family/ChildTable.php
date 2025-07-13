@@ -59,6 +59,7 @@ class ChildTable extends Component
     public function render(): View
     {
         $children = Child::query()
+            ->where('user_id', $this->userId)
             ->select([
                 'id',
                 'name',
@@ -68,7 +69,6 @@ class ChildTable extends Component
                 'valid_until',
                 'user_id',
             ])
-            ->where('user_id', $this->userId)
             ->latest()
             ->simplePaginate($this->perPage);
 

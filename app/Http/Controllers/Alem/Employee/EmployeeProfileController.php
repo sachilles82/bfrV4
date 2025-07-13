@@ -10,15 +10,18 @@ class EmployeeProfileController extends Controller
 {
     public function show(User $user, string $activeTab = 'employee-update'): View
     {
-        $authUser = Auth::user();
+        $authData = Auth::check() ? [
+            'authUserId' => Auth::id(),
+            'currentTeamId' => Auth::user()->current_team_id,
+            'companyId' => Auth::user()->company_id,
+        ] : null;
 
-        // Nur ID und slug sind bereits geladen
+
         return view('laravel.alem.employee.show', [
             'userId' => $user->id,
+            'userSlug' => $user->url_slug, // Für Navigation
             'activeTab' => $activeTab,
-            'authUserId' => $authUser->id,
-            'currentTeamId' => $authUser->current_team_id,
-            'companyId' => $authUser->company_id,
+            ...$authData,
         ]);
     }
 }

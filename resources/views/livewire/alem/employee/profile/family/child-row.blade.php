@@ -35,7 +35,8 @@
                 <flux:separator class="my-1"/>
 
                 <flux:menu.item
-                    wire:click="$dispatch('deleted')"
+{{--                    wire:click="$dispatch('deleted')"--}}
+wire:click="deleteChild"
                     wire:confirm="{{ __('Are you sure you want to remove this child?') }}"
                     icon="trash"
                     variant="danger">

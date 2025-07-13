@@ -9,6 +9,7 @@
             <x-navigation.alem.employee.header
                 :user-id="$userId"
                 :activeTab="$activeTab"
+                :userSlug="$userSlug"
             />
         </x-slot:header>
 
@@ -16,26 +17,28 @@
         <div class="mt-6 space-y-10 divide-y dark:divide-white/5 divide-gray-900/5">
             @if($activeTab === 'employee-update')
 
-                {{--                <livewire:alem.employee.profile.account.details--}}
-                {{--                    :user-id="$userId"--}}
-                {{--                />--}}
-
-                <livewire:alem.employee.profile.sos.contact-table
-                    :user-id="$userId"
-                />
-
                 <livewire:alem.employee.profile.family.child-table
                     :user-id="$userId"
                 />
+
+{{--                                <livewire:alem.employee.profile.account.details--}}
+{{--                                    :user-id="$userId"--}}
+{{--                                />--}}
+
+{{--                <livewire:alem.employee.profile.sos.contact-table--}}
+{{--                    :user-id="$userId"--}}
+{{--                />--}}
+
+
 
 
                 {{--                <livewire:alem.employee.profile.marital.status--}}
                 {{--                    :user-id="$userId"--}}
                 {{--                />--}}
 
-                {{--                <livewire:alem.employee.profile.personal.personal-data--}}
-                {{--                    :user-id="$userId"--}}
-                {{--                />--}}
+{{--                                <livewire:alem.employee.profile.personal.personal-data--}}
+{{--                                    :user-id="$userId"--}}
+{{--                                />--}}
 
                 {{--                <livewire:alem.employee.profile.member.information--}}
                 {{--                    :user-id="$userId"--}}

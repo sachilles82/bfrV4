@@ -42,6 +42,11 @@
                                     :$child
                                     @deleted="delete({{ $child->id }})"
                                 />
+
+{{--                                <livewire:alem.employee.profile.family.child-row--}}
+{{--                                    :key="'child-'.$child->id"--}}
+{{--                                    :$child--}}
+{{--                                />--}}
                             @empty
                                 <tr>
                                     <td colspan="7" class="px-6 py-12 text-center">
