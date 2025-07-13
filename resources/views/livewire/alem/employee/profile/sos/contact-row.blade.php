@@ -1,18 +1,18 @@
 <x-pupi.table2.tr.body>
     <x-pupi.table2.tr.cell1>
-        {{ $contact->name }}
+        {{ $contact->name}}
     </x-pupi.table2.tr.cell1>
     <x-pupi.table2.tr.cell>
-        {{ __($contact->gender?->label() ?? '-') }}
+        {{ $contact->gender ? __($contact->gender->label()) : '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $contact->related ?? '-' }}
+        {{ $contact->related ?: '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $contact->phone ?? '-' }}
+        {{ $contact->phone}}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $contact->email ?? '-' }}
+        {{ $contact->email ?: '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.action>
         <flux:dropdown align="end" offset="-15">

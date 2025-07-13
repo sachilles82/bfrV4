@@ -2,11 +2,9 @@
 
 namespace App\Models\Alem;
 
-use App\Enums\Model\ModelStatus;
 use App\Enums\User\Gender;
 use App\Models\User;
 use App\Traits\Cache\AdvancedCache;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

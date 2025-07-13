@@ -19,10 +19,10 @@ return new class extends Migration
 
             // Kind-spezifische Daten
             $table->string('name');
-            $table->string('gender')->default(Gender::Male)->nullable();
+            $table->string('gender')->default(Gender::Male);
             $table->date('birthdate');
             $table->string('ahv_number', 16)->nullable();
-            $table->date('valid_until')->nullable(); // Bis wann Kindergeld bezogen wird
+            $table->date('valid_until');
 
             $table->timestamps();
 

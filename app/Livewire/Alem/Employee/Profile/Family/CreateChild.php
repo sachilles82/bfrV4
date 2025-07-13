@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Family;
 
+use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Profile\Family\Helper\HandleCatchError;
-use App\Livewire\Alem\Employee\Profile\Family\Helper\ValidateChild;
+use App\Livewire\Alem\Employee\Profile\Family\Helper\ValidateCreateChild;
 use App\Models\Alem\Child;
 use App\Traits\Enum\GenderOptions;
 use Carbon\Carbon;
@@ -17,7 +18,7 @@ use Livewire\Component;
 class CreateChild extends Component
 {
     use AuthorizesRequests;
-    use ValidateChild, HandleCatchError;
+    use ValidateCreateChild, HandleCatchError;
     use GenderOptions;
 
     // Parent User ID
@@ -29,11 +30,11 @@ class CreateChild extends Component
     public ?string $gender = null;
     public ?string $birthdate = null;
     public ?string $ahv_number = null;
-    public ?string $valid_until = null;
 
     public function mount(int $userId): void
     {
         $this->userId = $userId;
+        $this->gender = Gender::Male->value;
     }
 
     /**
@@ -42,25 +43,32 @@ class CreateChild extends Component
     public function add(): void
     {
         try {
-            DB::transaction(function () {
-                // Berechne valid_until wenn birthdate gesetzt ist
-                if ($this->birthdate && !$this->valid_until) {
-                    $birthdate = Carbon::parse($this->birthdate);
-                    $this->valid_until = $birthdate->copy()->addYears(18)->format('Y-m-d');
-                }
+            // Validiere required Felder und gefüllte nullable Felder
+            $this->validateRequiredAndFilled();
 
-                Child::create([
+            DB::transaction(function () {
+                // Bereite alle Daten einmal vor - vermeidet mehrfache Property-Zugriffe
+                $birthdate = Carbon::parse($this->birthdate);
+
+                $data = [
                     'user_id' => $this->userId,
                     'name' => $this->name,
                     'gender' => $this->gender,
                     'birthdate' => $this->birthdate,
-                    'ahv_number' => $this->ahv_number,
-                    'valid_until' => $this->valid_until,
-                ]);
+                    'valid_until' => $birthdate->copy()->addYears(18)->format('Y-m-d'),
+                ];
+
+                // Füge nullable Felder nur hinzu wenn gefüllt
+                if (filled($this->ahv_number)) {
+                    $data['ahv_number'] = $this->ahv_number;
+                }
+
+                // Erstelle Child
+                Child::create($data);
             });
 
+            // Dispatch events und UI updates außerhalb der Transaktion
             $this->dispatch('added');
-
             $this->closeCreateChildModal();
 
             Flux::toast(
@@ -82,8 +90,8 @@ class CreateChild extends Component
         $this->modal('create-child')->close();
 
         $this->js("
-        setTimeout(() => {
-              \$wire.resetFormInputs();
+            setTimeout(() => {
+                \$wire.resetFormInputs();
             }, 1);
         ");
     }
@@ -91,10 +99,9 @@ class CreateChild extends Component
     public function resetFormInputs(): void
     {
         $this->resetErrorBag();
-        $this->reset([
-            'name', 'gender', 'birthdate',
-            'ahv_number', 'valid_until'
-        ]);
+        $this->reset(['name', 'birthdate', 'ahv_number']);
+        // Gender direkt setzen statt reset + neu setzen
+        $this->gender = Gender::Male->value;
     }
 
     public function render(): View

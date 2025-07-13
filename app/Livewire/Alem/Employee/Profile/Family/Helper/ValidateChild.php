@@ -35,7 +35,10 @@ trait ValidateChild
                 'string',
                 'min:2',
                 'max:100',
-                'regex:/^[a-zA-ZäöüÄÖÜéèêëàâîïôùûçÇ\s\-\'\.]+$/u'
+                'regex:/^[a-zA-ZäöüÄÖÜéèêëàâîïôùûçÇßñÑ\s\-\'\.]+$/u',
+                'not_regex:/\d/',
+                'not_regex:/[!@#$%^&*()_+=\[\]{};:"\\|,<>\/?]/',
+                'not_regex:/\s{2,}/', // Keine mehrfachen Leerzeichen
             ];
         }
 
@@ -68,7 +71,7 @@ trait ValidateChild
         // Valid Until
         if ($this->validUntilHasChanged()) {
             $rules['valid_until'] = [
-                'nullable',
+                'required',
                 'date',
                 'date_format:Y-m-d',
                 'after:today'
@@ -106,7 +109,7 @@ trait ValidateChild
                 'regex:/^756\.\d{4}\.\d{4}\.\d{2}$/'
             ],
             'valid_until' => [
-                'nullable',
+                'required',
                 'date',
                 'date_format:Y-m-d',
                 'after:today'
@@ -136,6 +139,7 @@ trait ValidateChild
             'ahv_number.regex' => __('Invalid AHV number format. Example: 756.1234.5678.90'),
 
             'valid_until.after' => __('The validity date must be in the future.'),
+            'valid_until.required' => __('The validity date is required.'),
         ];
     }
 

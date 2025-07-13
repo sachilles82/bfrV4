@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Alem\Employee\Profile\Sos;
 
+use App\Enums\User\Gender;
 use App\Livewire\Alem\Employee\Profile\Sos\Helper\HandleCatchError;
 use App\Livewire\Alem\Employee\Profile\Sos\Helper\ValidateContact;
 use App\Models\Alem\SOS;
@@ -33,6 +34,7 @@ class CreateContact extends Component
     public function mount(int $userId): void
     {
         $this->userId = $userId;
+        $this->gender = Gender::Male->value; //
     }
 
     /**

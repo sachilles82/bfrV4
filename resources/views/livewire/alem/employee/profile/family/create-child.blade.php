@@ -70,7 +70,7 @@
                             <x-pupi.input.text
                                 wire:model="name"
                                 id="name"
-                                required
+                                autofocus
                                 placeholder="{{ __('Your Child Name') }}"
                             />
 
@@ -90,7 +90,6 @@
                             <flux:input
                                 wire:model="birthdate"
                                 id="birthdate"
-                                required
                                 type="date"
                                 max="{{ now()->format('Y-m-d') }}"
                                 min="{{ now()->subYears(25)->format('Y-m-d') }}"
@@ -120,28 +119,6 @@
 
                         </x-pupi.input.group>
                     </div>
-
-                    <!-- Valid Until -->
-                    <div class="sm:col-span-3">
-                        <x-pupi.input.group
-                            label="{{ __('Valid Until') }}"
-                            for="valid_until"
-                            badge="{{ __('Optional') }}"
-                            model="valid_until"
-                            :error="$errors->first('valid_until')"
-                            help-text="{{ __('Automatically set to 18th birthday if not specified') }}">
-
-                            <flux:input
-                                wire:model="valid_until"
-                                id="valid_until"
-                                type="date"
-                                min="{{ now()->format('Y-m-d') }}"
-                                class="mt-2"
-                            />
-
-                        </x-pupi.input.group>
-                    </div>
-
                 </div>
             </div>
 

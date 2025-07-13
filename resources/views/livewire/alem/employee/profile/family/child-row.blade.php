@@ -3,16 +3,16 @@
         {{ $child->name }}
     </x-pupi.table2.tr.cell1>
     <x-pupi.table2.tr.cell>
-        {{ __($child->gender?->label() ?? '-') }}
+        {{ $child->gender ? __($child->gender->label()) : '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $child->birthdate?->format('d.m.Y') ?? '-' }}
+        {{ $child->birthdate?->format('d.m.Y') }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
         {{ $child->age }} {{ __('years') }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $child->ahv_number ?? '-' }}
+        {{ $child->ahv_number ?: '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
         {{ $child->valid_until->format('d.m.Y') }}
@@ -68,7 +68,7 @@
                             <x-pupi.input.group
                                 label="{{ __('Gender') }}"
                                 for="gender"
-                                badge="{{ __('Required') }}"
+                                badge="{{ __('Optional') }}"
                                 :error="$errors->first('gender')"
                                 model="gender"
                                 help-text="{{ __('') }}">
@@ -143,7 +143,7 @@
                                 label="{{ __('AHV Number') }}"
                                 for="ahv_number"
                                 model="ahv_number"
-                                badge="{{ __('Required') }}"
+                                badge="{{ __('Optional') }}"
                                 error="{{ $errors->first('ahv_number') }}">
 
                                 <x-pupi.input.text
@@ -162,7 +162,7 @@
                             <x-pupi.input.group
                                 label="{{ __('Valid Until') }}"
                                 for="valid_until"
-                                badge="{{ __('Optional') }}"
+                                badge="{{ __('Required') }}"
                                 :error="$errors->first('valid_until')"
                                 help-text="{{ __('Automatically set to 18th birthday if not specified') }}">
 
