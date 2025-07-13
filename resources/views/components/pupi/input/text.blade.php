@@ -2,6 +2,18 @@
     'type' => 'text', // Default ist text, kann aber 'email', 'phone', etc. sein
 ])
 
+@aware(['badge' => false])
+
+@php
+    // Prüfe ob required basierend auf dem parent component's badge
+    $isRequired = $badge === __('Required');
+
+    // Merge required attribute wenn nötig
+    if ($isRequired && !$attributes->has('required')) {
+        $attributes = $attributes->merge(['required' => true]);
+    }
+@endphp
+
 @if($type === 'email')
     <div class="mt-2 grid grid-cols-1">
         <input {{ $attributes->merge([

@@ -46,12 +46,12 @@ trait ValidateContact
 
         // Gender
         if ($this->genderHasChanged()) {
-            $rules['gender'] = ['required', Rule::enum(Gender::class)];
+            $rules['gender'] = ['nullable', Rule::enum(Gender::class)];
         }
 
         if ($this->relatedHasChanged()) {
             $rules['related'] = [
-                'required',
+                'nullable',
                 'string',
                 'min:2',
                 'max:255',
@@ -65,7 +65,7 @@ trait ValidateContact
         // Email - Erweiterte Validierung
         if ($this->emailHasChanged()) {
             $emailRule = [
-                'required',
+                'nullable',
                 'string',
                 'email:rfc,dns,spoof,filter',
                 'max:255',
@@ -87,7 +87,7 @@ trait ValidateContact
         // Phone 1 - Starke Validierung
         if ($this->phoneHasChanged()) {
             $rules['phone'] = [
-                'nullable',
+                'required',
                 'string',
                 'min:10',
                 'max:20',
@@ -111,7 +111,7 @@ trait ValidateContact
     public function rules(): array
     {
         $emailRule = [
-            'required',
+            'nullable',
             'string',
             'email:rfc,dns,spoof,filter',
             'max:255',
@@ -128,7 +128,7 @@ trait ValidateContact
         }
 
         return [
-            'gender' => ['required', Rule::enum(Gender::class)],
+            'gender' => ['nullable', Rule::enum(Gender::class)],
             'name' => [
                 'required',
                 'string',
@@ -140,7 +140,7 @@ trait ValidateContact
                 'not_regex:/\s{2,}/',
             ],
             'related' => [
-                'required',
+                'nullable',
                 'string',
                 'min:2',
                 'max:255',
@@ -151,7 +151,7 @@ trait ValidateContact
             ],
             'email' => $emailRule,
             'phone' => [
-                'nullable',
+                'required',
                 'string',
                 'min:10',
                 'max:20',
@@ -176,7 +176,6 @@ trait ValidateContact
             'name.not_regex' => __('Employee name contains invalid characters or formatting.'),
 
             // Related
-            'related.required' => __('Related person\'s name is required.'),
             'related.string' => __('Related person\'s name must be a string.'),
             'related.min' => __('Related person\'s name must be at least 2 characters.'),
             'related.max' => __('Related person\'s name must not exceed 255 characters.'),
@@ -184,11 +183,9 @@ trait ValidateContact
             'related.not_regex' => __('Related person\'s name contains invalid characters or formatting.'),
 
             // Gender
-            'gender.required' => __('Gender is required.'),
             'gender.enum' => __('The selected gender is invalid.'),
 
             // Email
-            'email.required' => __('Email address is required.'),
             'email.string' => __('Email must be a string.'),
             'email.email' => __('Please provide a valid email address.'),
             'email.max' => __('Email address must not exceed 255 characters.'),
@@ -198,6 +195,7 @@ trait ValidateContact
             'email.not_regex' => __('Email address contains invalid formatting.'),
 
             // Phone
+            'phone.required' => __('Phone number is required.'),
             'phone.string' => __('Phone number must be a string.'),
             'phone.min' => __('Phone number must be at least 10 characters long.'),
             'phone.max' => __('Phone number must not exceed 20 characters.'),

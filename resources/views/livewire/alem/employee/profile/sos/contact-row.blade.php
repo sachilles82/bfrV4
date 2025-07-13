@@ -64,7 +64,7 @@
                             <x-pupi.input.group
                                 label="{{ __('Gender') }}"
                                 for="gender"
-                                badge="{{ __('Required') }}"
+                                badge="{{ __('Optional') }}"
                                 :error="$errors->first('gender')"
                                 model="gender"
                                 help-text="{{ __('') }}">
@@ -115,7 +115,7 @@
                             <x-pupi.input.group
                                 label="{{ __('Relationship') }}"
                                 for="related"
-                                badge="{{ __('Required') }}"
+                                badge="{{ __('Optional') }}"
                                 model="related"
                                 :error="$errors->first('related')"
                                 help-text="{{ __('e.g. Spouse, Parent, Sibling') }}">
@@ -136,7 +136,7 @@
                                 label="{{ __('Phone Number') }}"
                                 for="phone"
                                 model="phone"
-                                badge="{{ __('Optional') }}"
+                                badge="{{ __('Required') }}"
                                 error="{{ $errors->first('phone') }}">
 
                                 <x-pupi.input.text
@@ -154,7 +154,7 @@
                             <x-pupi.input.group
                                 label="{{ __('Email Address') }}"
                                 for="email"
-                                badge="{{ __('Required') }}"
+                                badge="{{ __('Optional') }}"
                                 :error="$errors->first('email')"
                                 help-text="{{ __('Valid email address for emergency contact') }}">
 

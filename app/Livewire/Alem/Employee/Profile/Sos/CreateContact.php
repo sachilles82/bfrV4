@@ -47,7 +47,7 @@ class CreateContact extends Component
                 SOS::create([
                     'user_id' => $this->userId,
                     'name' => $this->name,
-                    'gender' => $this->gender ?: null,
+                    'gender' => $this->gender,
                     'related' => $this->related,
                     'phone' => $this->sanitizePhoneNumber($this->phone),
                     'email' => $this->email,

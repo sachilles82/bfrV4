@@ -52,10 +52,10 @@ class CreateChild extends Component
                 Child::create([
                     'user_id' => $this->userId,
                     'name' => $this->name,
-                    'gender' => $this->gender ?: null,
-                    'birthdate' => $this->birthdate ?: null,
-                    'ahv_number' => $this->ahv_number ?: null,
-                    'valid_until' => $this->valid_until ?: null,
+                    'gender' => $this->gender,
+                    'birthdate' => $this->birthdate,
+                    'ahv_number' => $this->ahv_number,
+                    'valid_until' => $this->valid_until,
                 ]);
             });
 

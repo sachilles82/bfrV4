@@ -18,9 +18,9 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
             $table->string('gender')->default(Gender::Male)->nullable();
-            $table->string('related');
+            $table->string('related')->nullable();
             $table->string('phone');
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
 
             $table->timestamps();
         });
