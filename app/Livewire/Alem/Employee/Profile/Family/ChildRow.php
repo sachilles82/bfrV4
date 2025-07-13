@@ -166,6 +166,36 @@ class ChildRow extends Component
     }
 
     /**
+     * Löscht das Child - mit Sicherheitsprüfung
+     */
+    public function deleteChild(): void
+    {
+        try {
+            // Sichere Löschung mit WHERE Conditions
+            $deleted = Child::where('id', $this->childId)
+                ->where('user_id', $this->userId)
+                ->delete();
+
+            if ($deleted) {
+                // Dispatch event zur ChildTable
+                $this->dispatch('child-deleted')->to('alem.employee.profile.family.child-table');
+
+                Flux::toast(
+                    text: __('Child removed successfully.'),
+                    heading: __('Success'),
+                    variant: 'success'
+                );
+            }
+        } catch (\Throwable $e) {
+            Flux::toast(
+                text: __('Error deleting child.'),
+                heading: __('Error'),
+                variant: 'danger'
+            );
+        }
+    }
+
+    /**
      * Schließt das Modal und bereinigt alle Daten
      */
     public function closeEditChildModal(): void
@@ -183,6 +213,9 @@ class ChildRow extends Component
     public function resetFormInputs(): void
     {
         $this->resetErrorBag();
+
+        // Clear Computed Property Cache
+        unset($this->child);
     }
 
     public function render(): View

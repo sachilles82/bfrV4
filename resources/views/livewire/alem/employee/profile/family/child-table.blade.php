@@ -39,7 +39,8 @@
 
                                 <livewire:alem.employee.profile.family.child-row
                                     :key="$child->id"
-                                    :$child @deleted="delete({{ $child->id }})"
+                                    :$child
+                                    @deleted="delete({{ $child->id }})"
                                 />
                             @empty
                                 <tr>
