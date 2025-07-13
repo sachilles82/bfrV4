@@ -1,21 +1,21 @@
 <x-pupi.table2.tr.body>
     <x-pupi.table2.tr.cell1>
-        {{ $child->name }}
+        {{ $this->child->name }}
     </x-pupi.table2.tr.cell1>
     <x-pupi.table2.tr.cell>
-        {{ $child->gender ? __($child->gender->label()) : '-' }}
+        {{ $this->child->gender ? __($this->child->gender->label()) : '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $child->birthdate?->format('d.m.Y') }}
+        {{ $this->child->birthdate?->format('d.m.Y') }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $child->age }} {{ __('years') }}
+        {{ $this->child->age }} {{ __('years') }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $child->ahv_number ?: '-' }}
+        {{ $this->child->ahv_number ?: '-' }}
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.cell>
-        {{ $child->valid_until->format('d.m.Y') }}
+        {{ $this->child->valid_until->format('d.m.Y') }}
         <span class="text-green-600 dark:text-green-400">✓</span>
     </x-pupi.table2.tr.cell>
     <x-pupi.table2.tr.action>
@@ -25,7 +25,7 @@
                          variant="ghost" inset="top bottom"/>
 
             <flux:menu class="min-w-32">
-                <flux:modal.trigger name="edit-child-{{ $child->id }}">
+                <flux:modal.trigger name="edit-child-{{ $this->child->id }}">
                     <flux:menu.item
                         icon="pencil">
                         {{ __('Edit') }}
@@ -48,7 +48,7 @@
 
     <td class="hidden sm:table-cell">
         <flux:modal
-            name="edit-child-{{ $child->id }}"
+            name="edit-child-{{ $this->child->id }}"
             variant="flyout"
             position="left"
             class="space-y-6 lg:min-w-3xl">

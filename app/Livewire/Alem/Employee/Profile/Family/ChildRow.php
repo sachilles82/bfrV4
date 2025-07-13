@@ -10,6 +10,8 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class ChildRow extends Component
@@ -18,7 +20,12 @@ class ChildRow extends Component
     use ValidateChild, HandleCatchError;
     use GenderOptions;
 
-    public Child $child;
+    // Geschützte IDs - können nicht vom Frontend manipuliert werden
+    #[Locked]
+    public int $childId;
+
+    #[Locked]
+    public int $userId;
 
     // Form fields
     public $name = null;
@@ -30,20 +37,40 @@ class ChildRow extends Component
     /** Original Daten des Child aus der Datenbank für Vergleiche */
     public array $originalData = [];
 
-    public function mount(): void
+    public function mount(Child $child): void
     {
+        // Speichere nur die IDs, nicht das ganze Model
+        $this->childId = $child->id;
+        $this->userId = $child->user_id;
+
         $this->initializeFormData();
+    }
+
+    /**
+     * Child als Computed Property
+     * Wird immer fresh aus der DB geladen und gecached
+     * Stellt sicher, dass das Child zum User gehört
+     */
+    #[Computed]
+    public function child(): Child
+    {
+        return Child::where('id', $this->childId)
+            ->where('user_id', $this->userId)
+            ->firstOrFail();
     }
 
     protected function initializeFormData(): void
     {
+        // Hole das Child über die sichere Computed Property
+        $child = $this->child;
+
         // WICHTIG: Speichere Original-Daten für Vergleich - KEINE empty strings, nur null
         $this->originalData = [
-            'name' => $this->child->name,
-            'gender' => $this->child->gender?->value,
-            'birthdate' => $this->child->birthdate?->format('Y-m-d'),
-            'ahv_number' => $this->child->ahv_number,
-            'valid_until' => $this->child->valid_until?->format('Y-m-d'),
+            'name' => $child->name,
+            'gender' => $child->gender?->value,
+            'birthdate' => $child->birthdate?->format('Y-m-d'),
+            'ahv_number' => $child->ahv_number,
+            'valid_until' => $child->valid_until?->format('Y-m-d'),
         ];
 
         // Setze Form-Felder NUR mit den originalData Werten
@@ -106,7 +133,9 @@ class ChildRow extends Component
             $this->updateOriginalDataAfterSave();
 
             // Refresh das Model
-            $this->child->refresh();
+//            $this->child->refresh();
+
+            unset($this->child);
 
             $this->closeEditChildModal();
 
