@@ -125,15 +125,15 @@ class ChildTable extends Component
 
                 // Eigentliche Löschung
                 $child->delete();
+
+                Flux::toast(
+                    text: __('Child :name removed successfully.', ['name' => $childName]),
+                    heading: __('Success'),
+                    variant: 'success'
+                );
             }); // Ende der Transaction - Lock wird automatisch freigegeben
 
             $this->resetPage();
-
-            Flux::toast(
-                text: __('Child :name removed successfully.', ['name' => $childName ?? 'Unknown']),
-                heading: __('Success'),
-                variant: 'success'
-            );
 
         } catch (ModelNotFoundException $e) {
             // ✅ Security Logging bei verdächtigen Aktivitäten
