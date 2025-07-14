@@ -39,13 +39,5 @@ class RouteServiceProvider extends ServiceProvider
                 ->select(['id', 'url_slug'])
                 ->firstOrFail();
         });
-
-//        // Standard User Binding (ohne UserType Filter)
-//        Route::bind('user', function (string $value) {
-//            return once(function () use ($value) {
-//                return User::where('url_slug', $value)
-//                    ->firstOrFail();
-//            });
-//        });
     }
 }

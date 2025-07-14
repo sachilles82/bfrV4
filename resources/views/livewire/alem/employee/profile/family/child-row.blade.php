@@ -35,8 +35,7 @@
                 <flux:separator class="my-1"/>
 
                 <flux:menu.item
-{{--                    wire:click="$dispatch('deleted')"--}}
-wire:click="deleteChild"
+                    wire:click="$dispatch('deleted')"
                     wire:confirm="{{ __('Are you sure you want to remove this child?') }}"
                     icon="trash"
                     variant="danger">
@@ -131,7 +130,7 @@ wire:click="deleteChild"
                                     id="birthdate"
                                     class="mt-2">
                                     <x-slot name="trigger">
-                                        <flux:date-picker.input />
+                                        <flux:date-picker.input/>
                                     </x-slot>
                                 </flux:date-picker>
 
@@ -172,7 +171,7 @@ wire:click="deleteChild"
                                     id="valid_until"
                                     class="mt-2">
                                     <x-slot name="trigger">
-                                        <flux:date-picker.input />
+                                        <flux:date-picker.input/>
                                     </x-slot>
                                 </flux:date-picker>
 
