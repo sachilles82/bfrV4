@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan boost:claude-code:*)",
+      "Bash(php.exe artisan:*)",
+      "Bash(herd which:*)",
+      "Bash(\"C:\\Users\\App4Media GmbH\\.config\\herd\\bin\\php84\\php.exe\" artisan boost:claude-code)",
+      "Bash(\"C:\\Users\\App4Media GmbH\\.config\\herd\\bin\\php84\\php.exe\" artisan boost:install)"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": [
+      "C:\\Users\\App4Media GmbH\\.config\\herd\\bin"
+    ]
+  }
+}
