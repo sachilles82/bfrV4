@@ -5,12 +5,17 @@
       "Bash(php.exe artisan:*)",
       "Bash(herd which:*)",
       "Bash(\"C:\\Users\\App4Media GmbH\\.config\\herd\\bin\\php84\\php.exe\" artisan boost:claude-code)",
-      "Bash(\"C:\\Users\\App4Media GmbH\\.config\\herd\\bin\\php84\\php.exe\" artisan boost:install)"
+      "Bash(\"C:\\Users\\App4Media GmbH\\.config\\herd\\bin\\php84\\php.exe\" artisan boost:install)",
+      "mcp__laravel-boost__application-info"
     ],
     "deny": [],
     "ask": [],
     "additionalDirectories": [
       "C:\\Users\\App4Media GmbH\\.config\\herd\\bin"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
 }
