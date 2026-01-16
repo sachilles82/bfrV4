@@ -667,7 +667,7 @@ class TestDataSeeder extends Seeder
             $roleId = $this->assignRole($managersCreated, $managerCount, $roles['Manager'], $nonManagerRoleIds);
             $roleAssignments[] = [
                 'role_id' => $roleId,
-                'model_type' => 'App\\Models\\User',
+                'model_type' => \App\Models\User::class,
                 'model_id' => $userId,
             ];
 

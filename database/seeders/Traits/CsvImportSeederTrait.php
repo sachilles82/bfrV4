@@ -151,7 +151,7 @@ trait CsvImportSeederTrait
 
             fputcsv($rolesHandle, [
                 $roleId,                                          // role_id
-                'App\\Models\\User',                              // model_type
+                \App\Models\User::class,                              // model_type
                 $userId,                                          // model_id
             ]);
 

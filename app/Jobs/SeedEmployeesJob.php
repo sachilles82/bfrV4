@@ -130,7 +130,7 @@ class SeedEmployeesJob implements ShouldQueue
 
             $roleData[] = [
                 'role_id' => $roleId,
-                'model_type' => 'App\\Models\\User',
+                'model_type' => \App\Models\User::class,
                 'model_id' => $userId,
             ];
 
